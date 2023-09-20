@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/util/src/SnTsTypeGenerator/SnTsTypeGenerator.csproj",
+                "${workspaceFolder}/util/src/usms-global.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/util/src/SnTsTypeGenerator/SnTsTypeGenerator.csproj",
+                "${workspaceFolder}/util/src/usms-global.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

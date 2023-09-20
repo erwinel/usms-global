@@ -11,8 +11,6 @@ public class GlideType
 {
     private readonly object _syncRoot = new();
 
-    internal const string COLNAME_SysID = "sys_id";
-
     private string _sysID = string.Empty;
 
     [NotNull]
@@ -23,8 +21,6 @@ public class GlideType
         set => _sysID = value ?? string.Empty;
     }
 
-    internal const string COLNAME_Name = "name";
-
     private string _name = string.Empty;
 
     [Key]
@@ -34,8 +30,6 @@ public class GlideType
         get => _name;
         set => _name = value ?? string.Empty;
     }
-
-    internal const string COLNAME_Label = "label";
 
     private string _label = string.Empty;
 
