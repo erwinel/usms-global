@@ -3,14 +3,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace SnTsTypeGenerator;
 
 [Table(nameof(SysScope))]
 public class SysScope
 {
-    internal const string COLNAME_Value = "scope";
-
     private string _value = string.Empty;
 
     [Key]
@@ -20,8 +19,6 @@ public class SysScope
         get => _value;
         set => _value = value ?? string.Empty;
     }
-
-    internal const string COLNAME_Name = "name";
 
     private string _name = string.Empty;
 
@@ -34,8 +31,6 @@ public class SysScope
     }
 
     public string? ShortDescription { get; set; }
-
-    internal const string COLNAME_SysID = "sys_id";
 
     private string _sysID = string.Empty;
 
@@ -64,6 +59,11 @@ public class SysScope
     [NotNull]
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
+
+    internal static SysScope? FromElement(JsonElement element)
+    {
+        throw new NotImplementedException();
+    }
 
     internal static void OnBuildEntity(EntityTypeBuilder<SysScope> builder)
     {

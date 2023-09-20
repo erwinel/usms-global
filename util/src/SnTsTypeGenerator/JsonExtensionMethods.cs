@@ -1,38 +1,95 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Mime;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
 public static class JsonExtensionMethods
 {
-    public static async Task<(JsonDocument? Document, string? Content)> GetJsonDocumentAsync(this HttpResponseMessage response, ILogger logger, CancellationToken cancellationToken)
+    public static Uri ToApiUri(this Uri baseUri, string tableName, string element, string value)
     {
-        try { response.EnsureSuccessStatusCode(); }
-        catch (HttpRequestException exception)
+        value = Uri.EscapeDataString($"{element}={value}");
+        return new UriBuilder(baseUri)
         {
-            logger.LogHttpRequestFailedError(response.RequestMessage!.RequestUri!, exception);
-            return (null, null);
-        }
+            Path = $"{URI_PATH_API}/{tableName}",
+            Query = $"sysparm_query={value}",
+            Fragment = null
+        }.Uri;
+    }
+
+    public static async Task<T?> GetLinkedObjectAsync<T>(this HttpClientHandler clientHandler, JsonElement element, string name, Func<string, Task<T?>> lookupFunc, Func<JsonElement, Task<T?>> createFunc, ILogger logger, CancellationToken cancellationToken) where T : class
+    {
+        if (!element.TryGetProperty(name, out JsonElement linkElement) || linkElement.ValueKind != JsonValueKind.Object)
+            return null;
+        string? link;
+        T? result;
+        Uri? uri;
         string responseBody;
-        try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
-        catch (Exception exception)
+        if (linkElement.TryGetNonEmptyString(JSON_KEY_VALUE, out string? value))
         {
-            logger.LogGetResponseContentFailedError(response.RequestMessage!.RequestUri!, exception);
-            return (null, null);
+            if ((result = await lookupFunc(value)) is not null)
+                return result;
+            if (!(linkElement.TryGetNonEmptyString(JSON_KEY_LINK, out link) && Uri.TryCreate(link, UriKind.Absolute, out uri)))
+                return null;
+            using HttpClient client = new(clientHandler);
+            HttpRequestMessage msg = new(HttpMethod.Get, uri);
+            msg.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+            using HttpResponseMessage response = await client.SendAsync(msg, cancellationToken);
+            try { response.EnsureSuccessStatusCode(); }
+            catch (HttpRequestException exception)
+            {
+                logger.LogHttpRequestFailedError(response.RequestMessage!.RequestUri!, exception);
+                return null;
+            }
+            try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
+            catch (Exception exception)
+            {
+                logger.LogGetResponseContentFailedError(response.RequestMessage!.RequestUri!, exception);
+                return null;
+            }
         }
+        else if (linkElement.TryGetNonEmptyString(JSON_KEY_LINK, out link) && Uri.TryCreate(link, UriKind.Absolute, out uri))
+        {
+            using HttpClient client = new(clientHandler);
+            HttpRequestMessage msg = new(HttpMethod.Get, uri);
+            msg.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+            using HttpResponseMessage response = await client.SendAsync(msg, cancellationToken);
+            try { response.EnsureSuccessStatusCode(); }
+            catch (HttpRequestException exception)
+            {
+                logger.LogHttpRequestFailedError(response.RequestMessage!.RequestUri!, exception);
+                return null;
+            }
+            try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
+            catch (Exception exception)
+            {
+                logger.LogGetResponseContentFailedError(response.RequestMessage!.RequestUri!, exception);
+                return null;
+            }
+        }
+        else
+            return null;
         if (string.IsNullOrWhiteSpace(responseBody))
         {
-            logger.LogInvalidHttpResponseError(response.RequestMessage!.RequestUri!, responseBody);
-            return (null, null);
+            logger.LogInvalidHttpResponseError(uri, responseBody);
+            return null;
         }
         
-        try { return (JsonDocument.Parse(responseBody), responseBody); }
+        JsonDocument doc;
+        try { doc = JsonDocument.Parse(responseBody); }
         catch (JsonException exception)
         {
-            logger.LogJsonCouldNotBeParsedError(response.RequestMessage!.RequestUri!, responseBody, exception);
-            return (null, responseBody);
+            logger.LogJsonCouldNotBeParsedError(uri, responseBody, exception);
+            return null;
         }
+        using (doc)
+        {
+            if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                return await createFunc(doc.RootElement);
+        }
+        return null;
     }
 
     public static bool TryGetStringValue(this JsonElement element, string name, [NotNullWhen(true)] out string? result)

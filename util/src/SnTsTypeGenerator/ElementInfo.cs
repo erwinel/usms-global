@@ -11,8 +11,6 @@ public class ElementInfo
 {
     private readonly object _syncRoot = new();
 
-    internal const string COLNAME_SysID = "sys_id";
-
     private string _sysID = string.Empty;
 
     [NotNull]
@@ -23,8 +21,6 @@ public class ElementInfo
         set => _sysID = value ?? string.Empty;
     }
 
-    internal const string COLNAME_Name = "element";
-
     private string _name = string.Empty;
 
     [Key]
@@ -34,8 +30,6 @@ public class ElementInfo
         get => _name;
         set => _name = value ?? string.Empty;
     }
-
-    internal const string COLNAME_Label = "label";
 
     private string _label = string.Empty;
 
@@ -66,8 +60,6 @@ public class ElementInfo
     public bool IsReadOnly { get; set; }
 
     public bool IsUnique { get; set; }
-
-    internal const string COLNAME_Scope = "scope";
 
     private string? _scopeValue;
 
@@ -116,8 +108,6 @@ public class ElementInfo
             }
         }
     }
-
-    internal const string COLNAME_Table = "name";
 
     private string _tableName = string.Empty;
 

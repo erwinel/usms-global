@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -10,8 +12,6 @@ namespace SnTsTypeGenerator;
 public class TableInfo
 {
     private readonly object _syncRoot = new();
-
-    internal const string COLNAME_SysID = "sys_id";
 
     private string _sysID = string.Empty;
 
@@ -23,8 +23,6 @@ public class TableInfo
         set => _sysID = value ?? string.Empty;
     }
 
-    internal const string COLNAME_Name = "name";
-
     private string _name = string.Empty;
 
     [Key]
@@ -34,8 +32,6 @@ public class TableInfo
         get => _name;
         set => _name = value ?? string.Empty;
     }
-
-    internal const string COLNAME_Label = "label";
 
     private string _label = string.Empty;
 
@@ -47,11 +43,7 @@ public class TableInfo
         set => _label = value ?? string.Empty;
     }
     
-    internal const string COLNAME_IsExtendable = "is_extendable";
-
     public bool IsExtendable { get; set; }
-
-    internal const string COLNAME_Scope = "scope";
 
     private string? _scopeValue;
 
@@ -101,8 +93,6 @@ public class TableInfo
             }
         }
     }
-
-    internal const string COLNAME_SuperClass = "super_class";
 
     private string? _superClassName;
 
@@ -154,8 +144,6 @@ public class TableInfo
             }
         }
     }
-
-    internal const string COLNAME_NumberPrefix = "number_ref";
 
     public string? NumberPrefix { get; set; }
 

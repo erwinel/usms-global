@@ -12,17 +12,20 @@ internal class Program
 
     private static void Main(string[] args)
     {
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        SnTsTypeGenerator.AppSettings.Configure(args, builder.Configuration);
         builder.Environment.ContentRootPath = Directory.GetCurrentDirectory();
+        var env = builder.Environment;
+        if (env.IsDevelopment())
+            builder.Configuration.AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly(), true);
         builder.Configuration.AddCommandLine(args);
         builder.Logging.AddConsole();
         builder.Services
-            .Configure<SnTsTypeGenerator.CommandSettings>(builder.Configuration)
-            .Configure<SnTsTypeGenerator.AppSettings>(builder.Configuration.GetSection(nameof(SnTsTypeGenerator)))
+            .Configure<SnTsTypeGenerator.AppSettings>(builder.Configuration)
             .AddDbContextPool<SnTsTypeGenerator.TypingsDbContext>(options =>
             {
                 var dbFile = builder.Configuration.Get<SnTsTypeGenerator.AppSettings>()?.DbFile;
-                if (string.IsNullOrEmpty(dbFile) && string.IsNullOrEmpty(dbFile = builder.Configuration.Get<SnTsTypeGenerator.CommandSettings>()?.Dbfile))
+                if (string.IsNullOrEmpty(dbFile))
                     dbFile = SnTsTypeGenerator.AppSettings.DEFAULT_DbFile;
                 try { dbFile = new FileInfo((Path.IsPathFullyQualified(dbFile) || Path.IsPathRooted(dbFile)) ? dbFile : Path.Combine(builder.Environment.ContentRootPath, dbFile)).FullName; }
                 catch { }
