@@ -1,0 +1,3 @@
+[submodule "types/snc"]
+	path = types/snc
+	url = https://github.com/erwinel/sn_typings_server_global.git
