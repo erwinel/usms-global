@@ -2,7 +2,16 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "Build All",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Build Util",
+                "Transpile Scripts"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Build Util",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -11,7 +20,18 @@
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Transpile Scripts",
+            "type": "typescript",
+            "tsconfig": "src/tsconfig.json",
+            "problemMatcher": "$tsc",
+            "group": "build"
         },
         {
             "label": "publish",
