@@ -1,0 +1,4 @@
+{
+	"types":{
+		"Bootstrap":{"alias":"GlideBootstrap"},"ColumnAttributes":{"alias":"GlideColumnAttributes"},"ECCQueueTransformer":{"alias":"GlideECCQueueTransformer"},"ExcelLoader2":{"alias":"GlideExcelLoader2"},"ImportLog":{"alias":"GlideImportLog"},"ImportMap":{"alias":"GlideImportMap"},"ImportMapField":{"alias":"GlideImportMapField"},"JDBCLoader":{"alias":"GlideJDBCLoader"},"JDBCProbeTestWorker":{"alias":"GlideJDBCProbeTestWorker"},"Loader":{"alias":"GlideLoader"},"TableCreator":{"alias":"GlideTableCreator"},"Unloader":{"alias":"GlideUnloader"}},"ns":{"datasource":{"types":{"DataSource":{"alias":"GlideDataSource"}}},"transformer":{"types":{"Transformer":{"alias":"GlideTransformer"}}}}
+		

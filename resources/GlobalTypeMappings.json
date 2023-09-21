@@ -1,0 +1,4301 @@
+{
+  "ns": {
+    "Packages": {
+      "ns": {
+        "java": {
+          "ns": {
+            "lang": {
+              "types": {
+                "Object": {},
+                "String": { "extends": [ "Packages.java.lang.Object" ] },
+                "Boolean": { "extends": [ "Packages.java.lang.Object" ] },
+                "Character": { "extends": [ "Packages.java.lang.Object" ] },
+                "Number": { "extends": [ "Packages.java.lang.Object" ] },
+                "Integer": { "extends": [ "Packages.java.lang.Number" ] },
+                "Long": { "extends": [ "Packages.java.lang.Number" ] },
+                "Double": { "extends": [ "Packages.java.lang.Number" ] },
+                "Byte": { "extends": [ "Packages.java.lang.Number" ] },
+                "Float": { "extends": [ "Packages.java.lang.Number" ] },
+                "Short": { "extends": [ "Packages.java.lang.Number" ] }
+              }
+            },
+            "util": {
+              "types": {
+                "Iterable": { "is_interface": true },
+                "Collection": {
+                  "extends": [ "Packages.java.util.Iterable" ],
+                  "is_interface": true
+                },
+                "Iterator": { "is_interface": true },
+                "ListIterator": {
+                  "extends": [ "Packages.java.util.Iterator" ],
+                  "is_interface": true
+                },
+                "List": {
+                  "extends": [ "Packages.java.util.Collection" ],
+                  "is_interface": true
+                },
+                "MapEntry": { "is_interface": true },
+                "Map": { "is_interface": true },
+                "Set": {
+                  "extends": [ "Packages.java.util.Collection" ],
+                  "is_interface": true
+                },
+                "AbstractCollection": { "extends": [ "Packages.java.lang.Object", "Packages.java.util.Collection" ] },
+                "AbstractList": { "extends": [ "Packages.java.util.AbstractCollection", "Packages.java.util.List" ] },
+                "ArrayList": { "extends": [ "Packages.java.util.AbstractList" ] },
+                "AbstractMap": { "extends": [ "Packages.java.lang.Object", "Packages.java.util.Collection" ] },
+                "HashMap": { "extends": [ "Packages.java.util.Map" ] },
+                "AbstractSet": { "extends": [ "Packages.java.lang.Object", "Packages.java.util.Set" ] },
+                "HashSet": { "extends": [ "Packages.java.util.AbstractSet" ] },
+                "Date": { "extends": [ "Packages.java.lang.Object" ] },
+                "TimeZone": { "extends": [ "Packages.java.lang.Object" ] }
+              }
+            }
+          }
+        },
+        "com": {
+          "ns": {
+            "glide": {
+              "types": {
+                "Glide": { "alias": "Glide" }
+              },
+              "ns": {
+                "monitor": {
+                  "types": {
+                    "AbstractBucketCollector": { "alias": "GlideAbstractBucketCollector" },
+                    "StatsInfo": { "alias": "GlideStatsInfo" }
+                  },
+                  "ns": {
+                    "sql": {
+                      "types": {
+                        "SQLChildMonitor": { "alias": "GlideSQLChildMonitor" },
+                        "SQLDeleteMonitor": { "alias": "GlideSQLDeleteMonitor" },
+                        "SQLInsertMonitor": { "alias": "GlideSQLInsertMonitor" },
+                        "SQLResponseMonitor": { "alias": "GlideSQLResponseMonitor" },
+                        "SQLSelectMonitor": { "alias": "GlideSQLSelectMonitor" },
+                        "SQLUpdateMonitor": { "alias": "GlideSQLUpdateMonitor" }
+                      }
+                    },
+                    "threads": {
+                      "types": {
+                        "SysBRThreadMonitor": { "alias": "GlideSysBRThreadMonitor" },
+                        "SysConcurrencyMonitor": { "alias": "GlideSysConcurrencyMonitor" },
+                        "SysCPUThreadMonitor": { "alias": "GlideSysCPUThreadMonitor" },
+                        "SysDBThreadMonitor": { "alias": "GlideSysDBThreadMonitor" },
+                        "SysNetThreadMonitor": { "alias": "GlideSysNetThreadMonitor" },
+                        "SysThreadMonitor": { "alias": "GlideSysThreadMonitor" }
+                      }
+                    }
+                  }
+                },
+                "db": {
+                  "ns": {
+                    "domain": {
+                      "types": {
+                        "AbstractDomainProvider": { "alias": "GlideAbstractDomainProvider" },
+                        "Domain": { "alias": "GlideDomain" },
+                        "DomainDisplay": { "alias": "GlideDomainDisplay" },
+                        "DomainHierarchy": { "alias": "GlideDomainHierarchy" },
+                        "DomainNumberProvider": { "alias": "GlideDomainNumberProvider" },
+                        "DomainPathDisplay": { "alias": "GlideDomainPathDisplay" },
+                        "DomainPathProvider": { "alias": "GlideDomainPathProvider" },
+                        "DomainSpoolProvider": { "alias": "GlideDomainSpoolProvider" },
+                        "DomainSupport": { "alias": "GlideDomainSupport" },
+                        "DomainTree": { "alias": "GlideDomainTree" },
+                        "DomainUtil": { "alias": "GlideDomainUtil" },
+                        "DomainValidator": { "alias": "GlideDomainValidator" }
+                      }
+                    },
+                    "explain": {
+                      "types": {
+                        "AQueryExplanation": { "alias": "GlideAQueryExplanation" }
+                      }
+                    },
+                    "auxiliary": {
+                      "types": {
+                        "Archiver": { "alias": "GlideArchiver" },
+                        "ArchiveRecord": { "alias": "GlideArchiveRecord" },
+                        "ArchiveRestore": { "alias": "GlideArchiveRestore" },
+                        "ArchiveStatus": { "alias": "GlideArchiveStatus" },
+                        "ArchiveTable": { "alias": "GlideArchiveTable" },
+                        "TableGroupMover": { "alias": "GlideTableGroupMover" },
+                        "TableMover": { "alias": "GlideTableMover" }
+                      }
+                    },
+                    "impex": {
+                      "types": {
+                        "Bootstrap": { "alias": "GlideBootstrap" },
+                        "ColumnAttributes": { "alias": "GlideColumnAttributes" },
+                        "ECCQueueTransformer": { "alias": "GlideECCQueueTransformer" },
+                        "ExcelLoader2": { "alias": "GlideExcelLoader2" },
+                        "ImportLog": { "alias": "GlideImportLog" },
+                        "ImportMap": { "alias": "GlideImportMap" },
+                        "ImportMapField": { "alias": "GlideImportMapField" },
+                        "JDBCLoader": { "alias": "GlideJDBCLoader" },
+                        "JDBCProbeTestWorker": { "alias": "GlideJDBCProbeTestWorker" },
+                        "Loader": { "alias": "GlideLoader" },
+                        "TableCreator": { "alias": "GlideTableCreator" },
+                        "Unloader": { "alias": "GlideUnloader" }
+                      },
+                      "ns": {
+                        "datasource": { "types": { "DataSource": { "alias": "GlideDataSource" } } },
+                        "transformer": { "types": { "Transformer": { "alias": "GlideTransformer" } } }
+                      }
+                    },
+                    "change": {
+                      "types": { "DBChangeManager": { "alias": "GlideDBChangeManager" } },
+                      "ns": {
+                        "command": {
+                          "types": {
+                            "SimmerDown": { "alias": "GlideSimmerDown" },
+                            "SimmerUp": { "alias": "GlideSimmerUp" }
+                          }
+                        }
+                      }
+                    },
+                    "pool": {
+                      "types": {
+                        "DBConnection": { "alias": "GlideDBConnection" },
+                        "DBConnectionPool": { "alias": "GlideDBConnectionPool" },
+                        "DBConnectionPooler": { "alias": "GlideDBConnectionPooler" }
+                      }
+                    },
+                    "rdbms": { "ns": { "mysql": { "types": { "DBIMySQL": { "alias": "GlideDBIMySQL" } } } } },
+                    "meta": {
+                      "types": {
+                        "IRow": { "alias": "GlideIRow" },
+                        "StorageUtils": { "alias": "GlideStorageUtils" },
+                        "Table": { "alias": "GlideTable" }
+                      }
+                    },
+                    "ir": {
+                      "types": {
+                        "IRQuerySummary": { "alias": "GlideIRQuerySummary" },
+                        "IRQuerySummarySimple": { "alias": "GlideIRQuerySummarySimple" }
+                      }
+                    },
+                    "access": { "types": { "ITableIterator": { "alias": "GlideITableIterator" } } },
+                    "conditions": {
+                      "types": {
+                        "QueryCondition": { "alias": "GlideQueryCondition" },
+                        "SubQuery": { "alias": "GlideSubQuery" }
+                      }
+                    },
+                    "table": {
+                      "types": {
+                        "TableParentChange": { "alias": "GlideTableParentChange" },
+                        "TableParentColumnChange": { "alias": "GlideTableParentColumnChange" }
+                      }
+                    }
+                  },
+                  "types": {
+                    "CascadeFromDelete": { "alias": "GlideCascadeFromDelete" },
+                    "CompositeElement": { "alias": "GlideCompositeElement" },
+                    "DatabaseVerifier": { "alias": "GlideDatabaseVerifier" },
+                    "DBAction": { "alias": "GlideDBAction" },
+                    "DBAggregateQuery": { "alias": "GlideDBAggregateQuery" },
+                    "DBAggregateUtil": { "alias": "GlideDBAggregateUtil" },
+                    "DBCompositeAction": { "alias": "GlideDBCompositeAction" },
+                    "DBConfiguration": { "alias": "GlideDBConfiguration" },
+                    "DBConfigurationManager": { "alias": "GlideDBConfigurationManager" },
+                    "DBConfigurationManagerEventHandler": { "alias": "GlideDBConfigurationManagerEventHandler" },
+                    "DBConfigurationParms": { "alias": "GlideDBConfigurationParms" },
+                    "DBConfigurationV2Migrator": { "alias": "GlideDBConfigurationV2Migrator" },
+                    "DBDelete": { "alias": "GlideDBDelete" },
+                    "DBI": { "alias": "GlideDBI" },
+                    "DBIndex": { "alias": "GlideDBIndex" },
+                    "DBMicroStats": { "alias": "GlideDBMicroStats" },
+                    "DBMultiTargetAction": { "alias": "GlideDBMultiTargetAction" },
+                    "DBObjectManager": { "alias": "GlideDBObjectManager" },
+                    "DBObjectToken": { "alias": "GlideDBObjectToken" },
+                    "DBPropertiesConfig": { "alias": "GlideDBPropertiesConfig" },
+                    "DBQuery": { "alias": "GlideDBQuery" },
+                    "DBTypes": { "alias": "GlideDBTypes" },
+                    "DBUpdate": { "alias": "GlideDBUpdate" },
+                    "DBUtil": { "alias": "GlideDBUtil" },
+                    "DBView": { "alias": "GlideDBView" },
+                    "ElementDescriptor": { "alias": "GlideElementDescriptor" },
+                    "IndexDescriptor": { "alias": "GlideIndexDescriptor" },
+                    "IndexUtils": { "alias": "GlideIndexUtils" },
+                    "IOStats": { "alias": "GlideIOStats" },
+                    "LabelGenerator": { "alias": "GlideLabelGenerator" },
+                    "MultipleAction": { "alias": "GlideMultipleAction" },
+                    "MultipleDelete": { "alias": "GlideMultipleDelete" },
+                    "MultipleInsert": { "alias": "GlideMultipleInsert" },
+                    "MultipleUpdate": { "alias": "GlideMultipleUpdate" },
+                    "NumberManager": { "alias": "GlideNumberManager" },
+                    "QueryString": { "alias": "GlideQueryString" },
+                    "QueryTerm": { "alias": "GlideQueryTerm" },
+                    "Relationships": { "alias": "GlideRelationships" },
+                    "SysField": { "alias": "GlideSysField" },
+                    "SYSMany2Many": { "alias": "GlideSYSMany2Many" },
+                    "TableDescriptor": { "alias": "GlideTableDescriptor" },
+                    "TableManager": { "alias": "GlideTableManager" }
+                  }
+                },
+                "execution_plan": {
+                  "types": {
+                    "AbstractExecutionPlan": { "alias": "GlideAbstractExecutionPlan" },
+                    "ExecutionPlan": { "alias": "GlideExecutionPlan" },
+                    "TaskToken": { "alias": "GlideTaskToken" }
+                  }
+                },
+                "listener": {
+                  "types": {
+                    "AbstractListener": { "alias": "GlideAbstractListener" },
+                    "ScriptListener": { "alias": "GlideScriptListener" },
+                    "SimpleScriptListener": { "alias": "GlideSimpleScriptListener" }
+                  }
+                },
+                "ui": {
+                  "ns": {
+                    "portal": { "types": { "AbstractRenderer": { "alias": "GlideAbstractRenderer" } } },
+                    "action": {
+                      "types": {
+                        "ActionManager": { "alias": "GlideActionManager" },
+                        "UIAction": { "alias": "GlideUIAction" }
+                      }
+                    },
+                    "jelly": {
+                      "ns": {
+                        "tags": {
+                          "types": { "BaseTag": { "alias": "GlideBaseTag" } },
+                          "ns": {
+                            "form": {
+                              "types": {
+                                "DBMacro": { "alias": "GlideDBMacro" },
+                                "GroupByListTag": { "alias": "GlideGroupByListTag" },
+                                "QueryFormatter": { "alias": "GlideQueryFormatter" }
+                              }
+                            },
+                            "mergedata": { "types": { "HistoryTag2": { "alias": "GlideHistoryTag2" } } }
+                          }
+                        }
+                      },
+                      "types": {
+                        "Emitter": { "alias": "GlideEmitter" },
+                        "GlideExpressionWrapper": { "alias": "GlideExpressionWrapper" },
+                        "GlideJellyContext": { "alias": "GlideJellyContext" },
+                        "JellyRunner": { "alias": "GlideJellyRunner" }
+                      }
+                    },
+                    "chart": {
+                      "ns": {
+                        "dataset": {
+                          "types": {
+                            "ChartFieldColors": { "alias": "GlideChartFieldColors" },
+                            "ChartUtil": { "alias": "GlideChartUtil" },
+                            "ChartValue": { "alias": "GlideChartValue" },
+                            "PivotTableSummaryTableWriter": { "alias": "GlidePivotTableSummaryTableWriter" },
+                            "SummaryTableGroupReader": { "alias": "GlideSummaryTableGroupReader" },
+                            "SummaryTableOrderedReader": { "alias": "GlideSummaryTableOrderedReader" },
+                            "SummaryTableReader": { "alias": "GlideSummaryTableReader" },
+                            "SummaryTableWriter": { "alias": "GlideSummaryTableWriter" }
+                          }
+                        }
+                      },
+                      "types": { "ChartGeneratorFactory": { "alias": "GlideChartGeneratorFactory" } }
+                    },
+                    "monitor": {
+                      "types": {
+                        "InternalMonitor": { "alias": "GlideInternalMonitor" },
+                        "IOMonitor": { "alias": "GlideIOMonitor" },
+                        "MemoryActive": { "alias": "GlideMemoryActive" },
+                        "MemoryCache": { "alias": "GlideMemoryCache" },
+                        "MemorySwap": { "alias": "GlideMemorySwap" },
+                        "MemoryTotal": { "alias": "GlideMemoryTotal" },
+                        "PartitionMonitor": { "alias": "GlidePartitionMonitor" }
+                      }
+                    },
+                    "io": {
+                      "types": {
+                        "GlideOutputWriter": { "alias": "GlideOutputWriter" },
+                        "GlideOutputWriterFactory": { "alias": "GlideOutputWriterFactory" }
+                      }
+                    },
+                    "diagnostics": { "types": { "SQLDebug": { "alias": "GlideSQLDebug" } } }
+                  },
+                  "types": {
+                    "CanceledUITransaction": { "alias": "GlideCanceledUITransaction" },
+                    "CollectionQueryCalculator": { "alias": "GlideCollectionQueryCalculator" },
+                    "CookieMan": { "alias": "GlideCookieMan" },
+                    "GlideForm": { "alias": "GlideForm" },
+                    "GlideFormCommon": { "alias": "GlideFormCommon" },
+                    "GlideFormulator": { "alias": "GlideFormulator" },
+                    "I18NStyle": { "alias": "GlideI18NStyle" },
+                    "ListLabel": { "alias": "GlideListLabel" },
+                    "ListSearchQuery": { "alias": "GlideListSearchQuery" },
+                    "MobileExtensions": { "alias": "GlideMobileExtensions" },
+                    "Popup": { "alias": "GlidePopup" },
+                    "PublicPage": { "alias": "GlidePublicPage" },
+                    "RenderProperties": { "alias": "GlideRenderProperties" },
+                    "ViewManager": { "alias": "GlideScriptViewManager" },
+                    "GlideServlet": { "alias": "GlideServlet" },
+                    "GlideServletRequest": { "alias": "GlideServletRequest" },
+                    "GlideServletResponse": { "alias": "GlideServletResponse" },
+                    "ServletStatus": { "alias": "GlideServletStatus" },
+                    "Sessions": { "alias": "GlideSessions" },
+                    "SysAttachment": { "alias": "GlideSysAttachment" },
+                    "SysAttachmentInputStream": { "alias": "GlideSysAttachmentInputStream" },
+                    "SysForm": { "alias": "GlideSysForm" },
+                    "SysForms": { "alias": "GlideSysForms" },
+                    "SysList": { "alias": "GlideSysList" },
+                    "SysListControl": { "alias": "GlideSysListControl" },
+                    "SysMessage": { "alias": "GlideSysMessage" },
+                    "SysRelatedList": { "alias": "GlideSysRelatedList" },
+                    "SysSection": { "alias": "GlideSysSection" },
+                    "SysUserList": { "alias": "GlideSysUserList" },
+                    "GlideThreadAttributes": { "alias": "GlideThreadAttributes" },
+                    "TreePicker": { "alias": "GlideTreePicker" },
+                    "Session": { "alias": "GlideUISession" },
+                    "GlideURI": { "alias": "GlideURI" },
+                    "ViewRuleNavigator": { "alias": "GlideViewRuleNavigator" },
+                    "XMLStats": { "alias": "GlideXMLStats" },
+                    "UINotification": { "alias": "UINotification" }
+                  }
+                },
+                "script": {
+                  "types": {
+                    "Action": { "alias": "GlideAction" },
+                    "Auditor": { "alias": "GlideAuditor" },
+                    "Compiler": { "alias": "GlideCompiler" },
+                    "GlideController": { "alias": "GlideController" },
+                    "GlideElement": { "alias": "GlideElement" },
+                    "GlideElementXMLSerializer": { "alias": "GlideElementXMLSerializer" },
+                    "Evaluator": { "alias": "GlideEvaluator" },
+                    "Filter": { "alias": "GlideFilter" },
+                    "FilterList": { "alias": "GlideFilterList" },
+                    "ImageLoader": { "alias": "GlideImageLoader" },
+                    "InternalElementTypeChoiceList": { "alias": "GlideInternalElementTypeChoiceList" },
+                    "JSUtil": { "alias": "GlideJSUtil" },
+                    "Lock": { "alias": "GlideLock" },
+                    "GlideMemoryRecord": { "alias": "GlideMemoryRecord" },
+                    "MetaData": { "alias": "GlideMetaData" },
+                    "MIDServerInfoAccessor": { "alias": "GlideMIDServerInfoAccessor" },
+                    "OverLoadedChoices": { "alias": "GlideOverLoadedChoices" },
+                    "GlideRecord": { "alias": "GlideRecord" },
+                    "GlideRecordFactory": { "alias": "GlideRecordFactory" },
+                    "GlideRecordKeySetLoader": { "alias": "GlideRecordKeySetLoader" },
+                    "RecordLock": { "alias": "GlideRecordLock" },
+                    "GlideRecordRollback": { "alias": "GlideRecordRollback" },
+                    "GlideRecordSet": { "alias": "GlideRecordSet" },
+                    "GlideRecordSimpleSerializer": { "alias": "GlideRecordSimpleSerializer" },
+                    "GlideRecordXMLSerializer": { "alias": "GlideRecordXMLSerializer" },
+                    "ReferenceField": { "alias": "GlideReferenceField" },
+                    "ReportChoiceList": { "alias": "GlideReportChoiceList" },
+                    "GlideRhinoEnvironment": { "alias": "GlideRhinoEnvironment" },
+                    "GlideRhinoHelper": { "alias": "GlideRhinoHelper" },
+                    "RhinoScope": { "alias": "GlideRhinoScope" },
+                    "GlideRhinoScopeHandler": { "alias": "GlideRhinoScopeHandler" },
+                    "ChoiceList": { "alias": "GlideScriptChoiceList" },
+                    "ScriptEvaluator": { "alias": "GlideScriptEvaluator" },
+                    "GlideScriptGlobals": { "alias": "GlideScriptGlobals" },
+                    "GlideRecordUtil": { "alias": "GlideScriptRecordUtil" },
+                    "GlideSystemUtilDB": { "alias": "GlideScriptSystemUtilDB" },
+                    "ScriptWriter": { "alias": "GlideScriptWriter" },
+                    "GlideSessionSandbox": { "alias": "GlideSessionSandbox" },
+                    "SysChoice": { "alias": "GlideSysChoice" },
+                    "GlideSystem": { "alias": "GlideSystem" },
+                    "TableChoiceList": { "alias": "GlideTableChoiceList" },
+                    "Template": { "alias": "GlideTemplate" },
+                    "UpdateTableChoiceList": { "alias": "GlideUpdateTableChoiceList" },
+                    "RhinoEnvironment": { "alias": "RhinoEnvironment" },
+                    "RhinoHelper": { "alias": "RhinoHelper" }
+                  },
+                  "ns": {
+                    "api": {
+                      "types": {
+                        "CustomerScriptFixer": { "alias": "GlideCustomerScriptFixer" },
+                        "GlideWhiteListManager": { "alias": "GlideWhiteListManager" }
+                      }
+                    },
+                    "glide_elements": {
+                      "types": {
+                        "GlideElementUserImage": { "alias": "GlideElementUserImage" },
+                        "GlideNumber": { "alias": "GlideNumber" }
+                      }
+                    },
+                    "proxy": {
+                      "types": {
+                        "File": { "alias": "GlideFile" },
+                        "Socket": { "alias": "GlideSocket" }
+                      }
+                    },
+                    "system": {
+                      "types": {
+                        "GlideSystemDateUtil": { "alias": "GlideSystemDateUtil" },
+                        "GlideSystemUtilDB": { "alias": "GlideSystemUtilDB" },
+                        "GlideSystemUtilScript": { "alias": "GlideSystemUtilScript" }
+                      }
+                    }
+                  }
+                },
+                "schedules": {
+                  "types": {
+                    "AJAXScheduleItem": { "alias": "GlideAJAXScheduleItem" },
+                    "AJAXSchedulePage": { "alias": "GlideAJAXSchedulePage" },
+                    "Schedule": { "alias": "GlideSchedule" },
+                    "ScheduleDateTimeSpan": { "alias": "GlideScheduleDateTimeSpan" },
+                    "ScheduleItem": { "alias": "GlideScheduleItem" },
+                    "ScheduleTimeMap": { "alias": "GlideScheduleTimeMap" },
+                    "ScheduleTimeSpan": { "alias": "GlideScheduleTimeSpan" },
+                    "TimelineFrameSeparator": { "alias": "GlideTimelineFrameSeparator" },
+                    "TimelineItem": { "alias": "GlideTimelineItem" },
+                    "TimelineSpan": { "alias": "GlideTimelineSpan" }
+                  }
+                },
+                "alerts": { "types": { "AlertActions": { "alias": "GlideAlertActions" } } },
+                "sys": {
+                  "types": {
+                    "Application": { "alias": "GlideApplication" },
+                    "EncryptionContext": { "alias": "GlideEncryptionContext" },
+                    "ExtensionPoint": { "alias": "GlideExtensionPoint" },
+                    "Group": { "alias": "GlideGroup" },
+                    "Impersonate": { "alias": "GlideImpersonate" },
+                    "GlideLocale": { "alias": "GlideLocale" },
+                    "Module": { "alias": "GlideModule" },
+                    "Plugin": { "alias": "GlidePlugin" },
+                    "PluginManager": { "alias": "GlidePluginManager" },
+                    "PluginManagerWorker": { "alias": "GlidePluginManagerWorker" },
+                    "PluginUtils": { "alias": "GlidePluginUtils" },
+                    "RecordCache": { "alias": "GlideRecordCache" },
+                    "Relationship": { "alias": "GlideRelationship" },
+                    "RelationshipUtil": { "alias": "GlideRelationshipUtil" },
+                    "GlideSession": { "alias": "GlideSession" },
+                    "SessionDebug": { "alias": "GlideSessionDebug" },
+                    "GlideStack": { "alias": "GlideStack" },
+                    "SysLog": { "alias": "GlideSysLog" },
+                    "Transaction": { "alias": "GlideTransaction" },
+                    "TransactionManager": { "alias": "GlideTransactionManager" },
+                    "Upgrade": { "alias": "GlideUpgrade" },
+                    "User": { "alias": "GlideUser" },
+                    "UserAuthenticator": { "alias": "GlideUserAuthenticator" },
+                    "UserGroup": { "alias": "GlideUserGroup" },
+                    "WorkerThreadManager": { "alias": "GlideWorkerThreadManager" }
+                  },
+                  "ns": {
+                    "cache": {
+                      "types": {
+                        "CacheManager": { "alias": "GlideCacheManager" },
+                        "LRUCache": { "alias": "GlideLRUCache" },
+                        "StringCache": { "alias": "GlideStringCache" },
+                        "SynchronizedLRUCache": { "alias": "GlideSynchronizedLRUCache" }
+                      }
+                    },
+                    "security": {
+                      "types": {
+                        "ContextualSecurityManager": { "alias": "GlideContextualSecurityManager" },
+                        "EncryptionContextCipher": { "alias": "GlideEncryptionContextCipher" },
+                        "EncryptionWrapperDB": { "alias": "GlideEncryptionWrapperDB" },
+                        "EncryptionWrapperDBAdmin": { "alias": "GlideEncryptionWrapperDBAdmin" },
+                        "EncryptionWrapperNAE": { "alias": "GlideEncryptionWrapperNAE" },
+                        "EncryptionWrapperNAEAdmin": { "alias": "GlideEncryptionWrapperNAEAdmin" },
+                        "ISecurityManager": { "alias": "GlideISecurityManager" },
+                        "GlideSecurityManager": { "alias": "GlideSecurityManager" },
+                        "SecurityQueryCalculator": { "alias": "GlideSecurityQueryCalculator" }
+                      }
+                    },
+                    "util": {
+                      "types": {
+                        "Governor": { "alias": "GlideGovernor" },
+                        "SysDateUtil": { "alias": "GlideSysDateUtil" },
+                        "SysFileUtil": { "alias": "GlideSysFileUtil" },
+                        "SysSemaphore": { "alias": "GlideSysSemaphore" },
+                        "SecurelyAccess": { "alias": "SecurelyAccess" }
+                      }
+                    },
+                    "ldap": {
+                      "types": {
+                        "LDAP": { "alias": "GlideLDAP" },
+                        "LDAPConfig": { "alias": "GlideLDAPConfig" },
+                        "LDAPConfigurations": { "alias": "GlideLDAPConfigurations" },
+                        "LDAPErrorAnalyzer": { "alias": "GlideLDAPErrorAnalyzer" },
+                        "LDAPGroups": { "alias": "GlideLDAPGroups" },
+                        "LDAPRefresh": { "alias": "GlideLDAPRefresh" },
+                        "LDAPResult": { "alias": "GlideLDAPResult" },
+                        "LDAPTarget": { "alias": "GlideLDAPTarget" },
+                        "LDAPTransformQueue": { "alias": "GlideLDAPTransformQueue" },
+                        "LDAPUsers": { "alias": "GlideLDAPUsers" },
+                        "LDAPUserUpdate": { "alias": "GlideLDAPUserUpdate" }
+                      }
+                    },
+                    "lock": {
+                      "types": {
+                        "Mutex": { "alias": "GlideMutex" },
+                        "SelfCleaningMutex": { "alias": "GlideSelfCleaningMutex" }
+                      }
+                    },
+                    "stats": {
+                      "types": {
+                        "MySQLWatch": { "alias": "GlideMySQLWatch" },
+                        "Statistician": { "alias": "GlideStatistician" }
+                      }
+                    }
+                  }
+                },
+                "processors": {
+                  "types": {
+                    "ApplicationModule": { "alias": "GlideApplicationModule" },
+                    "FieldList": { "alias": "GlideFieldList" },
+                    "Processor": { "alias": "GlideProcessor" },
+                    "ScriptProcessor": { "alias": "GlideScriptProcessor" }
+                  },
+                  "ns": {
+                    "soap": { "types": { "SOAPSecurity": { "alias": "GlideSOAPSecurity" } } },
+                    "xmlhttp": {
+                      "types": {
+                        "XMLGlideRecordSerializer": { "alias": "GlideXMLGlideRecordSerializer" },
+                        "XMLSysMetaSerializer": { "alias": "GlideXMLSysMetaSerializer" }
+                      }
+                    }
+                  }
+                },
+                "schedule": {
+                  "ns": { "recurrence": { "types": { "ARecurrence": { "alias": "GlideARecurrence" } } } },
+                  "types": {
+                    "GlideCalendar": { "alias": "GlideCalendar" },
+                    "GlideScheduler": { "alias": "GlideScheduler" }
+                  }
+                },
+                "lucene": {
+                  "ns": {
+                    "attachments": {
+                      "types": {
+                        "AttachmentIndexDocument": { "alias": "GlideAttachmentIndexDocument" },
+                        "AttachmentIndexTypes": { "alias": "GlideAttachmentIndexTypes" }
+                      }
+                    }
+                  },
+                  "types": { "TextIndexEvent": { "alias": "GlideLuceneTextIndexEvent" } }
+                },
+                "util": {
+                  "types": {
+                    "GlideAttributes": { "alias": "GlideAttributes" },
+                    "AutomationEncrypter": { "alias": "GlideAutomationEncrypter" },
+                    "BoundedIntProperty": { "alias": "GlideBoundedIntProperty" },
+                    "Checksum": { "alias": "GlideChecksum" },
+                    "CollectionEnumerator": { "alias": "GlideCollectionEnumerator" },
+                    "Counter": { "alias": "GlideCounter" },
+                    "DateUtil": { "alias": "GlideDateUtil" },
+                    "GlideDocument": { "alias": "GlideDocument" },
+                    "ElementIterator": { "alias": "GlideElementIterator" },
+                    "Encrypter": { "alias": "GlideEncrypter" },
+                    "FileUtil": { "alias": "GlideFileUtil" },
+                    "GlideGregorianCalendar": { "alias": "GlideGregorianCalendar" },
+                    "Guid": { "alias": "GlideGuid" },
+                    "HostUtil": { "alias": "GlideHostUtil" },
+                    "IConstants": { "alias": "GlideIConstants" },
+                    "IGlideRecord": { "alias": "GlideIGlideRecord" },
+                    "IPAddressUtil": { "alias": "GlideIPAddressUtil" },
+                    "IQueryCondition": { "alias": "GlideIQueryCondition" },
+                    "Log": { "alias": "GlideLog" },
+                    "LogCleanup": { "alias": "GlideLogCleanup" },
+                    "MarkupWriter": { "alias": "GlideMarkupWriter" },
+                    "MemoryTable": { "alias": "GlideMemoryTable" },
+                    "ObjectUtil": { "alias": "GlideObjectUtil" },
+                    "ProcessRunner": { "alias": "GlideProcessRunner" },
+                    "GlideProperties": { "alias": "GlideProperties" },
+                    "GlidePropertiesDB": { "alias": "GlidePropertiesDB" },
+                    "GlideProperty": { "alias": "GlideProperty" },
+                    "RegexUtil": { "alias": "GlideRegexUtil" },
+                    "ReplaceUpdateFiles": { "alias": "GlideReplaceUpdateFiles" },
+                    "RequestMap": { "alias": "GlideRequestMap" },
+                    "SecurityUtils": { "alias": "GlideSecurityUtils" },
+                    "ShellCommand": { "alias": "GlideShellCommand" },
+                    "SimpleDateFormatEx": { "alias": "GlideSimpleDateFormatEx" },
+                    "GlideStatus": { "alias": "GlideStatus" },
+                    "StopWatch": { "alias": "GlideStopWatch" },
+                    "StringInputStream": { "alias": "GlideStringInputStream" },
+                    "StringUtil": { "alias": "GlideStringUtil" },
+                    "SystemUtil": { "alias": "GlideSystemUtil" },
+                    "ThreadUtil": { "alias": "GlideThreadUtil" },
+                    "GlideURL": { "alias": "GlideURL" },
+                    "URLUTF8Encoder": { "alias": "GlideURLUTF8Encoder" },
+                    "URLUtil": { "alias": "GlideURLUtil" },
+                    "GlideUtil": { "alias": "GlideUtil" },
+                    "WSClient": { "alias": "GlideWSClient" },
+                    "XMLDocument": { "alias": "GlideXMLDocument" },
+                    "XMLElementIterator": { "alias": "GlideXMLElementIterator" },
+                    "XMLParameters": { "alias": "GlideXMLParameters" },
+                    "XMLUtil": { "alias": "GlideXMLUtil" },
+                    "ZipUtil": { "alias": "GlideZipUtil" }
+                  }
+                },
+                "audit": {
+                  "types": {
+                    "AuditDelete": { "alias": "GlideAuditDelete" },
+                    "HistorySet": { "alias": "GlideHistorySet" },
+                    "TransferAuditDataHelper": { "alias": "GlideTransferAuditDataHelper" }
+                  }
+                },
+                "calendar": {
+                  "types": {
+                    "GlideCalendarWeekEntry": { "alias": "GlideCalendarWeekEntry" },
+                    "RecordPopupGenerator": { "alias": "GlideRecordPopupGenerator" }
+                  }
+                },
+                "catalog": { "ns": { "cloner": { "types": { "CatalogCloneWorker": { "alias": "GlideCatalogCloneWorker" } } } } },
+                "channel": {
+                  "types": {
+                    "Channel": { "alias": "GlideChannel" },
+                    "ChannelManager": { "alias": "GlideChannelManager" },
+                    "ChannelMessage": { "alias": "GlideChannelMessage" }
+                  }
+                },
+                "choice": {
+                  "types": {
+                    "Choice": { "alias": "GlideChoice" },
+                    "ChoiceList": { "alias": "GlideChoiceList" },
+                    "ChoiceListGenerator": { "alias": "GlideChoiceListGenerator" },
+                    "ChoiceListSet": { "alias": "GlideChoiceListSet" },
+                    "XMLChoiceListSerializer": { "alias": "GlideXMLChoiceListSerializer" }
+                  }
+                },
+                "update": {
+                  "ns": {
+                    "saver": {
+                      "types": {
+                        "ChoiceListUpdateSaver": { "alias": "GlideChoiceListUpdateSaver" },
+                        "DefaultUpdateSaver": { "alias": "GlideDefaultUpdateSaver" }
+                      }
+                    },
+                    "collisions": { "types": { "CollisionDetector": { "alias": "GlideCollisionDetector" } } }
+                  },
+                  "types": {
+                    "RevertToOutOfBox": { "alias": "GlideRevertToOutOfBox" },
+                    "UpdateManager2": { "alias": "GlideUpdateManager2" },
+                    "UpdateSet": { "alias": "GlideUpdateSet" },
+                    "UpdateSetPreviewer": { "alias": "GlideUpdateSetPreviewer" },
+                    "UpdateSetWorker": { "alias": "GlideUpdateSetWorker" },
+                    "UpgradeLog": { "alias": "GlideUpgradeLog" },
+                    "UpgradeMonitor": { "alias": "GlideUpgradeMonitor" }
+                  }
+                },
+                "client_transaction": {
+                  "types": {
+                    "ClientBrowserTimes": { "alias": "GlideClientBrowserTimes" },
+                    "ClientNetworkTimes": { "alias": "GlideClientNetworkTimes" }
+                  }
+                },
+                "cluster": {
+                  "types": {
+                    "ClusterMessage": { "alias": "GlideClusterMessage" },
+                    "ClusterState": { "alias": "GlideClusterState" },
+                    "ClusterSynchronizer": { "alias": "GlideClusterSynchronizer" }
+                  }
+                },
+                "cms": {
+                  "types": {
+                    "CMSLinkHelper": { "alias": "GlideCMSLinkHelper" },
+                    "CMSPageLink": { "alias": "GlideCMSPageLink" },
+                    "ContentConfig": { "alias": "GlideContentConfig" },
+                    "ContentPage": { "alias": "GlideContentPage" },
+                    "ContentSite": { "alias": "GlideContentSite" },
+                    "ContentType": { "alias": "GlideContentType" }
+                  }
+                },
+                "misc": {
+                  "types": {
+                    "CompanyResolver": { "alias": "GlideCompanyResolver" },
+                    "QueryBreadcrumbs": { "alias": "GlideQueryBreadcrumbs" },
+                    "RecordEnsurer": { "alias": "GlideRecordEnsurer" },
+                    "RelatedListReconciler": { "alias": "GlideRelatedListReconciler" },
+                    "TableCleaner": { "alias": "GlideTableCleaner" },
+                    "UpgradeArtifactManager": { "alias": "GlideUpgradeArtifactManager" },
+                    "WarDeleter": { "alias": "GlideWarDeleter" },
+                    "WarDownloader": { "alias": "GlideWarDownloader" }
+                  }
+                },
+                "notification": {
+                  "types": {
+                    "Configuration": { "alias": "GlideConfiguration" },
+                    "Email": { "alias": "GlideEmail" },
+                    "EmailWatermark": { "alias": "GlideEmailWatermark" }
+                  },
+                  "ns": {
+                    "outbound": {
+                      "types": {
+                        "EmailAction": { "alias": "GlideEmailAction" },
+                        "EmailFormatter": { "alias": "GlideEmailFormatter" },
+                        "EmailOutbound": { "alias": "GlideEmailOutbound" },
+                        "EmailSender": { "alias": "GlideEmailSender" },
+                        "SMTPConnection": { "alias": "GlideSMTPConnection" },
+                        "SMTPSender": { "alias": "GlideSMTPSender" }
+                      }
+                    },
+                    "inbound": {
+                      "types": {
+                        "EmailInbound": { "alias": "GlideEmailInbound" },
+                        "EmailReader": { "alias": "GlideEmailReader" },
+                        "POP3Reader": { "alias": "GlidePOP3Reader" }
+                      }
+                    },
+                    "substitution": { "types": { "SubstituteURL": { "alias": "GlideSubstituteURL" } } }
+                  }
+                },
+                "db_context_menu": {
+                  "types": {
+                    "ContextMenu": { "alias": "GlideContextMenu" },
+                    "ContextMenuItem": { "alias": "GlideContextMenuItem" }
+                  }
+                },
+                "currency": {
+                  "types": {
+                    "Converter": { "alias": "GlideConverter" },
+                    "ECBDownloader": { "alias": "GlideECBDownloader" },
+                    "LocaleLoader": { "alias": "GlideLocaleLoader" },
+                    "PriceGenerator": { "alias": "GlidePriceGenerator" },
+                    "PriceLoader": { "alias": "GlidePriceLoader" }
+                  }
+                },
+                "communications": {
+                  "ns": {
+                    "crypto": { "types": { "Credentials": { "alias": "GlideCredentials" } } },
+                    "soap": {
+                      "types": {
+                        "SOAPDocument": { "alias": "GlideSOAPDocument" },
+                        "SOAPRequest": { "alias": "GlideSOAPRequest" },
+                        "SOAPResponse": { "alias": "GlideSOAPResponse" },
+                        "SOAPSigner": { "alias": "GlideSOAPSigner" }
+                      }
+                    }
+                  },
+                  "types": {
+                    "HTTPRequest": { "alias": "GlideHTTPRequest" },
+                    "HTTPResponse": { "alias": "GlideHTTPResponse" },
+                    "RemoteGlideRecord": { "alias": "GlideRemoteGlideRecord" },
+                    "SimpleHTTPClient": { "alias": "GlideSimpleHTTPClient" },
+                    "SSHClient": { "alias": "GlideSSHClient" }
+                  }
+                },
+                "security": { "types": { "CryptoService": { "alias": "GlideCryptoService" } } },
+                "generators": {
+                  "types": {
+                    "CSVExporter": { "alias": "GlideCSVExporter" },
+                    "ExcelExporter": { "alias": "GlideExcelExporter" }
+                  }
+                },
+                "database_views": { "types": { "DatabaseViewLink": { "alias": "GlideDatabaseViewLink" } } },
+                "glideobject": {
+                  "types": {
+                    "GlideDate": { "alias": "GlideDate" },
+                    "GlideDateTime": { "alias": "GlideDateTime" },
+                    "GlideDuration": { "alias": "GlideDuration" },
+                    "HierarchicalReference": { "alias": "GlideHierarchicalReference" },
+                    "IntegerTime": { "alias": "GlideIntegerTime" },
+                    "GlideList": { "alias": "GlideList" },
+                    "GlideListM2MBacking": { "alias": "GlideListM2MBacking" },
+                    "GlideObjectManager": { "alias": "GlideObjectManager" },
+                    "ScheduleDateTime": { "alias": "GlideScheduleDateTime" },
+                    "GlideTime": { "alias": "GlideTime" }
+                  }
+                },
+                "secondary_db_pools": {
+                  "types": {
+                    "DBCategoryDebug": { "alias": "GlideDBCategoryDebug" },
+                    "DBPoolTest": { "alias": "GlideDBPoolTest" },
+                    "SecondaryDatabaseBehindnessChecker": { "alias": "GlideSecondaryDatabaseBehindnessChecker" },
+                    "SecondaryDatabaseConfiguration": { "alias": "GlideSecondaryDatabaseConfiguration" }
+                  }
+                },
+                "db_image": { "types": { "DBImageProvider": { "alias": "GlideDBImageProvider" } } },
+                "certificates": { "types": { "DBKeyStoreFactory": { "alias": "GlideDBKeyStoreFactory" } } },
+                "jsdebug": { "types": { "DebugEvaluator": { "alias": "GlideDebugEvaluator" } } },
+                "diagrammer": {
+                  "types": {
+                    "Diagram": { "alias": "GlideDiagram" },
+                    "DiagramAction": { "alias": "GlideDiagramAction" },
+                    "DiagramEdge": { "alias": "GlideDiagramEdge" },
+                    "DiagramElement": { "alias": "GlideDiagramElement" },
+                    "DiagramNode": { "alias": "GlideDiagramNode" }
+                  }
+                },
+                "dist": { "ns": { "upgrade": { "ns": { "runner": { "types": { "DistUpgradeRunner": { "alias": "GlideDistUpgradeRunner" } } } } } } },
+                "escalation": { "types": { "EscalationManager": { "alias": "GlideEscalationManager" } } },
+                "job": {
+                  "types": {
+                    "EscalationTimerJobMarkII": { "alias": "GlideEscalationTimerJobMarkII" },
+                    "POP3ReaderJob": { "alias": "GlidePOP3ReaderJob" },
+                    "RunScriptJob": { "alias": "GlideRunScriptJob" },
+                    "SMTPSenderJob": { "alias": "GlideSMTPSenderJob" },
+                    "TableCleanerJob": { "alias": "GlideTableCleanerJob" }
+                  }
+                },
+                "policy": {
+                  "types": {
+                    "Event": { "alias": "GlideEvent" },
+                    "EventManager": { "alias": "GlideEventManager" },
+                    "ICALUtil": { "alias": "GlideICALUtil" },
+                    "UpdateSyncher": { "alias": "GlideUpdateSyncher" }
+                  }
+                },
+                "fixes": {
+                  "types": {
+                    "FixCatalogPlans": { "alias": "GlideFixCatalogPlans" },
+                    "FixDeliveryPlans": { "alias": "GlideFixDeliveryPlans" },
+                    "FixGroups": { "alias": "GlideFixGroups" },
+                    "FixItemOptionsAgain": { "alias": "GlideFixItemOptionsAgain" },
+                    "FixRules": { "alias": "GlideFixRules" },
+                    "FixSpellCheck": { "alias": "GlideFixSpellCheck" },
+                    "FixStuff": { "alias": "GlideFixStuff" },
+                    "FixUsers": { "alias": "GlideFixUsers" },
+                    "RegisterEscalationEvents": { "alias": "GlideRegisterEscalationEvents" }
+                  }
+                },
+                "report": {
+                  "types": {
+                    "Gauge": { "alias": "GlideGauge" },
+                    "Report": { "alias": "GlideReport" },
+                    "ReportViewManagement": { "alias": "GlideReportViewManagement" }
+                  }
+                },
+                "system_import_set": {
+                  "types": {
+                    "ImportSet": { "alias": "GlideImportSet" },
+                    "ImportSetLoader": { "alias": "GlideImportSetLoader" },
+                    "ImportSetRun": { "alias": "GlideImportSetRun" },
+                    "ImportSetTransformer": { "alias": "GlideImportSetTransformer" },
+                    "ImportSetTransformerWorker": { "alias": "GlideImportSetTransformerWorker" }
+                  }
+                },
+                "xmpp": { "types": { "JID": { "alias": "GlideJID" } } },
+                "autotester": {
+                  "types": {
+                    "JSTestUtil": { "alias": "GlideJSTestUtil" },
+                    "RhinoTestCase": { "alias": "GlideRhinoTestCase" },
+                    "GlideTestAgent": { "alias": "GlideTestAgent" }
+                  }
+                },
+                "labels": {
+                  "types": {
+                    "LabelEventHandler": { "alias": "GlideLabelEventHandler" },
+                    "LabelUtil": { "alias": "GlideLabelUtil" }
+                  }
+                },
+                "list_v2": {
+                  "types": {
+                    "ListGroupProperties": { "alias": "GlideListGroupProperties" },
+                    "ListProperties": { "alias": "GlideListProperties" }
+                  }
+                },
+                "load_test": { "types": { "LoadTestDirector": { "alias": "GlideLoadTestDirector" } } },
+                "log_file": { "types": { "LogFileReader": { "alias": "GlideLogFileReader" } } },
+                "sorting": {
+                  "types": {
+                    "OrderingDefinitionCreator": { "alias": "GlideOrderingDefinitionCreator" },
+                    "OrderingManager": { "alias": "GlideOrderingManager" }
+                  }
+                },
+                "worker": {
+                  "types": {
+                    "ProgressMonitor": { "alias": "GlideProgressMonitor" },
+                    "ProgressWorker": { "alias": "GlideProgressWorker" },
+                    "ScriptedProgressWorker": { "alias": "GlideScriptedProgressWorker" },
+                    "WorkerThread": { "alias": "GlideWorkerThread" }
+                  }
+                },
+                "replicator": { "types": { "ReplicationEngine": { "alias": "GlideReplicationEngine" } } },
+                "rrdb": {
+                  "ns": { "alerts": { "types": { "RRDBAlertProcessor": { "alias": "GlideRRDBAlertProcessor" } } } },
+                  "types": { "RRDBDefinition": { "alias": "GlideRRDBDefinition" } }
+                },
+                "text_search": { "types": { "SearchQueryFormatter": { "alias": "GlideSearchQueryFormatter" } } },
+                "service_api": {
+                  "types": {
+                    "ServiceAPIWrapper": { "alias": "GlideServiceAPIWrapper" },
+                    "ServiceAPI": { "alias": "ServiceAPI" }
+                  }
+                },
+                "collections": { "types": { "StringList": { "alias": "GlideStringList" } } },
+                "ts": {
+                  "ns": {
+                    "event": { "types": { "TextIndexEvent": { "alias": "GlideTextIndexEvent" } } },
+                    "cluster": {
+                      "types": {
+                        "TSAnalysisViewer": { "alias": "GlideTSAnalysisViewer" },
+                        "TSAnalyticsProcessor": { "alias": "GlideTSAnalyticsProcessor" },
+                        "TSClusterDefinitions": { "alias": "GlideTSClusterDefinitions" },
+                        "TSMoversViewer": { "alias": "GlideTSMoversViewer" }
+                      }
+                    },
+                    "trends": {
+                      "types": {
+                        "TSChainsHandler": { "alias": "GlideTSChainsHandler" },
+                        "TSChainsLoader": { "alias": "GlideTSChainsLoader" },
+                        "TSChainsPusher": { "alias": "GlideTSChainsPusher" },
+                        "TSChainsSummarizer": { "alias": "GlideTSChainsSummarizer" },
+                        "TSGlobalKeywordSummarizer": { "alias": "GlideTSGlobalKeywordSummarizer" },
+                        "TSKeywordHandler": { "alias": "GlideTSKeywordHandler" },
+                        "TSKeywordLoader": { "alias": "GlideTSKeywordLoader" },
+                        "TSKeywordPusher": { "alias": "GlideTSKeywordPusher" },
+                        "TSSearchSummary": { "alias": "GlideTSSearchSummary" }
+                      }
+                    },
+                    "util": {
+                      "types": {
+                        "TSDebug": { "alias": "GlideTSDebug" },
+                        "TSDidYouMean": { "alias": "GlideTSDidYouMean" },
+                        "TSTopSearches": { "alias": "GlideTSTopSearches" },
+                        "TSUtil": { "alias": "GlideTSUtil" }
+                      }
+                    },
+                    "stats": {
+                      "types": {
+                        "TSIndexStatistician": { "alias": "GlideTSIndexStatistician" },
+                        "TSIndexStopGenerator": { "alias": "GlideTSIndexStopGenerator" },
+                        "TSSearchStatistician": { "alias": "GlideTSSearchStatistician" }
+                      }
+                    },
+                    "indexer": { "types": { "TSIndexTables": { "alias": "GlideTSIndexTables" } } }
+                  },
+                  "types": { "TSVersion": { "alias": "GlideTSVersion" } }
+                },
+                "startup": { "types": { "TomcatHelper": { "alias": "GlideTomcatHelper" } } },
+                "system_update_set": { "types": { "UpdateSetController": { "alias": "GlideUpdateSetController" } } },
+                "wiki": { "types": { "GlideWikiModel": { "alias": "GlideWikiModel" } } },
+                "wsdlreader": {
+                  "types": {
+                    "WSDefinition": { "alias": "GlideWSDefinition" },
+                    "GlideWSDLReader": { "alias": "GlideWSDLReader" }
+                  }
+                },
+                "junit": { "ns": { "misc": { "types": { "TestExtension": { "alias": "TestExtension" } } } } }
+              }
+            },
+            "glideapp": {
+              "ns": {
+                "questionset": {
+                  "types": {
+                    "AbstractChoiceListQuestion": { "alias": "GlideappAbstractChoiceListQuestion" },
+                    "CheckBoxQuestion": { "alias": "GlideappCheckBoxQuestion" },
+                    "ContainerAwareQuestionSet": { "alias": "GlideappContainerAwareQuestionSet" },
+                    "DateQuestion": { "alias": "GlideappDateQuestion" },
+                    "DateTimeQuestion": { "alias": "GlideappDateTimeQuestion" },
+                    "ListCollectorQuestion": { "alias": "GlideappListCollectorQuestion" },
+                    "LookupSelectQuestion": { "alias": "GlideappLookupSelectQuestion" },
+                    "Question": { "alias": "GlideappQuestion" },
+                    "QuestionChoice": { "alias": "GlideappQuestionChoice" },
+                    "ReferenceQuestion": { "alias": "GlideappReferenceQuestion" },
+                    "SequencedQuestionSet": { "alias": "GlideappSequencedQuestionSet" },
+                    "YesNoQuestion": { "alias": "GlideappYesNoQuestion" }
+                  }
+                },
+                "ecc": {
+                  "types": {
+                    "ADSILoader": { "alias": "GlideappADSILoader" },
+                    "CMDBHelper": { "alias": "GlideappCMDBHelper" },
+                    "CMDBSoftwareHelper": { "alias": "GlideappCMDBSoftwareHelper" },
+                    "ECCInputMessage": { "alias": "GlideappECCInputMessage" },
+                    "ECCOutputMessage": { "alias": "GlideappECCOutputMessage" },
+                    "ECCQueueConnector": { "alias": "GlideappECCQueueConnector" },
+                    "ECCQueueProcessor": { "alias": "GlideappECCQueueProcessor" },
+                    "ECCResponseMessage": { "alias": "GlideappECCResponseMessage" },
+                    "IECC": { "alias": "GlideappIECC" },
+                    "QueueHelper": { "alias": "GlideappQueueHelper" },
+                    "QueueReader": { "alias": "GlideappQueueReader" },
+                    "WMILoader": { "alias": "GlideappWMILoader" }
+                  },
+                  "ns": { "ccmdb": { "types": { "ProcessQueue": { "alias": "GlideappProcessQueue" } } } }
+                },
+                "google_maps": { "types": { "AJAXMapPage": { "alias": "GlideappAJAXMapPage" } } },
+                "servicecatalog": {
+                  "types": {
+                    "CalculationHelper": { "alias": "GlideappCalculationHelper" },
+                    "Cart": { "alias": "GlideappCart" },
+                    "CartItem": { "alias": "GlideappCartItem" },
+                    "CatalogCategoryBatcher": { "alias": "GlideappCatalogCategoryBatcher" },
+                    "CatalogItem": { "alias": "GlideappCatalogItem" },
+                    "Category": { "alias": "GlideappCategory" },
+                    "CategoryPopper": { "alias": "GlideappCategoryPopper" },
+                    "CatItemPopper": { "alias": "GlideappCatItemPopper" },
+                    "DeliveryPlan": { "alias": "GlideappDeliveryPlan" },
+                    "ExpertPanelCatalogOrder": { "alias": "GlideappExpertPanelCatalogOrder" },
+                    "Fixes": { "alias": "GlideappFixes" },
+                    "IOUpgrade": { "alias": "GlideappIOUpgrade" },
+                    "ItemOptionsQuestionSet": { "alias": "GlideappItemOptionsQuestionSet" },
+                    "OrderGuide": { "alias": "GlideappOrderGuide" },
+                    "RequestItemWorkflow": { "alias": "GlideappRequestItemWorkflow" },
+                    "RequestNew": { "alias": "GlideappRequestNew" },
+                    "ScriptHelper": { "alias": "GlideappScriptHelper" },
+                    "SecurityMask": { "alias": "GlideappSecurityMask" },
+                    "TaskApprovalHelper": { "alias": "GlideappTaskApprovalHelper" }
+                  },
+                  "ns": {
+                    "valve": { "types": { "ValveProcessor": { "alias": "GlideappValveProcessor" } } },
+                    "variables": {
+                      "types": {
+                        "Variable": { "alias": "GlideappVariable" },
+                        "VariablePoolQuestionSet": { "alias": "GlideappVariablePoolQuestionSet" }
+                      }
+                    }
+                  }
+                },
+                "chart": { "types": { "ChartParameters": { "alias": "GlideappChartParameters" } } },
+                "live": {
+                  "ns": {
+                    "db": {
+                      "types": { "ChatRoom": { "alias": "GlideappChatRoom" } },
+                      "ns": { "ChatRoom": { "types": { "Error": { "alias": "GlideappChatRoom$Error" } } } }
+                    }
+                  },
+                  "types": { "LiveUtils": { "alias": "GlideappLiveUtils" } }
+                },
+                "workflow": {
+                  "ns": { "ui": { "types": { "ContextDiagramProcessor": { "alias": "GlideappContextDiagramProcessor" } } } },
+                  "types": {
+                    "Workflow": { "alias": "GlideappWorkflow" },
+                    "WorkflowHelper": { "alias": "GlideappWorkflowHelper" }
+                  }
+                },
+                "live_feed": {
+                  "ns": { "HTMLTransformers": { "types": { "ExpandableText": { "alias": "GlideappExpandableText" } } } },
+                  "types": {
+                    "LiveFeedEventHandler": { "alias": "GlideappLiveFeedEventHandler" },
+                    "LiveFeedJournalWriter": { "alias": "GlideappLiveFeedJournalWriter" },
+                    "LiveFeedUIAction": { "alias": "GlideappLiveFeedUIAction" },
+                    "MessageTag": { "alias": "GlideappMessageTag" },
+                    "TimeAgo": { "alias": "GlideappTimeAgo" }
+                  }
+                },
+                "home": {
+                  "types": {
+                    "Home": { "alias": "GlideappHome" },
+                    "HomePage": { "alias": "GlideappHomePage" },
+                    "HomePageFactory": { "alias": "GlideappHomePageFactory" }
+                  }
+                },
+                "jms": {
+                  "types": {
+                    "JMSECCReceiver": { "alias": "GlideappJMSECCReceiver" },
+                    "JMSECCSender": { "alias": "GlideappJMSECCSender" }
+                  }
+                },
+                "knowledge": { "types": { "KBIncludes": { "alias": "GlideappKBIncludes" } } },
+                "live_common": { "types": { "LiveProfile": { "alias": "GlideappLiveProfile" } } },
+                "version": { "types": { "UpdateVersion": { "alias": "GlideappUpdateVersion" } } },
+                "survey": { "types": { "UpgradeQuestions": { "alias": "GlideappUpgradeQuestions" } } },
+                "wizard": { "types": { "WizardIntercept": { "alias": "GlideappWizardIntercept" } } }
+              }
+            },
+            "glidesoft": {
+              "ns": {
+                "util": {
+                  "ns": {
+                    "xml": {
+                      "types": {
+                        "GlideAttributesImpl": { "alias": "GlidesoftGlideAttributesImpl" },
+                        "XMLMemoryTable": { "alias": "GlidesoftXMLMemoryTable" }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "snc": {
+              "ns": {
+                "commons": {
+                  "ns": {
+                    "networks": {
+                      "types": {
+                        "Address32Bit": { "alias": "SncAddress32Bit" },
+                        "DiscoveryRanges": { "alias": "SncDiscoveryRanges" },
+                        "IPAddressV4": { "alias": "SncIPAddressV4" },
+                        "IPAddressV6": { "alias": "SncIPAddressV6" },
+                        "IPIterator": { "alias": "SncIPIterator" },
+                        "IPList": { "alias": "SncIPList" },
+                        "IPMetaCollection": { "alias": "SncIPMetaCollection" },
+                        "IPNetmaskV4": { "alias": "SncIPNetmaskV4" },
+                        "IPNetworkV4": { "alias": "SncIPNetworkV4" },
+                        "IPRangeV4": { "alias": "SncIPRangeV4" },
+                        "MACAddress": { "alias": "SncMACAddress" },
+                        "MACAddressMfr": { "alias": "SncMACAddressMfr" }
+                      }
+                    }
+                  },
+                  "types": { "MIDConfigParameter": { "alias": "SncMIDConfigParameter" } }
+                },
+                "field_normalization": {
+                  "types": {
+                    "AliasApplier": { "alias": "SncAliasApplier" },
+                    "Configurations": { "alias": "SncConfigurations" },
+                    "ExtantDataJobState": { "alias": "SncExtantDataJobState" },
+                    "NormalCoalescer": { "alias": "SncNormalCoalescer" },
+                    "Normalizer": { "alias": "SncNormalizer" },
+                    "NormalValueChanger": { "alias": "SncNormalValueChanger" },
+                    "PendingValueCollector": { "alias": "SncPendingValueCollector" },
+                    "Preferences": { "alias": "SncPreferences" },
+                    "RuleApplier": { "alias": "SncRuleApplier" },
+                    "RuleToPending": { "alias": "SncRuleToPending" },
+                    "TransformApplier": { "alias": "SncTransformApplier" }
+                  },
+                  "ns": {
+                    "db": {
+                      "types": {
+                        "Configuration": { "alias": "SncConfiguration" },
+                        "ExtantDataJob": { "alias": "SncExtantDataJob" },
+                        "Value": { "alias": "SncValue" }
+                      }
+                    }
+                  }
+                },
+                "apps": {
+                  "ns": {
+                    "api": {
+                      "types": {
+                        "AppFiles": { "alias": "SncAppFiles" },
+                        "AppsAccess": { "alias": "SncAppsAccess" },
+                        "AppsUI": { "alias": "SncAppsUI" },
+                        "TableEditor": { "alias": "SncTableEditor" }
+                      }
+                    },
+                    "db": { "types": { "ApplicationFileListener": { "alias": "SncApplicationFileListener" } } },
+                    "file": { "types": { "FileTree": { "alias": "SncFileTree" } } },
+                    "tree": { "types": { "TreeBuilder": { "alias": "SncTreeBuilder" } } }
+                  }
+                },
+                "discovery": {
+                  "ns": {
+                    "sensor": {
+                      "types": {
+                        "ASensor": { "alias": "SncASensor" },
+                        "ClassifiedProcess": { "alias": "SncClassifiedProcess" }
+                      },
+                      "ns": {
+                        "snmp": {
+                          "types": {
+                            "Classify": { "alias": "SncClassify" },
+                            "DiscoverySNMPClassificatio": { "alias": "SncDiscoverySNMPClassification" }
+                          }
+                        }
+                      }
+                    },
+                    "logging": {
+                      "types": {
+                        "DeviceHistory": { "alias": "SncDeviceHistory" },
+                        "DiscoveryLog": { "alias": "SncDiscoveryLog" }
+                      }
+                    },
+                    "database": {
+                      "types": {
+                        "DiscoveryReconciler": { "alias": "SncDiscoveryReconciler" },
+                        "PrintServerHelper": { "alias": "SncPrintServerHelper" },
+                        "ScrapeIANAEnterpriseNumbers": { "alias": "SncScrapeIANAEnterpriseNumbers" },
+                        "ScrapeIEEENICCodes": { "alias": "SncScrapeIEEENICCodes" }
+                      }
+                    },
+                    "utils": { "types": { "Hostname": { "alias": "SncHostname" } } },
+                    "perfmon": { "types": { "ProbeRunTime": { "alias": "SncProbeRunTime" } } }
+                  },
+                  "types": {
+                    "DiscoveryCancel": { "alias": "SncDiscoveryCancel" },
+                    "DiscoveryClassification": { "alias": "SncDiscoveryClassification" },
+                    "DiscoveryRangesDB": { "alias": "SncDiscoveryRangesDB" },
+                    "DiscoveryUtils": { "alias": "SncDiscoveryUtils" },
+                    "Layer7Connections": { "alias": "SncLayer7Connections" },
+                    "MIDServerRangesDB": { "alias": "SncMIDServerRangesDB" },
+                    "Probe": { "alias": "SncProbe" },
+                    "SensorProcessor": { "alias": "SncSensorProcessor" },
+                    "SerialNumber": { "alias": "SncSerialNumber" },
+                    "SerialNumberList": { "alias": "SncSerialNumberList" },
+                    "SessionMate": { "alias": "SncSessionMate" }
+                  }
+                },
+                "authentication": { "ns": { "digest": { "types": { "Authentication": { "alias": "SncAuthentication" } } } } },
+                "cmdb": {
+                  "types": {
+                    "BaselineCMDB": { "alias": "SncBaselineCMDB" },
+                    "ECMDBUtil": { "alias": "SncECMDBUtil" },
+                    "MakeAndModel": { "alias": "SncMakeAndModel" },
+                    "ReclassifyCI": { "alias": "SncReclassifyCI" },
+                    "Relationships": { "alias": "SncRelationships" }
+                  }
+                },
+                "ha": {
+                  "ns": {
+                    "clone": {
+                      "types": {
+                        "BulkCopy": { "alias": "SncBulkCopy" },
+                        "CloneController": { "alias": "SncCloneController" },
+                        "CloneLogger": { "alias": "SncCloneLogger" },
+                        "CloneTask": { "alias": "SncCloneTask" },
+                        "CloneUtils": { "alias": "SncCloneUtils" },
+                        "DropTablesTask": { "alias": "SncDropTablesTask" },
+                        "HAClone": { "alias": "SncHAClone" }
+                      },
+                      "ns": {
+                        "instance": {
+                          "types": {
+                            "Instance": { "alias": "SncCloneInstance" },
+                            "DropBackupTablesTask": { "alias": "SncDropBackupTablesTask" },
+                            "InstanceClone": { "alias": "SncInstanceClone" },
+                            "InstanceRollback": { "alias": "SncInstanceRollback" },
+                            "ScheduleDropBackupTablesTask": { "alias": "SncScheduleDropBackupTablesTask" },
+                            "SendNotificationTask": { "alias": "SncSendNotificationTask" },
+                            "SimmerControl": { "alias": "SncSimmerControl" }
+                          }
+                        }
+                      }
+                    },
+                    "connectivity": {
+                      "types": {
+                        "ConnectionTest": { "alias": "SncConnectionTest" },
+                        "HAConnectionTest": { "alias": "SncHAConnectionTest" },
+                        "InstanceConnectionTest": { "alias": "SncInstanceConnectionTest" }
+                      }
+                    },
+                    "tablecheck": {
+                      "types": {
+                        "HADatabaseCheck": { "alias": "SncHADatabaseCheck" },
+                        "HAReplicationQueueSnapshotBuilder": { "alias": "SncHAReplicationQueueSnapshotBuilder" },
+                        "HATableCheck": { "alias": "SncHATableCheck" },
+                        "HATableCheckThread": { "alias": "SncHATableCheckThread" },
+                        "HATableQuickCheck": { "alias": "SncHATableQuickCheck" },
+                        "HATableRepair": { "alias": "SncHATableRepair" }
+                      }
+                    }
+                  },
+                  "types": {
+                    "HAPairingUtils": { "alias": "SncHAPairingUtils" },
+                    "HAReplicationController": { "alias": "SncHAReplicationController" },
+                    "HAUtils": { "alias": "SncHAUtils" },
+                    "ReadTest": { "alias": "SncReadTest" }
+                  }
+                },
+                "db": {
+                  "ns": {
+                    "clone": { "ns": { "change": { "types": { "DBChangeManagerFactoryHA": { "alias": "SncDBChangeManagerFactoryHA" } } } } },
+                    "replicate": {
+                      "types": {
+                        "ReplicationAdvisor": { "alias": "SncReplicationAdvisor" },
+                        "ReplicationEngine": { "alias": "SncReplicationEngine" },
+                        "ReplicationQueue": { "alias": "SncReplicationQueue" },
+                        "TableRotation": { "alias": "SncTableRotation" },
+                        "TableRotationExtension": { "alias": "SncTableRotationExtension" },
+                        "TableRotationExtensions": { "alias": "SncTableRotationExtensions" },
+                        "TableRotationWatcher": { "alias": "SncTableRotationWatcher" }
+                      }
+                    }
+                  }
+                },
+                "ec2": { "types": { "EC2Properties": { "alias": "SncEC2Properties" } } },
+                "customer_logon": {
+                  "types": {
+                    "ElrondClient": { "alias": "SncElrondClient" },
+                    "RequestCredentials": { "alias": "SncRequestCredentials" }
+                  }
+                },
+                "expert": {
+                  "types": {
+                    "Expert": { "alias": "SncExpert" },
+                    "ExpertInstance": { "alias": "SncExpertInstance" },
+                    "ExpertPanel": { "alias": "SncExpertPanel" }
+                  }
+                },
+                "da": {
+                  "ns": {
+                    "gateway": {
+                      "ns": {
+                        "replication": {
+                          "types": {
+                            "FailoverController": { "alias": "SncFailoverController" },
+                            "GatewayPluginStartup": { "alias": "SncGatewayPluginStartup" }
+                          }
+                        },
+                        "clone": {
+                          "types": {
+                            "GatewayClone": { "alias": "SncGatewayClone" },
+                            "GatewayTruncateHierarchy": { "alias": "SncGatewayTruncateHierarchy" }
+                          }
+                        }
+                      },
+                      "types": {
+                        "GatewayCache": { "alias": "SncGatewayCache" },
+                        "GatewayConnectivity": { "alias": "SncGatewayConnectivity" },
+                        "GlideGateways": { "alias": "SncGlideGateways" }
+                      }
+                    }
+                  }
+                },
+                "ipauthenticator": { "types": { "IPAuthenticator": { "alias": "SncIPAuthenticator" } } },
+                "jrobin": {
+                  "types": {
+                    "JRobinGraphDef": { "alias": "SncJRobinGraphDef" },
+                    "RrdGlideBackendFactory": { "alias": "SncRrdGlideBackendFactory" }
+                  }
+                },
+                "system": { "types": { "NotifySNC": { "alias": "SncNotifySNC" } } },
+                "on_call_rotation": { "types": { "OnCallRotation": { "alias": "SncOnCallRotation" } } },
+                "discovery_automation": { "types": { "RBSensorProcessor": { "alias": "SncRBSensorProcessor" } } },
+                "software_asset_management": { "types": { "SAMCounter": { "alias": "SncSAMCounter" } } },
+                "automation": { "types": { "TriggerSynchronizer": { "alias": "SncTriggerSynchronizer" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "https://www": { "ns": { "youtube": { "types": { "com/watch?feature=player_detailpage\u0026v=9qYl_pBZej": { "alias": "GlideHTTPClient" } } } } }
+  },
+  "aliases": {
+    "Glide": {
+      "fullname": "Packages.com.glide.Glide",
+      "inactive": true
+    },
+    "GlideAbstractBucketCollector": {
+      "fullname": "Packages.com.glide.monitor.AbstractBucketCollector",
+      "inactive": true
+    },
+    "GlideAbstractDomainProvider": {
+      "fullname": "Packages.com.glide.db.domain.AbstractDomainProvider",
+      "inactive": true
+    },
+    "GlideAbstractExecutionPlan": {
+      "fullname": "Packages.com.glide.execution_plan.AbstractExecutionPlan",
+      "inactive": true
+    },
+    "GlideAbstractListener": {
+      "fullname": "Packages.com.glide.listener.AbstractListener",
+      "inactive": true
+    },
+    "GlideAbstractRenderer": {
+      "fullname": "Packages.com.glide.ui.portal.AbstractRenderer",
+      "inactive": true
+    },
+    "GlideAction": {
+      "fullname": "Packages.com.glide.script.Action",
+      "inactive": true
+    },
+    "GlideActionManager": {
+      "fullname": "Packages.com.glide.ui.action.ActionManager",
+      "inactive": true
+    },
+    "GlideAJAXScheduleItem": {
+      "fullname": "Packages.com.glide.schedules.AJAXScheduleItem",
+      "inactive": true
+    },
+    "GlideAJAXSchedulePage": {
+      "fullname": "Packages.com.glide.schedules.AJAXSchedulePage",
+      "inactive": true
+    },
+    "GlideAlertActions": {
+      "fullname": "Packages.com.glide.alerts.AlertActions",
+      "inactive": true
+    },
+    "GlideappAbstractChoiceListQuestion": {
+      "fullname": "Packages.com.glideapp.questionset.AbstractChoiceListQuestion",
+      "inactive": true
+    },
+    "GlideappADSILoader": {
+      "fullname": "Packages.com.glideapp.ecc.ADSILoader",
+      "inactive": true
+    },
+    "GlideappAJAXMapPage": {
+      "fullname": "Packages.com.glideapp.google_maps.AJAXMapPage",
+      "inactive": true
+    },
+    "GlideappCalculationHelper": {
+      "fullname": "Packages.com.glideapp.servicecatalog.CalculationHelper",
+      "inactive": true
+    },
+    "GlideappCart": {
+      "fullname": "Packages.com.glideapp.servicecatalog.Cart",
+      "inactive": true
+    },
+    "GlideappCartItem": {
+      "fullname": "Packages.com.glideapp.servicecatalog.CartItem",
+      "inactive": true
+    },
+    "GlideappCatalogCategoryBatcher": {
+      "fullname": "Packages.com.glideapp.servicecatalog.CatalogCategoryBatcher",
+      "inactive": true
+    },
+    "GlideappCatalogItem": {
+      "fullname": "Packages.com.glideapp.servicecatalog.CatalogItem",
+      "inactive": true
+    },
+    "GlideappCategory": {
+      "fullname": "Packages.com.glideapp.servicecatalog.Category",
+      "inactive": true
+    },
+    "GlideappCategoryPopper": {
+      "fullname": "Packages.com.glideapp.servicecatalog.CategoryPopper",
+      "inactive": true
+    },
+    "GlideappCatItemPopper": {
+      "fullname": "Packages.com.glideapp.servicecatalog.CatItemPopper",
+      "inactive": true
+    },
+    "GlideappChartParameters": {
+      "fullname": "Packages.com.glideapp.chart.ChartParameters",
+      "inactive": true
+    },
+    "GlideappChatRoom": {
+      "fullname": "Packages.com.glideapp.live.db.ChatRoom",
+      "inactive": true
+    },
+    "GlideappChatRoom$Error": {
+      "fullname": "Packages.com.glideapp.live.db.ChatRoom.Error",
+      "inactive": true
+    },
+    "GlideappCheckBoxQuestion": {
+      "fullname": "Packages.com.glideapp.questionset.CheckBoxQuestion",
+      "inactive": true
+    },
+    "GlideappCMDBHelper": {
+      "fullname": "Packages.com.glideapp.ecc.CMDBHelper",
+      "inactive": true
+    },
+    "GlideappCMDBSoftwareHelper": {
+      "fullname": "Packages.com.glideapp.ecc.CMDBSoftwareHelper",
+      "inactive": true
+    },
+    "GlideappContainerAwareQuestionSet": {
+      "fullname": "Packages.com.glideapp.questionset.ContainerAwareQuestionSet",
+      "inactive": true
+    },
+    "GlideappContextDiagramProcessor": {
+      "fullname": "Packages.com.glideapp.workflow.ui.ContextDiagramProcessor",
+      "inactive": true
+    },
+    "GlideappDateQuestion": {
+      "fullname": "Packages.com.glideapp.questionset.DateQuestion",
+      "inactive": true
+    },
+    "GlideappDateTimeQuestion": {
+      "fullname": "Packages.com.glideapp.questionset.DateTimeQuestion",
+      "inactive": true
+    },
+    "GlideappDeliveryPlan": {
+      "fullname": "Packages.com.glideapp.servicecatalog.DeliveryPlan",
+      "inactive": true
+    },
+    "GlideappECCInputMessage": {
+      "fullname": "Packages.com.glideapp.ecc.ECCInputMessage",
+      "inactive": true
+    },
+    "GlideappECCOutputMessage": {
+      "fullname": "Packages.com.glideapp.ecc.ECCOutputMessage",
+      "inactive": true
+    },
+    "GlideappECCQueueConnector": {
+      "fullname": "Packages.com.glideapp.ecc.ECCQueueConnector",
+      "inactive": true
+    },
+    "GlideappECCQueueProcessor": {
+      "fullname": "Packages.com.glideapp.ecc.ECCQueueProcessor",
+      "inactive": true
+    },
+    "GlideappECCResponseMessage": {
+      "fullname": "Packages.com.glideapp.ecc.ECCResponseMessage",
+      "inactive": true
+    },
+    "GlideappExpandableText": {
+      "fullname": "Packages.com.glideapp.live_feed.HTMLTransformers.ExpandableText",
+      "inactive": true
+    },
+    "GlideappExpertPanelCatalogOrder": {
+      "fullname": "Packages.com.glideapp.servicecatalog.ExpertPanelCatalogOrder",
+      "inactive": true
+    },
+    "GlideappFixes": {
+      "fullname": "Packages.com.glideapp.servicecatalog.Fixes",
+      "inactive": true
+    },
+    "GlideappHome": {
+      "fullname": "Packages.com.glideapp.home.Home",
+      "inactive": true
+    },
+    "GlideappHomePage": {
+      "fullname": "Packages.com.glideapp.home.HomePage",
+      "inactive": true
+    },
+    "GlideappHomePageFactory": {
+      "fullname": "Packages.com.glideapp.home.HomePageFactory",
+      "inactive": true
+    },
+    "GlideappIECC": {
+      "fullname": "Packages.com.glideapp.ecc.IECC",
+      "inactive": true
+    },
+    "GlideappIOUpgrade": {
+      "fullname": "Packages.com.glideapp.servicecatalog.IOUpgrade",
+      "inactive": true
+    },
+    "GlideappItemOptionsQuestionSet": {
+      "fullname": "Packages.com.glideapp.servicecatalog.ItemOptionsQuestionSet",
+      "inactive": true
+    },
+    "GlideappJMSECCReceiver": {
+      "fullname": "Packages.com.glideapp.jms.JMSECCReceiver",
+      "inactive": true
+    },
+    "GlideappJMSECCSender": {
+      "fullname": "Packages.com.glideapp.jms.JMSECCSender",
+      "inactive": true
+    },
+    "GlideappKBIncludes": {
+      "fullname": "Packages.com.glideapp.knowledge.KBIncludes",
+      "inactive": true
+    },
+    "GlideApplication": {
+      "fullname": "Packages.com.glide.sys.Application",
+      "inactive": true
+    },
+    "GlideApplicationModule": {
+      "fullname": "Packages.com.glide.processors.ApplicationModule",
+      "inactive": true
+    },
+    "GlideappListCollectorQuestion": {
+      "fullname": "Packages.com.glideapp.questionset.ListCollectorQuestion",
+      "inactive": true
+    },
+    "GlideappLiveFeedEventHandler": {
+      "fullname": "Packages.com.glideapp.live_feed.LiveFeedEventHandler",
+      "inactive": true
+    },
+    "GlideappLiveFeedJournalWriter": {
+      "fullname": "Packages.com.glideapp.live_feed.LiveFeedJournalWriter",
+      "inactive": true
+    },
+    "GlideappLiveFeedUIAction": {
+      "fullname": "Packages.com.glideapp.live_feed.LiveFeedUIAction",
+      "inactive": true
+    },
+    "GlideappLiveProfile": {
+      "fullname": "Packages.com.glideapp.live_common.LiveProfile",
+      "inactive": true
+    },
+    "GlideappLiveUtils": {
+      "fullname": "Packages.com.glideapp.live.LiveUtils",
+      "inactive": true
+    },
+    "GlideappLookupSelectQuestion": {
+      "fullname": "Packages.com.glideapp.questionset.LookupSelectQuestion",
+      "inactive": true
+    },
+    "GlideappMessageTag": {
+      "fullname": "Packages.com.glideapp.live_feed.MessageTag",
+      "inactive": true
+    },
+    "GlideappOrderGuide": {
+      "fullname": "Packages.com.glideapp.servicecatalog.OrderGuide",
+      "inactive": true
+    },
+    "GlideappProcessQueue": {
+      "fullname": "Packages.com.glideapp.ecc.ccmdb.ProcessQueue",
+      "inactive": true
+    },
+    "GlideappQuestion": {
+      "fullname": "Packages.com.glideapp.questionset.Question",
+      "inactive": true
+    },
+    "GlideappQuestionChoice": {
+      "fullname": "Packages.com.glideapp.questionset.QuestionChoice",
+      "inactive": true
+    },
+    "GlideappQueueHelper": {
+      "fullname": "Packages.com.glideapp.ecc.QueueHelper",
+      "inactive": true
+    },
+    "GlideappQueueReader": {
+      "fullname": "Packages.com.glideapp.ecc.QueueReader",
+      "inactive": true
+    },
+    "GlideappReferenceQuestion": {
+      "fullname": "Packages.com.glideapp.questionset.ReferenceQuestion",
+      "inactive": true
+    },
+    "GlideappRequestItemWorkflow": {
+      "fullname": "Packages.com.glideapp.servicecatalog.RequestItemWorkflow",
+      "inactive": true
+    },
+    "GlideappRequestNew": {
+      "fullname": "Packages.com.glideapp.servicecatalog.RequestNew",
+      "inactive": true
+    },
+    "GlideappScriptHelper": {
+      "fullname": "Packages.com.glideapp.servicecatalog.ScriptHelper",
+      "inactive": true
+    },
+    "GlideappSecurityMask": {
+      "fullname": "Packages.com.glideapp.servicecatalog.SecurityMask",
+      "inactive": true
+    },
+    "GlideappSequencedQuestionSet": {
+      "fullname": "Packages.com.glideapp.questionset.SequencedQuestionSet",
+      "inactive": true
+    },
+    "GlideappTaskApprovalHelper": {
+      "fullname": "Packages.com.glideapp.servicecatalog.TaskApprovalHelper",
+      "inactive": true
+    },
+    "GlideappTimeAgo": {
+      "fullname": "Packages.com.glideapp.live_feed.TimeAgo",
+      "inactive": true
+    },
+    "GlideappUpdateVersion": {
+      "fullname": "Packages.com.glideapp.version.UpdateVersion",
+      "inactive": true
+    },
+    "GlideappUpgradeQuestions": {
+      "fullname": "Packages.com.glideapp.survey.UpgradeQuestions",
+      "inactive": true
+    },
+    "GlideappValveProcessor": {
+      "fullname": "Packages.com.glideapp.servicecatalog.valve.ValveProcessor",
+      "inactive": true
+    },
+    "GlideappVariable": {
+      "fullname": "Packages.com.glideapp.servicecatalog.variables.Variable",
+      "inactive": true
+    },
+    "GlideappVariablePoolQuestionSet": {
+      "fullname": "Packages.com.glideapp.servicecatalog.variables.VariablePoolQuestionSet",
+      "inactive": true
+    },
+    "GlideappWizardIntercept": {
+      "fullname": "Packages.com.glideapp.wizard.WizardIntercept",
+      "inactive": true
+    },
+    "GlideappWMILoader": {
+      "fullname": "Packages.com.glideapp.ecc.WMILoader",
+      "inactive": true
+    },
+    "GlideappWorkflow": {
+      "fullname": "Packages.com.glideapp.workflow.Workflow",
+      "inactive": true
+    },
+    "GlideappWorkflowHelper": {
+      "fullname": "Packages.com.glideapp.workflow.WorkflowHelper",
+      "inactive": true
+    },
+    "GlideappYesNoQuestion": {
+      "fullname": "Packages.com.glideapp.questionset.YesNoQuestion",
+      "inactive": true
+    },
+    "GlideAQueryExplanation": {
+      "fullname": "Packages.com.glide.db.explain.AQueryExplanation",
+      "inactive": true
+    },
+    "GlideArchiver": {
+      "fullname": "Packages.com.glide.db.auxiliary.Archiver",
+      "inactive": true
+    },
+    "GlideArchiveRecord": {
+      "fullname": "Packages.com.glide.db.auxiliary.ArchiveRecord",
+      "inactive": true
+    },
+    "GlideArchiveRestore": {
+      "fullname": "Packages.com.glide.db.auxiliary.ArchiveRestore",
+      "inactive": true
+    },
+    "GlideArchiveStatus": {
+      "fullname": "Packages.com.glide.db.auxiliary.ArchiveStatus",
+      "inactive": true
+    },
+    "GlideArchiveTable": {
+      "fullname": "Packages.com.glide.db.auxiliary.ArchiveTable",
+      "inactive": true
+    },
+    "GlideARecurrence": {
+      "fullname": "Packages.com.glide.schedule.recurrence.ARecurrence",
+      "inactive": true
+    },
+    "GlideAttachmentIndexDocument": {
+      "fullname": "Packages.com.glide.lucene.attachments.AttachmentIndexDocument",
+      "inactive": true
+    },
+    "GlideAttachmentIndexTypes": {
+      "fullname": "Packages.com.glide.lucene.attachments.AttachmentIndexTypes",
+      "inactive": true
+    },
+    "GlideAttributes": {
+      "fullname": "Packages.com.glide.util.GlideAttributes",
+      "inactive": true
+    },
+    "GlideAuditDelete": {
+      "fullname": "Packages.com.glide.audit.AuditDelete",
+      "inactive": true
+    },
+    "GlideAuditor": {
+      "fullname": "Packages.com.glide.script.Auditor",
+      "inactive": true
+    },
+    "GlideAutomationEncrypter": {
+      "fullname": "Packages.com.glide.util.AutomationEncrypter",
+      "inactive": true
+    },
+    "GlideBaseTag": {
+      "fullname": "Packages.com.glide.ui.jelly.tags.BaseTag",
+      "inactive": true
+    },
+    "GlideBootstrap": {
+      "fullname": "Packages.com.glide.db.impex.Bootstrap",
+      "inactive": true
+    },
+    "GlideBoundedIntProperty": {
+      "fullname": "Packages.com.glide.util.BoundedIntProperty",
+      "inactive": true
+    },
+    "GlideCacheManager": {
+      "fullname": "Packages.com.glide.sys.cache.CacheManager",
+      "inactive": true
+    },
+    "GlideCalendar": {
+      "fullname": "Packages.com.glide.schedule.GlideCalendar",
+      "inactive": true
+    },
+    "GlideCalendarWeekEntry": {
+      "fullname": "Packages.com.glide.calendar.GlideCalendarWeekEntry",
+      "inactive": true
+    },
+    "GlideCanceledUITransaction": {
+      "fullname": "Packages.com.glide.ui.CanceledUITransaction",
+      "inactive": true
+    },
+    "GlideCascadeFromDelete": {
+      "fullname": "Packages.com.glide.db.CascadeFromDelete",
+      "inactive": true
+    },
+    "GlideCatalogCloneWorker": {
+      "fullname": "Packages.com.glide.catalog.cloner.CatalogCloneWorker",
+      "inactive": true
+    },
+    "GlideChannel": {
+      "fullname": "Packages.com.glide.channel.Channel",
+      "inactive": true
+    },
+    "GlideChannelManager": {
+      "fullname": "Packages.com.glide.channel.ChannelManager",
+      "inactive": true
+    },
+    "GlideChannelMessage": {
+      "fullname": "Packages.com.glide.channel.ChannelMessage",
+      "inactive": true
+    },
+    "GlideChartFieldColors": {
+      "fullname": "Packages.com.glide.ui.chart.dataset.ChartFieldColors",
+      "inactive": true
+    },
+    "GlideChartGeneratorFactory": {
+      "fullname": "Packages.com.glide.ui.chart.ChartGeneratorFactory",
+      "inactive": true
+    },
+    "GlideChartUtil": {
+      "fullname": "Packages.com.glide.ui.chart.dataset.ChartUtil",
+      "inactive": true
+    },
+    "GlideChartValue": {
+      "fullname": "Packages.com.glide.ui.chart.dataset.ChartValue",
+      "inactive": true
+    },
+    "GlideChecksum": {
+      "fullname": "Packages.com.glide.util.Checksum",
+      "inactive": true
+    },
+    "GlideChoice": {
+      "fullname": "Packages.com.glide.choice.Choice",
+      "inactive": true
+    },
+    "GlideChoiceList": {
+      "fullname": "Packages.com.glide.choice.ChoiceList",
+      "inactive": true
+    },
+    "GlideChoiceListGenerator": {
+      "fullname": "Packages.com.glide.choice.ChoiceListGenerator",
+      "inactive": true
+    },
+    "GlideChoiceListSet": {
+      "fullname": "Packages.com.glide.choice.ChoiceListSet",
+      "inactive": true
+    },
+    "GlideChoiceListUpdateSaver": {
+      "fullname": "Packages.com.glide.update.saver.ChoiceListUpdateSaver",
+      "inactive": true
+    },
+    "GlideClientBrowserTimes": {
+      "fullname": "Packages.com.glide.client_transaction.ClientBrowserTimes",
+      "inactive": true
+    },
+    "GlideClientNetworkTimes": {
+      "fullname": "Packages.com.glide.client_transaction.ClientNetworkTimes",
+      "inactive": true
+    },
+    "GlideClusterMessage": {
+      "fullname": "Packages.com.glide.cluster.ClusterMessage",
+      "inactive": true
+    },
+    "GlideClusterState": {
+      "fullname": "Packages.com.glide.cluster.ClusterState",
+      "inactive": true
+    },
+    "GlideClusterSynchronizer": {
+      "fullname": "Packages.com.glide.cluster.ClusterSynchronizer",
+      "inactive": true
+    },
+    "GlideCMSLinkHelper": {
+      "fullname": "Packages.com.glide.cms.CMSLinkHelper",
+      "inactive": true
+    },
+    "GlideCMSPageLink": {
+      "fullname": "Packages.com.glide.cms.CMSPageLink",
+      "inactive": true
+    },
+    "GlideCollectionEnumerator": {
+      "fullname": "Packages.com.glide.util.CollectionEnumerator",
+      "inactive": true
+    },
+    "GlideCollectionQueryCalculator": {
+      "fullname": "Packages.com.glide.ui.CollectionQueryCalculator",
+      "inactive": true
+    },
+    "GlideCollisionDetector": {
+      "fullname": "Packages.com.glide.update.collisions.CollisionDetector",
+      "inactive": true
+    },
+    "GlideColumnAttributes": {
+      "fullname": "Packages.com.glide.db.impex.ColumnAttributes",
+      "inactive": true
+    },
+    "GlideCompanyResolver": {
+      "fullname": "Packages.com.glide.misc.CompanyResolver",
+      "inactive": true
+    },
+    "GlideCompiler": {
+      "fullname": "Packages.com.glide.script.Compiler",
+      "inactive": true
+    },
+    "GlideCompositeElement": {
+      "fullname": "Packages.com.glide.db.CompositeElement",
+      "inactive": true
+    },
+    "GlideConfiguration": {
+      "fullname": "Packages.com.glide.notification.Configuration",
+      "inactive": true
+    },
+    "GlideContentConfig": {
+      "fullname": "Packages.com.glide.cms.ContentConfig",
+      "inactive": true
+    },
+    "GlideContentPage": {
+      "fullname": "Packages.com.glide.cms.ContentPage",
+      "inactive": true
+    },
+    "GlideContentSite": {
+      "fullname": "Packages.com.glide.cms.ContentSite",
+      "inactive": true
+    },
+    "GlideContentType": {
+      "fullname": "Packages.com.glide.cms.ContentType",
+      "inactive": true
+    },
+    "GlideContextMenu": {
+      "fullname": "Packages.com.glide.db_context_menu.ContextMenu",
+      "inactive": true
+    },
+    "GlideContextMenuItem": {
+      "fullname": "Packages.com.glide.db_context_menu.ContextMenuItem",
+      "inactive": true
+    },
+    "GlideContextualSecurityManager": {
+      "fullname": "Packages.com.glide.sys.security.ContextualSecurityManager",
+      "inactive": true
+    },
+    "GlideController": {
+      "fullname": "Packages.com.glide.script.GlideController",
+      "inactive": true
+    },
+    "GlideConverter": {
+      "fullname": "Packages.com.glide.currency.Converter",
+      "inactive": true
+    },
+    "GlideCookieMan": {
+      "fullname": "Packages.com.glide.ui.CookieMan",
+      "inactive": true
+    },
+    "GlideCounter": {
+      "fullname": "Packages.com.glide.util.Counter",
+      "inactive": true
+    },
+    "GlideCredentials": {
+      "fullname": "Packages.com.glide.communications.crypto.Credentials",
+      "inactive": true
+    },
+    "GlideCryptoService": {
+      "fullname": "Packages.com.glide.security.CryptoService",
+      "inactive": true
+    },
+    "GlideCSVExporter": {
+      "fullname": "Packages.com.glide.generators.CSVExporter",
+      "inactive": true
+    },
+    "GlideCustomerScriptFixer": {
+      "fullname": "Packages.com.glide.script.api.CustomerScriptFixer",
+      "inactive": true
+    },
+    "GlideDatabaseVerifier": {
+      "fullname": "Packages.com.glide.db.DatabaseVerifier",
+      "inactive": true
+    },
+    "GlideDatabaseViewLink": {
+      "fullname": "Packages.com.glide.database_views.DatabaseViewLink",
+      "inactive": true
+    },
+    "GlideDataSource": {
+      "fullname": "Packages.com.glide.db.impex.datasource.DataSource",
+      "inactive": true
+    },
+    "GlideDate": {
+      "fullname": "Packages.com.glide.glideobject.GlideDate",
+      "inactive": true
+    },
+    "GlideDateTime": {
+      "fullname": "Packages.com.glide.glideobject.GlideDateTime",
+      "inactive": true
+    },
+    "GlideDateUtil": {
+      "fullname": "Packages.com.glide.util.DateUtil",
+      "inactive": true
+    },
+    "GlideDBAction": {
+      "fullname": "Packages.com.glide.db.DBAction",
+      "inactive": true
+    },
+    "GlideDBAggregateQuery": {
+      "fullname": "Packages.com.glide.db.DBAggregateQuery",
+      "inactive": true
+    },
+    "GlideDBAggregateUtil": {
+      "fullname": "Packages.com.glide.db.DBAggregateUtil",
+      "inactive": true
+    },
+    "GlideDBCategoryDebug": {
+      "fullname": "Packages.com.glide.secondary_db_pools.DBCategoryDebug",
+      "inactive": true
+    },
+    "GlideDBChangeManager": {
+      "fullname": "Packages.com.glide.db.change.DBChangeManager",
+      "inactive": true
+    },
+    "GlideDBCompositeAction": {
+      "fullname": "Packages.com.glide.db.DBCompositeAction",
+      "inactive": true
+    },
+    "GlideDBConfiguration": {
+      "fullname": "Packages.com.glide.db.DBConfiguration",
+      "inactive": true
+    },
+    "GlideDBConfigurationManager": {
+      "fullname": "Packages.com.glide.db.DBConfigurationManager",
+      "inactive": true
+    },
+    "GlideDBConfigurationManagerEventHandler": {
+      "fullname": "Packages.com.glide.db.DBConfigurationManagerEventHandler",
+      "inactive": true
+    },
+    "GlideDBConfigurationParms": {
+      "fullname": "Packages.com.glide.db.DBConfigurationParms",
+      "inactive": true
+    },
+    "GlideDBConfigurationV2Migrator": {
+      "fullname": "Packages.com.glide.db.DBConfigurationV2Migrator",
+      "inactive": true
+    },
+    "GlideDBConnection": {
+      "fullname": "Packages.com.glide.db.pool.DBConnection",
+      "inactive": true
+    },
+    "GlideDBConnectionPool": {
+      "fullname": "Packages.com.glide.db.pool.DBConnectionPool",
+      "inactive": true
+    },
+    "GlideDBConnectionPooler": {
+      "fullname": "Packages.com.glide.db.pool.DBConnectionPooler",
+      "inactive": true
+    },
+    "GlideDBDelete": {
+      "fullname": "Packages.com.glide.db.DBDelete",
+      "inactive": true
+    },
+    "GlideDBI": {
+      "fullname": "Packages.com.glide.db.DBI",
+      "inactive": true
+    },
+    "GlideDBImageProvider": {
+      "fullname": "Packages.com.glide.db_image.DBImageProvider",
+      "inactive": true
+    },
+    "GlideDBIMySQL": {
+      "fullname": "Packages.com.glide.db.rdbms.mysql.DBIMySQL",
+      "inactive": true
+    },
+    "GlideDBIndex": {
+      "fullname": "Packages.com.glide.db.DBIndex",
+      "inactive": true
+    },
+    "GlideDBKeyStoreFactory": {
+      "fullname": "Packages.com.glide.certificates.DBKeyStoreFactory",
+      "inactive": true
+    },
+    "GlideDBMacro": {
+      "fullname": "Packages.com.glide.ui.jelly.tags.form.DBMacro",
+      "inactive": true
+    },
+    "GlideDBMicroStats": {
+      "fullname": "Packages.com.glide.db.DBMicroStats",
+      "inactive": true
+    },
+    "GlideDBMultiTargetAction": {
+      "fullname": "Packages.com.glide.db.DBMultiTargetAction",
+      "inactive": true
+    },
+    "GlideDBObjectManager": {
+      "fullname": "Packages.com.glide.db.DBObjectManager",
+      "inactive": true
+    },
+    "GlideDBObjectToken": {
+      "fullname": "Packages.com.glide.db.DBObjectToken",
+      "inactive": true
+    },
+    "GlideDBPoolTest": {
+      "fullname": "Packages.com.glide.secondary_db_pools.DBPoolTest",
+      "inactive": true
+    },
+    "GlideDBPropertiesConfig": {
+      "fullname": "Packages.com.glide.db.DBPropertiesConfig",
+      "inactive": true
+    },
+    "GlideDBQuery": {
+      "fullname": "Packages.com.glide.db.DBQuery",
+      "inactive": true
+    },
+    "GlideDBTypes": {
+      "fullname": "Packages.com.glide.db.DBTypes",
+      "inactive": true
+    },
+    "GlideDBUpdate": {
+      "fullname": "Packages.com.glide.db.DBUpdate",
+      "inactive": true
+    },
+    "GlideDBUtil": {
+      "fullname": "Packages.com.glide.db.DBUtil",
+      "inactive": true
+    },
+    "GlideDBView": {
+      "fullname": "Packages.com.glide.db.DBView",
+      "inactive": true
+    },
+    "GlideDebugEvaluator": {
+      "fullname": "Packages.com.glide.jsdebug.DebugEvaluator",
+      "inactive": true
+    },
+    "GlideDefaultUpdateSaver": {
+      "fullname": "Packages.com.glide.update.saver.DefaultUpdateSaver",
+      "inactive": true
+    },
+    "GlideDiagram": {
+      "fullname": "Packages.com.glide.diagrammer.Diagram",
+      "inactive": true
+    },
+    "GlideDiagramAction": {
+      "fullname": "Packages.com.glide.diagrammer.DiagramAction",
+      "inactive": true
+    },
+    "GlideDiagramEdge": {
+      "fullname": "Packages.com.glide.diagrammer.DiagramEdge",
+      "inactive": true
+    },
+    "GlideDiagramElement": {
+      "fullname": "Packages.com.glide.diagrammer.DiagramElement",
+      "inactive": true
+    },
+    "GlideDiagramNode": {
+      "fullname": "Packages.com.glide.diagrammer.DiagramNode",
+      "inactive": true
+    },
+    "GlideDistUpgradeRunner": {
+      "fullname": "Packages.com.glide.dist.upgrade.runner.DistUpgradeRunner",
+      "inactive": true
+    },
+    "GlideDocument": {
+      "fullname": "Packages.com.glide.util.GlideDocument",
+      "inactive": true
+    },
+    "GlideDomain": {
+      "fullname": "Packages.com.glide.db.domain.Domain",
+      "inactive": true
+    },
+    "GlideDomainDisplay": {
+      "fullname": "Packages.com.glide.db.domain.DomainDisplay",
+      "inactive": true
+    },
+    "GlideDomainHierarchy": {
+      "fullname": "Packages.com.glide.db.domain.DomainHierarchy",
+      "inactive": true
+    },
+    "GlideDomainNumberProvider": {
+      "fullname": "Packages.com.glide.db.domain.DomainNumberProvider",
+      "inactive": true
+    },
+    "GlideDomainPathDisplay": {
+      "fullname": "Packages.com.glide.db.domain.DomainPathDisplay",
+      "inactive": true
+    },
+    "GlideDomainPathProvider": {
+      "fullname": "Packages.com.glide.db.domain.DomainPathProvider",
+      "inactive": true
+    },
+    "GlideDomainSpoolProvider": {
+      "fullname": "Packages.com.glide.db.domain.DomainSpoolProvider",
+      "inactive": true
+    },
+    "GlideDomainSupport": {
+      "fullname": "Packages.com.glide.db.domain.DomainSupport",
+      "inactive": true
+    },
+    "GlideDomainTree": {
+      "fullname": "Packages.com.glide.db.domain.DomainTree",
+      "inactive": true
+    },
+    "GlideDomainUtil": {
+      "fullname": "Packages.com.glide.db.domain.DomainUtil",
+      "inactive": true
+    },
+    "GlideDomainValidator": {
+      "fullname": "Packages.com.glide.db.domain.DomainValidator",
+      "inactive": true
+    },
+    "GlideDuration": {
+      "fullname": "Packages.com.glide.glideobject.GlideDuration",
+      "inactive": true
+    },
+    "GlideECBDownloader": {
+      "fullname": "Packages.com.glide.currency.ECBDownloader",
+      "inactive": true
+    },
+    "GlideECCQueueTransformer": {
+      "fullname": "Packages.com.glide.db.impex.ECCQueueTransformer",
+      "inactive": true
+    },
+    "GlideElement": { "fullname": "Packages.com.glide.script.GlideElement" },
+    "GlideElementDescriptor": { "fullname": "Packages.com.glide.db.ElementDescriptor" },
+    "GlideElementIterator": {
+      "fullname": "Packages.com.glide.util.ElementIterator",
+      "inactive": true
+    },
+    "GlideElementUserImage": { "fullname": "Packages.com.glide.script.glide_elements.GlideElementUserImage" },
+    "GlideElementXMLSerializer": {
+      "fullname": "Packages.com.glide.script.GlideElementXMLSerializer",
+      "inactive": true
+    },
+    "GlideEmail": {
+      "fullname": "Packages.com.glide.notification.Email",
+      "inactive": true
+    },
+    "GlideEmailAction": {
+      "fullname": "Packages.com.glide.notification.outbound.EmailAction",
+      "inactive": true
+    },
+    "GlideEmailFormatter": {
+      "fullname": "Packages.com.glide.notification.outbound.EmailFormatter",
+      "inactive": true
+    },
+    "GlideEmailInbound": {
+      "fullname": "Packages.com.glide.notification.inbound.EmailInbound",
+      "inactive": true
+    },
+    "GlideEmailOutbound": {
+      "fullname": "Packages.com.glide.notification.outbound.EmailOutbound",
+      "inactive": true
+    },
+    "GlideEmailReader": {
+      "fullname": "Packages.com.glide.notification.inbound.EmailReader",
+      "inactive": true
+    },
+    "GlideEmailSender": {
+      "fullname": "Packages.com.glide.notification.outbound.EmailSender",
+      "inactive": true
+    },
+    "GlideEmailWatermark": {
+      "fullname": "Packages.com.glide.notification.EmailWatermark",
+      "inactive": true
+    },
+    "GlideEmitter": {
+      "fullname": "Packages.com.glide.ui.jelly.Emitter",
+      "inactive": true
+    },
+    "GlideEncrypter": {
+      "fullname": "Packages.com.glide.util.Encrypter",
+      "inactive": true
+    },
+    "GlideEncryptionContext": {
+      "fullname": "Packages.com.glide.sys.EncryptionContext",
+      "inactive": true
+    },
+    "GlideEncryptionContextCipher": {
+      "fullname": "Packages.com.glide.sys.security.EncryptionContextCipher",
+      "inactive": true
+    },
+    "GlideEncryptionWrapperDB": {
+      "fullname": "Packages.com.glide.sys.security.EncryptionWrapperDB",
+      "inactive": true
+    },
+    "GlideEncryptionWrapperDBAdmin": {
+      "fullname": "Packages.com.glide.sys.security.EncryptionWrapperDBAdmin",
+      "inactive": true
+    },
+    "GlideEncryptionWrapperNAE": {
+      "fullname": "Packages.com.glide.sys.security.EncryptionWrapperNAE",
+      "inactive": true
+    },
+    "GlideEncryptionWrapperNAEAdmin": {
+      "fullname": "Packages.com.glide.sys.security.EncryptionWrapperNAEAdmin",
+      "inactive": true
+    },
+    "GlideEscalationManager": {
+      "fullname": "Packages.com.glide.escalation.EscalationManager",
+      "inactive": true
+    },
+    "GlideEscalationTimerJobMarkII": {
+      "fullname": "Packages.com.glide.job.EscalationTimerJobMarkII",
+      "inactive": true
+    },
+    "GlideEvaluator": {
+      "fullname": "Packages.com.glide.script.Evaluator",
+      "inactive": true
+    },
+    "GlideEvent": {
+      "fullname": "Packages.com.glide.policy.Event",
+      "inactive": true
+    },
+    "GlideEventManager": {
+      "fullname": "Packages.com.glide.policy.EventManager",
+      "inactive": true
+    },
+    "GlideExcelExporter": {
+      "fullname": "Packages.com.glide.generators.ExcelExporter",
+      "inactive": true
+    },
+    "GlideExcelLoader2": {
+      "fullname": "Packages.com.glide.db.impex.ExcelLoader2",
+      "inactive": true
+    },
+    "GlideExecutionPlan": {
+      "fullname": "Packages.com.glide.execution_plan.ExecutionPlan",
+      "inactive": true
+    },
+    "GlideExpressionWrapper": {
+      "fullname": "Packages.com.glide.ui.jelly.GlideExpressionWrapper",
+      "inactive": true
+    },
+    "GlideExtensionPoint": {
+      "fullname": "Packages.com.glide.sys.ExtensionPoint",
+      "inactive": true
+    },
+    "GlideFieldList": {
+      "fullname": "Packages.com.glide.processors.FieldList",
+      "inactive": true
+    },
+    "GlideFile": {
+      "fullname": "Packages.com.glide.script.proxy.File",
+      "inactive": true
+    },
+    "GlideFileUtil": {
+      "fullname": "Packages.com.glide.util.FileUtil",
+      "inactive": true
+    },
+    "GlideFilter": {
+      "fullname": "Packages.com.glide.script.Filter",
+      "inactive": true
+    },
+    "GlideFilterList": {
+      "fullname": "Packages.com.glide.script.FilterList",
+      "inactive": true
+    },
+    "GlideFixCatalogPlans": {
+      "fullname": "Packages.com.glide.fixes.FixCatalogPlans",
+      "inactive": true
+    },
+    "GlideFixDeliveryPlans": {
+      "fullname": "Packages.com.glide.fixes.FixDeliveryPlans",
+      "inactive": true
+    },
+    "GlideFixGroups": {
+      "fullname": "Packages.com.glide.fixes.FixGroups",
+      "inactive": true
+    },
+    "GlideFixItemOptionsAgain": {
+      "fullname": "Packages.com.glide.fixes.FixItemOptionsAgain",
+      "inactive": true
+    },
+    "GlideFixRules": {
+      "fullname": "Packages.com.glide.fixes.FixRules",
+      "inactive": true
+    },
+    "GlideFixSpellCheck": {
+      "fullname": "Packages.com.glide.fixes.FixSpellCheck",
+      "inactive": true
+    },
+    "GlideFixStuff": {
+      "fullname": "Packages.com.glide.fixes.FixStuff",
+      "inactive": true
+    },
+    "GlideFixUsers": {
+      "fullname": "Packages.com.glide.fixes.FixUsers",
+      "inactive": true
+    },
+    "GlideForm": {
+      "fullname": "Packages.com.glide.ui.GlideForm",
+      "inactive": true
+    },
+    "GlideFormCommon": {
+      "fullname": "Packages.com.glide.ui.GlideFormCommon",
+      "inactive": true
+    },
+    "GlideFormulator": {
+      "fullname": "Packages.com.glide.ui.GlideFormulator",
+      "inactive": true
+    },
+    "GlideGauge": {
+      "fullname": "Packages.com.glide.report.Gauge",
+      "inactive": true
+    },
+    "GlideGovernor": {
+      "fullname": "Packages.com.glide.sys.util.Governor",
+      "inactive": true
+    },
+    "GlideGregorianCalendar": {
+      "fullname": "Packages.com.glide.util.GlideGregorianCalendar",
+      "inactive": true
+    },
+    "GlideGroup": {
+      "fullname": "Packages.com.glide.sys.Group",
+      "inactive": true
+    },
+    "GlideGroupByListTag": {
+      "fullname": "Packages.com.glide.ui.jelly.tags.form.GroupByListTag",
+      "inactive": true
+    },
+    "GlideGuid": {
+      "fullname": "Packages.com.glide.util.Guid",
+      "inactive": true
+    },
+    "GlideHierarchicalReference": {
+      "fullname": "Packages.com.glide.glideobject.HierarchicalReference",
+      "inactive": true
+    },
+    "GlideHistorySet": {
+      "fullname": "Packages.com.glide.audit.HistorySet",
+      "inactive": true
+    },
+    "GlideHistoryTag2": {
+      "fullname": "Packages.com.glide.ui.jelly.tags.mergedata.HistoryTag2",
+      "inactive": true
+    },
+    "GlideHostUtil": {
+      "fullname": "Packages.com.glide.util.HostUtil",
+      "inactive": true
+    },
+    "GlideHTTPClient": {
+      "fullname": "https://www.youtube.com/watch?feature=player_detailpage\u0026v=9qYl_pBZej",
+      "inactive": true
+    },
+    "GlideHTTPRequest": {
+      "fullname": "Packages.com.glide.communications.HTTPRequest",
+      "inactive": true
+    },
+    "GlideHTTPResponse": {
+      "fullname": "Packages.com.glide.communications.HTTPResponse",
+      "inactive": true
+    },
+    "GlideI18NStyle": {
+      "fullname": "Packages.com.glide.ui.I18NStyle",
+      "inactive": true
+    },
+    "GlideICALUtil": {
+      "fullname": "Packages.com.glide.policy.ICALUtil",
+      "inactive": true
+    },
+    "GlideIConstants": {
+      "fullname": "Packages.com.glide.util.IConstants",
+      "inactive": true
+    },
+    "GlideIGlideRecord": {
+      "fullname": "Packages.com.glide.util.IGlideRecord",
+      "inactive": true
+    },
+    "GlideImageLoader": {
+      "fullname": "Packages.com.glide.script.ImageLoader",
+      "inactive": true
+    },
+    "GlideImpersonate": {
+      "fullname": "Packages.com.glide.sys.Impersonate",
+      "inactive": true
+    },
+    "GlideImportLog": {
+      "fullname": "Packages.com.glide.db.impex.ImportLog",
+      "inactive": true
+    },
+    "GlideImportMap": {
+      "fullname": "Packages.com.glide.db.impex.ImportMap",
+      "inactive": true
+    },
+    "GlideImportMapField": {
+      "fullname": "Packages.com.glide.db.impex.ImportMapField",
+      "inactive": true
+    },
+    "GlideImportSet": {
+      "fullname": "Packages.com.glide.system_import_set.ImportSet",
+      "inactive": true
+    },
+    "GlideImportSetLoader": {
+      "fullname": "Packages.com.glide.system_import_set.ImportSetLoader",
+      "inactive": true
+    },
+    "GlideImportSetRun": {
+      "fullname": "Packages.com.glide.system_import_set.ImportSetRun",
+      "inactive": true
+    },
+    "GlideImportSetTransformer": {
+      "fullname": "Packages.com.glide.system_import_set.ImportSetTransformer",
+      "inactive": true
+    },
+    "GlideImportSetTransformerWorker": {
+      "fullname": "Packages.com.glide.system_import_set.ImportSetTransformerWorker",
+      "inactive": true
+    },
+    "GlideIndexDescriptor": {
+      "fullname": "Packages.com.glide.db.IndexDescriptor",
+      "inactive": true
+    },
+    "GlideIndexUtils": {
+      "fullname": "Packages.com.glide.db.IndexUtils",
+      "inactive": true
+    },
+    "GlideIntegerTime": {
+      "fullname": "Packages.com.glide.glideobject.IntegerTime",
+      "inactive": true
+    },
+    "GlideInternalElementTypeChoiceList": {
+      "fullname": "Packages.com.glide.script.InternalElementTypeChoiceList",
+      "inactive": true
+    },
+    "GlideInternalMonitor": {
+      "fullname": "Packages.com.glide.ui.monitor.InternalMonitor",
+      "inactive": true
+    },
+    "GlideIOMonitor": {
+      "fullname": "Packages.com.glide.ui.monitor.IOMonitor",
+      "inactive": true
+    },
+    "GlideIOStats": {
+      "fullname": "Packages.com.glide.db.IOStats",
+      "inactive": true
+    },
+    "GlideIPAddressUtil": {
+      "fullname": "Packages.com.glide.util.IPAddressUtil",
+      "inactive": true
+    },
+    "GlideIQueryCondition": {
+      "fullname": "Packages.com.glide.util.IQueryCondition",
+      "inactive": true
+    },
+    "GlideIRow": {
+      "fullname": "Packages.com.glide.db.meta.IRow",
+      "inactive": true
+    },
+    "GlideIRQuerySummary": {
+      "fullname": "Packages.com.glide.db.ir.IRQuerySummary",
+      "inactive": true
+    },
+    "GlideIRQuerySummarySimple": {
+      "fullname": "Packages.com.glide.db.ir.IRQuerySummarySimple",
+      "inactive": true
+    },
+    "GlideISecurityManager": {
+      "fullname": "Packages.com.glide.sys.security.ISecurityManager",
+      "inactive": true
+    },
+    "GlideITableIterator": {
+      "fullname": "Packages.com.glide.db.access.ITableIterator",
+      "inactive": true
+    },
+    "GlideJDBCLoader": {
+      "fullname": "Packages.com.glide.db.impex.JDBCLoader",
+      "inactive": true
+    },
+    "GlideJDBCProbeTestWorker": {
+      "fullname": "Packages.com.glide.db.impex.JDBCProbeTestWorker",
+      "inactive": true
+    },
+    "GlideJellyContext": {
+      "fullname": "Packages.com.glide.ui.jelly.GlideJellyContext",
+      "inactive": true
+    },
+    "GlideJellyRunner": {
+      "fullname": "Packages.com.glide.ui.jelly.JellyRunner",
+      "inactive": true
+    },
+    "GlideJID": {
+      "fullname": "Packages.com.glide.xmpp.JID",
+      "inactive": true
+    },
+    "GlideJSTestUtil": {
+      "fullname": "Packages.com.glide.autotester.JSTestUtil",
+      "inactive": true
+    },
+    "GlideJSUtil": {
+      "fullname": "Packages.com.glide.script.JSUtil",
+      "inactive": true
+    },
+    "GlideLabelEventHandler": {
+      "fullname": "Packages.com.glide.labels.LabelEventHandler",
+      "inactive": true
+    },
+    "GlideLabelGenerator": {
+      "fullname": "Packages.com.glide.db.LabelGenerator",
+      "inactive": true
+    },
+    "GlideLabelUtil": {
+      "fullname": "Packages.com.glide.labels.LabelUtil",
+      "inactive": true
+    },
+    "GlideLDAP": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAP",
+      "inactive": true
+    },
+    "GlideLDAPConfig": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPConfig",
+      "inactive": true
+    },
+    "GlideLDAPConfigurations": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPConfigurations",
+      "inactive": true
+    },
+    "GlideLDAPErrorAnalyzer": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPErrorAnalyzer",
+      "inactive": true
+    },
+    "GlideLDAPGroups": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPGroups",
+      "inactive": true
+    },
+    "GlideLDAPRefresh": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPRefresh",
+      "inactive": true
+    },
+    "GlideLDAPResult": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPResult",
+      "inactive": true
+    },
+    "GlideLDAPTarget": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPTarget",
+      "inactive": true
+    },
+    "GlideLDAPTransformQueue": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPTransformQueue",
+      "inactive": true
+    },
+    "GlideLDAPUsers": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPUsers",
+      "inactive": true
+    },
+    "GlideLDAPUserUpdate": {
+      "fullname": "Packages.com.glide.sys.ldap.LDAPUserUpdate",
+      "inactive": true
+    },
+    "GlideList": {
+      "fullname": "Packages.com.glide.glideobject.GlideList",
+      "inactive": true
+    },
+    "GlideListGroupProperties": {
+      "fullname": "Packages.com.glide.list_v2.ListGroupProperties",
+      "inactive": true
+    },
+    "GlideListLabel": {
+      "fullname": "Packages.com.glide.ui.ListLabel",
+      "inactive": true
+    },
+    "GlideListM2MBacking": {
+      "fullname": "Packages.com.glide.glideobject.GlideListM2MBacking",
+      "inactive": true
+    },
+    "GlideListProperties": {
+      "fullname": "Packages.com.glide.list_v2.ListProperties",
+      "inactive": true
+    },
+    "GlideListSearchQuery": {
+      "fullname": "Packages.com.glide.ui.ListSearchQuery",
+      "inactive": true
+    },
+    "GlideLoader": {
+      "fullname": "Packages.com.glide.db.impex.Loader",
+      "inactive": true
+    },
+    "GlideLoadTestDirector": {
+      "fullname": "Packages.com.glide.load_test.LoadTestDirector",
+      "inactive": true
+    },
+    "GlideLocale": {
+      "fullname": "Packages.com.glide.sys.GlideLocale",
+      "inactive": true
+    },
+    "GlideLocaleLoader": {
+      "fullname": "Packages.com.glide.currency.LocaleLoader",
+      "inactive": true
+    },
+    "GlideLock": {
+      "fullname": "Packages.com.glide.script.Lock",
+      "inactive": true
+    },
+    "GlideLog": {
+      "fullname": "Packages.com.glide.util.Log",
+      "inactive": true
+    },
+    "GlideLogCleanup": {
+      "fullname": "Packages.com.glide.util.LogCleanup",
+      "inactive": true
+    },
+    "GlideLogFileReader": {
+      "fullname": "Packages.com.glide.log_file.LogFileReader",
+      "inactive": true
+    },
+    "GlideLRUCache": {
+      "fullname": "Packages.com.glide.sys.cache.LRUCache",
+      "inactive": true
+    },
+    "GlideLuceneTextIndexEvent": {
+      "fullname": "Packages.com.glide.lucene.TextIndexEvent",
+      "inactive": true
+    },
+    "GlideMarkupWriter": {
+      "fullname": "Packages.com.glide.util.MarkupWriter",
+      "inactive": true
+    },
+    "GlideMemoryActive": {
+      "fullname": "Packages.com.glide.ui.monitor.MemoryActive",
+      "inactive": true
+    },
+    "GlideMemoryCache": {
+      "fullname": "Packages.com.glide.ui.monitor.MemoryCache",
+      "inactive": true
+    },
+    "GlideMemoryRecord": {
+      "fullname": "Packages.com.glide.script.GlideMemoryRecord",
+      "inactive": true
+    },
+    "GlideMemorySwap": {
+      "fullname": "Packages.com.glide.ui.monitor.MemorySwap",
+      "inactive": true
+    },
+    "GlideMemoryTable": {
+      "fullname": "Packages.com.glide.util.MemoryTable",
+      "inactive": true
+    },
+    "GlideMemoryTotal": {
+      "fullname": "Packages.com.glide.ui.monitor.MemoryTotal",
+      "inactive": true
+    },
+    "GlideMetaData": {
+      "fullname": "Packages.com.glide.script.MetaData",
+      "inactive": true
+    },
+    "GlideMIDServerInfoAccessor": {
+      "fullname": "Packages.com.glide.script.MIDServerInfoAccessor",
+      "inactive": true
+    },
+    "GlideMobileExtensions": {
+      "fullname": "Packages.com.glide.ui.MobileExtensions",
+      "inactive": true
+    },
+    "GlideModule": {
+      "fullname": "Packages.com.glide.sys.Module",
+      "inactive": true
+    },
+    "GlideMultipleAction": {
+      "fullname": "Packages.com.glide.db.MultipleAction",
+      "inactive": true
+    },
+    "GlideMultipleDelete": {
+      "fullname": "Packages.com.glide.db.MultipleDelete",
+      "inactive": true
+    },
+    "GlideMultipleInsert": {
+      "fullname": "Packages.com.glide.db.MultipleInsert",
+      "inactive": true
+    },
+    "GlideMultipleUpdate": {
+      "fullname": "Packages.com.glide.db.MultipleUpdate",
+      "inactive": true
+    },
+    "GlideMutex": {
+      "fullname": "Packages.com.glide.sys.lock.Mutex",
+      "inactive": true
+    },
+    "GlideMySQLWatch": {
+      "fullname": "Packages.com.glide.sys.stats.MySQLWatch",
+      "inactive": true
+    },
+    "GlideNumber": {
+      "fullname": "Packages.com.glide.script.glide_elements.GlideNumber",
+      "inactive": true
+    },
+    "GlideNumberManager": {
+      "fullname": "Packages.com.glide.db.NumberManager",
+      "inactive": true
+    },
+    "GlideObjectManager": {
+      "fullname": "Packages.com.glide.glideobject.GlideObjectManager",
+      "inactive": true
+    },
+    "GlideObjectUtil": {
+      "fullname": "Packages.com.glide.util.ObjectUtil",
+      "inactive": true
+    },
+    "GlideOrderingDefinitionCreator": {
+      "fullname": "Packages.com.glide.sorting.OrderingDefinitionCreator",
+      "inactive": true
+    },
+    "GlideOrderingManager": {
+      "fullname": "Packages.com.glide.sorting.OrderingManager",
+      "inactive": true
+    },
+    "GlideOutputWriter": {
+      "fullname": "Packages.com.glide.ui.io.GlideOutputWriter",
+      "inactive": true
+    },
+    "GlideOutputWriterFactory": {
+      "fullname": "Packages.com.glide.ui.io.GlideOutputWriterFactory",
+      "inactive": true
+    },
+    "GlideOverLoadedChoices": {
+      "fullname": "Packages.com.glide.script.OverLoadedChoices",
+      "inactive": true
+    },
+    "GlidePartitionMonitor": {
+      "fullname": "Packages.com.glide.ui.monitor.PartitionMonitor",
+      "inactive": true
+    },
+    "GlidePivotTableSummaryTableWriter": {
+      "fullname": "Packages.com.glide.ui.chart.dataset.PivotTableSummaryTableWriter",
+      "inactive": true
+    },
+    "GlidePlugin": {
+      "fullname": "Packages.com.glide.sys.Plugin",
+      "inactive": true
+    },
+    "GlidePluginManager": {
+      "fullname": "Packages.com.glide.sys.PluginManager",
+      "inactive": true
+    },
+    "GlidePluginManagerWorker": {
+      "fullname": "Packages.com.glide.sys.PluginManagerWorker",
+      "inactive": true
+    },
+    "GlidePluginUtils": {
+      "fullname": "Packages.com.glide.sys.PluginUtils",
+      "inactive": true
+    },
+    "GlidePOP3Reader": {
+      "fullname": "Packages.com.glide.notification.inbound.POP3Reader",
+      "inactive": true
+    },
+    "GlidePOP3ReaderJob": {
+      "fullname": "Packages.com.glide.job.POP3ReaderJob",
+      "inactive": true
+    },
+    "GlidePopup": {
+      "fullname": "Packages.com.glide.ui.Popup",
+      "inactive": true
+    },
+    "GlidePriceGenerator": {
+      "fullname": "Packages.com.glide.currency.PriceGenerator",
+      "inactive": true
+    },
+    "GlidePriceLoader": {
+      "fullname": "Packages.com.glide.currency.PriceLoader",
+      "inactive": true
+    },
+    "GlideProcessor": {
+      "fullname": "Packages.com.glide.processors.Processor",
+      "inactive": true
+    },
+    "GlideProcessRunner": {
+      "fullname": "Packages.com.glide.util.ProcessRunner",
+      "inactive": true
+    },
+    "GlideProgressMonitor": {
+      "fullname": "Packages.com.glide.worker.ProgressMonitor",
+      "inactive": true
+    },
+    "GlideProgressWorker": {
+      "fullname": "Packages.com.glide.worker.ProgressWorker",
+      "inactive": true
+    },
+    "GlideProperties": {
+      "fullname": "Packages.com.glide.util.GlideProperties",
+      "inactive": true
+    },
+    "GlidePropertiesDB": {
+      "fullname": "Packages.com.glide.util.GlidePropertiesDB",
+      "inactive": true
+    },
+    "GlideProperty": {
+      "fullname": "Packages.com.glide.util.GlideProperty",
+      "inactive": true
+    },
+    "GlidePublicPage": {
+      "fullname": "Packages.com.glide.ui.PublicPage",
+      "inactive": true
+    },
+    "GlideQueryBreadcrumbs": {
+      "fullname": "Packages.com.glide.misc.QueryBreadcrumbs",
+      "inactive": true
+    },
+    "GlideQueryCondition": {
+      "fullname": "Packages.com.glide.db.conditions.QueryCondition",
+      "inactive": true
+    },
+    "GlideQueryFormatter": {
+      "fullname": "Packages.com.glide.ui.jelly.tags.form.QueryFormatter",
+      "inactive": true
+    },
+    "GlideQueryString": {
+      "fullname": "Packages.com.glide.db.QueryString",
+      "inactive": true
+    },
+    "GlideQueryTerm": {
+      "fullname": "Packages.com.glide.db.QueryTerm",
+      "inactive": true
+    },
+    "GlideRecord": { "fullname": "Packages.com.glide.script.GlideRecord" },
+    "GlideRecordCache": {
+      "fullname": "Packages.com.glide.sys.RecordCache",
+      "inactive": true
+    },
+    "GlideRecordEnsurer": {
+      "fullname": "Packages.com.glide.misc.RecordEnsurer",
+      "inactive": true
+    },
+    "GlideRecordFactory": {
+      "fullname": "Packages.com.glide.script.GlideRecordFactory",
+      "inactive": true
+    },
+    "GlideRecordKeySetLoader": {
+      "fullname": "Packages.com.glide.script.GlideRecordKeySetLoader",
+      "inactive": true
+    },
+    "GlideRecordLock": {
+      "fullname": "Packages.com.glide.script.RecordLock",
+      "inactive": true
+    },
+    "GlideRecordPopupGenerator": {
+      "fullname": "Packages.com.glide.calendar.RecordPopupGenerator",
+      "inactive": true
+    },
+    "GlideRecordRollback": {
+      "fullname": "Packages.com.glide.script.GlideRecordRollback",
+      "inactive": true
+    },
+    "GlideRecordSet": {
+      "fullname": "Packages.com.glide.script.GlideRecordSet",
+      "inactive": true
+    },
+    "GlideRecordSimpleSerializer": {
+      "fullname": "Packages.com.glide.script.GlideRecordSimpleSerializer",
+      "inactive": true
+    },
+    "GlideRecordXMLSerializer": {
+      "fullname": "Packages.com.glide.script.GlideRecordXMLSerializer",
+      "inactive": true
+    },
+    "GlideReferenceField": {
+      "fullname": "Packages.com.glide.script.ReferenceField",
+      "inactive": true
+    },
+    "GlideRegexUtil": {
+      "fullname": "Packages.com.glide.util.RegexUtil",
+      "inactive": true
+    },
+    "GlideRegisterEscalationEvents": {
+      "fullname": "Packages.com.glide.fixes.RegisterEscalationEvents",
+      "inactive": true
+    },
+    "GlideRelatedListReconciler": {
+      "fullname": "Packages.com.glide.misc.RelatedListReconciler",
+      "inactive": true
+    },
+    "GlideRelationship": {
+      "fullname": "Packages.com.glide.sys.Relationship",
+      "inactive": true
+    },
+    "GlideRelationships": {
+      "fullname": "Packages.com.glide.db.Relationships",
+      "inactive": true
+    },
+    "GlideRelationshipUtil": {
+      "fullname": "Packages.com.glide.sys.RelationshipUtil",
+      "inactive": true
+    },
+    "GlideRemoteGlideRecord": {
+      "fullname": "Packages.com.glide.communications.RemoteGlideRecord",
+      "inactive": true
+    },
+    "GlideRenderProperties": {
+      "fullname": "Packages.com.glide.ui.RenderProperties",
+      "inactive": true
+    },
+    "GlideReplaceUpdateFiles": {
+      "fullname": "Packages.com.glide.util.ReplaceUpdateFiles",
+      "inactive": true
+    },
+    "GlideReplicationEngine": {
+      "fullname": "Packages.com.glide.replicator.ReplicationEngine",
+      "inactive": true
+    },
+    "GlideReport": {
+      "fullname": "Packages.com.glide.report.Report",
+      "inactive": true
+    },
+    "GlideReportChoiceList": {
+      "fullname": "Packages.com.glide.script.ReportChoiceList",
+      "inactive": true
+    },
+    "GlideReportViewManagement": {
+      "fullname": "Packages.com.glide.report.ReportViewManagement",
+      "inactive": true
+    },
+    "GlideRequestMap": {
+      "fullname": "Packages.com.glide.util.RequestMap",
+      "inactive": true
+    },
+    "GlideRevertToOutOfBox": {
+      "fullname": "Packages.com.glide.update.RevertToOutOfBox",
+      "inactive": true
+    },
+    "GlideRhinoEnvironment": {
+      "fullname": "Packages.com.glide.script.GlideRhinoEnvironment",
+      "inactive": true
+    },
+    "GlideRhinoHelper": {
+      "fullname": "Packages.com.glide.script.GlideRhinoHelper",
+      "inactive": true
+    },
+    "GlideRhinoScope": {
+      "fullname": "Packages.com.glide.script.RhinoScope",
+      "inactive": true
+    },
+    "GlideRhinoScopeHandler": {
+      "fullname": "Packages.com.glide.script.GlideRhinoScopeHandler",
+      "inactive": true
+    },
+    "GlideRhinoTestCase": {
+      "fullname": "Packages.com.glide.autotester.RhinoTestCase",
+      "inactive": true
+    },
+    "GlideRRDBAlertProcessor": {
+      "fullname": "Packages.com.glide.rrdb.alerts.RRDBAlertProcessor",
+      "inactive": true
+    },
+    "GlideRRDBDefinition": {
+      "fullname": "Packages.com.glide.rrdb.RRDBDefinition",
+      "inactive": true
+    },
+    "GlideRunScriptJob": {
+      "fullname": "Packages.com.glide.job.RunScriptJob",
+      "inactive": true
+    },
+    "GlideSchedule": {
+      "fullname": "Packages.com.glide.schedules.Schedule",
+      "inactive": true
+    },
+    "GlideScheduleDateTime": {
+      "fullname": "Packages.com.glide.glideobject.ScheduleDateTime",
+      "inactive": true
+    },
+    "GlideScheduleDateTimeSpan": {
+      "fullname": "Packages.com.glide.schedules.ScheduleDateTimeSpan",
+      "inactive": true
+    },
+    "GlideScheduleItem": {
+      "fullname": "Packages.com.glide.schedules.ScheduleItem",
+      "inactive": true
+    },
+    "GlideScheduler": {
+      "fullname": "Packages.com.glide.schedule.GlideScheduler",
+      "inactive": true
+    },
+    "GlideScheduleTimeMap": {
+      "fullname": "Packages.com.glide.schedules.ScheduleTimeMap",
+      "inactive": true
+    },
+    "GlideScheduleTimeSpan": {
+      "fullname": "Packages.com.glide.schedules.ScheduleTimeSpan",
+      "inactive": true
+    },
+    "GlideScriptChoiceList": {
+      "fullname": "Packages.com.glide.script.ChoiceList",
+      "inactive": true
+    },
+    "GlideScriptedProgressWorker": {
+      "fullname": "Packages.com.glide.worker.ScriptedProgressWorker",
+      "inactive": true
+    },
+    "GlideScriptEvaluator": {
+      "fullname": "Packages.com.glide.script.ScriptEvaluator",
+      "inactive": true
+    },
+    "GlideScriptGlobals": {
+      "fullname": "Packages.com.glide.script.GlideScriptGlobals",
+      "inactive": true
+    },
+    "GlideScriptListener": {
+      "fullname": "Packages.com.glide.listener.ScriptListener",
+      "inactive": true
+    },
+    "GlideScriptProcessor": {
+      "fullname": "Packages.com.glide.processors.ScriptProcessor",
+      "inactive": true
+    },
+    "GlideScriptRecordUtil": {
+      "fullname": "Packages.com.glide.script.GlideRecordUtil",
+      "inactive": true
+    },
+    "GlideScriptSystemUtilDB": {
+      "fullname": "Packages.com.glide.script.GlideSystemUtilDB",
+      "inactive": true
+    },
+    "GlideScriptViewManager": {
+      "fullname": "Packages.com.glide.ui.ViewManager",
+      "inactive": true
+    },
+    "GlideScriptWriter": {
+      "fullname": "Packages.com.glide.script.ScriptWriter",
+      "inactive": true
+    },
+    "GlideSearchQueryFormatter": {
+      "fullname": "Packages.com.glide.text_search.SearchQueryFormatter",
+      "inactive": true
+    },
+    "GlideSecondaryDatabaseBehindnessChecker": {
+      "fullname": "Packages.com.glide.secondary_db_pools.SecondaryDatabaseBehindnessChecker",
+      "inactive": true
+    },
+    "GlideSecondaryDatabaseConfiguration": {
+      "fullname": "Packages.com.glide.secondary_db_pools.SecondaryDatabaseConfiguration",
+      "inactive": true
+    },
+    "GlideSecurityManager": {
+      "fullname": "Packages.com.glide.sys.security.GlideSecurityManager",
+      "inactive": true
+    },
+    "GlideSecurityQueryCalculator": {
+      "fullname": "Packages.com.glide.sys.security.SecurityQueryCalculator",
+      "inactive": true
+    },
+    "GlideSecurityUtils": {
+      "fullname": "Packages.com.glide.util.SecurityUtils",
+      "inactive": true
+    },
+    "GlideSelfCleaningMutex": {
+      "fullname": "Packages.com.glide.sys.lock.SelfCleaningMutex",
+      "inactive": true
+    },
+    "GlideServiceAPIWrapper": {
+      "fullname": "Packages.com.glide.service_api.ServiceAPIWrapper",
+      "inactive": true
+    },
+    "GlideServlet": {
+      "fullname": "Packages.com.glide.ui.GlideServlet",
+      "inactive": true
+    },
+    "GlideServletRequest": {
+      "fullname": "Packages.com.glide.ui.GlideServletRequest",
+      "inactive": true
+    },
+    "GlideServletResponse": {
+      "fullname": "Packages.com.glide.ui.GlideServletResponse",
+      "inactive": true
+    },
+    "GlideServletStatus": {
+      "fullname": "Packages.com.glide.ui.ServletStatus",
+      "inactive": true
+    },
+    "GlideSession": {
+      "fullname": "Packages.com.glide.sys.GlideSession",
+      "inactive": true
+    },
+    "GlideSessionDebug": {
+      "fullname": "Packages.com.glide.sys.SessionDebug",
+      "inactive": true
+    },
+    "GlideSessions": {
+      "fullname": "Packages.com.glide.ui.Sessions",
+      "inactive": true
+    },
+    "GlideSessionSandbox": {
+      "fullname": "Packages.com.glide.script.GlideSessionSandbox",
+      "inactive": true
+    },
+    "GlideShellCommand": {
+      "fullname": "Packages.com.glide.util.ShellCommand",
+      "inactive": true
+    },
+    "GlideSimmerDown": {
+      "fullname": "Packages.com.glide.db.change.command.SimmerDown",
+      "inactive": true
+    },
+    "GlideSimmerUp": {
+      "fullname": "Packages.com.glide.db.change.command.SimmerUp",
+      "inactive": true
+    },
+    "GlideSimpleDateFormatEx": {
+      "fullname": "Packages.com.glide.util.SimpleDateFormatEx",
+      "inactive": true
+    },
+    "GlideSimpleHTTPClient": {
+      "fullname": "Packages.com.glide.communications.SimpleHTTPClient",
+      "inactive": true
+    },
+    "GlideSimpleScriptListener": {
+      "fullname": "Packages.com.glide.listener.SimpleScriptListener",
+      "inactive": true
+    },
+    "GlideSMTPConnection": {
+      "fullname": "Packages.com.glide.notification.outbound.SMTPConnection",
+      "inactive": true
+    },
+    "GlideSMTPSender": {
+      "fullname": "Packages.com.glide.notification.outbound.SMTPSender",
+      "inactive": true
+    },
+    "GlideSMTPSenderJob": {
+      "fullname": "Packages.com.glide.job.SMTPSenderJob",
+      "inactive": true
+    },
+    "GlideSOAPDocument": {
+      "fullname": "Packages.com.glide.communications.soap.SOAPDocument",
+      "inactive": true
+    },
+    "GlideSOAPRequest": {
+      "fullname": "Packages.com.glide.communications.soap.SOAPRequest",
+      "inactive": true
+    },
+    "GlideSOAPResponse": {
+      "fullname": "Packages.com.glide.communications.soap.SOAPResponse",
+      "inactive": true
+    },
+    "GlideSOAPSecurity": {
+      "fullname": "Packages.com.glide.processors.soap.SOAPSecurity",
+      "inactive": true
+    },
+    "GlideSOAPSigner": {
+      "fullname": "Packages.com.glide.communications.soap.SOAPSigner",
+      "inactive": true
+    },
+    "GlideSocket": {
+      "fullname": "Packages.com.glide.script.proxy.Socket",
+      "inactive": true
+    },
+    "GlidesoftGlideAttributesImpl": {
+      "fullname": "Packages.com.glidesoft.util.xml.GlideAttributesImpl",
+      "inactive": true
+    },
+    "GlidesoftXMLMemoryTable": {
+      "fullname": "Packages.com.glidesoft.util.xml.XMLMemoryTable",
+      "inactive": true
+    },
+    "GlideSQLChildMonitor": {
+      "fullname": "Packages.com.glide.monitor.sql.SQLChildMonitor",
+      "inactive": true
+    },
+    "GlideSQLDebug": {
+      "fullname": "Packages.com.glide.ui.diagnostics.SQLDebug",
+      "inactive": true
+    },
+    "GlideSQLDeleteMonitor": {
+      "fullname": "Packages.com.glide.monitor.sql.SQLDeleteMonitor",
+      "inactive": true
+    },
+    "GlideSQLInsertMonitor": {
+      "fullname": "Packages.com.glide.monitor.sql.SQLInsertMonitor",
+      "inactive": true
+    },
+    "GlideSQLResponseMonitor": {
+      "fullname": "Packages.com.glide.monitor.sql.SQLResponseMonitor",
+      "inactive": true
+    },
+    "GlideSQLSelectMonitor": {
+      "fullname": "Packages.com.glide.monitor.sql.SQLSelectMonitor",
+      "inactive": true
+    },
+    "GlideSQLUpdateMonitor": {
+      "fullname": "Packages.com.glide.monitor.sql.SQLUpdateMonitor",
+      "inactive": true
+    },
+    "GlideSSHClient": {
+      "fullname": "Packages.com.glide.communications.SSHClient",
+      "inactive": true
+    },
+    "GlideStack": {
+      "fullname": "Packages.com.glide.sys.GlideStack",
+      "inactive": true
+    },
+    "GlideStatistician": {
+      "fullname": "Packages.com.glide.sys.stats.Statistician",
+      "inactive": true
+    },
+    "GlideStatsInfo": {
+      "fullname": "Packages.com.glide.monitor.StatsInfo",
+      "inactive": true
+    },
+    "GlideStatus": {
+      "fullname": "Packages.com.glide.util.GlideStatus",
+      "inactive": true
+    },
+    "GlideStopWatch": {
+      "fullname": "Packages.com.glide.util.StopWatch",
+      "inactive": true
+    },
+    "GlideStorageUtils": {
+      "fullname": "Packages.com.glide.db.meta.StorageUtils",
+      "inactive": true
+    },
+    "GlideStringCache": {
+      "fullname": "Packages.com.glide.sys.cache.StringCache",
+      "inactive": true
+    },
+    "GlideStringInputStream": {
+      "fullname": "Packages.com.glide.util.StringInputStream",
+      "inactive": true
+    },
+    "GlideStringList": {
+      "fullname": "Packages.com.glide.collections.StringList",
+      "inactive": true
+    },
+    "GlideStringUtil": {
+      "fullname": "Packages.com.glide.util.StringUtil",
+      "inactive": true
+    },
+    "GlideSubQuery": {
+      "fullname": "Packages.com.glide.db.conditions.SubQuery",
+      "inactive": true
+    },
+    "GlideSubstituteURL": {
+      "fullname": "Packages.com.glide.notification.substitution.SubstituteURL",
+      "inactive": true
+    },
+    "GlideSummaryTableGroupReader": {
+      "fullname": "Packages.com.glide.ui.chart.dataset.SummaryTableGroupReader",
+      "inactive": true
+    },
+    "GlideSummaryTableOrderedReader": {
+      "fullname": "Packages.com.glide.ui.chart.dataset.SummaryTableOrderedReader",
+      "inactive": true
+    },
+    "GlideSummaryTableReader": {
+      "fullname": "Packages.com.glide.ui.chart.dataset.SummaryTableReader",
+      "inactive": true
+    },
+    "GlideSummaryTableWriter": {
+      "fullname": "Packages.com.glide.ui.chart.dataset.SummaryTableWriter",
+      "inactive": true
+    },
+    "GlideSynchronizedLRUCache": {
+      "fullname": "Packages.com.glide.sys.cache.SynchronizedLRUCache",
+      "inactive": true
+    },
+    "GlideSysAttachment": {
+      "fullname": "Packages.com.glide.ui.SysAttachment",
+      "inactive": true
+    },
+    "GlideSysAttachmentInputStream": {
+      "fullname": "Packages.com.glide.ui.SysAttachmentInputStream",
+      "inactive": true
+    },
+    "GlideSysBRThreadMonitor": {
+      "fullname": "Packages.com.glide.monitor.threads.SysBRThreadMonitor",
+      "inactive": true
+    },
+    "GlideSysChoice": {
+      "fullname": "Packages.com.glide.script.SysChoice",
+      "inactive": true
+    },
+    "GlideSysConcurrencyMonitor": {
+      "fullname": "Packages.com.glide.monitor.threads.SysConcurrencyMonitor",
+      "inactive": true
+    },
+    "GlideSysCPUThreadMonitor": {
+      "fullname": "Packages.com.glide.monitor.threads.SysCPUThreadMonitor",
+      "inactive": true
+    },
+    "GlideSysDateUtil": {
+      "fullname": "Packages.com.glide.sys.util.SysDateUtil",
+      "inactive": true
+    },
+    "GlideSysDBThreadMonitor": {
+      "fullname": "Packages.com.glide.monitor.threads.SysDBThreadMonitor",
+      "inactive": true
+    },
+    "GlideSysField": {
+      "fullname": "Packages.com.glide.db.SysField",
+      "inactive": true
+    },
+    "GlideSysFileUtil": {
+      "fullname": "Packages.com.glide.sys.util.SysFileUtil",
+      "inactive": true
+    },
+    "GlideSysForm": {
+      "fullname": "Packages.com.glide.ui.SysForm",
+      "inactive": true
+    },
+    "GlideSysForms": {
+      "fullname": "Packages.com.glide.ui.SysForms",
+      "inactive": true
+    },
+    "GlideSysList": {
+      "fullname": "Packages.com.glide.ui.SysList",
+      "inactive": true
+    },
+    "GlideSysListControl": {
+      "fullname": "Packages.com.glide.ui.SysListControl",
+      "inactive": true
+    },
+    "GlideSysLog": {
+      "fullname": "Packages.com.glide.sys.SysLog",
+      "inactive": true
+    },
+    "GlideSYSMany2Many": {
+      "fullname": "Packages.com.glide.db.SYSMany2Many",
+      "inactive": true
+    },
+    "GlideSysMessage": {
+      "fullname": "Packages.com.glide.ui.SysMessage",
+      "inactive": true
+    },
+    "GlideSysNetThreadMonitor": {
+      "fullname": "Packages.com.glide.monitor.threads.SysNetThreadMonitor",
+      "inactive": true
+    },
+    "GlideSysRelatedList": {
+      "fullname": "Packages.com.glide.ui.SysRelatedList",
+      "inactive": true
+    },
+    "GlideSysSection": {
+      "fullname": "Packages.com.glide.ui.SysSection",
+      "inactive": true
+    },
+    "GlideSysSemaphore": {
+      "fullname": "Packages.com.glide.sys.util.SysSemaphore",
+      "inactive": true
+    },
+    "GlideSystem": {
+      "fullname": "Packages.com.glide.script.GlideSystem",
+      "inactive": true
+    },
+    "GlideSystemDateUtil": {
+      "fullname": "Packages.com.glide.script.system.GlideSystemDateUtil",
+      "inactive": true
+    },
+    "GlideSystemUtil": {
+      "fullname": "Packages.com.glide.util.SystemUtil",
+      "inactive": true
+    },
+    "GlideSystemUtilDB": {
+      "fullname": "Packages.com.glide.script.system.GlideSystemUtilDB",
+      "inactive": true
+    },
+    "GlideSystemUtilScript": {
+      "fullname": "Packages.com.glide.script.system.GlideSystemUtilScript",
+      "inactive": true
+    },
+    "GlideSysThreadMonitor": {
+      "fullname": "Packages.com.glide.monitor.threads.SysThreadMonitor",
+      "inactive": true
+    },
+    "GlideSysUserList": {
+      "fullname": "Packages.com.glide.ui.SysUserList",
+      "inactive": true
+    },
+    "GlideTable": {
+      "fullname": "Packages.com.glide.db.meta.Table",
+      "inactive": true
+    },
+    "GlideTableChoiceList": {
+      "fullname": "Packages.com.glide.script.TableChoiceList",
+      "inactive": true
+    },
+    "GlideTableCleaner": {
+      "fullname": "Packages.com.glide.misc.TableCleaner",
+      "inactive": true
+    },
+    "GlideTableCleanerJob": {
+      "fullname": "Packages.com.glide.job.TableCleanerJob",
+      "inactive": true
+    },
+    "GlideTableCreator": {
+      "fullname": "Packages.com.glide.db.impex.TableCreator",
+      "inactive": true
+    },
+    "GlideTableDescriptor": {
+      "fullname": "Packages.com.glide.db.TableDescriptor",
+      "inactive": true
+    },
+    "GlideTableGroupMover": {
+      "fullname": "Packages.com.glide.db.auxiliary.TableGroupMover",
+      "inactive": true
+    },
+    "GlideTableManager": {
+      "fullname": "Packages.com.glide.db.TableManager",
+      "inactive": true
+    },
+    "GlideTableMover": {
+      "fullname": "Packages.com.glide.db.auxiliary.TableMover",
+      "inactive": true
+    },
+    "GlideTableParentChange": {
+      "fullname": "Packages.com.glide.db.table.TableParentChange",
+      "inactive": true
+    },
+    "GlideTableParentColumnChange": {
+      "fullname": "Packages.com.glide.db.table.TableParentColumnChange",
+      "inactive": true
+    },
+    "GlideTaskToken": {
+      "fullname": "Packages.com.glide.execution_plan.TaskToken",
+      "inactive": true
+    },
+    "GlideTemplate": {
+      "fullname": "Packages.com.glide.script.Template",
+      "inactive": true
+    },
+    "GlideTestAgent": {
+      "fullname": "Packages.com.glide.autotester.GlideTestAgent",
+      "inactive": true
+    },
+    "GlideTextIndexEvent": {
+      "fullname": "Packages.com.glide.ts.event.TextIndexEvent",
+      "inactive": true
+    },
+    "GlideThreadAttributes": {
+      "fullname": "Packages.com.glide.ui.GlideThreadAttributes",
+      "inactive": true
+    },
+    "GlideThreadUtil": {
+      "fullname": "Packages.com.glide.util.ThreadUtil",
+      "inactive": true
+    },
+    "GlideTime": {
+      "fullname": "Packages.com.glide.glideobject.GlideTime",
+      "inactive": true
+    },
+    "GlideTimelineFrameSeparator": {
+      "fullname": "Packages.com.glide.schedules.TimelineFrameSeparator",
+      "inactive": true
+    },
+    "GlideTimelineItem": {
+      "fullname": "Packages.com.glide.schedules.TimelineItem",
+      "inactive": true
+    },
+    "GlideTimelineSpan": {
+      "fullname": "Packages.com.glide.schedules.TimelineSpan",
+      "inactive": true
+    },
+    "GlideTomcatHelper": {
+      "fullname": "Packages.com.glide.startup.TomcatHelper",
+      "inactive": true
+    },
+    "GlideTransaction": {
+      "fullname": "Packages.com.glide.sys.Transaction",
+      "inactive": true
+    },
+    "GlideTransactionManager": {
+      "fullname": "Packages.com.glide.sys.TransactionManager",
+      "inactive": true
+    },
+    "GlideTransferAuditDataHelper": {
+      "fullname": "Packages.com.glide.audit.TransferAuditDataHelper",
+      "inactive": true
+    },
+    "GlideTransformer": {
+      "fullname": "Packages.com.glide.db.impex.transformer.Transformer",
+      "inactive": true
+    },
+    "GlideTreePicker": {
+      "fullname": "Packages.com.glide.ui.TreePicker",
+      "inactive": true
+    },
+    "GlideTSAnalysisViewer": {
+      "fullname": "Packages.com.glide.ts.cluster.TSAnalysisViewer",
+      "inactive": true
+    },
+    "GlideTSAnalyticsProcessor": {
+      "fullname": "Packages.com.glide.ts.cluster.TSAnalyticsProcessor",
+      "inactive": true
+    },
+    "GlideTSChainsHandler": {
+      "fullname": "Packages.com.glide.ts.trends.TSChainsHandler",
+      "inactive": true
+    },
+    "GlideTSChainsLoader": {
+      "fullname": "Packages.com.glide.ts.trends.TSChainsLoader",
+      "inactive": true
+    },
+    "GlideTSChainsPusher": {
+      "fullname": "Packages.com.glide.ts.trends.TSChainsPusher",
+      "inactive": true
+    },
+    "GlideTSChainsSummarizer": {
+      "fullname": "Packages.com.glide.ts.trends.TSChainsSummarizer",
+      "inactive": true
+    },
+    "GlideTSClusterDefinitions": {
+      "fullname": "Packages.com.glide.ts.cluster.TSClusterDefinitions",
+      "inactive": true
+    },
+    "GlideTSDebug": {
+      "fullname": "Packages.com.glide.ts.util.TSDebug",
+      "inactive": true
+    },
+    "GlideTSDidYouMean": {
+      "fullname": "Packages.com.glide.ts.util.TSDidYouMean",
+      "inactive": true
+    },
+    "GlideTSGlobalKeywordSummarizer": {
+      "fullname": "Packages.com.glide.ts.trends.TSGlobalKeywordSummarizer",
+      "inactive": true
+    },
+    "GlideTSIndexStatistician": {
+      "fullname": "Packages.com.glide.ts.stats.TSIndexStatistician",
+      "inactive": true
+    },
+    "GlideTSIndexStopGenerator": {
+      "fullname": "Packages.com.glide.ts.stats.TSIndexStopGenerator",
+      "inactive": true
+    },
+    "GlideTSIndexTables": {
+      "fullname": "Packages.com.glide.ts.indexer.TSIndexTables",
+      "inactive": true
+    },
+    "GlideTSKeywordHandler": {
+      "fullname": "Packages.com.glide.ts.trends.TSKeywordHandler",
+      "inactive": true
+    },
+    "GlideTSKeywordLoader": {
+      "fullname": "Packages.com.glide.ts.trends.TSKeywordLoader",
+      "inactive": true
+    },
+    "GlideTSKeywordPusher": {
+      "fullname": "Packages.com.glide.ts.trends.TSKeywordPusher",
+      "inactive": true
+    },
+    "GlideTSMoversViewer": {
+      "fullname": "Packages.com.glide.ts.cluster.TSMoversViewer",
+      "inactive": true
+    },
+    "GlideTSSearchStatistician": {
+      "fullname": "Packages.com.glide.ts.stats.TSSearchStatistician",
+      "inactive": true
+    },
+    "GlideTSSearchSummary": {
+      "fullname": "Packages.com.glide.ts.trends.TSSearchSummary",
+      "inactive": true
+    },
+    "GlideTSTopSearches": {
+      "fullname": "Packages.com.glide.ts.util.TSTopSearches",
+      "inactive": true
+    },
+    "GlideTSUtil": {
+      "fullname": "Packages.com.glide.ts.util.TSUtil",
+      "inactive": true
+    },
+    "GlideTSVersion": {
+      "fullname": "Packages.com.glide.ts.TSVersion",
+      "inactive": true
+    },
+    "GlideUIAction": {
+      "fullname": "Packages.com.glide.ui.action.UIAction",
+      "inactive": true
+    },
+    "GlideUISession": {
+      "fullname": "Packages.com.glide.ui.Session",
+      "inactive": true
+    },
+    "GlideUnloader": {
+      "fullname": "Packages.com.glide.db.impex.Unloader",
+      "inactive": true
+    },
+    "GlideUpdateManager2": {
+      "fullname": "Packages.com.glide.update.UpdateManager2",
+      "inactive": true
+    },
+    "GlideUpdateSet": {
+      "fullname": "Packages.com.glide.update.UpdateSet",
+      "inactive": true
+    },
+    "GlideUpdateSetController": {
+      "fullname": "Packages.com.glide.system_update_set.UpdateSetController",
+      "inactive": true
+    },
+    "GlideUpdateSetPreviewer": {
+      "fullname": "Packages.com.glide.update.UpdateSetPreviewer",
+      "inactive": true
+    },
+    "GlideUpdateSetWorker": {
+      "fullname": "Packages.com.glide.update.UpdateSetWorker",
+      "inactive": true
+    },
+    "GlideUpdateSyncher": {
+      "fullname": "Packages.com.glide.policy.UpdateSyncher",
+      "inactive": true
+    },
+    "GlideUpdateTableChoiceList": {
+      "fullname": "Packages.com.glide.script.UpdateTableChoiceList",
+      "inactive": true
+    },
+    "GlideUpgrade": {
+      "fullname": "Packages.com.glide.sys.Upgrade",
+      "inactive": true
+    },
+    "GlideUpgradeArtifactManager": {
+      "fullname": "Packages.com.glide.misc.UpgradeArtifactManager",
+      "inactive": true
+    },
+    "GlideUpgradeLog": {
+      "fullname": "Packages.com.glide.update.UpgradeLog",
+      "inactive": true
+    },
+    "GlideUpgradeMonitor": {
+      "fullname": "Packages.com.glide.update.UpgradeMonitor",
+      "inactive": true
+    },
+    "GlideURI": {
+      "fullname": "Packages.com.glide.ui.GlideURI",
+      "inactive": true
+    },
+    "GlideURL": {
+      "fullname": "Packages.com.glide.util.GlideURL",
+      "inactive": true
+    },
+    "GlideURLUTF8Encoder": {
+      "fullname": "Packages.com.glide.util.URLUTF8Encoder",
+      "inactive": true
+    },
+    "GlideURLUtil": {
+      "fullname": "Packages.com.glide.util.URLUtil",
+      "inactive": true
+    },
+    "GlideUser": {
+      "fullname": "Packages.com.glide.sys.User",
+      "inactive": true
+    },
+    "GlideUserAuthenticator": {
+      "fullname": "Packages.com.glide.sys.UserAuthenticator",
+      "inactive": true
+    },
+    "GlideUserGroup": {
+      "fullname": "Packages.com.glide.sys.UserGroup",
+      "inactive": true
+    },
+    "GlideUtil": {
+      "fullname": "Packages.com.glide.util.GlideUtil",
+      "inactive": true
+    },
+    "GlideViewRuleNavigator": {
+      "fullname": "Packages.com.glide.ui.ViewRuleNavigator",
+      "inactive": true
+    },
+    "GlideWarDeleter": {
+      "fullname": "Packages.com.glide.misc.WarDeleter",
+      "inactive": true
+    },
+    "GlideWarDownloader": {
+      "fullname": "Packages.com.glide.misc.WarDownloader",
+      "inactive": true
+    },
+    "GlideWhiteListManager": {
+      "fullname": "Packages.com.glide.script.api.GlideWhiteListManager",
+      "inactive": true
+    },
+    "GlideWikiModel": {
+      "fullname": "Packages.com.glide.wiki.GlideWikiModel",
+      "inactive": true
+    },
+    "GlideWorkerThread": {
+      "fullname": "Packages.com.glide.worker.WorkerThread",
+      "inactive": true
+    },
+    "GlideWorkerThreadManager": {
+      "fullname": "Packages.com.glide.sys.WorkerThreadManager",
+      "inactive": true
+    },
+    "GlideWSClient": {
+      "fullname": "Packages.com.glide.util.WSClient",
+      "inactive": true
+    },
+    "GlideWSDefinition": {
+      "fullname": "Packages.com.glide.wsdlreader.WSDefinition",
+      "inactive": true
+    },
+    "GlideWSDLReader": {
+      "fullname": "Packages.com.glide.wsdlreader.GlideWSDLReader",
+      "inactive": true
+    },
+    "GlideXMLChoiceListSerializer": {
+      "fullname": "Packages.com.glide.choice.XMLChoiceListSerializer",
+      "inactive": true
+    },
+    "GlideXMLDocument": {
+      "fullname": "Packages.com.glide.util.XMLDocument",
+      "inactive": true
+    },
+    "GlideXMLElementIterator": {
+      "fullname": "Packages.com.glide.util.XMLElementIterator",
+      "inactive": true
+    },
+    "GlideXMLGlideRecordSerializer": {
+      "fullname": "Packages.com.glide.processors.xmlhttp.XMLGlideRecordSerializer",
+      "inactive": true
+    },
+    "GlideXMLParameters": {
+      "fullname": "Packages.com.glide.util.XMLParameters",
+      "inactive": true
+    },
+    "GlideXMLStats": {
+      "fullname": "Packages.com.glide.ui.XMLStats",
+      "inactive": true
+    },
+    "GlideXMLSysMetaSerializer": {
+      "fullname": "Packages.com.glide.processors.xmlhttp.XMLSysMetaSerializer",
+      "inactive": true
+    },
+    "GlideXMLUtil": {
+      "fullname": "Packages.com.glide.util.XMLUtil",
+      "inactive": true
+    },
+    "GlideZipUtil": {
+      "fullname": "Packages.com.glide.util.ZipUtil",
+      "inactive": true
+    },
+    "RhinoEnvironment": {
+      "fullname": "Packages.com.glide.script.RhinoEnvironment",
+      "inactive": true
+    },
+    "RhinoHelper": {
+      "fullname": "Packages.com.glide.script.RhinoHelper",
+      "inactive": true
+    },
+    "SecurelyAccess": {
+      "fullname": "Packages.com.glide.sys.util.SecurelyAccess",
+      "inactive": true
+    },
+    "ServiceAPI": {
+      "fullname": "Packages.com.glide.service_api.ServiceAPI",
+      "inactive": true
+    },
+    "SncAddress32Bit": {
+      "fullname": "Packages.com.snc.commons.networks.Address32Bit",
+      "inactive": true
+    },
+    "SncAliasApplier": {
+      "fullname": "Packages.com.snc.field_normalization.AliasApplier",
+      "inactive": true
+    },
+    "SncAppFiles": {
+      "fullname": "Packages.com.snc.apps.api.AppFiles",
+      "inactive": true
+    },
+    "SncApplicationFileListener": {
+      "fullname": "Packages.com.snc.apps.db.ApplicationFileListener",
+      "inactive": true
+    },
+    "SncAppsAccess": {
+      "fullname": "Packages.com.snc.apps.api.AppsAccess",
+      "inactive": true
+    },
+    "SncAppsUI": {
+      "fullname": "Packages.com.snc.apps.api.AppsUI",
+      "inactive": true
+    },
+    "SncASensor": {
+      "fullname": "Packages.com.snc.discovery.sensor.ASensor",
+      "inactive": true
+    },
+    "SncAuthentication": {
+      "fullname": "Packages.com.snc.authentication.digest.Authentication",
+      "inactive": true
+    },
+    "SncBaselineCMDB": {
+      "fullname": "Packages.com.snc.cmdb.BaselineCMDB",
+      "inactive": true
+    },
+    "SncBulkCopy": {
+      "fullname": "Packages.com.snc.ha.clone.BulkCopy",
+      "inactive": true
+    },
+    "SncClassifiedProcess": {
+      "fullname": "Packages.com.snc.discovery.sensor.ClassifiedProcess",
+      "inactive": true
+    },
+    "SncClassify": {
+      "fullname": "Packages.com.snc.discovery.sensor.snmp.Classify",
+      "inactive": true
+    },
+    "SncCloneController": {
+      "fullname": "Packages.com.snc.ha.clone.CloneController",
+      "inactive": true
+    },
+    "SncCloneInstance": {
+      "fullname": "Packages.com.snc.ha.clone.instance.Instance",
+      "inactive": true
+    },
+    "SncCloneLogger": {
+      "fullname": "Packages.com.snc.ha.clone.CloneLogger",
+      "inactive": true
+    },
+    "SncCloneTask": {
+      "fullname": "Packages.com.snc.ha.clone.CloneTask",
+      "inactive": true
+    },
+    "SncCloneUtils": {
+      "fullname": "Packages.com.snc.ha.clone.CloneUtils",
+      "inactive": true
+    },
+    "SncConfiguration": {
+      "fullname": "Packages.com.snc.field_normalization.db.Configuration",
+      "inactive": true
+    },
+    "SncConfigurations": {
+      "fullname": "Packages.com.snc.field_normalization.Configurations",
+      "inactive": true
+    },
+    "SncConnectionTest": {
+      "fullname": "Packages.com.snc.ha.connectivity.ConnectionTest",
+      "inactive": true
+    },
+    "SncDBChangeManagerFactoryHA": {
+      "fullname": "Packages.com.snc.db.clone.change.DBChangeManagerFactoryHA",
+      "inactive": true
+    },
+    "SncDeviceHistory": {
+      "fullname": "Packages.com.snc.discovery.logging.DeviceHistory",
+      "inactive": true
+    },
+    "SncDiscoveryCancel": {
+      "fullname": "Packages.com.snc.discovery.DiscoveryCancel",
+      "inactive": true
+    },
+    "SncDiscoveryClassification": {
+      "fullname": "Packages.com.snc.discovery.DiscoveryClassification",
+      "inactive": true
+    },
+    "SncDiscoveryLog": {
+      "fullname": "Packages.com.snc.discovery.logging.DiscoveryLog",
+      "inactive": true
+    },
+    "SncDiscoveryRanges": {
+      "fullname": "Packages.com.snc.commons.networks.DiscoveryRanges",
+      "inactive": true
+    },
+    "SncDiscoveryRangesDB": {
+      "fullname": "Packages.com.snc.discovery.DiscoveryRangesDB",
+      "inactive": true
+    },
+    "SncDiscoveryReconciler": {
+      "fullname": "Packages.com.snc.discovery.database.DiscoveryReconciler",
+      "inactive": true
+    },
+    "SncDiscoverySNMPClassification": {
+      "fullname": "Packages.com.snc.discovery.sensor.snmp.DiscoverySNMPClassificatio",
+      "inactive": true
+    },
+    "SncDiscoveryUtils": {
+      "fullname": "Packages.com.snc.discovery.DiscoveryUtils",
+      "inactive": true
+    },
+    "SncDropBackupTablesTask": {
+      "fullname": "Packages.com.snc.ha.clone.instance.DropBackupTablesTask",
+      "inactive": true
+    },
+    "SncDropTablesTask": {
+      "fullname": "Packages.com.snc.ha.clone.DropTablesTask",
+      "inactive": true
+    },
+    "SncEC2Properties": {
+      "fullname": "Packages.com.snc.ec2.EC2Properties",
+      "inactive": true
+    },
+    "SncECMDBUtil": {
+      "fullname": "Packages.com.snc.cmdb.ECMDBUtil",
+      "inactive": true
+    },
+    "SncElrondClient": {
+      "fullname": "Packages.com.snc.customer_logon.ElrondClient",
+      "inactive": true
+    },
+    "SncExpert": {
+      "fullname": "Packages.com.snc.expert.Expert",
+      "inactive": true
+    },
+    "SncExpertInstance": {
+      "fullname": "Packages.com.snc.expert.ExpertInstance",
+      "inactive": true
+    },
+    "SncExpertPanel": {
+      "fullname": "Packages.com.snc.expert.ExpertPanel",
+      "inactive": true
+    },
+    "SncExtantDataJob": {
+      "fullname": "Packages.com.snc.field_normalization.db.ExtantDataJob",
+      "inactive": true
+    },
+    "SncExtantDataJobState": {
+      "fullname": "Packages.com.snc.field_normalization.ExtantDataJobState",
+      "inactive": true
+    },
+    "SncFailoverController": {
+      "fullname": "Packages.com.snc.da.gateway.replication.FailoverController",
+      "inactive": true
+    },
+    "SncFileTree": {
+      "fullname": "Packages.com.snc.apps.file.FileTree",
+      "inactive": true
+    },
+    "SncGatewayCache": {
+      "fullname": "Packages.com.snc.da.gateway.GatewayCache",
+      "inactive": true
+    },
+    "SncGatewayClone": {
+      "fullname": "Packages.com.snc.da.gateway.clone.GatewayClone",
+      "inactive": true
+    },
+    "SncGatewayConnectivity": {
+      "fullname": "Packages.com.snc.da.gateway.GatewayConnectivity",
+      "inactive": true
+    },
+    "SncGatewayPluginStartup": {
+      "fullname": "Packages.com.snc.da.gateway.replication.GatewayPluginStartup",
+      "inactive": true
+    },
+    "SncGatewayTruncateHierarchy": {
+      "fullname": "Packages.com.snc.da.gateway.clone.GatewayTruncateHierarchy",
+      "inactive": true
+    },
+    "SncGlideGateways": {
+      "fullname": "Packages.com.snc.da.gateway.GlideGateways",
+      "inactive": true
+    },
+    "SncHAClone": {
+      "fullname": "Packages.com.snc.ha.clone.HAClone",
+      "inactive": true
+    },
+    "SncHAConnectionTest": {
+      "fullname": "Packages.com.snc.ha.connectivity.HAConnectionTest",
+      "inactive": true
+    },
+    "SncHADatabaseCheck": {
+      "fullname": "Packages.com.snc.ha.tablecheck.HADatabaseCheck",
+      "inactive": true
+    },
+    "SncHAPairingUtils": {
+      "fullname": "Packages.com.snc.ha.HAPairingUtils",
+      "inactive": true
+    },
+    "SncHAReplicationController": {
+      "fullname": "Packages.com.snc.ha.HAReplicationController",
+      "inactive": true
+    },
+    "SncHAReplicationQueueSnapshotBuilder": {
+      "fullname": "Packages.com.snc.ha.tablecheck.HAReplicationQueueSnapshotBuilder",
+      "inactive": true
+    },
+    "SncHATableCheck": {
+      "fullname": "Packages.com.snc.ha.tablecheck.HATableCheck",
+      "inactive": true
+    },
+    "SncHATableCheckThread": {
+      "fullname": "Packages.com.snc.ha.tablecheck.HATableCheckThread",
+      "inactive": true
+    },
+    "SncHATableQuickCheck": {
+      "fullname": "Packages.com.snc.ha.tablecheck.HATableQuickCheck",
+      "inactive": true
+    },
+    "SncHATableRepair": {
+      "fullname": "Packages.com.snc.ha.tablecheck.HATableRepair",
+      "inactive": true
+    },
+    "SncHAUtils": {
+      "fullname": "Packages.com.snc.ha.HAUtils",
+      "inactive": true
+    },
+    "SncHostname": {
+      "fullname": "Packages.com.snc.discovery.utils.Hostname",
+      "inactive": true
+    },
+    "SncInstanceClone": {
+      "fullname": "Packages.com.snc.ha.clone.instance.InstanceClone",
+      "inactive": true
+    },
+    "SncInstanceConnectionTest": {
+      "fullname": "Packages.com.snc.ha.connectivity.InstanceConnectionTest",
+      "inactive": true
+    },
+    "SncInstanceRollback": {
+      "fullname": "Packages.com.snc.ha.clone.instance.InstanceRollback",
+      "inactive": true
+    },
+    "SncIPAddressV4": {
+      "fullname": "Packages.com.snc.commons.networks.IPAddressV4",
+      "inactive": true
+    },
+    "SncIPAddressV6": {
+      "fullname": "Packages.com.snc.commons.networks.IPAddressV6",
+      "inactive": true
+    },
+    "SncIPAuthenticator": {
+      "fullname": "Packages.com.snc.ipauthenticator.IPAuthenticator",
+      "inactive": true
+    },
+    "SncIPIterator": {
+      "fullname": "Packages.com.snc.commons.networks.IPIterator",
+      "inactive": true
+    },
+    "SncIPList": {
+      "fullname": "Packages.com.snc.commons.networks.IPList",
+      "inactive": true
+    },
+    "SncIPMetaCollection": {
+      "fullname": "Packages.com.snc.commons.networks.IPMetaCollection",
+      "inactive": true
+    },
+    "SncIPNetmaskV4": {
+      "fullname": "Packages.com.snc.commons.networks.IPNetmaskV4",
+      "inactive": true
+    },
+    "SncIPNetworkV4": {
+      "fullname": "Packages.com.snc.commons.networks.IPNetworkV4",
+      "inactive": true
+    },
+    "SncIPRangeV4": {
+      "fullname": "Packages.com.snc.commons.networks.IPRangeV4",
+      "inactive": true
+    },
+    "SncJRobinGraphDef": {
+      "fullname": "Packages.com.snc.jrobin.JRobinGraphDef",
+      "inactive": true
+    },
+    "SncLayer7Connections": {
+      "fullname": "Packages.com.snc.discovery.Layer7Connections",
+      "inactive": true
+    },
+    "SncMACAddress": {
+      "fullname": "Packages.com.snc.commons.networks.MACAddress",
+      "inactive": true
+    },
+    "SncMACAddressMfr": {
+      "fullname": "Packages.com.snc.commons.networks.MACAddressMfr",
+      "inactive": true
+    },
+    "SncMakeAndModel": {
+      "fullname": "Packages.com.snc.cmdb.MakeAndModel",
+      "inactive": true
+    },
+    "SncMIDConfigParameter": {
+      "fullname": "Packages.com.snc.commons.MIDConfigParameter",
+      "inactive": true
+    },
+    "SncMIDServerRangesDB": {
+      "fullname": "Packages.com.snc.discovery.MIDServerRangesDB",
+      "inactive": true
+    },
+    "SncNormalCoalescer": {
+      "fullname": "Packages.com.snc.field_normalization.NormalCoalescer",
+      "inactive": true
+    },
+    "SncNormalizer": {
+      "fullname": "Packages.com.snc.field_normalization.Normalizer",
+      "inactive": true
+    },
+    "SncNormalValueChanger": {
+      "fullname": "Packages.com.snc.field_normalization.NormalValueChanger",
+      "inactive": true
+    },
+    "SncNotifySNC": {
+      "fullname": "Packages.com.snc.system.NotifySNC",
+      "inactive": true
+    },
+    "SncOnCallRotation": {
+      "fullname": "Packages.com.snc.on_call_rotation.OnCallRotation",
+      "inactive": true
+    },
+    "SncPendingValueCollector": {
+      "fullname": "Packages.com.snc.field_normalization.PendingValueCollector",
+      "inactive": true
+    },
+    "SncPreferences": {
+      "fullname": "Packages.com.snc.field_normalization.Preferences",
+      "inactive": true
+    },
+    "SncPrintServerHelper": {
+      "fullname": "Packages.com.snc.discovery.database.PrintServerHelper",
+      "inactive": true
+    },
+    "SncProbe": {
+      "fullname": "Packages.com.snc.discovery.Probe",
+      "inactive": true
+    },
+    "SncProbeRunTime": {
+      "fullname": "Packages.com.snc.discovery.perfmon.ProbeRunTime",
+      "inactive": true
+    },
+    "SncRBSensorProcessor": {
+      "fullname": "Packages.com.snc.discovery_automation.RBSensorProcessor",
+      "inactive": true
+    },
+    "SncReadTest": {
+      "fullname": "Packages.com.snc.ha.ReadTest",
+      "inactive": true
+    },
+    "SncReclassifyCI": {
+      "fullname": "Packages.com.snc.cmdb.ReclassifyCI",
+      "inactive": true
+    },
+    "SncRelationships": {
+      "fullname": "Packages.com.snc.cmdb.Relationships",
+      "inactive": true
+    },
+    "SncReplicationAdvisor": {
+      "fullname": "Packages.com.snc.db.replicate.ReplicationAdvisor",
+      "inactive": true
+    },
+    "SncReplicationEngine": {
+      "fullname": "Packages.com.snc.db.replicate.ReplicationEngine",
+      "inactive": true
+    },
+    "SncReplicationQueue": {
+      "fullname": "Packages.com.snc.db.replicate.ReplicationQueue",
+      "inactive": true
+    },
+    "SncRequestCredentials": {
+      "fullname": "Packages.com.snc.customer_logon.RequestCredentials",
+      "inactive": true
+    },
+    "SncRrdGlideBackendFactory": {
+      "fullname": "Packages.com.snc.jrobin.RrdGlideBackendFactory",
+      "inactive": true
+    },
+    "SncRuleApplier": {
+      "fullname": "Packages.com.snc.field_normalization.RuleApplier",
+      "inactive": true
+    },
+    "SncRuleToPending": {
+      "fullname": "Packages.com.snc.field_normalization.RuleToPending",
+      "inactive": true
+    },
+    "SncSAMCounter": {
+      "fullname": "Packages.com.snc.software_asset_management.SAMCounter",
+      "inactive": true
+    },
+    "SncScheduleDropBackupTablesTask": {
+      "fullname": "Packages.com.snc.ha.clone.instance.ScheduleDropBackupTablesTask",
+      "inactive": true
+    },
+    "SncScrapeIANAEnterpriseNumbers": {
+      "fullname": "Packages.com.snc.discovery.database.ScrapeIANAEnterpriseNumbers",
+      "inactive": true
+    },
+    "SncScrapeIEEENICCodes": {
+      "fullname": "Packages.com.snc.discovery.database.ScrapeIEEENICCodes",
+      "inactive": true
+    },
+    "SncSendNotificationTask": {
+      "fullname": "Packages.com.snc.ha.clone.instance.SendNotificationTask",
+      "inactive": true
+    },
+    "SncSensorProcessor": {
+      "fullname": "Packages.com.snc.discovery.SensorProcessor",
+      "inactive": true
+    },
+    "SncSerialNumber": {
+      "fullname": "Packages.com.snc.discovery.SerialNumber",
+      "inactive": true
+    },
+    "SncSerialNumberList": {
+      "fullname": "Packages.com.snc.discovery.SerialNumberList",
+      "inactive": true
+    },
+    "SncSessionMate": {
+      "fullname": "Packages.com.snc.discovery.SessionMate",
+      "inactive": true
+    },
+    "SncSimmerControl": {
+      "fullname": "Packages.com.snc.ha.clone.instance.SimmerControl",
+      "inactive": true
+    },
+    "SncTableEditor": {
+      "fullname": "Packages.com.snc.apps.api.TableEditor",
+      "inactive": true
+    },
+    "SncTableRotation": {
+      "fullname": "Packages.com.snc.db.replicate.TableRotation",
+      "inactive": true
+    },
+    "SncTableRotationExtension": {
+      "fullname": "Packages.com.snc.db.replicate.TableRotationExtension",
+      "inactive": true
+    },
+    "SncTableRotationExtensions": {
+      "fullname": "Packages.com.snc.db.replicate.TableRotationExtensions",
+      "inactive": true
+    },
+    "SncTableRotationWatcher": {
+      "fullname": "Packages.com.snc.db.replicate.TableRotationWatcher",
+      "inactive": true
+    },
+    "SncTransformApplier": {
+      "fullname": "Packages.com.snc.field_normalization.TransformApplier",
+      "inactive": true
+    },
+    "SncTreeBuilder": {
+      "fullname": "Packages.com.snc.apps.tree.TreeBuilder",
+      "inactive": true
+    },
+    "SncTriggerSynchronizer": {
+      "fullname": "Packages.com.snc.automation.TriggerSynchronizer",
+      "inactive": true
+    },
+    "SncValue": {
+      "fullname": "Packages.com.snc.field_normalization.db.Value",
+      "inactive": true
+    },
+    "TestExtension": {
+      "fullname": "Packages.com.glide.junit.misc.TestExtension",
+      "inactive": true
+    },
+    "UINotification": {
+      "fullname": "Packages.com.glide.ui.UINotification",
+      "inactive": true
+    }
+  },
+  "types": {
+    "IGlideElement": { "is_interface": true },
+    "GlideElementGlideObject": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementNumeric": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementSysClassName": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementReference": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementBoolean": { "extends": [ "Packages.java.lang.Boolean", "IGlideElement" ] },
+    "GlideElementScript": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementDocumentation": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementConditions": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementCurrency": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementPrice": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementWorkflow": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementDomainId": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementVariables": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementTranslatedField": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementTranslatedHTML": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] },
+    "GlideElementTranslatedText": { "extends": [ "Packages.java.lang.String", "IGlideElement" ] }
+  }
+}
