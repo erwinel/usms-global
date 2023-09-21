@@ -28,7 +28,7 @@
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": [
     "npm install",
-    "cd script/module",
+    "cd util/src",
     "dotnet restore"
   ]
 
