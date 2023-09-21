@@ -145,7 +145,7 @@ public sealed class RemoteLoaderService
         if (tableInfo is not null)
             return tableInfo;
         using HttpClient httpClient = new(_handler);
-        Uri requestUri = _remoteUri.ToApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name);
+        Uri requestUri = _remoteUri.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name);
         HttpRequestMessage message = new(HttpMethod.Get, requestUri);
         message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
         using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);

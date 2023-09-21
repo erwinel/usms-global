@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.CodeDom.Compiler;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
@@ -289,5 +290,15 @@ public class ElementInfo
         builder.HasOne(t => t.Type).WithMany(s => s.Elements).HasForeignKey(t => t.TypeName).IsRequired().OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(t => t.Scope).WithMany(s => s.Elements).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(t => t.Reference).WithMany(s => s.ReferredBy).HasForeignKey(t => t.RefTableName).OnDelete(DeleteBehavior.Restrict);
+    }
+
+    internal async Task RenderPropertyGlobalAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal async Task RenderPropertyScopedAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

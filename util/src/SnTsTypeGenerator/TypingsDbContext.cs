@@ -119,4 +119,6 @@ public class TypingsDbContext : DbContext
     public virtual DbSet<TableInfo> Tables { get; set; } = null!;
 
     public virtual DbSet<SysScope> Scopes { get; set; } = null!;
+
+    public virtual DbSet<ElementInfo> Elements { get; set; } = null!;
 }

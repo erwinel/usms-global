@@ -71,25 +71,29 @@ public class AppSettings
     /// </summary>
     public string? RemoteURL { get; set; }
 
+    public const string DEFAULT_NAMESPACE = "global";
+
+    public const string DEFAULT_OUTPUT_FILENAME = "types.d.ts";
+    
     /// <summary>
-    /// Gets the shorthand for the <c>--<see cref="Namespace" /></c> command line option.
+    /// Gets the shorthand for the <c>--<see cref="Output" /></c> command line option.
     /// </summary>
-    public const string SHORTHAND_n = "-n";
+    public const string SHORTHAND_o = "-o";
 
     /// <summary>
-    /// The output typescript namespace.
+    /// The output file name.
     /// </summary>
-    public string? Namespace { get; set; }
+    public string? Output { get; set; }
 
     /// <summary>
-    /// Gets the shorthand for the <c>--<see cref="Global" /></c> command line option.
+    /// Gets the shorthand for the <c>--<see cref="Force" /></c> command line option.
     /// </summary>
-    public const string SHORTHAND_g = "-g";
+    public const string SHORTHAND_f = "-f";
 
     /// <summary>
-    /// Generate typings for use in global applications.
+    /// Force overwrite of output file.
     /// </summary>
-    public bool? Global { get; set; }
+    public bool? Force { get; set; }
 
     /// <summary>
     /// Gets the shorthand for the <c>--<see cref="Scoped" /></c> command line option.
@@ -100,6 +104,16 @@ public class AppSettings
     /// Generate typings for use in scoped applications.
     /// </summary>
     public bool? Scoped { get; set; }
+
+    /// <summary>
+    /// Gets the shorthand for the <c>--<see cref="Global" /></c> command line option.
+    /// </summary>
+    public const string SHORTHAND_g = "-g";
+
+    /// <summary>
+    /// Generate typings for use in global applications.
+    /// </summary>
+    public bool? Global { get; set; }
 
     /// <summary>
     /// Gets the shorthand for the <c>--<see cref="Help" /></c> command line option.
@@ -238,17 +252,25 @@ public class AppSettings
             Console.WriteLine($"\t\t\tCannot be used with the --{nameof(Scoped)} (-{SHORTHAND_s}) option.");
             Console.WriteLine();
 
-            Console.Write($"\t-{SHORTHAND_n}");
+            Console.Write($"\t-{SHORTHAND_o}");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(" namespaceName");
+            Console.WriteLine(" filename.d.ts");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\t\tor");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write($"\t--{nameof(Namespace)}=");
+            Console.Write($"\t--{nameof(Output)}=");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("namespaceName");
+            Console.WriteLine("filename.d.ts");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\t\t\tSpecifies the namespace for the output typings. The default is no namespace.");
+            Console.WriteLine($"\t\t\tSpecifies the output file name. The default is {DEFAULT_OUTPUT_FILENAME}.");
+            Console.WriteLine();
+
+            Console.Write($"\t-{SHORTHAND_f}");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("\t\tor");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"\t--{nameof(Force)}");
+            Console.WriteLine("\t\t\tForce overwrite of the output file.");
             Console.WriteLine();
 
             Console.WriteLine($"\t{SHORTHAND__3F_}");

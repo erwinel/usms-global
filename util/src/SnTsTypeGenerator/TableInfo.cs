@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.CodeDom.Compiler;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
@@ -165,6 +167,45 @@ public class TableInfo
     [BackingField(nameof(_referredBy))]
     public virtual HashSet<ElementInfo> ReferredBy { get => _referredBy; set => _referredBy = value ?? new(); }
 
+    internal string GetNamespace() => string.IsNullOrWhiteSpace(_scopeValue) ? AppSettings.DEFAULT_NAMESPACE : _scopeValue;
+
+    internal string GetShortName()
+    {
+        if (string.IsNullOrWhiteSpace(_scopeValue) || _scopeValue == AppSettings.DEFAULT_NAMESPACE || !_name.StartsWith(_scopeValue))
+            return _name;
+        int len = _scopeValue.Length + 1;
+        if (_name.Length <= len || _name[_scopeValue.Length] != '_')
+            return _name;
+        return _name[len..];
+    }
+
+    internal string GetGlideRecordTypeString(string targetNs)
+    {
+        if (string.IsNullOrWhiteSpace(_scopeValue) || _scopeValue == AppSettings.DEFAULT_NAMESPACE)
+            return $"{NS_NAME_GlideRecord}.{Name}";
+        if (targetNs == _scopeValue)
+            return $"{NS_NAME_record}.{GetShortName()}";
+        return $"{_scopeValue}.{NS_NAME_record}.{GetShortName()}";
+    }
+
+    internal string GetGlideElementTypeString(string targetNs)
+    {
+        if (string.IsNullOrWhiteSpace(_scopeValue) || _scopeValue == AppSettings.DEFAULT_NAMESPACE)
+            return $"{NS_NAME_GlideElement}.{Name}";
+        if (targetNs == _scopeValue)
+            return $"{NS_NAME_element}.{GetShortName()}";
+        return $"{_scopeValue}.{NS_NAME_element}.{GetShortName()}";
+    }
+
+    internal string GetInterfaceTypeString(string targetNs)
+    {
+        if (string.IsNullOrWhiteSpace(_scopeValue) || _scopeValue == AppSettings.DEFAULT_NAMESPACE)
+            return $"{NS_NAME_tableFields}.{Name}";
+        if (targetNs == _scopeValue)
+            return $"{NS_NAME_fields}.{GetShortName()}";
+        return $"{_scopeValue}.{NS_NAME_fields}.{GetShortName()}";
+    }
+
     internal static void OnBuildEntity(EntityTypeBuilder<TableInfo> builder)
     {
         builder.HasKey(t => t.Name);
@@ -188,5 +229,61 @@ public class TableInfo
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(SysID)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(SysID)}\" COLLATE NOCASE)";
         yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(IsExtendable)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(IsExtendable)}\")";
+    }
+
+    private async Task RenderFieldsAsync(IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, CancellationToken cancellationToken)
+    {
+        string @namespace = GetNamespace();
+        var tableName = Name;
+        EntityEntry<TableInfo> entry = dbContext.Tables.Entry(this);
+        var elements = await entry.GetRelatedCollectionAsync(e => e.Elements, cancellationToken);
+        TableInfo? superClass = await entry.GetReferencedEntityAsync(e => e.SuperClass, () => SuperClassName is not null, cancellationToken);
+        string extends;
+        if (superClass is not null)
+        {
+            extends = $"extends {superClass.GetInterfaceTypeString(@namespace)}{{";
+            elements = elements.NewElements(await superClass.GetRelatedCollectionAsync(dbContext.Tables, t => t.Elements, cancellationToken));
+        }
+        else if (elements.ExtendsBaseRecord())
+        {
+            elements = elements.GetNonBaseRecordElements();
+            extends = "extends IBaseRecord {";
+        }
+        else
+            extends = "{";
+        tableName = GetShortName();
+        await writer.WriteLineAsync();
+        await writer.WriteLineAsync("/**");
+        if (tableName == Name)
+            await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(Label) || Label == tableName) ? tableName : Label.SmartQuoteJson())} glide record fields.");
+        else
+            await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(Label) || Label == tableName) ? tableName : Label.SmartQuoteJson())} ({Name}) glide record fields.");
+        await writer.WriteLineAsync($" * @see {{@link {GetGlideRecordTypeString(@namespace)}}}");
+        await writer.WriteLineAsync($" * @see {{@link {GetGlideElementTypeString(@namespace)}}}");
+        await writer.WriteLineAsync(" */");
+        if (elements.Any())
+        {
+            await writer.WriteAsync($"export interface {tableName} {extends}");
+            var indent = writer.Indent + 1;
+            foreach (ElementInfo e in elements)
+            {
+                writer.Indent = indent;
+                await renderPropertyAsync(e, @namespace);
+            }
+            writer.Indent = indent - 1;
+            await writer.WriteLineAsync("}");
+        }
+        else
+            await writer.WriteLineAsync($"export interface {tableName} {extends} }}");
+    }
+
+    internal async Task RenderFieldsGlobalAsync(IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
+    {
+        await RenderFieldsAsync(writer, dbContext, async (e, ns) => await e.RenderPropertyGlobalAsync(writer, ns, cancellationToken), cancellationToken);
+    }
+    
+    internal async Task RenderFieldsScopedAsync(IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
+    {
+        await RenderFieldsAsync(writer, dbContext, async (e, ns) => await e.RenderPropertyScopedAsync(writer, ns, cancellationToken), cancellationToken);
     }
 }

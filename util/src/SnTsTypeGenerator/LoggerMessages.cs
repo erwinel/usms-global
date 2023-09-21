@@ -143,14 +143,57 @@ public static class LoggerMessages
     
     #endregion
 
-    #region HttpRequestFailed Error (0x0010)
+    #region Critical OutputFileAlreadyExists Error (0x0010)
     
-    public const int EVENT_ID_HttpRequestFailedError = 0x0010;
+    public const int EVENT_ID_CriticalOutputFileAlreadyExistsError = 0x0010;
+    public static readonly EventId CriticalOutputFileAlreadyExistsError = new(EVENT_ID_CriticalOutputFileAlreadyExistsError, nameof(CriticalOutputFileAlreadyExistsError));
+    private static readonly Action<ILogger, string, Exception?> _criticalOutputFileAlreadyExistsError = LoggerMessage.Define<string>(LogLevel.Critical, CriticalOutputFileAlreadyExistsError,
+        "File {Path}");
+    /// <summary>
+    /// Logs an OutputFileAlreadyExists event with event code 0x0010.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="path">The path of the file.</param>
+    /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
+    public static void LogCriticalOutputFileAlreadyExistsError(this ILogger logger, string path) => _criticalOutputFileAlreadyExistsError(logger, path, null);
+    
+    #endregion
+
+    #region Critical OutputFileAccessError Error (0x0011)
+    
+    public const int EVENT_ID_CriticalOutputFileAccessErrorError = 0x0011;
+    public static readonly EventId CriticalOutputFileAccessErrorError = new(EVENT_ID_CriticalOutputFileAccessErrorError, nameof(CriticalOutputFileAccessErrorError));
+    private static readonly Action<ILogger, string, Exception?> _criticalOutputFileAccessErrorError1 = LoggerMessage.Define<string>(LogLevel.Critical, CriticalOutputFileAccessErrorError,
+        "Error accessing output file {Path}.");
+    private static readonly Action<ILogger, string, string, Exception?> _criticalOutputFileAccessErrorError2 = LoggerMessage.Define<string, string>(LogLevel.Critical, CriticalOutputFileAccessErrorError,
+        "Error accessing output file {Path}: {Message}");
+
+    /// <summary>
+    /// Logs an OutputFileAccessError event with event code 0x0011.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="path">The path of the output file.</param>
+    /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
+    public static void LogCriticalOutputFileAccessErrorError(this ILogger logger, string path, Exception? error = null) => _criticalOutputFileAccessErrorError1(logger, path, error);
+    
+    /// <summary>
+    /// Logs an OutputFileAccessError event with event code 0x0011.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="path">The path of the output file.</param>
+    /// <param name="message">The message describing the error.</param>
+    public static void LogCriticalOutputFileAccessErrorError(this ILogger logger, string path, string message) => _criticalOutputFileAccessErrorError2(logger, path, message, null);
+    
+    #endregion
+
+    #region HttpRequestFailed Error (0x0012)
+    
+    public const int EVENT_ID_HttpRequestFailedError = 0x0012;
     public static readonly EventId HttpRequestFailedError = new(EVENT_ID_HttpRequestFailedError, nameof(HttpRequestFailedError));
     private static readonly Action<ILogger, Uri, Exception?> _httpRequestFailedError = LoggerMessage.Define<Uri>(LogLevel.Error, HttpRequestFailedError,
         "Remote request failed ({URI}).");
     /// <summary>
-    /// Logs an HttpRequestFailed event with event code 0x0010.
+    /// Logs an HttpRequestFailed event with event code 0x0012.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI that failed.</param>
@@ -159,14 +202,14 @@ public static class LoggerMessages
     
     #endregion
 
-    #region GetResponseContentFailed Error (0x0011)
+    #region GetResponseContentFailed Error (0x0013)
     
-    public const int EVENT_ID_GetResponseContentFailedError = 0x0011;
+    public const int EVENT_ID_GetResponseContentFailedError = 0x0013;
     public static readonly EventId GetResponseContentFailedError = new(EVENT_ID_GetResponseContentFailedError, nameof(GetResponseContentFailedError));
     private static readonly Action<ILogger, Uri, Exception?> _getResponseContentFailedError = LoggerMessage.Define<Uri>(LogLevel.Error, GetResponseContentFailedError,
         "Failed to get text-based content from remote URI {URI}");
     /// <summary>
-    /// Logs a GetResponseContentFailed event with event code 0x0011.
+    /// Logs a GetResponseContentFailed event with event code 0x0013.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request uri.</param>
@@ -175,14 +218,14 @@ public static class LoggerMessages
     
     #endregion
 
-    #region JsonCouldNotBeParsed Error (0x0012)
+    #region JsonCouldNotBeParsed Error (0x0014)
     
-    public const int EVENT_ID_JsonCouldNotBeParsedError = 0x0012;
+    public const int EVENT_ID_JsonCouldNotBeParsedError = 0x0014;
     public static readonly EventId JsonCouldNotBeParsedError = new(EVENT_ID_JsonCouldNotBeParsedError, nameof(JsonCouldNotBeParsedError));
     private static readonly Action<ILogger, Uri, string, Exception?> _jsonCouldNotBeParsedError = LoggerMessage.Define<Uri, string>(LogLevel.Error, JsonCouldNotBeParsedError,
         "Unable to parse response from {URI}; Content: {Content}");
     /// <summary>
-    /// Logs a JsonCouldNotBeParsed event with event code 0x0012.
+    /// Logs a JsonCouldNotBeParsed event with event code 0x0014.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
@@ -192,14 +235,14 @@ public static class LoggerMessages
     
     #endregion
 
-    #region InvalidHttpResponse Error (0x0013)
+    #region InvalidHttpResponse Error (0x0015)
     
-    public const int EVENT_ID_InvalidHttpResponseError = 0x0013;
+    public const int EVENT_ID_InvalidHttpResponseError = 0x0015;
     public static readonly EventId InvalidHttpResponseError = new(EVENT_ID_InvalidHttpResponseError, nameof(InvalidHttpResponseError));
     private static readonly Action<ILogger, Uri, string, Exception?> _invalidHttpResponseError = LoggerMessage.Define<Uri, string>(LogLevel.Error, InvalidHttpResponseError,
         "Response from {URI} did not match the expected type; Content: {Content}");
     /// <summary>
-    /// Logs an InvalidHttpResponse event with event code 0x0013.
+    /// Logs an InvalidHttpResponse event with event code 0x0015.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
