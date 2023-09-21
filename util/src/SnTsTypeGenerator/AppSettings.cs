@@ -13,7 +13,7 @@ public class AppSettings
     /// <summary>
     /// Gets the shorthand for the <c>--<see cref="Dbfile" /></c> command line option.
     /// </summary>
-    public const string SHORTHAND_DbFile = "";
+    public const string SHORTHAND_d = "-d";
 
     /// <summary>
     /// Specifies the relative or absolute path of the database file.
@@ -24,7 +24,7 @@ public class AppSettings
     /// <summary>
     /// Gets the shorthand for the <c>--<see cref="Table" /></c> command line option.
     /// </summary>
-    public const string SHORTHAND_Table = "";
+    public const string SHORTHAND_t = "-t";
 
     /// <summary>
     /// Database table names to generate typings for.
@@ -34,7 +34,7 @@ public class AppSettings
     /// <summary>
     /// Gets the shorthand for the <c>--<see cref="UserName" /></c> command line option.
     /// </summary>
-    public const string SHORTHAND_UserName = "";
+    public const string SHORTHAND_u = "-u";
 
     /// <summary>
     /// Login user name.
@@ -44,7 +44,7 @@ public class AppSettings
     /// <summary>
     /// Gets the shorthand for the <c>--<see cref="Password" /></c> command line option.
     /// </summary>
-    public const string SHORTHAND_Password = "";
+    public const string SHORTHAND_p = "-p";
 
     /// <summary>
     /// Password credential.
@@ -52,19 +52,9 @@ public class AppSettings
     public string? Password { get; set; }
 
     /// <summary>
-    /// Gets the shorthand for the <c>--<see cref="ClientId" /></c> command line option.
-    /// </summary>
-    public const string SHORTHAND_ClientId = "-i";
-
-    /// <summary>
     /// Gets or sets the client ID from the ServiceNow Application Registry.
     /// </summary>
     public string? ClientId { get; set; }
-
-    /// <summary>
-    /// Gets the shorthand for the <c>--<see cref="ClientSecret" /></c> command line option.
-    /// </summary>
-    public const string SHORTHAND_ClientSecret = "-i";
 
     /// <summary>
     /// Gets or sets the client secret from the ServiceNow Application Registry.
@@ -74,7 +64,7 @@ public class AppSettings
     /// <summary>
     /// Gets the shorthand for the <c>--<see cref="RemoteURL" /></c> command line option.
     /// </summary>
-    public const string SHORTHAND_RemoteURL = "";
+    public const string SHORTHAND_r = "-r";
 
     /// <summary>
     /// The remote ServiceNow instance URI.
@@ -82,14 +72,44 @@ public class AppSettings
     public string? RemoteURL { get; set; }
 
     /// <summary>
+    /// Gets the shorthand for the <c>--<see cref="Namespace" /></c> command line option.
+    /// </summary>
+    public const string SHORTHAND_n = "-n";
+
+    /// <summary>
+    /// The output typescript namespace.
+    /// </summary>
+    public string? Namespace { get; set; }
+
+    /// <summary>
+    /// Gets the shorthand for the <c>--<see cref="Global" /></c> command line option.
+    /// </summary>
+    public const string SHORTHAND_g = "-g";
+
+    /// <summary>
+    /// Generate typings for use in global applications.
+    /// </summary>
+    public bool? Global { get; set; }
+
+    /// <summary>
+    /// Gets the shorthand for the <c>--<see cref="Scoped" /></c> command line option.
+    /// </summary>
+    public const string SHORTHAND_s = "-s";
+
+    /// <summary>
+    /// Generate typings for use in scoped applications.
+    /// </summary>
+    public bool? Scoped { get; set; }
+
+    /// <summary>
     /// Gets the shorthand for the <c>--<see cref="Help" /></c> command line option.
     /// </summary>
-    public const string SHORTHAND_Help1 = "-h";
+    public const string SHORTHAND_h = "-h";
 
     /// <summary>
     /// Gets the command line switch for the <see cref="Help" /> application option option.
     /// </summary>
-    public const string SHORTHAND_Help2 = "-?";
+    public const string SHORTHAND__3F_ = "-?";
     
     /// <summary>
     /// Gets or sets the value indicating whether to write help information to the console.
@@ -99,15 +119,15 @@ public class AppSettings
 
     private static readonly Dictionary<string, string> _switchMappings = new()
     {
-        { SHORTHAND_DbFile, nameof(DbFile) },
-        { SHORTHAND_Table, nameof(Table) },
-        { SHORTHAND_UserName, nameof(UserName) },
-        { SHORTHAND_Password, nameof(Password) },
-        { SHORTHAND_ClientId, nameof(ClientId) },
-        { SHORTHAND_ClientSecret, nameof(ClientSecret) },
-        { SHORTHAND_RemoteURL, nameof(RemoteURL) },
-        { SHORTHAND_Help1, nameof(Help) },
-        { SHORTHAND_Help2, nameof(Help) }
+        { SHORTHAND_d, nameof(DbFile) },
+        { SHORTHAND_t, nameof(Table) },
+        { SHORTHAND_u, nameof(UserName) },
+        { SHORTHAND_p, nameof(Password) },
+        { SHORTHAND_r, nameof(RemoteURL) },
+        { SHORTHAND_g, nameof(Global) },
+        { SHORTHAND_s, nameof(Scoped) },
+        { SHORTHAND_h, nameof(Help) },
+        { SHORTHAND__3F_, nameof(Help) }
     };
     
     internal static void Configure(string[] args, ConfigurationManager configuration)
@@ -128,66 +148,114 @@ public class AppSettings
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine();
             Console.WriteLine("Command line options:");
-            Console.Write($"\t{SHORTHAND_DbFile}");
+
+            Console.Write($"\t-{SHORTHAND_d}");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(" [fileName]");
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(" fileName");
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\t\tor");
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write($"\t--{nameof(DbFile)}=");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("[fileName]");
+            Console.WriteLine("fileName");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("\t\t\tSpecifies the Path to the typings database.");
             Console.WriteLine("\t\t\tThis path is relative to the subdirectory containing the executable.");
             Console.WriteLine("\t\t\tThe default behavior is use a database named {DEFAULT_DbFile} in the same subdirectory as the executable.");
             Console.WriteLine();
-            Console.Write($"\t{SHORTHAND_Table} ");
+
+            Console.Write($"\t-{SHORTHAND_t}");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(" [comma_separated_table_names]");
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(" name");
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine(",name,...");
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("\t\tor");
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write($"\t--{nameof(Table)}=");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("[comma_separated_table_names]");
+            Console.WriteLine("name");
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine(",name,...");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("\t\t\tSpecifies the names of the table to generate typings for.");
             Console.WriteLine();
-            Console.Write($"\t{SHORTHAND_UserName} ");
+
+            Console.Write($"\t-{SHORTHAND_u}");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(" [user_name]");
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(" login");
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\t\tor");
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write($"\t--{nameof(UserName)}=");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("[user_name]");
+            Console.WriteLine("login");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\t\t\tSpecifies the user name credentials to use when connedting to the remote instance.");
+            Console.WriteLine("\t\t\tSpecifies the user name credentials to use when connecting to the remote instance.");
             Console.WriteLine();
-            Console.WriteLine($"\t{SHORTHAND_Password}");
-            Console.WriteLine("\t\tor");
-            Console.WriteLine($"\t--{nameof(Password)}");
-            Console.WriteLine("\t\t\tSpecifies the password credentials to use when connedting to the remote instance.");
-            Console.WriteLine();
-            Console.Write($"\t{SHORTHAND_RemoteURL} ");
+
+            Console.Write($"\t-{SHORTHAND_p}");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(" [url]");
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(" password");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("\t\tor");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"\t--{nameof(Password)}=");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("password");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("\t\t\tSpecifies the password credentials to use when connecting to the remote instance.");
+            Console.WriteLine();
+
+            Console.Write($"\t-{SHORTHAND_r}");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(" url");
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\t\tor");
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write($"\t--{nameof(RemoteURL)}=");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("[url]");
+            Console.WriteLine("url");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("\t\t\tSpecifies the base URL of the remote ServiceNow instance.");
+            Console.WriteLine();
+
+            Console.Write($"\t-{SHORTHAND_s}");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("\t\tor");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"\t{SHORTHAND_Help2}");
+            Console.Write($"\t--{nameof(Scoped)}");
+            Console.WriteLine("\t\t\tGenerate typings for use with scoped apps.");
+            Console.WriteLine($"\t\t\tCannot be used with the --{nameof(Global)} (-{SHORTHAND_g}) option.");
+            Console.WriteLine();
+
+            Console.Write($"\t-{SHORTHAND_g}");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("\t\tor");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"\t--{nameof(Global)}");
+            Console.WriteLine("\t\t\tGenerate typings for use with global apps (this is the default behavior).");
+            Console.WriteLine($"\t\t\tCannot be used with the --{nameof(Scoped)} (-{SHORTHAND_s}) option.");
+            Console.WriteLine();
+
+            Console.Write($"\t-{SHORTHAND_n}");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(" namespaceName");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("\t\tor");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($"\t--{nameof(Namespace)}=");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("namespaceName");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("\t\t\tSpecifies the namespace for the output typings. The default is no namespace.");
+            Console.WriteLine();
+
+            Console.WriteLine($"\t{SHORTHAND__3F_}");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\t\tor");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($"\t{SHORTHAND_Help1}");
+            Console.WriteLine($"\t{SHORTHAND_h}");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\t\tor");
             Console.ForegroundColor = ConsoleColor.White;

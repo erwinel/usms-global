@@ -20,6 +20,8 @@ public sealed class RemoteLoaderService
 
     private readonly Dictionary<string, string> _numberRefMap = new(StringComparer.InvariantCultureIgnoreCase);
 
+    internal bool HasHandler => _handler is not null;
+
     private async Task<TableInfo?> TableFromElementAsync(JsonElement element, bool checkDb, CancellationToken cancellationToken)
     {
         if (!(element.TryGetNonEmptyString(JSON_KEY_SYS_ID, out string? sys_id) && element.TryGetNonEmptyString(JSON_KEY_NAME, out string? value)))
@@ -58,7 +60,8 @@ public sealed class RemoteLoaderService
         var remoteUri = _appSettings.Value.RemoteURL;
         if (string.IsNullOrWhiteSpace(remoteUri))
         {
-            _logger.LogCriticalRemoteInstanceUriNotProvidedError();
+            if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
+                _logger.LogCriticalRemoteInstanceUriNotProvidedError();
             _remoteUri = new Uri(string.Empty);
             return;
         }
@@ -68,7 +71,8 @@ public sealed class RemoteLoaderService
             if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
             {
                 _remoteUri = uri;
-                _logger.LogCriticalInvalidRemoteInstanceUriError();
+                if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
+                    _logger.LogCriticalInvalidRemoteInstanceUriError();
                 return;
             }
             _remoteUri = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
@@ -78,20 +82,23 @@ public sealed class RemoteLoaderService
                 {
                     if (_appSettings.Value.Password is null)
                     {
-                        _logger.LogCriticalUserNameNotProvidedError();
+                        if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
+                            _logger.LogCriticalUserNameNotProvidedError();
                         return;
                     }
                     Console.Write("User Name: ");
                     string? userName = Console.ReadLine();
                     if (string.IsNullOrEmpty(userName))
                     {
-                        _logger.LogCriticalUserNameNotProvidedError();
+                        if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
+                            _logger.LogCriticalUserNameNotProvidedError();
                         return;
                     }
                     string? password = Console.ReadLine();
                     if (string.IsNullOrEmpty(password))
                     {
-                        _logger.LogCriticalPasswordNotProvidedError();
+                        if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
+                            _logger.LogCriticalPasswordNotProvidedError();
                         return;
                     }
                     credentials = new(userName, password);
@@ -100,7 +107,8 @@ public sealed class RemoteLoaderService
                 {
                     if (_appSettings.Value.ClientSecret is null)
                     {
-                        _logger.LogCriticalPasswordNotProvidedError();
+                        if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
+                            _logger.LogCriticalPasswordNotProvidedError();
                         return;
                     }
                     credentials = new(_appSettings.Value.ClientId, _appSettings.Value.ClientSecret);
@@ -111,17 +119,20 @@ public sealed class RemoteLoaderService
                 string? password = _appSettings.Value.Password;
                 if (password is null && string.IsNullOrEmpty(password = Console.ReadLine()))
                 {
-                    _logger.LogCriticalPasswordNotProvidedError();
+                    if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
+                        _logger.LogCriticalPasswordNotProvidedError();
                     return;
                 }
                 credentials = new(_appSettings.Value.UserName, password);
             }
-            _handler = new() { Credentials = credentials };
+            if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
+                _handler = new() { Credentials = credentials };
         }
         else
         {
             _remoteUri = Uri.TryCreate(remoteUri, UriKind.Absolute, out uri) ? uri : new Uri(Uri.EscapeDataString(remoteUri), UriKind.Relative);
-            _logger.LogCriticalInvalidRemoteInstanceUriError();
+            if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
+                _logger.LogCriticalInvalidRemoteInstanceUriError();
         }
     }
 

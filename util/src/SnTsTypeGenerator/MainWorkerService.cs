@@ -29,11 +29,21 @@ public sealed class MainWorkerService : BackgroundService
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         stoppingToken.ThrowIfCancellationRequested();
+
         if (_appSettings.Value.Help.HasValue && _appSettings.Value.Help.Value)
+        {
             AppSettings.WriteHelpToConsole();
-            
+            return;
+        }
+        
+        if (_appSettings.Value.Scoped.HasValue && _appSettings.Value.Scoped.Value && _appSettings.Value.Global.HasValue && _appSettings.Value.Global.Value)
+        {
+            _logger.LogCriticalGlobalAndScopedSwitchesBothSetError();
+            return;
+        }
+
         var tableNames = _appSettings.Value.Table?.Where(t => !string.IsNullOrEmpty(t)) ?? Enumerable.Empty<string>();
-        if (tableNames.Any() || (tableNames = (_appSettings.Value.DbFile?.Split(',').Where(t => !string.IsNullOrEmpty(t)) ?? Enumerable.Empty<string>())).Any())
+        if (tableNames.Any() || (tableNames = _appSettings.Value.DbFile?.Split(',').Where(t => !string.IsNullOrEmpty(t)) ?? Enumerable.Empty<string>()).Any())
         {
             Collection<TableInfo> toRender = new();
             foreach (string name in tableNames.Select(n => n.Trim().ToLower()).Distinct())
