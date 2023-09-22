@@ -49,13 +49,13 @@
             "isWholeLine": false
         },
         {
-            "text": "BUG:", 
+            "text": "BUG:",
             "before": {
-				"contentText": "⚠️" // adds text before the highlight
-			}, 
+                "contentText": "⚠️" // adds text before the highlight
+            },
             "after": {
-				"contentText": "⚠️" // adds text after the highlight
-			},
+                "contentText": "⚠️" // adds text after the highlight
+            },
             "color": "red",
             "border": "1px solid red",
             "borderRadius": "2px",

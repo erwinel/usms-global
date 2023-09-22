@@ -3,12 +3,16 @@
     "noImplicitAny": false,
     "module": "none",
     "target": "ES2021",
-    "lib": ["ES2021"],
+    "lib": [
+      "ES2021"
+    ],
     "removeComments": false,
     "sourceMap": false,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["../types"],
+    "typeRoots": [
+      "../types"
+    ],
     "declaration": true,
     "declarationDir": "../dist/types",
     "outDir": "../dist/js"
