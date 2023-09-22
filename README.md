@@ -8,9 +8,9 @@ This is intended to be developed using VS Code. See [/.vscode/extensions.json](.
 
 Run `npm install` from the root folder of this repository to install dependencies.
 
-## SNC Typings Submodule Maintenance
+### SNC Typings Submodule Maintenance
 
-### Initialize Submodule after Repository Clone
+#### Initialize Submodule after Repository Clone
 
 This is for pulling down the repository contents from the remote.
 
@@ -24,7 +24,7 @@ cd types/snc
 git checkout master
 ```
 
-## Update Submodule from Origin
+### Update Submodule from Origin
 
 This is for pulling down the latest changes from the remote repository.
 
@@ -37,7 +37,7 @@ cd ../..
 git commit -am "Updated types/snc submodule to latest revision"
 ```
 
-## Push Submodule Updates to Origin
+### Push Submodule Updates to Origin
 
 If you make changes to the contents of the `types/snc` submodule, you can use these commands to commit the changes and push them to the remote repository.
 
