@@ -1,9 +1,8 @@
 Param(
-    [Uri]$BaseUri = 'https://dev145540.service-now.com',
+    [Uri]$BaseUri = 'https://dev145316.service-now.com',
     [string[]]$TableName = @('sys_metadata', 'sys_scope', 'sys_package', 'task', 'sys_number', 'sys_user', 'sys_user_group', 'sys_user_role', 'sys_user_grmember',
-        'sys_user_group_type', 'sys_user_role', 'sys_user_role_contains', 'sys_user_has_role', 'sys_group_has_role', 'sys_glide_object', 'sys_db_object', 'sys_dictionary')
-    # [string[]]$TableName = @('sys_filter_option_dynamic', 'gsw_content', 'license_details', 'cmn_cost_center', 'cmn_schedule', 'core_company', 'cmn_building', 'cmn_department',
-    # 'sys_user_grmember', 'sys_perspective', 'cmn_location', 'ldap_server_config', 'sc_cat_item_delivery_plan', 'sys_group_has_role', 'sys_glide_object', 'sys_db_object', 'sys_dictionary')
+         'sys_user_group_type', 'sys_user_role', 'sys_user_role_contains', 'sys_user_has_role', 'sys_group_has_role', 'sys_glide_object', 'sys_db_object', 'sys_dictionary',
+         'incident', 'sc_request', 'sc_req_item', 'sc_task')
 )
 
 <#

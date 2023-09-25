@@ -2,24 +2,24 @@
     "result": [
         {
             "create_access": {
-                "display_value": "false",
-                "value": "false"
+                "display_value": "true",
+                "value": "true"
             },
             "alter_access": {
-                "display_value": "false",
-                "value": "false"
+                "display_value": "true",
+                "value": "true"
             },
             "access": {
                 "display_value": null,
                 "value": ""
             },
             "live_feed_enabled": {
-                "display_value": "false",
-                "value": "false"
+                "display_value": "true",
+                "value": "true"
             },
             "sys_updated_on": {
-                "display_value": "2023-06-25 07:17:06",
-                "value": "2023-06-25 11:17:06"
+                "display_value": "2023-06-25 07:54:34",
+                "value": "2023-06-25 11:54:34"
             },
             "sys_class_name": {
                 "display_value": "Table",
@@ -30,8 +30,8 @@
                 "value": "false"
             },
             "sys_id": {
-                "display_value": "f6791303b4232110320f8dc279c8048d",
-                "value": "f6791303b4232110320f8dc279c8048d"
+                "display_value": "f5cc1b0bb4a32110320f8dc279c804d6",
+                "value": "f5cc1b0bb4a32110320f8dc279c804d6"
             },
             "user_role": {
                 "display_value": "",
@@ -54,28 +54,28 @@
                 "value": ""
             },
             "sys_created_on": {
-                "display_value": "2023-06-25 07:17:06",
-                "value": "2023-06-25 11:17:06"
+                "display_value": "2023-06-25 07:31:31",
+                "value": "2023-06-25 11:31:31"
             },
             "caller_access": {
                 "display_value": null,
                 "value": ""
             },
             "client_scripts_access": {
-                "display_value": "false",
-                "value": "false"
+                "display_value": "true",
+                "value": "true"
             },
             "extension_model": {
                 "display_value": null,
                 "value": ""
             },
             "actions_access": {
-                "display_value": "false",
-                "value": "false"
+                "display_value": "true",
+                "value": "true"
             },
             "sys_name": {
-                "display_value": "Sys Db Object",
-                "value": "Sys Db Object"
+                "display_value": "Incident",
+                "value": "Incident"
             },
             "sys_scope": {
                 "display_value": "Global",
@@ -95,33 +95,34 @@
                 "value": "true"
             },
             "super_class": {
-                "display_value": "Application File",
-                "link": "https://dev145316.service-now.com/api/now/table/sys_db_object/b2791303b4232110320f8dc279c8048c",
-                "value": "b2791303b4232110320f8dc279c8048c"
+                "display_value": "Task",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_db_object/9e5a170bb4232110320f8dc279c804ec",
+                "value": "9e5a170bb4232110320f8dc279c804ec"
             },
             "sys_mod_count": {
-                "display_value": "0",
-                "value": "0"
+                "display_value": "1",
+                "value": "1"
             },
             "ws_access": {
                 "display_value": "true",
                 "value": "true"
             },
             "label": {
-                "display_value": "Table",
-                "value": "Table"
+                "display_value": "Incident",
+                "value": "Incident"
             },
             "update_access": {
-                "display_value": "false",
-                "value": "false"
+                "display_value": "true",
+                "value": "true"
             },
             "sys_package": {
-                "display_value": "",
-                "value": ""
+                "display_value": "Incident",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/f1cc1b0bb4a32110320f8dc279c804bc",
+                "value": "f1cc1b0bb4a32110320f8dc279c804bc"
             },
             "sys_update_name": {
-                "display_value": "sys_db_object_f6791303b4232110320f8dc279c8048d",
-                "value": "sys_db_object_f6791303b4232110320f8dc279c8048d"
+                "display_value": "sys_db_object_f5cc1b0bb4a32110320f8dc279c804d6",
+                "value": "sys_db_object_f5cc1b0bb4a32110320f8dc279c804d6"
             },
             "scriptable_table": {
                 "display_value": "false",
@@ -132,12 +133,13 @@
                 "value": "false"
             },
             "name": {
-                "display_value": "sys_db_object",
-                "value": "sys_db_object"
+                "display_value": "incident",
+                "value": "incident"
             },
             "number_ref": {
-                "display_value": "",
-                "value": ""
+                "display_value": "INC",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_number/3",
+                "value": "3"
             },
             "sys_policy": {
                 "display_value": null,

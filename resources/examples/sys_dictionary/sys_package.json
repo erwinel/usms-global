@@ -18,8 +18,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -42,8 +42,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -75,7 +75,7 @@
             },
             "internal_type": {
                 "display_value": "True/False",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=boolean",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=boolean",
                 "value": "boolean"
             },
             "sys_created_by": {
@@ -175,8 +175,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "07594331e821211076da10591ad2874b",
-                "value": "07594331e821211076da10591ad2874b"
+                "display_value": "17795303b4232110320f8dc279c8044b",
+                "value": "17795303b4232110320f8dc279c8044b"
             },
             "write_roles": {
                 "display_value": "",
@@ -196,7 +196,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -249,8 +249,8 @@
             },
             "sys_package": {
                 "display_value": "",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/f5590331e821211076da10591ad2870a",
-                "value": "f5590331e821211076da10591ad2870a"
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/d6791303b4232110320f8dc279c8040a",
+                "value": "d6791303b4232110320f8dc279c8040a"
             },
             "formula": {
                 "display_value": "",
@@ -299,8 +299,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -323,8 +323,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -356,7 +356,7 @@
             },
             "internal_type": {
                 "display_value": "Integer",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=integer",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=integer",
                 "value": "integer"
             },
             "sys_created_by": {
@@ -456,8 +456,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "07594331e821211076da10591ad28751",
-                "value": "07594331e821211076da10591ad28751"
+                "display_value": "17795303b4232110320f8dc279c80451",
+                "value": "17795303b4232110320f8dc279c80451"
             },
             "write_roles": {
                 "display_value": "",
@@ -477,7 +477,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -636,7 +636,7 @@
             },
             "internal_type": {
                 "display_value": "True/False",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=boolean",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=boolean",
                 "value": "boolean"
             },
             "sys_created_by": {
@@ -736,8 +736,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "0b594331e821211076da10591ad28749",
-                "value": "0b594331e821211076da10591ad28749"
+                "display_value": "1b795303b4232110320f8dc279c80449",
+                "value": "1b795303b4232110320f8dc279c80449"
             },
             "write_roles": {
                 "display_value": "",
@@ -757,7 +757,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -810,8 +810,8 @@
             },
             "sys_package": {
                 "display_value": "Usage Analytics",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/965a0f79e821211076da10591ad287e2",
-                "value": "965a0f79e821211076da10591ad287e2"
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/837a1f4bb4232110320f8dc279c80441",
+                "value": "837a1f4bb4232110320f8dc279c80441"
             },
             "formula": {
                 "display_value": "",
@@ -860,8 +860,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -884,8 +884,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -917,7 +917,7 @@
             },
             "internal_type": {
                 "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
                 "value": "string"
             },
             "sys_created_by": {
@@ -1017,8 +1017,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "0b594331e821211076da10591ad2874f",
-                "value": "0b594331e821211076da10591ad2874f"
+                "display_value": "1b795303b4232110320f8dc279c8044f",
+                "value": "1b795303b4232110320f8dc279c8044f"
             },
             "write_roles": {
                 "display_value": "",
@@ -1038,7 +1038,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -1197,7 +1197,7 @@
             },
             "internal_type": {
                 "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
                 "value": "string"
             },
             "sys_created_by": {
@@ -1297,8 +1297,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "0f594331e821211076da10591ad28747",
-                "value": "0f594331e821211076da10591ad28747"
+                "display_value": "1f795303b4232110320f8dc279c80447",
+                "value": "1f795303b4232110320f8dc279c80447"
             },
             "write_roles": {
                 "display_value": "",
@@ -1318,7 +1318,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -1371,8 +1371,8 @@
             },
             "sys_package": {
                 "display_value": "System (glidesoft)",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/4579cf31e821211076da10591ad2871a",
-                "value": "4579cf31e821211076da10591ad2871a"
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/9599df03b4232110320f8dc279c8041a",
+                "value": "9599df03b4232110320f8dc279c8041a"
             },
             "formula": {
                 "display_value": "",
@@ -1421,8 +1421,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -1445,8 +1445,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -1478,7 +1478,7 @@
             },
             "internal_type": {
                 "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
                 "value": "string"
             },
             "sys_created_by": {
@@ -1578,8 +1578,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "0f594331e821211076da10591ad2874d",
-                "value": "0f594331e821211076da10591ad2874d"
+                "display_value": "1f795303b4232110320f8dc279c8044d",
+                "value": "1f795303b4232110320f8dc279c8044d"
             },
             "write_roles": {
                 "display_value": "",
@@ -1599,7 +1599,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -1701,8 +1701,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-08-02 06:35:05",
-                "value": "2023-08-02 10:35:05"
+                "display_value": "2023-06-25 07:22:10",
+                "value": "2023-06-25 11:22:10"
             },
             "spell_check": {
                 "display_value": "false",
@@ -1725,8 +1725,570 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:22:10",
+                "value": "2023-06-25 11:22:10"
+            },
+            "array_denormalized": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "element_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_name": {
+                "display_value": "Subscription Category",
+                "value": "Subscription Category"
+            },
+            "reference_key": {
+                "display_value": "",
+                "value": ""
+            },
+            "reference_qual_condition": {
+                "display_value": "",
+                "value": ""
+            },
+            "xml_view": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "dependent": {
+                "display_value": "",
+                "value": ""
+            },
+            "internal_type": {
+                "display_value": "String",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
+                "value": "string"
+            },
+            "sys_created_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "element": {
+                "display_value": "license_category",
+                "value": "license_category"
+            },
+            "max_length": {
+                "display_value": "40",
+                "value": "40"
+            },
+            "use_dependent_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "delete_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual_type": {
+                "display_value": "Script",
+                "value": "script"
+            },
+            "active": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "choice_table": {
+                "display_value": "",
+                "value": ""
+            },
+            "foreign_database": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_update_name": {
+                "display_value": "sys_dictionary_sys_package_license_category",
+                "value": "sys_dictionary_sys_package_license_category"
+            },
+            "unique": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "name": {
+                "display_value": "sys_package",
+                "value": "sys_package"
+            },
+            "dependent_on_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "primary": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_policy": {
+                "display_value": null,
+                "value": ""
+            },
+            "next_element": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "widget": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_dynamic_default": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sizeclass": {
+                "display_value": "",
+                "value": ""
+            },
+            "mandatory": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_class_name": {
+                "display_value": "Dictionary Entry",
+                "value": "sys_dictionary"
+            },
+            "dynamic_default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_id": {
+                "display_value": "30aad7cbb4232110320f8dc279c8042c",
+                "value": "30aad7cbb4232110320f8dc279c8042c"
+            },
+            "write_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "array": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "audit": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "read_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_scope": {
+                "display_value": "Global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
+                "value": "global"
+            },
+            "create_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation_script": {
+                "display_value": "",
+                "value": ""
+            },
+            "defaultsort": {
+                "display_value": "",
+                "value": ""
+            },
+            "column_label": {
+                "display_value": "Subscription Category",
+                "value": "Subscription Category"
+            },
+            "comments": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_reference_qualifier": {
+                "display_value": "Simple",
+                "value": "simple"
+            },
+            "display": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_floats": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_mod_count": {
+                "display_value": "0",
+                "value": "0"
+            },
+            "default_value": {
+                "display_value": "none",
+                "value": "none"
+            },
+            "staged": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_type": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_package": {
+                "display_value": "Subscription Management and Enforcement Framework",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/fcaad7cbb4232110320f8dc279c80414",
+                "value": "fcaad7cbb4232110320f8dc279c80414"
+            },
+            "formula": {
+                "display_value": "",
+                "value": ""
+            },
+            "attributes": {
+                "display_value": "edge_encryption_enabled=true,edge_encryption_excluded=true",
+                "value": "edge_encryption_enabled=true,edge_encryption_excluded=true"
+            },
+            "choice": {
+                "display_value": "Dropdown without -- None -- (must specify a default value)",
+                "value": "3"
+            },
+            "reference_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "table_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "text_index": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "function_definition": {
+                "display_value": "",
+                "value": ""
+            }
+        },
+        {
+            "calculation": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_ref_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "function_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_updated_on": {
+                "display_value": "2023-06-25 07:22:10",
+                "value": "2023-06-25 11:22:10"
+            },
+            "spell_check": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_cascade_rule": {
+                "display_value": null,
+                "value": ""
+            },
+            "reference": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_updated_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "read_only": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_created_on": {
+                "display_value": "2023-06-25 07:22:10",
+                "value": "2023-06-25 11:22:10"
+            },
+            "array_denormalized": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "element_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_name": {
+                "display_value": "Subscription requirement",
+                "value": "Subscription requirement"
+            },
+            "reference_key": {
+                "display_value": "",
+                "value": ""
+            },
+            "reference_qual_condition": {
+                "display_value": "",
+                "value": ""
+            },
+            "xml_view": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "dependent": {
+                "display_value": "",
+                "value": ""
+            },
+            "internal_type": {
+                "display_value": "String",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
+                "value": "string"
+            },
+            "sys_created_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "element": {
+                "display_value": "enforce_license",
+                "value": "enforce_license"
+            },
+            "max_length": {
+                "display_value": "40",
+                "value": "40"
+            },
+            "use_dependent_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "delete_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual_type": {
+                "display_value": "Script",
+                "value": "script"
+            },
+            "active": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "choice_table": {
+                "display_value": "",
+                "value": ""
+            },
+            "foreign_database": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_update_name": {
+                "display_value": "sys_dictionary_sys_package_enforce_license",
+                "value": "sys_dictionary_sys_package_enforce_license"
+            },
+            "unique": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "name": {
+                "display_value": "sys_package",
+                "value": "sys_package"
+            },
+            "dependent_on_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "primary": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_policy": {
+                "display_value": null,
+                "value": ""
+            },
+            "next_element": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "widget": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_dynamic_default": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sizeclass": {
+                "display_value": "",
+                "value": ""
+            },
+            "mandatory": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_class_name": {
+                "display_value": "Dictionary Entry",
+                "value": "sys_dictionary"
+            },
+            "dynamic_default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_id": {
+                "display_value": "38aad7cbb4232110320f8dc279c8042e",
+                "value": "38aad7cbb4232110320f8dc279c8042e"
+            },
+            "write_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "array": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "audit": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "read_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_scope": {
+                "display_value": "Global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
+                "value": "global"
+            },
+            "create_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation_script": {
+                "display_value": "",
+                "value": ""
+            },
+            "defaultsort": {
+                "display_value": "",
+                "value": ""
+            },
+            "column_label": {
+                "display_value": "Subscription requirement",
+                "value": "Subscription requirement"
+            },
+            "comments": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_reference_qualifier": {
+                "display_value": "Simple",
+                "value": "simple"
+            },
+            "display": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_floats": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_mod_count": {
+                "display_value": "0",
+                "value": "0"
+            },
+            "default_value": {
+                "display_value": "none",
+                "value": "none"
+            },
+            "staged": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_type": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_package": {
+                "display_value": "Subscription Management and Enforcement Framework",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/fcaad7cbb4232110320f8dc279c80414",
+                "value": "fcaad7cbb4232110320f8dc279c80414"
+            },
+            "formula": {
+                "display_value": "",
+                "value": ""
+            },
+            "attributes": {
+                "display_value": "edge_encryption_enabled=true,edge_encryption_excluded=true",
+                "value": "edge_encryption_enabled=true,edge_encryption_excluded=true"
+            },
+            "choice": {
+                "display_value": "Dropdown without -- None -- (must specify a default value)",
+                "value": "3"
+            },
+            "reference_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "table_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "text_index": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "function_definition": {
+                "display_value": "",
+                "value": ""
+            }
+        },
+        {
+            "calculation": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_ref_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "function_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_updated_on": {
+                "display_value": "2023-09-24 06:49:53",
+                "value": "2023-09-24 10:49:53"
+            },
+            "spell_check": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_cascade_rule": {
+                "display_value": null,
+                "value": ""
+            },
+            "reference": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_updated_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "read_only": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_created_on": {
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -1758,7 +2320,7 @@
             },
             "internal_type": {
                 "display_value": "Collection",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=collection",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=collection",
                 "value": "collection"
             },
             "sys_created_by": {
@@ -1842,8 +2404,8 @@
                 "value": "false"
             },
             "sizeclass": {
-                "display_value": "1,757",
-                "value": "1757"
+                "display_value": "1,705",
+                "value": "1705"
             },
             "mandatory": {
                 "display_value": "false",
@@ -1858,8 +2420,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "4b594331e821211076da10591ad28744",
-                "value": "4b594331e821211076da10591ad28744"
+                "display_value": "4b795303b4232110320f8dc279c80444",
+                "value": "4b795303b4232110320f8dc279c80444"
             },
             "write_roles": {
                 "display_value": "",
@@ -1879,7 +2441,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -1915,8 +2477,8 @@
                 "value": "false"
             },
             "sys_mod_count": {
-                "display_value": "6",
-                "value": "6"
+                "display_value": "2",
+                "value": "2"
             },
             "default_value": {
                 "display_value": "",
@@ -1932,8 +2494,8 @@
             },
             "sys_package": {
                 "display_value": "",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/f5590331e821211076da10591ad2870a",
-                "value": "f5590331e821211076da10591ad2870a"
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/d6791303b4232110320f8dc279c8040a",
+                "value": "d6791303b4232110320f8dc279c8040a"
             },
             "formula": {
                 "display_value": "",
@@ -1982,8 +2544,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -2006,8 +2568,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -2039,7 +2601,7 @@
             },
             "internal_type": {
                 "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
                 "value": "string"
             },
             "sys_created_by": {
@@ -2139,8 +2701,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "4b594331e821211076da10591ad28746",
-                "value": "4b594331e821211076da10591ad28746"
+                "display_value": "5b795303b4232110320f8dc279c80446",
+                "value": "5b795303b4232110320f8dc279c80446"
             },
             "write_roles": {
                 "display_value": "",
@@ -2160,7 +2722,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -2213,8 +2775,8 @@
             },
             "sys_package": {
                 "display_value": "",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/f5590331e821211076da10591ad2870a",
-                "value": "f5590331e821211076da10591ad2870a"
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/d6791303b4232110320f8dc279c8040a",
+                "value": "d6791303b4232110320f8dc279c8040a"
             },
             "formula": {
                 "display_value": "",
@@ -2263,8 +2825,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -2287,8 +2849,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -2320,7 +2882,7 @@
             },
             "internal_type": {
                 "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
                 "value": "string"
             },
             "sys_created_by": {
@@ -2420,8 +2982,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "83594331e821211076da10591ad2874c",
-                "value": "83594331e821211076da10591ad2874c"
+                "display_value": "93795303b4232110320f8dc279c8044c",
+                "value": "93795303b4232110320f8dc279c8044c"
             },
             "write_roles": {
                 "display_value": "",
@@ -2441,7 +3003,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -2494,8 +3056,8 @@
             },
             "sys_package": {
                 "display_value": "",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/f5590331e821211076da10591ad2870a",
-                "value": "f5590331e821211076da10591ad2870a"
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/d6791303b4232110320f8dc279c8040a",
+                "value": "d6791303b4232110320f8dc279c8040a"
             },
             "formula": {
                 "display_value": "",
@@ -2544,8 +3106,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -2568,8 +3130,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -2601,7 +3163,7 @@
             },
             "internal_type": {
                 "display_value": "True/False",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=boolean",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=boolean",
                 "value": "boolean"
             },
             "sys_created_by": {
@@ -2701,8 +3263,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "87594331e821211076da10591ad2874a",
-                "value": "87594331e821211076da10591ad2874a"
+                "display_value": "97795303b4232110320f8dc279c8044a",
+                "value": "97795303b4232110320f8dc279c8044a"
             },
             "write_roles": {
                 "display_value": "",
@@ -2722,7 +3284,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -2775,8 +3337,8 @@
             },
             "sys_package": {
                 "display_value": "",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/f5590331e821211076da10591ad2870a",
-                "value": "f5590331e821211076da10591ad2870a"
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/d6791303b4232110320f8dc279c8040a",
+                "value": "d6791303b4232110320f8dc279c8040a"
             },
             "formula": {
                 "display_value": "",
@@ -2825,8 +3387,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -2849,8 +3411,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -2882,7 +3444,7 @@
             },
             "internal_type": {
                 "display_value": "Date/Time",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=glide_date_time",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=glide_date_time",
                 "value": "glide_date_time"
             },
             "sys_created_by": {
@@ -2982,8 +3544,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "87594331e821211076da10591ad28750",
-                "value": "87594331e821211076da10591ad28750"
+                "display_value": "97795303b4232110320f8dc279c80450",
+                "value": "97795303b4232110320f8dc279c80450"
             },
             "write_roles": {
                 "display_value": "",
@@ -3003,7 +3565,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -3105,8 +3667,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -3129,8 +3691,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -3162,7 +3724,7 @@
             },
             "internal_type": {
                 "display_value": "Version",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=version",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=version",
                 "value": "version"
             },
             "sys_created_by": {
@@ -3262,8 +3824,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "8b594331e821211076da10591ad28748",
-                "value": "8b594331e821211076da10591ad28748"
+                "display_value": "9b795303b4232110320f8dc279c80448",
+                "value": "9b795303b4232110320f8dc279c80448"
             },
             "write_roles": {
                 "display_value": "",
@@ -3283,7 +3845,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -3336,8 +3898,8 @@
             },
             "sys_package": {
                 "display_value": "",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/f5590331e821211076da10591ad2870a",
-                "value": "f5590331e821211076da10591ad2870a"
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/d6791303b4232110320f8dc279c8040a",
+                "value": "d6791303b4232110320f8dc279c8040a"
             },
             "formula": {
                 "display_value": "",
@@ -3386,8 +3948,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -3410,8 +3972,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -3443,7 +4005,7 @@
             },
             "internal_type": {
                 "display_value": "Date/Time",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=glide_date_time",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=glide_date_time",
                 "value": "glide_date_time"
             },
             "sys_created_by": {
@@ -3543,8 +4105,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "8b594331e821211076da10591ad2874e",
-                "value": "8b594331e821211076da10591ad2874e"
+                "display_value": "9b795303b4232110320f8dc279c8044e",
+                "value": "9b795303b4232110320f8dc279c8044e"
             },
             "write_roles": {
                 "display_value": "",
@@ -3564,7 +4126,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -3666,8 +4228,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -3690,8 +4252,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -3723,7 +4285,7 @@
             },
             "internal_type": {
                 "display_value": "Sys ID (GUID)",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=GUID",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=GUID",
                 "value": "GUID"
             },
             "sys_created_by": {
@@ -3823,8 +4385,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "8f594331e821211076da10591ad2874c",
-                "value": "8f594331e821211076da10591ad2874c"
+                "display_value": "9f795303b4232110320f8dc279c8044c",
+                "value": "9f795303b4232110320f8dc279c8044c"
             },
             "write_roles": {
                 "display_value": "",
@@ -3844,7 +4406,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -3946,8 +4508,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:54:08",
-                "value": "2023-03-14 02:54:08"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "spell_check": {
                 "display_value": "false",
@@ -3970,570 +4532,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:54:08",
-                "value": "2023-03-14 02:54:08"
-            },
-            "array_denormalized": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "element_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_name": {
-                "display_value": "Subscription requirement",
-                "value": "Subscription requirement"
-            },
-            "reference_key": {
-                "display_value": "",
-                "value": ""
-            },
-            "reference_qual_condition": {
-                "display_value": "",
-                "value": ""
-            },
-            "xml_view": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "dependent": {
-                "display_value": "",
-                "value": ""
-            },
-            "internal_type": {
-                "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
-                "value": "string"
-            },
-            "sys_created_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "element": {
-                "display_value": "enforce_license",
-                "value": "enforce_license"
-            },
-            "max_length": {
-                "display_value": "40",
-                "value": "40"
-            },
-            "use_dependent_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "delete_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual_type": {
-                "display_value": "Script",
-                "value": "script"
-            },
-            "active": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "choice_table": {
-                "display_value": "",
-                "value": ""
-            },
-            "foreign_database": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_update_name": {
-                "display_value": "sys_dictionary_sys_package_enforce_license",
-                "value": "sys_dictionary_sys_package_enforce_license"
-            },
-            "unique": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "name": {
-                "display_value": "sys_package",
-                "value": "sys_package"
-            },
-            "dependent_on_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "primary": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_policy": {
-                "display_value": null,
-                "value": ""
-            },
-            "next_element": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "widget": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_dynamic_default": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sizeclass": {
-                "display_value": "",
-                "value": ""
-            },
-            "mandatory": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_class_name": {
-                "display_value": "Dictionary Entry",
-                "value": "sys_dictionary"
-            },
-            "dynamic_default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_id": {
-                "display_value": "b69ac7f9e821211076da10591ad287ea",
-                "value": "b69ac7f9e821211076da10591ad287ea"
-            },
-            "write_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "array": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "audit": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "read_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_scope": {
-                "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
-                "value": "global"
-            },
-            "create_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation_script": {
-                "display_value": "",
-                "value": ""
-            },
-            "defaultsort": {
-                "display_value": "",
-                "value": ""
-            },
-            "column_label": {
-                "display_value": "Subscription requirement",
-                "value": "Subscription requirement"
-            },
-            "comments": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_reference_qualifier": {
-                "display_value": "Simple",
-                "value": "simple"
-            },
-            "display": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_floats": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_mod_count": {
-                "display_value": "0",
-                "value": "0"
-            },
-            "default_value": {
-                "display_value": "none",
-                "value": "none"
-            },
-            "staged": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_type": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_package": {
-                "display_value": "Subscription Management and Enforcement Framework",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/769ac7f9e821211076da10591ad287d3",
-                "value": "769ac7f9e821211076da10591ad287d3"
-            },
-            "formula": {
-                "display_value": "",
-                "value": ""
-            },
-            "attributes": {
-                "display_value": "edge_encryption_enabled=true,edge_encryption_excluded=true",
-                "value": "edge_encryption_enabled=true,edge_encryption_excluded=true"
-            },
-            "choice": {
-                "display_value": "Dropdown without -- None -- (must specify a default value)",
-                "value": "3"
-            },
-            "reference_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "table_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "text_index": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "function_definition": {
-                "display_value": "",
-                "value": ""
-            }
-        },
-        {
-            "calculation": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_ref_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "function_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_updated_on": {
-                "display_value": "2023-03-13 22:54:08",
-                "value": "2023-03-14 02:54:08"
-            },
-            "spell_check": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_cascade_rule": {
-                "display_value": null,
-                "value": ""
-            },
-            "reference": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_updated_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "read_only": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_created_on": {
-                "display_value": "2023-03-13 22:54:08",
-                "value": "2023-03-14 02:54:08"
-            },
-            "array_denormalized": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "element_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_name": {
-                "display_value": "Subscription Category",
-                "value": "Subscription Category"
-            },
-            "reference_key": {
-                "display_value": "",
-                "value": ""
-            },
-            "reference_qual_condition": {
-                "display_value": "",
-                "value": ""
-            },
-            "xml_view": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "dependent": {
-                "display_value": "",
-                "value": ""
-            },
-            "internal_type": {
-                "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
-                "value": "string"
-            },
-            "sys_created_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "element": {
-                "display_value": "license_category",
-                "value": "license_category"
-            },
-            "max_length": {
-                "display_value": "40",
-                "value": "40"
-            },
-            "use_dependent_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "delete_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual_type": {
-                "display_value": "Script",
-                "value": "script"
-            },
-            "active": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "choice_table": {
-                "display_value": "",
-                "value": ""
-            },
-            "foreign_database": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_update_name": {
-                "display_value": "sys_dictionary_sys_package_license_category",
-                "value": "sys_dictionary_sys_package_license_category"
-            },
-            "unique": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "name": {
-                "display_value": "sys_package",
-                "value": "sys_package"
-            },
-            "dependent_on_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "primary": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_policy": {
-                "display_value": null,
-                "value": ""
-            },
-            "next_element": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "widget": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_dynamic_default": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sizeclass": {
-                "display_value": "",
-                "value": ""
-            },
-            "mandatory": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_class_name": {
-                "display_value": "Dictionary Entry",
-                "value": "sys_dictionary"
-            },
-            "dynamic_default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_id": {
-                "display_value": "be9ac7f9e821211076da10591ad287ec",
-                "value": "be9ac7f9e821211076da10591ad287ec"
-            },
-            "write_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "array": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "audit": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "read_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_scope": {
-                "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
-                "value": "global"
-            },
-            "create_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation_script": {
-                "display_value": "",
-                "value": ""
-            },
-            "defaultsort": {
-                "display_value": "",
-                "value": ""
-            },
-            "column_label": {
-                "display_value": "Subscription Category",
-                "value": "Subscription Category"
-            },
-            "comments": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_reference_qualifier": {
-                "display_value": "Simple",
-                "value": "simple"
-            },
-            "display": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_floats": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_mod_count": {
-                "display_value": "0",
-                "value": "0"
-            },
-            "default_value": {
-                "display_value": "none",
-                "value": "none"
-            },
-            "staged": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_type": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_package": {
-                "display_value": "Subscription Management and Enforcement Framework",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/769ac7f9e821211076da10591ad287d3",
-                "value": "769ac7f9e821211076da10591ad287d3"
-            },
-            "formula": {
-                "display_value": "",
-                "value": ""
-            },
-            "attributes": {
-                "display_value": "edge_encryption_enabled=true,edge_encryption_excluded=true",
-                "value": "edge_encryption_enabled=true,edge_encryption_excluded=true"
-            },
-            "choice": {
-                "display_value": "Dropdown without -- None -- (must specify a default value)",
-                "value": "3"
-            },
-            "reference_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "table_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "text_index": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "function_definition": {
-                "display_value": "",
-                "value": ""
-            }
-        },
-        {
-            "calculation": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_ref_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "function_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
-            },
-            "spell_check": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_cascade_rule": {
-                "display_value": null,
-                "value": ""
-            },
-            "reference": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_updated_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "read_only": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:08",
+                "value": "2023-06-25 11:17:08"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -4565,7 +4565,7 @@
             },
             "internal_type": {
                 "display_value": "System Class Name",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=sys_class_name",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=sys_class_name",
                 "value": "sys_class_name"
             },
             "sys_created_by": {
@@ -4662,12 +4662,12 @@
             },
             "dynamic_default_value": {
                 "display_value": "Get Current Table Name",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_filter_option_dynamic/b5cb83a85f220100a9ad2572f2b4773c",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_filter_option_dynamic/b5cb83a85f220100a9ad2572f2b4773c",
                 "value": "b5cb83a85f220100a9ad2572f2b4773c"
             },
             "sys_id": {
-                "display_value": "cb594331e821211076da10591ad28745",
-                "value": "cb594331e821211076da10591ad28745"
+                "display_value": "db795303b4232110320f8dc279c80445",
+                "value": "db795303b4232110320f8dc279c80445"
             },
             "write_roles": {
                 "display_value": "",
@@ -4687,7 +4687,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -4740,8 +4740,8 @@
             },
             "sys_package": {
                 "display_value": "",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_package/f5590331e821211076da10591ad2870a",
-                "value": "f5590331e821211076da10591ad2870a"
+                "link": "https://dev145316.service-now.com/api/now/table/sys_package/d6791303b4232110320f8dc279c8040a",
+                "value": "d6791303b4232110320f8dc279c8040a"
             },
             "formula": {
                 "display_value": "",

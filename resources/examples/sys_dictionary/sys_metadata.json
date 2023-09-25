@@ -18,8 +18,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:07",
+                "value": "2023-06-25 11:17:07"
             },
             "spell_check": {
                 "display_value": "false",
@@ -42,849 +42,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
-            },
-            "array_denormalized": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "element_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "reference_key": {
-                "display_value": "",
-                "value": ""
-            },
-            "reference_qual_condition": {
-                "display_value": "",
-                "value": ""
-            },
-            "xml_view": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "dependent": {
-                "display_value": "",
-                "value": ""
-            },
-            "internal_type": {
-                "display_value": "Integer",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=integer",
-                "value": "integer"
-            },
-            "sys_created_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "element": {
-                "display_value": "sys_mod_count",
-                "value": "sys_mod_count"
-            },
-            "max_length": {
-                "display_value": "40",
-                "value": "40"
-            },
-            "use_dependent_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "delete_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual_type": {
-                "display_value": null,
-                "value": ""
-            },
-            "active": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "choice_table": {
-                "display_value": "",
-                "value": ""
-            },
-            "foreign_database": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_update_name": {
-                "display_value": "sys_dictionary_sys_metadata_sys_mod_count",
-                "value": "sys_dictionary_sys_metadata_sys_mod_count"
-            },
-            "unique": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "dependent_on_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "primary": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_policy": {
-                "display_value": null,
-                "value": ""
-            },
-            "next_element": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "widget": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_dynamic_default": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sizeclass": {
-                "display_value": "",
-                "value": ""
-            },
-            "mandatory": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_class_name": {
-                "display_value": "Dictionary Entry",
-                "value": "sys_dictionary"
-            },
-            "dynamic_default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_id": {
-                "display_value": "16590331e821211076da10591ad2876a",
-                "value": "16590331e821211076da10591ad2876a"
-            },
-            "write_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "array": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "audit": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "read_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_scope": {
-                "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
-                "value": "global"
-            },
-            "create_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation_script": {
-                "display_value": "",
-                "value": ""
-            },
-            "defaultsort": {
-                "display_value": "",
-                "value": ""
-            },
-            "column_label": {
-                "display_value": "Updates",
-                "value": "Updates"
-            },
-            "comments": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_reference_qualifier": {
-                "display_value": "Simple",
-                "value": "simple"
-            },
-            "display": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_floats": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_mod_count": {
-                "display_value": "0",
-                "value": "0"
-            },
-            "default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "staged": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_type": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_package": {
-                "display_value": "",
-                "value": ""
-            },
-            "formula": {
-                "display_value": "",
-                "value": ""
-            },
-            "attributes": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice": {
-                "display_value": null,
-                "value": "0"
-            },
-            "reference_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "table_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "text_index": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "function_definition": {
-                "display_value": "",
-                "value": ""
-            }
-        },
-        {
-            "calculation": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_ref_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "function_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
-            },
-            "spell_check": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_cascade_rule": {
-                "display_value": null,
-                "value": ""
-            },
-            "reference": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_updated_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "read_only": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
-            },
-            "array_denormalized": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "element_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "reference_key": {
-                "display_value": "",
-                "value": ""
-            },
-            "reference_qual_condition": {
-                "display_value": "",
-                "value": ""
-            },
-            "xml_view": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "dependent": {
-                "display_value": "",
-                "value": ""
-            },
-            "internal_type": {
-                "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
-                "value": "string"
-            },
-            "sys_created_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "element": {
-                "display_value": "sys_updated_by",
-                "value": "sys_updated_by"
-            },
-            "max_length": {
-                "display_value": "40",
-                "value": "40"
-            },
-            "use_dependent_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "delete_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual_type": {
-                "display_value": null,
-                "value": ""
-            },
-            "active": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "choice_table": {
-                "display_value": "",
-                "value": ""
-            },
-            "foreign_database": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_update_name": {
-                "display_value": "sys_dictionary_sys_metadata_sys_updated_by",
-                "value": "sys_dictionary_sys_metadata_sys_updated_by"
-            },
-            "unique": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "dependent_on_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "primary": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_policy": {
-                "display_value": null,
-                "value": ""
-            },
-            "next_element": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "widget": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_dynamic_default": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sizeclass": {
-                "display_value": "",
-                "value": ""
-            },
-            "mandatory": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_class_name": {
-                "display_value": "Dictionary Entry",
-                "value": "sys_dictionary"
-            },
-            "dynamic_default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_id": {
-                "display_value": "1a590331e821211076da10591ad28768",
-                "value": "1a590331e821211076da10591ad28768"
-            },
-            "write_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "array": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "audit": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "read_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_scope": {
-                "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
-                "value": "global"
-            },
-            "create_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation_script": {
-                "display_value": "",
-                "value": ""
-            },
-            "defaultsort": {
-                "display_value": "",
-                "value": ""
-            },
-            "column_label": {
-                "display_value": "Updated by",
-                "value": "Updated by"
-            },
-            "comments": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_reference_qualifier": {
-                "display_value": "Simple",
-                "value": "simple"
-            },
-            "display": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_floats": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_mod_count": {
-                "display_value": "0",
-                "value": "0"
-            },
-            "default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "staged": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_type": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_package": {
-                "display_value": "",
-                "value": ""
-            },
-            "formula": {
-                "display_value": "",
-                "value": ""
-            },
-            "attributes": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice": {
-                "display_value": null,
-                "value": "0"
-            },
-            "reference_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "table_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "text_index": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "function_definition": {
-                "display_value": "",
-                "value": ""
-            }
-        },
-        {
-            "calculation": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_ref_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "function_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
-            },
-            "spell_check": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_cascade_rule": {
-                "display_value": null,
-                "value": ""
-            },
-            "reference": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_updated_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "read_only": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
-            },
-            "array_denormalized": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "element_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_name": {
-                "display_value": "Class",
-                "value": "Class"
-            },
-            "reference_key": {
-                "display_value": "",
-                "value": ""
-            },
-            "reference_qual_condition": {
-                "display_value": "",
-                "value": ""
-            },
-            "xml_view": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "dependent": {
-                "display_value": "",
-                "value": ""
-            },
-            "internal_type": {
-                "display_value": "System Class Name",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=sys_class_name",
-                "value": "sys_class_name"
-            },
-            "sys_created_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "element": {
-                "display_value": "sys_class_name",
-                "value": "sys_class_name"
-            },
-            "max_length": {
-                "display_value": "80",
-                "value": "80"
-            },
-            "use_dependent_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "delete_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual_type": {
-                "display_value": "Script",
-                "value": "script"
-            },
-            "active": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "choice_table": {
-                "display_value": "",
-                "value": ""
-            },
-            "foreign_database": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_update_name": {
-                "display_value": "sys_dictionary_sys_metadata_sys_class_name",
-                "value": "sys_dictionary_sys_metadata_sys_class_name"
-            },
-            "unique": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "dependent_on_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "primary": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_policy": {
-                "display_value": null,
-                "value": ""
-            },
-            "next_element": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "widget": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_dynamic_default": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "sizeclass": {
-                "display_value": "",
-                "value": ""
-            },
-            "mandatory": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_class_name": {
-                "display_value": "Dictionary Entry",
-                "value": "sys_dictionary"
-            },
-            "dynamic_default_value": {
-                "display_value": "Get Current Table Name",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_filter_option_dynamic/b5cb83a85f220100a9ad2572f2b4773c",
-                "value": "b5cb83a85f220100a9ad2572f2b4773c"
-            },
-            "sys_id": {
-                "display_value": "1e590331e821211076da10591ad28766",
-                "value": "1e590331e821211076da10591ad28766"
-            },
-            "write_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "array": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "audit": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "read_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_scope": {
-                "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
-                "value": "global"
-            },
-            "create_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation_script": {
-                "display_value": "",
-                "value": ""
-            },
-            "defaultsort": {
-                "display_value": "",
-                "value": ""
-            },
-            "column_label": {
-                "display_value": "Class",
-                "value": "Class"
-            },
-            "comments": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_reference_qualifier": {
-                "display_value": "Simple",
-                "value": "simple"
-            },
-            "display": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_floats": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_mod_count": {
-                "display_value": "0",
-                "value": "0"
-            },
-            "default_value": {
-                "display_value": "javascript:current.getTableName();",
-                "value": "javascript:current.getTableName();"
-            },
-            "staged": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_type": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_package": {
-                "display_value": "",
-                "value": ""
-            },
-            "formula": {
-                "display_value": "",
-                "value": ""
-            },
-            "attributes": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice": {
-                "display_value": "Dropdown without -- None -- (must specify a default value)",
-                "value": "3"
-            },
-            "reference_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "table_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "text_index": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "function_definition": {
-                "display_value": "",
-                "value": ""
-            }
-        },
-        {
-            "calculation": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_ref_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "function_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:40",
-                "value": "2023-03-14 02:48:40"
-            },
-            "spell_check": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_cascade_rule": {
-                "display_value": null,
-                "value": ""
-            },
-            "reference": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_updated_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "read_only": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_created_on": {
-                "display_value": "2023-03-13 22:48:40",
-                "value": "2023-03-14 02:48:40"
+                "display_value": "2023-06-25 07:17:07",
+                "value": "2023-06-25 11:17:07"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -916,7 +75,7 @@
             },
             "internal_type": {
                 "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
                 "value": "string"
             },
             "sys_created_by": {
@@ -1016,8 +175,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "3e594331e821211076da10591ad2872f",
-                "value": "3e594331e821211076da10591ad2872f"
+                "display_value": "0f795303b4232110320f8dc279c8042f",
+                "value": "0f795303b4232110320f8dc279c8042f"
             },
             "write_roles": {
                 "display_value": "",
@@ -1037,7 +196,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -1139,8 +298,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-09-02 06:35:01",
-                "value": "2023-09-02 10:35:01"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "spell_check": {
                 "display_value": "false",
@@ -1163,8 +322,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -1195,577 +354,17 @@
                 "value": ""
             },
             "internal_type": {
-                "display_value": "Collection",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=collection",
-                "value": "collection"
+                "display_value": "Integer",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=integer",
+                "value": "integer"
             },
             "sys_created_by": {
                 "display_value": "system",
                 "value": "system"
             },
             "element": {
-                "display_value": "",
-                "value": ""
-            },
-            "max_length": {
-                "display_value": "40",
-                "value": "40"
-            },
-            "use_dependent_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "delete_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual_type": {
-                "display_value": "Script",
-                "value": "script"
-            },
-            "active": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "choice_table": {
-                "display_value": "",
-                "value": ""
-            },
-            "foreign_database": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_update_name": {
-                "display_value": "sys_dictionary_sys_metadata_null",
-                "value": "sys_dictionary_sys_metadata_null"
-            },
-            "unique": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "dependent_on_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "primary": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_policy": {
-                "display_value": null,
-                "value": ""
-            },
-            "next_element": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "widget": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_dynamic_default": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sizeclass": {
-                "display_value": "584,912",
-                "value": "584912"
-            },
-            "mandatory": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_class_name": {
-                "display_value": "Dictionary Entry",
-                "value": "sys_dictionary"
-            },
-            "dynamic_default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_id": {
-                "display_value": "46590331e821211076da10591ad28764",
-                "value": "46590331e821211076da10591ad28764"
-            },
-            "write_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "array": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "audit": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "read_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_scope": {
-                "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
-                "value": "global"
-            },
-            "create_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation_script": {
-                "display_value": "",
-                "value": ""
-            },
-            "defaultsort": {
-                "display_value": "",
-                "value": ""
-            },
-            "column_label": {
-                "display_value": null,
-                "value": ""
-            },
-            "comments": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_reference_qualifier": {
-                "display_value": "Simple",
-                "value": "simple"
-            },
-            "display": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_floats": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_mod_count": {
-                "display_value": "16",
-                "value": "16"
-            },
-            "default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "staged": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_type": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_package": {
-                "display_value": "",
-                "value": ""
-            },
-            "formula": {
-                "display_value": "",
-                "value": ""
-            },
-            "attributes": {
-                "display_value": "all_tables.include_auto_recovery=true,all_tables.text_index_translations=true,no_data_replicate=true,no_labels=true,text_index_default_partial_matching_rule=-25%,text_index_default_query_mode=IR_AND_OR_QUERY,text_index_enable_idf=true",
-                "value": "all_tables.include_auto_recovery=true,all_tables.text_index_translations=true,no_data_replicate=true,no_labels=true,text_index_default_partial_matching_rule=-25%,text_index_default_query_mode=IR_AND_OR_QUERY,text_index_enable_idf=true"
-            },
-            "choice": {
-                "display_value": null,
-                "value": "0"
-            },
-            "reference_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "table_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "text_index": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "function_definition": {
-                "display_value": "",
-                "value": ""
-            }
-        },
-        {
-            "calculation": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_ref_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "function_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
-            },
-            "spell_check": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_cascade_rule": {
-                "display_value": null,
-                "value": ""
-            },
-            "reference": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_updated_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "read_only": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
-            },
-            "array_denormalized": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "element_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "reference_key": {
-                "display_value": "",
-                "value": ""
-            },
-            "reference_qual_condition": {
-                "display_value": "",
-                "value": ""
-            },
-            "xml_view": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "dependent": {
-                "display_value": "",
-                "value": ""
-            },
-            "internal_type": {
-                "display_value": "Sys ID (GUID)",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=GUID",
-                "value": "GUID"
-            },
-            "sys_created_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "element": {
-                "display_value": "sys_id",
-                "value": "sys_id"
-            },
-            "max_length": {
-                "display_value": "32",
-                "value": "32"
-            },
-            "use_dependent_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "delete_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual_type": {
-                "display_value": null,
-                "value": ""
-            },
-            "active": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "choice_table": {
-                "display_value": "",
-                "value": ""
-            },
-            "foreign_database": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_update_name": {
-                "display_value": "sys_dictionary_sys_metadata_sys_id",
-                "value": "sys_dictionary_sys_metadata_sys_id"
-            },
-            "unique": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "dependent_on_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "primary": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "sys_policy": {
-                "display_value": null,
-                "value": ""
-            },
-            "next_element": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "widget": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_dynamic_default": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sizeclass": {
-                "display_value": "",
-                "value": ""
-            },
-            "mandatory": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "sys_class_name": {
-                "display_value": "Dictionary Entry",
-                "value": "sys_dictionary"
-            },
-            "dynamic_default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_id": {
-                "display_value": "52590331e821211076da10591ad28768",
-                "value": "52590331e821211076da10591ad28768"
-            },
-            "write_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "array": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "audit": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "read_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_scope": {
-                "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
-                "value": "global"
-            },
-            "create_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation_script": {
-                "display_value": "",
-                "value": ""
-            },
-            "defaultsort": {
-                "display_value": "",
-                "value": ""
-            },
-            "column_label": {
-                "display_value": "Sys ID",
-                "value": "Sys ID"
-            },
-            "comments": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_reference_qualifier": {
-                "display_value": "Simple",
-                "value": "simple"
-            },
-            "display": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_floats": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_mod_count": {
-                "display_value": "0",
-                "value": "0"
-            },
-            "default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "staged": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_type": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_package": {
-                "display_value": "",
-                "value": ""
-            },
-            "formula": {
-                "display_value": "",
-                "value": ""
-            },
-            "attributes": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice": {
-                "display_value": null,
-                "value": "0"
-            },
-            "reference_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "table_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "text_index": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "function_definition": {
-                "display_value": "",
-                "value": ""
-            }
-        },
-        {
-            "calculation": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_ref_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "function_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
-            },
-            "spell_check": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_cascade_rule": {
-                "display_value": null,
-                "value": ""
-            },
-            "reference": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_updated_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "read_only": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
-            },
-            "array_denormalized": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "element_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "reference_key": {
-                "display_value": "",
-                "value": ""
-            },
-            "reference_qual_condition": {
-                "display_value": "",
-                "value": ""
-            },
-            "xml_view": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "dependent": {
-                "display_value": "",
-                "value": ""
-            },
-            "internal_type": {
-                "display_value": "Date/Time",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=glide_date_time",
-                "value": "glide_date_time"
-            },
-            "sys_created_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "element": {
-                "display_value": "sys_created_on",
-                "value": "sys_created_on"
+                "display_value": "sys_mod_count",
+                "value": "sys_mod_count"
             },
             "max_length": {
                 "display_value": "40",
@@ -1796,8 +395,8 @@
                 "value": ""
             },
             "sys_update_name": {
-                "display_value": "sys_dictionary_sys_metadata_sys_created_on",
-                "value": "sys_dictionary_sys_metadata_sys_created_on"
+                "display_value": "sys_dictionary_sys_metadata_sys_mod_count",
+                "value": "sys_dictionary_sys_metadata_sys_mod_count"
             },
             "unique": {
                 "display_value": "false",
@@ -1856,8 +455,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "5e590331e821211076da10591ad28769",
-                "value": "5e590331e821211076da10591ad28769"
+                "display_value": "26791303b4232110320f8dc279c8046a",
+                "value": "26791303b4232110320f8dc279c8046a"
             },
             "write_roles": {
                 "display_value": "",
@@ -1877,7 +476,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -1893,8 +492,8 @@
                 "value": ""
             },
             "column_label": {
-                "display_value": "Created",
-                "value": "Created"
+                "display_value": "Updates",
+                "value": "Updates"
             },
             "comments": {
                 "display_value": "",
@@ -1979,289 +578,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:40",
-                "value": "2023-03-14 02:48:40"
-            },
-            "spell_check": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_cascade_rule": {
-                "display_value": "None",
-                "value": "none"
-            },
-            "reference": {
-                "display_value": "Application",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_db_object?name=sys_scope",
-                "value": "sys_scope"
-            },
-            "sys_updated_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "read_only": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_created_on": {
-                "display_value": "2023-03-13 22:48:40",
-                "value": "2023-03-14 02:48:40"
-            },
-            "array_denormalized": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "element_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_name": {
-                "display_value": "Application",
-                "value": "Application"
-            },
-            "reference_key": {
-                "display_value": "",
-                "value": ""
-            },
-            "reference_qual_condition": {
-                "display_value": "",
-                "value": ""
-            },
-            "xml_view": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "dependent": {
-                "display_value": "",
-                "value": ""
-            },
-            "internal_type": {
-                "display_value": "Reference",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=reference",
-                "value": "reference"
-            },
-            "sys_created_by": {
-                "display_value": "system",
-                "value": "system"
-            },
-            "element": {
-                "display_value": "sys_scope",
-                "value": "sys_scope"
-            },
-            "max_length": {
-                "display_value": "32",
-                "value": "32"
-            },
-            "use_dependent_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "delete_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual_type": {
-                "display_value": "Script",
-                "value": "script"
-            },
-            "active": {
-                "display_value": "true",
-                "value": "true"
-            },
-            "choice_table": {
-                "display_value": "",
-                "value": ""
-            },
-            "foreign_database": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_update_name": {
-                "display_value": "sys_dictionary_sys_metadata_sys_scope",
-                "value": "sys_dictionary_sys_metadata_sys_scope"
-            },
-            "unique": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
-            },
-            "dependent_on_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "primary": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_policy": {
-                "display_value": null,
-                "value": ""
-            },
-            "next_element": {
-                "display_value": "",
-                "value": ""
-            },
-            "virtual": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "widget": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_dynamic_default": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sizeclass": {
-                "display_value": "",
-                "value": ""
-            },
-            "mandatory": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_class_name": {
-                "display_value": "Dictionary Entry",
-                "value": "sys_dictionary"
-            },
-            "dynamic_default_value": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_id": {
-                "display_value": "7a594331e821211076da10591ad28733",
-                "value": "7a594331e821211076da10591ad28733"
-            },
-            "write_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "array": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "audit": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "read_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_scope": {
-                "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
-                "value": "global"
-            },
-            "create_roles": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_creation_script": {
-                "display_value": "",
-                "value": ""
-            },
-            "defaultsort": {
-                "display_value": "",
-                "value": ""
-            },
-            "column_label": {
-                "display_value": "Application",
-                "value": "Application"
-            },
-            "comments": {
-                "display_value": "",
-                "value": ""
-            },
-            "use_reference_qualifier": {
-                "display_value": "Simple",
-                "value": "simple"
-            },
-            "display": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_floats": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_mod_count": {
-                "display_value": "0",
-                "value": "0"
-            },
-            "default_value": {
-                "display_value": "javascript:(((typeof parent == 'object') && parent != null && parent.getTableName() == 'sys_app') ? parent.sys_id : gs.getCurrentApplicationId())",
-                "value": "javascript:(((typeof parent == 'object') && parent != null && parent.getTableName() == 'sys_app') ? parent.sys_id : gs.getCurrentApplicationId())"
-            },
-            "staged": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "reference_type": {
-                "display_value": "",
-                "value": ""
-            },
-            "sys_package": {
-                "display_value": "",
-                "value": ""
-            },
-            "formula": {
-                "display_value": "",
-                "value": ""
-            },
-            "attributes": {
-                "display_value": "ignore_filter_on_new=true,list_force_default=true,readonly_clickthrough=true",
-                "value": "ignore_filter_on_new=true,list_force_default=true,readonly_clickthrough=true"
-            },
-            "choice": {
-                "display_value": null,
-                "value": "0"
-            },
-            "reference_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "table_reference": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "text_index": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "function_definition": {
-                "display_value": "",
-                "value": ""
-            }
-        },
-        {
-            "calculation": {
-                "display_value": "",
-                "value": ""
-            },
-            "dynamic_ref_qual": {
-                "display_value": "",
-                "value": ""
-            },
-            "choice_field": {
-                "display_value": "",
-                "value": ""
-            },
-            "function_field": {
-                "display_value": "false",
-                "value": "false"
-            },
-            "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "spell_check": {
                 "display_value": "false",
@@ -2284,8 +602,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -2317,7 +635,7 @@
             },
             "internal_type": {
                 "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
                 "value": "string"
             },
             "sys_created_by": {
@@ -2325,8 +643,8 @@
                 "value": "system"
             },
             "element": {
-                "display_value": "sys_created_by",
-                "value": "sys_created_by"
+                "display_value": "sys_updated_by",
+                "value": "sys_updated_by"
             },
             "max_length": {
                 "display_value": "40",
@@ -2357,8 +675,8 @@
                 "value": ""
             },
             "sys_update_name": {
-                "display_value": "sys_dictionary_sys_metadata_sys_created_by",
-                "value": "sys_dictionary_sys_metadata_sys_created_by"
+                "display_value": "sys_dictionary_sys_metadata_sys_updated_by",
+                "value": "sys_dictionary_sys_metadata_sys_updated_by"
             },
             "unique": {
                 "display_value": "false",
@@ -2417,8 +735,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "96590331e821211076da10591ad28769",
-                "value": "96590331e821211076da10591ad28769"
+                "display_value": "2a791303b4232110320f8dc279c80468",
+                "value": "2a791303b4232110320f8dc279c80468"
             },
             "write_roles": {
                 "display_value": "",
@@ -2438,7 +756,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -2454,8 +772,8 @@
                 "value": ""
             },
             "column_label": {
-                "display_value": "Created by",
-                "value": "Created by"
+                "display_value": "Updated by",
+                "value": "Updated by"
             },
             "comments": {
                 "display_value": "",
@@ -2540,8 +858,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "spell_check": {
                 "display_value": "false",
@@ -2564,8 +882,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -2576,8 +894,8 @@
                 "value": "false"
             },
             "sys_name": {
-                "display_value": "sys_metadata",
-                "value": "sys_metadata"
+                "display_value": "Class",
+                "value": "Class"
             },
             "reference_key": {
                 "display_value": "",
@@ -2596,21 +914,21 @@
                 "value": ""
             },
             "internal_type": {
-                "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
-                "value": "string"
+                "display_value": "System Class Name",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=sys_class_name",
+                "value": "sys_class_name"
             },
             "sys_created_by": {
                 "display_value": "system",
                 "value": "system"
             },
             "element": {
-                "display_value": "sys_update_name",
-                "value": "sys_update_name"
+                "display_value": "sys_class_name",
+                "value": "sys_class_name"
             },
             "max_length": {
-                "display_value": "250",
-                "value": "250"
+                "display_value": "80",
+                "value": "80"
             },
             "use_dependent_field": {
                 "display_value": "false",
@@ -2637,8 +955,8 @@
                 "value": ""
             },
             "sys_update_name": {
-                "display_value": "sys_dictionary_sys_metadata_sys_update_name",
-                "value": "sys_dictionary_sys_metadata_sys_update_name"
+                "display_value": "sys_dictionary_sys_metadata_sys_class_name",
+                "value": "sys_dictionary_sys_metadata_sys_class_name"
             },
             "unique": {
                 "display_value": "false",
@@ -2677,8 +995,8 @@
                 "value": ""
             },
             "use_dynamic_default": {
-                "display_value": "false",
-                "value": "false"
+                "display_value": "true",
+                "value": "true"
             },
             "sizeclass": {
                 "display_value": "",
@@ -2693,12 +1011,13 @@
                 "value": "sys_dictionary"
             },
             "dynamic_default_value": {
-                "display_value": "",
-                "value": ""
+                "display_value": "Get Current Table Name",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_filter_option_dynamic/b5cb83a85f220100a9ad2572f2b4773c",
+                "value": "b5cb83a85f220100a9ad2572f2b4773c"
             },
             "sys_id": {
-                "display_value": "9a590331e821211076da10591ad28767",
-                "value": "9a590331e821211076da10591ad28767"
+                "display_value": "2e791303b4232110320f8dc279c80466",
+                "value": "2e791303b4232110320f8dc279c80466"
             },
             "write_roles": {
                 "display_value": "",
@@ -2718,7 +1037,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -2734,8 +1053,8 @@
                 "value": ""
             },
             "column_label": {
-                "display_value": "Update name",
-                "value": "Update name"
+                "display_value": "Class",
+                "value": "Class"
             },
             "comments": {
                 "display_value": "",
@@ -2758,8 +1077,8 @@
                 "value": "0"
             },
             "default_value": {
-                "display_value": "",
-                "value": ""
+                "display_value": "javascript:current.getTableName();",
+                "value": "javascript:current.getTableName();"
             },
             "staged": {
                 "display_value": "false",
@@ -2782,8 +1101,8 @@
                 "value": ""
             },
             "choice": {
-                "display_value": null,
-                "value": "0"
+                "display_value": "Dropdown without -- None -- (must specify a default value)",
+                "value": "3"
             },
             "reference_qual": {
                 "display_value": "",
@@ -2820,8 +1139,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:07",
+                "value": "2023-06-25 11:17:07"
             },
             "spell_check": {
                 "display_value": "false",
@@ -2833,7 +1152,7 @@
             },
             "reference": {
                 "display_value": "Package",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_db_object?name=sys_package",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_db_object?name=sys_package",
                 "value": "sys_package"
             },
             "sys_updated_by": {
@@ -2845,8 +1164,8 @@
                 "value": "true"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:41",
-                "value": "2023-03-14 02:48:41"
+                "display_value": "2023-06-25 07:17:07",
+                "value": "2023-06-25 11:17:07"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -2878,7 +1197,7 @@
             },
             "internal_type": {
                 "display_value": "Reference",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=reference",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=reference",
                 "value": "reference"
             },
             "sys_created_by": {
@@ -2978,8 +1297,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "b6594331e821211076da10591ad28737",
-                "value": "b6594331e821211076da10591ad28737"
+                "display_value": "4b795303b4232110320f8dc279c80433",
+                "value": "4b795303b4232110320f8dc279c80433"
             },
             "write_roles": {
                 "display_value": "",
@@ -2999,7 +1318,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -3101,8 +1420,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "spell_check": {
                 "display_value": "false",
@@ -3125,8 +1444,1129 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
+            },
+            "array_denormalized": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "element_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "reference_key": {
+                "display_value": "",
+                "value": ""
+            },
+            "reference_qual_condition": {
+                "display_value": "",
+                "value": ""
+            },
+            "xml_view": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "dependent": {
+                "display_value": "",
+                "value": ""
+            },
+            "internal_type": {
+                "display_value": "Sys ID (GUID)",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=GUID",
+                "value": "GUID"
+            },
+            "sys_created_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "element": {
+                "display_value": "sys_id",
+                "value": "sys_id"
+            },
+            "max_length": {
+                "display_value": "32",
+                "value": "32"
+            },
+            "use_dependent_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "delete_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual_type": {
+                "display_value": null,
+                "value": ""
+            },
+            "active": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "choice_table": {
+                "display_value": "",
+                "value": ""
+            },
+            "foreign_database": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_update_name": {
+                "display_value": "sys_dictionary_sys_metadata_sys_id",
+                "value": "sys_dictionary_sys_metadata_sys_id"
+            },
+            "unique": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "dependent_on_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "primary": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "sys_policy": {
+                "display_value": null,
+                "value": ""
+            },
+            "next_element": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "widget": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_dynamic_default": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sizeclass": {
+                "display_value": "",
+                "value": ""
+            },
+            "mandatory": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "sys_class_name": {
+                "display_value": "Dictionary Entry",
+                "value": "sys_dictionary"
+            },
+            "dynamic_default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_id": {
+                "display_value": "62791303b4232110320f8dc279c80468",
+                "value": "62791303b4232110320f8dc279c80468"
+            },
+            "write_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "array": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "audit": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "read_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_scope": {
+                "display_value": "Global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
+                "value": "global"
+            },
+            "create_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation_script": {
+                "display_value": "",
+                "value": ""
+            },
+            "defaultsort": {
+                "display_value": "",
+                "value": ""
+            },
+            "column_label": {
+                "display_value": "Sys ID",
+                "value": "Sys ID"
+            },
+            "comments": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_reference_qualifier": {
+                "display_value": "Simple",
+                "value": "simple"
+            },
+            "display": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_floats": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_mod_count": {
+                "display_value": "0",
+                "value": "0"
+            },
+            "default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "staged": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_type": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_package": {
+                "display_value": "",
+                "value": ""
+            },
+            "formula": {
+                "display_value": "",
+                "value": ""
+            },
+            "attributes": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice": {
+                "display_value": null,
+                "value": "0"
+            },
+            "reference_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "table_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "text_index": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "function_definition": {
+                "display_value": "",
+                "value": ""
+            }
+        },
+        {
+            "calculation": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_ref_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "function_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_updated_on": {
+                "display_value": "2023-09-24 06:49:52",
+                "value": "2023-09-24 10:49:52"
+            },
+            "spell_check": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_cascade_rule": {
+                "display_value": null,
+                "value": ""
+            },
+            "reference": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_updated_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "read_only": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_created_on": {
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
+            },
+            "array_denormalized": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "element_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "reference_key": {
+                "display_value": "",
+                "value": ""
+            },
+            "reference_qual_condition": {
+                "display_value": "",
+                "value": ""
+            },
+            "xml_view": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "dependent": {
+                "display_value": "",
+                "value": ""
+            },
+            "internal_type": {
+                "display_value": "Collection",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=collection",
+                "value": "collection"
+            },
+            "sys_created_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "element": {
+                "display_value": "",
+                "value": ""
+            },
+            "max_length": {
+                "display_value": "40",
+                "value": "40"
+            },
+            "use_dependent_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "delete_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual_type": {
+                "display_value": "Script",
+                "value": "script"
+            },
+            "active": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "choice_table": {
+                "display_value": "",
+                "value": ""
+            },
+            "foreign_database": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_update_name": {
+                "display_value": "sys_dictionary_sys_metadata_null",
+                "value": "sys_dictionary_sys_metadata_null"
+            },
+            "unique": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "dependent_on_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "primary": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_policy": {
+                "display_value": null,
+                "value": ""
+            },
+            "next_element": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "widget": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_dynamic_default": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sizeclass": {
+                "display_value": "449,144",
+                "value": "449144"
+            },
+            "mandatory": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_class_name": {
+                "display_value": "Dictionary Entry",
+                "value": "sys_dictionary"
+            },
+            "dynamic_default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_id": {
+                "display_value": "66791303b4232110320f8dc279c80464",
+                "value": "66791303b4232110320f8dc279c80464"
+            },
+            "write_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "array": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "audit": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "read_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_scope": {
+                "display_value": "Global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
+                "value": "global"
+            },
+            "create_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation_script": {
+                "display_value": "",
+                "value": ""
+            },
+            "defaultsort": {
+                "display_value": "",
+                "value": ""
+            },
+            "column_label": {
+                "display_value": null,
+                "value": ""
+            },
+            "comments": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_reference_qualifier": {
+                "display_value": "Simple",
+                "value": "simple"
+            },
+            "display": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_floats": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_mod_count": {
+                "display_value": "4",
+                "value": "4"
+            },
+            "default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "staged": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_type": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_package": {
+                "display_value": "",
+                "value": ""
+            },
+            "formula": {
+                "display_value": "",
+                "value": ""
+            },
+            "attributes": {
+                "display_value": "all_tables.include_auto_recovery=true,all_tables.text_index_translations=true,no_data_replicate=true,no_labels=true,text_index_default_partial_matching_rule=-25%,text_index_default_query_mode=IR_AND_OR_QUERY,text_index_enable_idf=true",
+                "value": "all_tables.include_auto_recovery=true,all_tables.text_index_translations=true,no_data_replicate=true,no_labels=true,text_index_default_partial_matching_rule=-25%,text_index_default_query_mode=IR_AND_OR_QUERY,text_index_enable_idf=true"
+            },
+            "choice": {
+                "display_value": null,
+                "value": "0"
+            },
+            "reference_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "table_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "text_index": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "function_definition": {
+                "display_value": "",
+                "value": ""
+            }
+        },
+        {
+            "calculation": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_ref_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "function_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_updated_on": {
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
+            },
+            "spell_check": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_cascade_rule": {
+                "display_value": null,
+                "value": ""
+            },
+            "reference": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_updated_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "read_only": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_created_on": {
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
+            },
+            "array_denormalized": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "element_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "reference_key": {
+                "display_value": "",
+                "value": ""
+            },
+            "reference_qual_condition": {
+                "display_value": "",
+                "value": ""
+            },
+            "xml_view": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "dependent": {
+                "display_value": "",
+                "value": ""
+            },
+            "internal_type": {
+                "display_value": "Date/Time",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=glide_date_time",
+                "value": "glide_date_time"
+            },
+            "sys_created_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "element": {
+                "display_value": "sys_created_on",
+                "value": "sys_created_on"
+            },
+            "max_length": {
+                "display_value": "40",
+                "value": "40"
+            },
+            "use_dependent_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "delete_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual_type": {
+                "display_value": null,
+                "value": ""
+            },
+            "active": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "choice_table": {
+                "display_value": "",
+                "value": ""
+            },
+            "foreign_database": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_update_name": {
+                "display_value": "sys_dictionary_sys_metadata_sys_created_on",
+                "value": "sys_dictionary_sys_metadata_sys_created_on"
+            },
+            "unique": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "dependent_on_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "primary": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_policy": {
+                "display_value": null,
+                "value": ""
+            },
+            "next_element": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "widget": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_dynamic_default": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sizeclass": {
+                "display_value": "",
+                "value": ""
+            },
+            "mandatory": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_class_name": {
+                "display_value": "Dictionary Entry",
+                "value": "sys_dictionary"
+            },
+            "dynamic_default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_id": {
+                "display_value": "6e791303b4232110320f8dc279c80469",
+                "value": "6e791303b4232110320f8dc279c80469"
+            },
+            "write_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "array": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "audit": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "read_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_scope": {
+                "display_value": "Global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
+                "value": "global"
+            },
+            "create_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation_script": {
+                "display_value": "",
+                "value": ""
+            },
+            "defaultsort": {
+                "display_value": "",
+                "value": ""
+            },
+            "column_label": {
+                "display_value": "Created",
+                "value": "Created"
+            },
+            "comments": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_reference_qualifier": {
+                "display_value": "Simple",
+                "value": "simple"
+            },
+            "display": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_floats": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_mod_count": {
+                "display_value": "0",
+                "value": "0"
+            },
+            "default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "staged": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_type": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_package": {
+                "display_value": "",
+                "value": ""
+            },
+            "formula": {
+                "display_value": "",
+                "value": ""
+            },
+            "attributes": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice": {
+                "display_value": null,
+                "value": "0"
+            },
+            "reference_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "table_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "text_index": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "function_definition": {
+                "display_value": "",
+                "value": ""
+            }
+        },
+        {
+            "calculation": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_ref_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "function_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_updated_on": {
+                "display_value": "2023-06-25 07:17:07",
+                "value": "2023-06-25 11:17:07"
+            },
+            "spell_check": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_cascade_rule": {
+                "display_value": "None",
+                "value": "none"
+            },
+            "reference": {
+                "display_value": "Application",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_db_object?name=sys_scope",
+                "value": "sys_scope"
+            },
+            "sys_updated_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "read_only": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_created_on": {
+                "display_value": "2023-06-25 07:17:07",
+                "value": "2023-06-25 11:17:07"
+            },
+            "array_denormalized": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "element_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_name": {
+                "display_value": "Application",
+                "value": "Application"
+            },
+            "reference_key": {
+                "display_value": "",
+                "value": ""
+            },
+            "reference_qual_condition": {
+                "display_value": "",
+                "value": ""
+            },
+            "xml_view": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "dependent": {
+                "display_value": "",
+                "value": ""
+            },
+            "internal_type": {
+                "display_value": "Reference",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=reference",
+                "value": "reference"
+            },
+            "sys_created_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "element": {
+                "display_value": "sys_scope",
+                "value": "sys_scope"
+            },
+            "max_length": {
+                "display_value": "32",
+                "value": "32"
+            },
+            "use_dependent_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "delete_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual_type": {
+                "display_value": "Script",
+                "value": "script"
+            },
+            "active": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "choice_table": {
+                "display_value": "",
+                "value": ""
+            },
+            "foreign_database": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_update_name": {
+                "display_value": "sys_dictionary_sys_metadata_sys_scope",
+                "value": "sys_dictionary_sys_metadata_sys_scope"
+            },
+            "unique": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "dependent_on_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "primary": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_policy": {
+                "display_value": null,
+                "value": ""
+            },
+            "next_element": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "widget": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_dynamic_default": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sizeclass": {
+                "display_value": "",
+                "value": ""
+            },
+            "mandatory": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_class_name": {
+                "display_value": "Dictionary Entry",
+                "value": "sys_dictionary"
+            },
+            "dynamic_default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_id": {
+                "display_value": "87795303b4232110320f8dc279c80437",
+                "value": "87795303b4232110320f8dc279c80437"
+            },
+            "write_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "array": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "audit": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "read_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_scope": {
+                "display_value": "Global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
+                "value": "global"
+            },
+            "create_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation_script": {
+                "display_value": "",
+                "value": ""
+            },
+            "defaultsort": {
+                "display_value": "",
+                "value": ""
+            },
+            "column_label": {
+                "display_value": "Application",
+                "value": "Application"
+            },
+            "comments": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_reference_qualifier": {
+                "display_value": "Simple",
+                "value": "simple"
+            },
+            "display": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_floats": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_mod_count": {
+                "display_value": "0",
+                "value": "0"
+            },
+            "default_value": {
+                "display_value": "javascript:(((typeof parent == 'object') && parent != null && parent.getTableName() == 'sys_app') ? parent.sys_id : gs.getCurrentApplicationId())",
+                "value": "javascript:(((typeof parent == 'object') && parent != null && parent.getTableName() == 'sys_app') ? parent.sys_id : gs.getCurrentApplicationId())"
+            },
+            "staged": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_type": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_package": {
+                "display_value": "",
+                "value": ""
+            },
+            "formula": {
+                "display_value": "",
+                "value": ""
+            },
+            "attributes": {
+                "display_value": "ignore_filter_on_new=true,list_force_default=true,readonly_clickthrough=true",
+                "value": "ignore_filter_on_new=true,list_force_default=true,readonly_clickthrough=true"
+            },
+            "choice": {
+                "display_value": null,
+                "value": "0"
+            },
+            "reference_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "table_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "text_index": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "function_definition": {
+                "display_value": "",
+                "value": ""
+            }
+        },
+        {
+            "calculation": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_ref_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "function_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_updated_on": {
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
+            },
+            "spell_check": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_cascade_rule": {
+                "display_value": null,
+                "value": ""
+            },
+            "reference": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_updated_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "read_only": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_created_on": {
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -3158,7 +2598,567 @@
             },
             "internal_type": {
                 "display_value": "String",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=string",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
+                "value": "string"
+            },
+            "sys_created_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "element": {
+                "display_value": "sys_created_by",
+                "value": "sys_created_by"
+            },
+            "max_length": {
+                "display_value": "40",
+                "value": "40"
+            },
+            "use_dependent_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "delete_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual_type": {
+                "display_value": null,
+                "value": ""
+            },
+            "active": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "choice_table": {
+                "display_value": "",
+                "value": ""
+            },
+            "foreign_database": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_update_name": {
+                "display_value": "sys_dictionary_sys_metadata_sys_created_by",
+                "value": "sys_dictionary_sys_metadata_sys_created_by"
+            },
+            "unique": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "dependent_on_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "primary": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_policy": {
+                "display_value": null,
+                "value": ""
+            },
+            "next_element": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "widget": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_dynamic_default": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sizeclass": {
+                "display_value": "",
+                "value": ""
+            },
+            "mandatory": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_class_name": {
+                "display_value": "Dictionary Entry",
+                "value": "sys_dictionary"
+            },
+            "dynamic_default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_id": {
+                "display_value": "a6791303b4232110320f8dc279c80469",
+                "value": "a6791303b4232110320f8dc279c80469"
+            },
+            "write_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "array": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "audit": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "read_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_scope": {
+                "display_value": "Global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
+                "value": "global"
+            },
+            "create_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation_script": {
+                "display_value": "",
+                "value": ""
+            },
+            "defaultsort": {
+                "display_value": "",
+                "value": ""
+            },
+            "column_label": {
+                "display_value": "Created by",
+                "value": "Created by"
+            },
+            "comments": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_reference_qualifier": {
+                "display_value": "Simple",
+                "value": "simple"
+            },
+            "display": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_floats": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_mod_count": {
+                "display_value": "0",
+                "value": "0"
+            },
+            "default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "staged": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_type": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_package": {
+                "display_value": "",
+                "value": ""
+            },
+            "formula": {
+                "display_value": "",
+                "value": ""
+            },
+            "attributes": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice": {
+                "display_value": null,
+                "value": "0"
+            },
+            "reference_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "table_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "text_index": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "function_definition": {
+                "display_value": "",
+                "value": ""
+            }
+        },
+        {
+            "calculation": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_ref_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "function_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_updated_on": {
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
+            },
+            "spell_check": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_cascade_rule": {
+                "display_value": null,
+                "value": ""
+            },
+            "reference": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_updated_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "read_only": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_created_on": {
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
+            },
+            "array_denormalized": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "element_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "reference_key": {
+                "display_value": "",
+                "value": ""
+            },
+            "reference_qual_condition": {
+                "display_value": "",
+                "value": ""
+            },
+            "xml_view": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "dependent": {
+                "display_value": "",
+                "value": ""
+            },
+            "internal_type": {
+                "display_value": "String",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
+                "value": "string"
+            },
+            "sys_created_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "element": {
+                "display_value": "sys_update_name",
+                "value": "sys_update_name"
+            },
+            "max_length": {
+                "display_value": "250",
+                "value": "250"
+            },
+            "use_dependent_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "delete_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual_type": {
+                "display_value": "Script",
+                "value": "script"
+            },
+            "active": {
+                "display_value": "true",
+                "value": "true"
+            },
+            "choice_table": {
+                "display_value": "",
+                "value": ""
+            },
+            "foreign_database": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_update_name": {
+                "display_value": "sys_dictionary_sys_metadata_sys_update_name",
+                "value": "sys_dictionary_sys_metadata_sys_update_name"
+            },
+            "unique": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "dependent_on_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "primary": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_policy": {
+                "display_value": null,
+                "value": ""
+            },
+            "next_element": {
+                "display_value": "",
+                "value": ""
+            },
+            "virtual": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "widget": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_dynamic_default": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sizeclass": {
+                "display_value": "",
+                "value": ""
+            },
+            "mandatory": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_class_name": {
+                "display_value": "Dictionary Entry",
+                "value": "sys_dictionary"
+            },
+            "dynamic_default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_id": {
+                "display_value": "aa791303b4232110320f8dc279c80467",
+                "value": "aa791303b4232110320f8dc279c80467"
+            },
+            "write_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "array": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "audit": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "read_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_scope": {
+                "display_value": "Global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
+                "value": "global"
+            },
+            "create_roles": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_creation_script": {
+                "display_value": "",
+                "value": ""
+            },
+            "defaultsort": {
+                "display_value": "",
+                "value": ""
+            },
+            "column_label": {
+                "display_value": "Update name",
+                "value": "Update name"
+            },
+            "comments": {
+                "display_value": "",
+                "value": ""
+            },
+            "use_reference_qualifier": {
+                "display_value": "Simple",
+                "value": "simple"
+            },
+            "display": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_floats": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_mod_count": {
+                "display_value": "0",
+                "value": "0"
+            },
+            "default_value": {
+                "display_value": "",
+                "value": ""
+            },
+            "staged": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_type": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_package": {
+                "display_value": "",
+                "value": ""
+            },
+            "formula": {
+                "display_value": "",
+                "value": ""
+            },
+            "attributes": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice": {
+                "display_value": null,
+                "value": "0"
+            },
+            "reference_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "table_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "text_index": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "function_definition": {
+                "display_value": "",
+                "value": ""
+            }
+        },
+        {
+            "calculation": {
+                "display_value": "",
+                "value": ""
+            },
+            "dynamic_ref_qual": {
+                "display_value": "",
+                "value": ""
+            },
+            "choice_field": {
+                "display_value": "",
+                "value": ""
+            },
+            "function_field": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_updated_on": {
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
+            },
+            "spell_check": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "reference_cascade_rule": {
+                "display_value": null,
+                "value": ""
+            },
+            "reference": {
+                "display_value": "",
+                "value": ""
+            },
+            "sys_updated_by": {
+                "display_value": "system",
+                "value": "system"
+            },
+            "read_only": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_created_on": {
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
+            },
+            "array_denormalized": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "element_reference": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "sys_name": {
+                "display_value": "sys_metadata",
+                "value": "sys_metadata"
+            },
+            "reference_key": {
+                "display_value": "",
+                "value": ""
+            },
+            "reference_qual_condition": {
+                "display_value": "",
+                "value": ""
+            },
+            "xml_view": {
+                "display_value": "false",
+                "value": "false"
+            },
+            "dependent": {
+                "display_value": "",
+                "value": ""
+            },
+            "internal_type": {
+                "display_value": "String",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=string",
                 "value": "string"
             },
             "sys_created_by": {
@@ -3258,8 +3258,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "d2590331e821211076da10591ad28767",
-                "value": "d2590331e821211076da10591ad28767"
+                "display_value": "e2791303b4232110320f8dc279c80467",
+                "value": "e2791303b4232110320f8dc279c80467"
             },
             "write_roles": {
                 "display_value": "",
@@ -3279,7 +3279,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
@@ -3381,8 +3381,8 @@
                 "value": "false"
             },
             "sys_updated_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "spell_check": {
                 "display_value": "false",
@@ -3405,8 +3405,8 @@
                 "value": "false"
             },
             "sys_created_on": {
-                "display_value": "2023-03-13 22:48:38",
-                "value": "2023-03-14 02:48:38"
+                "display_value": "2023-06-25 07:17:05",
+                "value": "2023-06-25 11:17:05"
             },
             "array_denormalized": {
                 "display_value": "false",
@@ -3438,7 +3438,7 @@
             },
             "internal_type": {
                 "display_value": "Date/Time",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_glide_object?name=glide_date_time",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_glide_object?name=glide_date_time",
                 "value": "glide_date_time"
             },
             "sys_created_by": {
@@ -3538,8 +3538,8 @@
                 "value": ""
             },
             "sys_id": {
-                "display_value": "de590331e821211076da10591ad28768",
-                "value": "de590331e821211076da10591ad28768"
+                "display_value": "ee791303b4232110320f8dc279c80468",
+                "value": "ee791303b4232110320f8dc279c80468"
             },
             "write_roles": {
                 "display_value": "",
@@ -3559,7 +3559,7 @@
             },
             "sys_scope": {
                 "display_value": "Global",
-                "link": "https://dev145540.service-now.com/api/now/table/sys_scope/global",
+                "link": "https://dev145316.service-now.com/api/now/table/sys_scope/global",
                 "value": "global"
             },
             "create_roles": {
