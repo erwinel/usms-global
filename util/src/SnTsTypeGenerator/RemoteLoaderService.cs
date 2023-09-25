@@ -24,6 +24,7 @@ public sealed class RemoteLoaderService
 
     private async Task<TableInfo?> TableFromElementAsync(JsonElement element, bool checkDb, CancellationToken cancellationToken)
     {
+        // BUG: Elements have schema { display_value: string, value: string, link?: string; } when sysparm_display_value=all
         if (!(element.TryGetNonEmptyString(JSON_KEY_SYS_ID, out string? sys_id) && element.TryGetNonEmptyString(JSON_KEY_NAME, out string? value)))
             return null;
         value = value.ToLower();

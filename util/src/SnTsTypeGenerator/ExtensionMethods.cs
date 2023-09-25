@@ -321,7 +321,7 @@ public static class ExtensionMethods
         return new UriBuilder(baseUri)
         {
             Path = $"{URI_PATH_API}/{tableName}",
-            Query = $"sysparm_query={value}",
+            Query = $"sysparm_query={value}&sysparm_display_value=all",
             Fragment = null
         }.Uri;
     }
@@ -337,6 +337,7 @@ public static class ExtensionMethods
     /// <param name="logger">The logger to use.</param>
     /// <param name="cancellationToken">The token to observe while waiting for the task to complete.</param>
     /// <typeparam name="T">The return object type.</typeparam>
+    // BUG: Need add sysparm_display_value=all query parameter to request URI so the returned the property schema is { display_value: string, value: string, link?: string; }
     public static async Task<T?> GetLinkedObjectAsync<T>(this HttpClientHandler clientHandler, JsonElement element, string name, Func<string, Task<T?>> lookupFunc, Func<JsonElement, Task<T?>> createFunc, ILogger logger, CancellationToken cancellationToken) where T : class
     {
         if (!element.TryGetProperty(name, out JsonElement linkElement) || linkElement.ValueKind != JsonValueKind.Object)
