@@ -63,7 +63,12 @@ internal static class Constants
     internal const string JSON_KEY_LABEL = "label";
     
     /// <summary>
-    /// "Element" Column (element) name.
+    /// "Comments" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_COMMENTS = "comments";
+    
+    /// <summary>
+    /// "Column name" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_ELEMENT = "element";
     
@@ -78,12 +83,107 @@ internal static class Constants
     internal const string JSON_KEY_SCOPE = "scope";
     
     /// <summary>
-    /// "Parent Class" Column (element) name.
+    /// "Application" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_SYS_SCOPE = "sys_scope";
+    
+    /// <summary>
+    /// "Package" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_SYS_PACKAGE = "sys_package";
+    
+    /// <summary>
+    /// "Extends table" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_SUPER_CLASS = "super_class";
     
     /// <summary>
-    /// "Number Reference" Column (element) name.
+    /// "Display" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_DISPLAY = "display";
+    
+    /// <summary>
+    /// "Sizeclass" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_SIZECLASS = "sizeclass";
+    
+    /// <summary>
+    /// "Column label" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_COLUMN_LABEL = "column_label";
+    
+    /// <summary>
+    /// "Type" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_INTERNAL_TYPE = "internal_type";
+    
+    /// <summary>
+    /// "Defaultsort" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_DEFAULTSORT = "defaultsort";
+    
+    /// <summary>
+    /// "Active" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_ACTIVE = "active";
+    
+    /// <summary>
+    /// "Array" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_ARRAY = "array";
+    
+    /// <summary>
+    /// "Max length" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_MAX_LENGTH = "max_length";
+    
+    /// <summary>
+    /// "Reference" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_REFERENCE = "reference";
+    
+    /// <summary>
+    /// "Calculated" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_VIRTUAL = "virtual";
+    
+    /// <summary>
+    /// "Default value" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_DEFAULT_VALUE = "default_value";
+    
+    /// <summary>
+    /// "Unique" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_UNIQUE = "unique";
+    
+    /// <summary>
+    /// "Mandatory" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_MANDATORY = "mandatory";
+    
+    /// <summary>
+    /// "Primary" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_PRIMARY = "primary";
+    
+    /// <summary>
+    /// "Read only" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_READ_ONLY = "read_only";
+    
+    /// <summary>
+    /// "Extension model" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_EXTENSION_MODEL = "extension_model";
+    
+    /// <summary>
+    /// "Accessible from" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_ACCESS = "access";
+    
+    /// <summary>
+    /// "Auto number" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_NUMBER_REF = "number_ref";
     
@@ -101,6 +201,31 @@ internal static class Constants
     /// "Prefix" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_PREFIX = "prefix";
+    
+    /// <summary>
+    /// "Extends" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_SCALAR_TYPE = "scalar_type";
+    
+    /// <summary>
+    /// "Class name" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_CLASS_NAME = "class_name";
+    
+    /// <summary>
+    /// "Use original value" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_USE_ORIGINAL_VALUE = "use_original_value";
+    
+    /// <summary>
+    /// "Length" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_SCALAR_LENGTH = "scalar_length";
+    
+    /// <summary>
+    /// "Visible" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_VISIBLE = "visible";
     
     /// <summary>
     /// "Created By" Column (element) name.
