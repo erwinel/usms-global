@@ -10,6 +10,9 @@ using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
+/// <summary>
+/// Represents an item from the "Table" (<see cref="Constants.TABLE_NAME_SYS_DB_OBJECT" />) table.
+/// </summary>
 [Table(nameof(TableInfo))]
 public class TableInfo
 {
@@ -17,6 +20,9 @@ public class TableInfo
 
     private string _sysID = string.Empty;
 
+    /// <summary>
+    /// Value of the "Sys ID" (<see cref="Constants.JSON_KEY_SYS_ID" />) column.
+    /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]
     public string SysID
@@ -27,6 +33,9 @@ public class TableInfo
 
     private string _name = string.Empty;
 
+    /// <summary>
+    /// Value of the "Name" (<see cref="Constants.JSON_KEY_NAME" />) column.
+    /// </summary>
     [Key]
     [BackingField(nameof(_name))]
     public string Name
@@ -37,6 +46,9 @@ public class TableInfo
 
     private string _label = string.Empty;
 
+    /// <summary>
+    /// Value of the "Label" (<see cref="Constants.JSON_KEY_LABEL" />) column.
+    /// </summary>
     [NotNull]
     [BackingField(nameof(_label))]
     public string Label
@@ -45,8 +57,94 @@ public class TableInfo
         set => _label = value ?? string.Empty;
     }
     
+    /// <summary>
+    /// Value of the "Extensible" (<see cref="Constants.JSON_KEY_NAME" />) column.
+    /// </summary>
     public bool IsExtendable { get; set; }
 
+    private string _accessibleFrom = string.Empty;
+
+    /// <summary>
+    /// Value of the "Accessible from" (<see cref="Constants.JSON_KEY_ACCESS" />) column.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_accessibleFrom))]
+    public string AccessibleFrom
+    {
+        get => _accessibleFrom;
+        set => _accessibleFrom = value ?? string.Empty;
+    }
+    
+    /// <summary>
+    /// Value of the "Extension model" (<see cref="Constants.JSON_KEY_EXTENSION_MODEL" />) column.
+    /// </summary>
+    public string? ExtensionModel { get; set; }
+
+    /// <summary>
+    /// Associated value of the "Auto number" (<see cref="Constants.JSON_KEY_NUMBER_REF" />) column.
+    /// </summary>
+    public string? NumberPrefix { get; set; }
+
+    /// <summary>
+    /// Date and time that this record was last updated.
+    /// </summary>
+    public DateTime LastUpdated { get; set; }
+    
+    /// <summary>
+    /// Name of the associated record for the "Package" (<see cref="Constants.JSON_KEY_SYS_PACKAGE" />) column.
+    /// </summary>
+    private string? _packageName;
+
+    [BackingField(nameof(_packageName))]
+    public string? PackageName
+    {
+        get => _package?.Name ?? _packageName;
+        set
+        {
+            lock (_syncRoot)
+            {
+                if (value is null)
+                {
+                    if (_packageName is not null)
+                    {
+                        _packageName = null;
+                        _package = null;
+                    }
+                }
+                else if (_packageName is null || !value.Equals(_packageName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (_package is null)
+                        _packageName = value;
+                    else if (value.Equals(_package.Name, StringComparison.InvariantCultureIgnoreCase))
+                        _packageName = null;
+                    else
+                        _package = null;
+                }
+            }
+        }
+    }
+
+    private SysPackage? _package;
+    
+    public SysPackage? Package
+    {
+        get => _package;
+        set
+        {
+            lock (_syncRoot)
+            {
+                if ((value is null) ? _package is null : _package is not null && ReferenceEquals(_package, value))
+                    return;
+
+                _package = value;
+                _packageName = null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Value of the associated record for the "Application" (<see cref="Constants.JSON_KEY_SYS_SCOPE" />) column.
+    /// </summary>
     private string? _scopeValue;
 
     [BackingField(nameof(_scopeValue))]
@@ -98,7 +196,9 @@ public class TableInfo
 
     private string? _superClassName;
 
-
+    /// <summary>
+    /// Table name associated with the "Extends table" (<see cref="Constants.JSON_KEY_SUPER_CLASS" />) column.
+    /// </summary>
     [BackingField(nameof(_superClassName))]
     public string? SuperClassName
     {
@@ -147,7 +247,54 @@ public class TableInfo
         }
     }
 
-    public string? NumberPrefix { get; set; }
+    private string _sourceFqdn = string.Empty;
+
+    /// <summary>
+    /// The FQDN of the source ServiceNow instance.
+    /// </summary>
+    [BackingField(nameof(_sourceFqdn))]
+    public string SourceFqdn
+    {
+        get => _source?.FQDN ?? _sourceFqdn;
+        set
+        {
+            if (value is null)
+                throw new ArgumentNullException(nameof(value));
+            lock (_syncRoot)
+            {
+                if (_source is null || !value.Equals(_source.FQDN, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _sourceFqdn = value;
+                    _source = null;
+                }
+            }
+        }
+    }
+
+    private SourceInfo? _source;
+    public SourceInfo? Source
+    {
+        get => _source;
+        set
+        {
+            lock (_syncRoot)
+            {
+                if (value is null)
+                {
+                    if (_source is null)
+                        return;
+                    _sourceFqdn = _source.FQDN;
+                }
+                else
+                {
+                    if (_source is not null && ReferenceEquals(_source, value))
+                        return;
+                    _source = value;
+                    _sourceFqdn = string.Empty;
+                }
+            }
+        }
+    }
 
     private HashSet<TableInfo> _derived = new();
 
@@ -206,10 +353,22 @@ public class TableInfo
         return $"{_scopeValue}.{NS_NAME_fields}.{GetShortName()}";
     }
 
+    internal async Task<TableInfo?> FromElementAsync(JsonElement source, RemoteLoaderService loaderService, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal async Task<GlideType?> FromRefElementAsync(JsonElement? source, RemoteLoaderService loaderService, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     internal static void OnBuildEntity(EntityTypeBuilder<TableInfo> builder)
     {
         builder.HasKey(t => t.Name);
         builder.HasIndex(t => t.SysID).IsUnique();
+        builder.HasOne(t => t.Source).WithMany(s => s.Tables).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(t => t.Scope).WithMany(s => s.Tables).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(t => t.SuperClass).WithMany(s => s.Derived).HasForeignKey(t => t.SuperClassName).OnDelete(DeleteBehavior.Restrict);
     }
@@ -221,9 +380,14 @@ public class TableInfo
     ""{nameof(Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(NumberPrefix)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(AccessibleFrom)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(ExtensionModel)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(IsExtendable)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(LastUpdated)}"" DATETIME NOT NULL,
+    ""{nameof(PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SuperClass)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(TableInfo)}"" PRIMARY KEY(""{nameof(Name)}""),
     CONSTRAINT ""UK_{nameof(TableInfo)}_{nameof(SysID)}"" UNIQUE(""{nameof(SysID)}"")
 )";

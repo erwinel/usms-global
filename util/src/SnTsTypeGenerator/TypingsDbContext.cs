@@ -50,6 +50,32 @@ public class TypingsDbContext : DbContext
         using (connection)
         {
             var transaction = connection.BeginTransaction();
+            foreach (string query in SourceInfo.GetDbInitCommands())
+            {
+                using SqliteCommand command = connection.CreateCommand();
+                command.CommandText = query;
+                command.CommandType = System.Data.CommandType.Text;
+                try { _ = command.ExecuteNonQuery(); }
+                catch (Exception exception)
+                {
+                    _logger.LogCriticalDbInitializationFailureError(query, typeof(SourceInfo), dbFile, exception);
+                    transaction.Rollback();
+                    return;
+                }
+            }
+            foreach (string query in SysPackage.GetDbInitCommands())
+            {
+                using SqliteCommand command = connection.CreateCommand();
+                command.CommandText = query;
+                command.CommandType = System.Data.CommandType.Text;
+                try { _ = command.ExecuteNonQuery(); }
+                catch (Exception exception)
+                {
+                    _logger.LogCriticalDbInitializationFailureError(query, typeof(SysPackage), dbFile, exception);
+                    transaction.Rollback();
+                    return;
+                }
+            }
             foreach (string query in SysScope.GetDbInitCommands())
             {
                 using SqliteCommand command = connection.CreateCommand();
@@ -120,5 +146,9 @@ public class TypingsDbContext : DbContext
 
     public virtual DbSet<SysScope> Scopes { get; set; } = null!;
 
+    public virtual DbSet<SysPackage> Packages { get; set; } = null!;
+
     public virtual DbSet<ElementInfo> Elements { get; set; } = null!;
+
+    public virtual DbSet<SourceInfo> Sources { get; set; } = null!;
 }

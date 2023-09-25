@@ -1,35 +1,23 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 
 namespace SnTsTypeGenerator;
 
 /// <summary>
-/// Represents an item from the "Application" (<see cref="Constants.TABLE_NAME_SYS_SCOPE" />) table.
+/// Represents an item from the "Package" (sys_package) table.
 /// </summary>
-[Table(nameof(SysScope))]
-public class SysScope
+public class SysPackage
 {
     private readonly object _syncRoot = new();
 
-    private string _value = string.Empty;
-
-    [Key]
-    [BackingField(nameof(_value))]
-    public string Value
-    {
-        get => _value;
-        set => _value = value ?? string.Empty;
-    }
-
     private string _name = string.Empty;
 
-    /// <summary>
-    /// Value of the "Name" (<see cref="Constants.JSON_KEY_NAME" />) column.
-    /// </summary>
     [NotNull]
     [BackingField(nameof(_name))]
     public string Name
@@ -39,19 +27,6 @@ public class SysScope
     }
 
     public string? ShortDescription { get; set; }
-
-    private string _sysID = string.Empty;
-
-    /// <summary>
-    /// Value of the "Sys ID" (<see cref="Constants.JSON_KEY_SYS_ID" />) column.
-    /// </summary>
-    [NotNull]
-    [BackingField(nameof(_sysID))]
-    public string SysID
-    {
-        get => _sysID;
-        set => _sysID = value ?? string.Empty;
-    }
 
     /// <summary>
     /// Date and time that this record was last updated.
@@ -106,6 +81,11 @@ public class SysScope
             }
         }
     }
+
+    internal SysPackage? FromRefElement(JsonElement? source)
+    {
+        throw new NotImplementedException();
+    }
     
     private HashSet<GlideType> _types = new();
 
@@ -125,30 +105,20 @@ public class SysScope
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
 
-    internal static SysScope? FromElement(JsonElement element)
+    internal static void OnBuildEntity(EntityTypeBuilder<SysPackage> builder)
     {
-        throw new NotImplementedException();
-    }
-
-    internal static void OnBuildEntity(EntityTypeBuilder<SysScope> builder)
-    {
-        builder.HasKey(s => s.Value);
-        builder.HasIndex(s => s.SysID).IsUnique();
-        builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+        builder.HasKey(s => s.Name);
+        builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
     }
 
     internal static IEnumerable<string> GetDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysScope)}"" (
-    ""{nameof(Value)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysPackage)}"" (
     ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysScope)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(SysScope)}"" PRIMARY KEY(""{nameof(Value)}""),
-    CONSTRAINT ""UK_{nameof(SysScope)}_{nameof(SysID)}"" UNIQUE(""{nameof(SysID)}"")
+    ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(SysPackage)}"" PRIMARY KEY(""{nameof(Name)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(SysScope)}_{nameof(SysID)}\" ON \"{nameof(SysScope)}\" (\"{nameof(SysID)}\" COLLATE NOCASE)";
     }
 }

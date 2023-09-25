@@ -41,6 +41,7 @@ public sealed class RemoteLoaderService
                 n => Task.FromResult(_numberRefMap.TryGetValue(n, out string? v) ? v : null), e => Task.FromResult(e.TryGetNonEmptyString(JSON_KEY_PREFIX, out string? p) ? p : null), _logger, cancellationToken),
             Scope = await _handler!.GetLinkedObjectAsync(element, JSON_KEY_SCOPE,
                 async n => await _dbContext.Scopes.FindAsync(n), e => Task.FromResult(SysScope.FromElement(e)), _logger, cancellationToken)
+            // TODO: Initialize Source, Package and LastUpdated property values
         };
         _dbContext.Tables.Add(tableInfo);
         await _dbContext.SaveChangesAsync(cancellationToken);
