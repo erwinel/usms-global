@@ -198,6 +198,11 @@ internal static class Constants
     internal const string JSON_KEY_VALUE = "value";
     
     /// <summary>
+    /// "Display Value" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_DISPLAY_VALUE = "display_value";
+    
+    /// <summary>
     /// "Prefix" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_PREFIX = "prefix";
