@@ -24,8 +24,7 @@ public sealed class RemoteLoaderService
 
     private async Task<TableInfo?> TableFromElementAsync(JsonElement element, bool checkDb, CancellationToken cancellationToken)
     {
-        // BUG: Elements have schema { display_value: string, value: string, link?: string; } when sysparm_display_value=all
-        if (!(element.TryGetNonEmptyString(JSON_KEY_SYS_ID, out string? sys_id) && element.TryGetNonEmptyString(JSON_KEY_NAME, out string? value)))
+        if (!(element.TryGetNestedValueElementAsNonEmptyString(JSON_KEY_SYS_ID, out string? sys_id) && element.TryGetNestedValueElementAsNonEmptyString(JSON_KEY_NAME, out string? value)))
             return null;
         value = value.ToLower();
         TableInfo? tableInfo;
@@ -35,10 +34,10 @@ public sealed class RemoteLoaderService
         {
             SysID = sys_id,
             Name = value,
-            IsExtendable = element.GetBoolean(JSON_KEY_IS_EXTENDABLE),
-            Label = element.GetNonEmptyString(JSON_KEY_LABEL, value),
+            IsExtendable = element.GetNestedValueElementAsBoolean(JSON_KEY_IS_EXTENDABLE),
+            Label = element.GetNestedValueElementAsNonEmptyString(JSON_KEY_LABEL, value),
             NumberPrefix = await _handler!.GetLinkedObjectAsync(element, JSON_KEY_NUMBER_REF,
-                n => Task.FromResult(_numberRefMap.TryGetValue(n, out string? v) ? v : null), e => Task.FromResult(e.TryGetNonEmptyString(JSON_KEY_PREFIX, out string? p) ? p : null), _logger, cancellationToken),
+                n => Task.FromResult(_numberRefMap.TryGetValue(n, out string? v) ? v : null), e => Task.FromResult(e.TryGetNestedValueElementAsNonEmptyString(JSON_KEY_PREFIX, out string? p) ? p : null), _logger, cancellationToken),
             Scope = await _handler!.GetLinkedObjectAsync(element, JSON_KEY_SCOPE,
                 async n => await _dbContext.Scopes.FindAsync(n), e => Task.FromResult(SysScope.FromElement(e)), _logger, cancellationToken)
             // TODO: Initialize Source, Package and LastUpdated property values
