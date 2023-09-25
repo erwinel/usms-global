@@ -49,16 +49,3 @@ git push
 cd ../..
 git commit -am "[Your message here]"
 ```
-
-## TODO
-
-- [ ] In [.devcontainer/devcontainer.json](./.devcontainer/devcontainer.json), change the `postCreateCommand` setting to
-
-    ```json
-    [
-        "npm install",
-        "git submodule update --init --recursive",
-        "cd types/snc; git checkout master",
-        "cd $CODESPACE_VSCODE_FOLDER/util/src; dotnet restore"
-    ]
-    ```
