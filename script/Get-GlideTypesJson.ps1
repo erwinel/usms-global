@@ -1,15 +1,18 @@
 Param(
-    [Uri]$BaseUri = 'https://dev145540.service-now.com'
+    [Uri]$BaseUri = 'https://dev145316.service-now.com'
 )
 
 <#
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 #>
 
-if ($null -eq $Script:SnCredentials) { $Script:SnCredentials = Get-Credential -Message 'SN Login' }
+if ($null -eq $Script:SnCredentials) {
+    $Script:SnCredentials = Get-Credential -Message 'SN Login';
+}
 
 $UriBuilder = [System.UriBuilder]::new($BaseUri);
 $UriBuilder.Path = '/api/now/table/sys_glide_object';
+$UriBuilder.Query = "sysparm_display_value=all";
 $Uri = $UriBuilder.Uri.AbsoluteUri;
 $Response = Invoke-WebRequest -Uri $Uri -Method Get -Credential $Script:SnCredentials -Headers @{
     Accept = "application/json";
