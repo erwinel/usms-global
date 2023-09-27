@@ -25,7 +25,6 @@ $TableName | ForEach-Object {
     $Path = $PSScriptRoot | Join-Path -ChildPath "../resources/examples/sys_db_object/$_.json";
     $JsonText | Out-File -LiteralPath $Path -Encoding utf8 -Force;
     "Saved type information to $Path" | Write-Information -InformationAction Continue;
-    $JsonText | Write-Output;
 
     $UriBuilder.Path = '/api/now/table/sys_dictionary';
     $Uri = $UriBuilder.Uri.AbsoluteUri;
