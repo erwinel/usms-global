@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -75,7 +76,10 @@ public class SourceInfo
 
     internal static void OnBuildEntity(EntityTypeBuilder<SourceInfo> builder)
     {
-        builder.HasKey(s => s.FQDN);
+        _ = builder.HasKey(s => s.FQDN);
+        _ = builder.HasIndex(t => t.IsPersonalDev);
+        _ = builder.Property(nameof(FQDN)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(Label)).UseCollation(COLLATION_NOCASE);
     }
 
     internal static IEnumerable<string> GetDbInitCommands()
@@ -84,8 +88,9 @@ public class SourceInfo
     ""{nameof(FQDN)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(IsPersonalDev)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(LastAccessed)}"" DATETIME NOT NULL,
+    ""{nameof(LastAccessed)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     CONSTRAINT ""PK_{nameof(SourceInfo)}"" PRIMARY KEY(""{nameof(FQDN)}"")
 )";
+        yield return $"CREATE INDEX \"IDX_{nameof(SourceInfo)}_{nameof(IsPersonalDev)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(IsPersonalDev)}\")";
     }
 }

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -83,6 +84,10 @@ public class SysScope
     }
 
     private SourceInfo? _source;
+    
+    /// <summary>
+    /// The record representing the source ServiceNow instance.
+    /// </summary>
     public SourceInfo? Source
     {
         get => _source;
@@ -132,9 +137,14 @@ public class SysScope
 
     internal static void OnBuildEntity(EntityTypeBuilder<SysScope> builder)
     {
-        builder.HasKey(s => s.Value);
-        builder.HasIndex(s => s.SysID).IsUnique();
-        builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+        _ = builder.HasKey(s => s.Value);
+        _ = builder.HasIndex(s => s.SysID).IsUnique();
+        _ = builder.Property(nameof(Value)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(ShortDescription)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(SysID)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(SourceFqdn)).UseCollation(COLLATION_NOCASE);
+        _ = builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
     }
 
     internal static IEnumerable<string> GetDbInitCommands()
@@ -144,7 +154,7 @@ public class SysScope
     ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(LastUpdated)}"" DATETIME NOT NULL,
+    ""{nameof(LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysScope)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(SysScope)}"" PRIMARY KEY(""{nameof(Value)}""),
     CONSTRAINT ""UK_{nameof(SysScope)}_{nameof(SysID)}"" UNIQUE(""{nameof(SysID)}"")

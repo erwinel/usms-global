@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -156,6 +157,9 @@ public class ElementInfo
 
     private SysPackage? _package;
     
+    /// <summary>
+    /// The source package for the element.
+    /// </summary>
     public SysPackage? Package
     {
         get => _package;
@@ -207,6 +211,10 @@ public class ElementInfo
     }
 
     private SysScope? _scope;
+    
+    /// <summary>
+    /// The scope for the element.
+    /// </summary>
     public SysScope? Scope
     {
         get => _scope;
@@ -249,6 +257,9 @@ public class ElementInfo
 
     private TableInfo? _table;
     
+    /// <summary>
+    /// The table that the current element belongs to.
+    /// </summary>
     public TableInfo? Table
     {
         get => _table;
@@ -299,6 +310,9 @@ public class ElementInfo
 
     private GlideType? _type;
     
+    /// <summary>
+    /// The record representing the column type.
+    /// </summary>
     public GlideType? Type
     {
         get => _type;
@@ -359,6 +373,10 @@ public class ElementInfo
     }
 
     private TableInfo? _reference;
+    
+    /// <summary>
+    /// The table the current column refers to.
+    /// </summary>
     public TableInfo? Reference
     {
         get => _reference;
@@ -400,6 +418,10 @@ public class ElementInfo
     }
 
     private SourceInfo? _source;
+    
+    /// <summary>
+    /// The record representing the source ServiceNow instance.
+    /// </summary>
     public SourceInfo? Source
     {
         get => _source;
@@ -462,6 +484,9 @@ public class ElementInfo
     {
         builder.HasKey(t => t.Name);
         builder.HasIndex(t => t.SysID).IsUnique();
+        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(Label)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(SysID)).UseCollation(COLLATION_NOCASE);
         builder.HasOne(t => t.Source).WithMany(s => s.Elements).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(t => t.Table).WithMany(s => s.Elements).HasForeignKey(t => t.TableName).IsRequired().OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(t => t.Type).WithMany(s => s.Elements).HasForeignKey(t => t.TypeName).IsRequired().OnDelete(DeleteBehavior.Restrict);

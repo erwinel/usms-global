@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
-
 /// <summary>
 /// Represents an item from the "Package" (sys_package) table.
 /// </summary>
@@ -18,12 +19,28 @@ public class SysPackage
 
     private string _name = string.Empty;
 
-    [NotNull]
+    /// <summary>
+    /// Display name of the package.
+    /// </summary>
+    [Key]
     [BackingField(nameof(_name))]
     public string Name
     {
         get => _name;
         set => _name = value ?? string.Empty;
+    }
+
+    private string _value = string.Empty;
+
+    /// <summary>
+    /// Value of the package reference.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_value))]
+    public string Value
+    {
+        get => _value;
+        set => _value = value ?? string.Empty;
     }
 
     public string? ShortDescription { get; set; }
@@ -58,6 +75,10 @@ public class SysPackage
     }
 
     private SourceInfo? _source;
+
+    /// <summary>
+    /// The record representing the source ServiceNow instance.
+    /// </summary>
     public SourceInfo? Source
     {
         get => _source;
@@ -78,6 +99,61 @@ public class SysPackage
                     _source = value;
                     _sourceFqdn = string.Empty;
                 }
+            }
+        }
+    }
+
+    private Guid? _outputId;
+
+    /// <summary>
+    /// Foreign key associated with <see cref="Output"/> .
+    /// </summary>
+    [BackingField(nameof(_outputId))]
+    public Guid? OutputId
+    {
+        get => _output?.Id ?? _outputId;
+        set
+        {
+            lock (_syncRoot)
+            {
+                if (value.HasValue)
+                {
+                    if (!(_outputId.HasValue && value.Value.Equals(_outputId.Value)))
+                    {
+                        if (_output is null)
+                            _outputId = value;
+                        else if (value.Value.Equals(_output.Id))
+                            _outputId = null;
+                        else
+                            _output = null;
+                    }
+                }
+                else if (_outputId.HasValue)
+                {
+                    _outputId = null;
+                    _output = null;
+                }
+            }
+        }
+    }
+
+    private OutputFile? _output;
+
+    /// <summary>
+    /// Specifies an optional explicit output file.
+    /// </summary>
+    public OutputFile? Output
+    {
+        get => _output;
+        set
+        {
+            lock (_syncRoot)
+            {
+                if ((value is null) ? _output is null : _output is not null && ReferenceEquals(_output, value))
+                    return;
+
+                _output = value;
+                _outputId = null;
             }
         }
     }
@@ -107,8 +183,12 @@ public class SysPackage
 
     internal static void OnBuildEntity(EntityTypeBuilder<SysPackage> builder)
     {
-        builder.HasKey(s => s.Name);
-        builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+        _ = builder.HasKey(s => s.Name);
+        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(ShortDescription)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(SourceFqdn)).UseCollation(COLLATION_NOCASE);
+        _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+        _ = builder.HasOne(t => t.Output).WithMany(s => s.Packages).HasForeignKey(t => t.OutputId).IsRequired().OnDelete(DeleteBehavior.Restrict);
     }
 
     internal static IEnumerable<string> GetDbInitCommands()
@@ -116,7 +196,8 @@ public class SysPackage
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysPackage)}"" (
     ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(LastUpdated)}"" DATETIME NOT NULL,
+    ""{nameof(LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    ""{nameof(OutputId)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(OutputFile)}"" REFERENCES ""{nameof(OutputFile)}""(""{nameof(OutputFile.Id)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(SysPackage)}"" PRIMARY KEY(""{nameof(Name)}"")
 )";

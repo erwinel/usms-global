@@ -126,6 +126,9 @@ public class TableInfo
 
     private SysPackage? _package;
     
+    /// <summary>
+    /// The source package of the table.
+    /// </summary>
     public SysPackage? Package
     {
         get => _package;
@@ -142,11 +145,11 @@ public class TableInfo
         }
     }
 
+    private string? _scopeValue;
+
     /// <summary>
     /// Value of the associated record for the "Application" (<see cref="Constants.JSON_KEY_SYS_SCOPE" />) column.
     /// </summary>
-    private string? _scopeValue;
-
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue
     {
@@ -178,6 +181,9 @@ public class TableInfo
 
     private SysScope? _scope;
     
+    /// <summary>
+    /// The scope of the table.
+    /// </summary>
     public SysScope? Scope
     {
         get => _scope;
@@ -231,6 +237,9 @@ public class TableInfo
 
     private TableInfo? _superClass;
 
+    /// <summary>
+    /// The extended table.
+    /// </summary>
     public TableInfo? SuperClass
     {
         get => _superClass;
@@ -272,6 +281,10 @@ public class TableInfo
     }
 
     private SourceInfo? _source;
+    
+    /// <summary>
+    /// The record representing the source ServiceNow instance.
+    /// </summary>
     public SourceInfo? Source
     {
         get => _source;
@@ -365,12 +378,23 @@ public class TableInfo
 
     internal static void OnBuildEntity(EntityTypeBuilder<TableInfo> builder)
     {
-        builder.HasKey(t => t.Name);
-        builder.HasIndex(t => t.SysID).IsUnique();
-        builder.HasOne(t => t.Source).WithMany(s => s.Tables).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.Scope).WithMany(s => s.Tables).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.SuperClass).WithMany(s => s.Derived).HasForeignKey(t => t.SuperClassName).OnDelete(DeleteBehavior.Restrict);
+        _ = builder.HasKey(t => t.Name);
+        _ = builder.HasIndex(t => t.SysID).IsUnique();
+        _ = builder.HasIndex(t => t.IsExtendable);
+        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(Label)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(SysID)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(NumberPrefix)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(AccessibleFrom)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(ExtensionModel)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(SourceFqdn)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(PackageName)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(ScopeValue)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(SuperClassName)).UseCollation(COLLATION_NOCASE);
+        _ = builder.HasOne(t => t.Source).WithMany(s => s.Tables).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+        _ = builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
+        _ = builder.HasOne(t => t.Scope).WithMany(s => s.Tables).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
+        _ = builder.HasOne(t => t.SuperClass).WithMany(s => s.Derived).HasForeignKey(t => t.SuperClassName).OnDelete(DeleteBehavior.Restrict);
     }
 
     internal static IEnumerable<string> GetDbInitCommands()
@@ -383,7 +407,7 @@ public class TableInfo
     ""{nameof(AccessibleFrom)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(ExtensionModel)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(IsExtendable)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(LastUpdated)}"" DATETIME NOT NULL,
+    ""{nameof(LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     ""{nameof(PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SuperClass)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
@@ -401,7 +425,7 @@ public class TableInfo
         var tableName = Name;
         EntityEntry<TableInfo> entry = dbContext.Tables.Entry(this);
         var elements = await entry.GetRelatedCollectionAsync(e => e.Elements, cancellationToken);
-        TableInfo? superClass = await entry.GetReferencedEntityAsync(e => e.SuperClass, () => SuperClassName is not null, cancellationToken);
+        TableInfo? superClass = await entry.GetReferencedEntityAsync(e => e.SuperClass, cancellationToken);
         string extends;
         if (superClass is not null)
         {

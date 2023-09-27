@@ -5,6 +5,8 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using static SnTsTypeGenerator.Constants;
 
@@ -87,29 +89,7 @@ public static class ExtensionMethods
         ReferenceEntry<TEntity, TProperty> referenceEntry = entry.Reference(propertyExpression);
         if (referenceEntry.TargetEntry is not null)
             return referenceEntry.TargetEntry;
-        if (!referenceEntry.IsLoaded)
-            await referenceEntry.LoadAsync(cancellationToken);
-        return referenceEntry.TargetEntry;
-    }
-
-    /// <summary>
-    /// Asyncrhonously loads and gets the related entity for a navigation property.
-    /// </summary>
-    /// <param name="entry">The parent entity entry.</param>
-    /// <param name="propertyExpression">The expression for the nagivation property.</param>
-    /// <param name="keyTest">Checks whether the associated key has a value.</param>
-    /// <param name="cancellationToken">The token to observe while waiting for the task to complete.</param>
-    /// <typeparam name="TEntity">The parent entity type.</typeparam>
-    /// <typeparam name="TProperty">The related entity type.</typeparam>
-    /// <returns>The entry related entity or <see langword="null" /> if there is no related entity.</returns>
-    public static async Task<EntityEntry<TProperty>?> GetReferencedEntryAsync<TEntity, TProperty>(this EntityEntry<TEntity>? entry, Expression<Func<TEntity, TProperty?>> propertyExpression, Func<bool> keyTest, CancellationToken cancellationToken)
-         where TEntity : class
-         where TProperty : class
-    {
-        if (entry is null)
-            return null;
-        ReferenceEntry<TEntity, TProperty> referenceEntry = entry.Reference(propertyExpression);
-        if (referenceEntry.TargetEntry is null && keyTest() && !referenceEntry.IsLoaded)
+        if (!referenceEntry.IsLoaded && referenceEntry.Metadata is INavigation nav && nav.ForeignKey.Properties.Any(p => entry.Property(p).CurrentValue is not null))
             await referenceEntry.LoadAsync(cancellationToken);
         return referenceEntry.TargetEntry;
     }
@@ -136,62 +116,22 @@ public static class ExtensionMethods
     /// <summary>
     /// Asyncrhonously loads and gets the related entity for a navigation property.
     /// </summary>
-    /// <param name="entity">The parent entity object.</param>
-    /// <param name="dbSet">The database context property for the parent entity's table.</param>
-    /// <param name="propertyExpression">The expression for the nagivation property.</param>
-    /// <param name="keyTest">Checks whether the associated key has a value.</param>
-    /// <param name="cancellationToken">The token to observe while waiting for the task to complete.</param>
-    /// <typeparam name="TEntity">The parent entity type.</typeparam>
-    /// <typeparam name="TProperty">The related entity type.</typeparam>
-    /// <returns>The entry related entity or <see langword="null" /> if there is no related entity.</returns>
-    public static async Task<EntityEntry<TProperty>?> GetReferencedEntryAsync<TEntity, TProperty>(this TEntity? entity, DbSet<TEntity> dbSet, Expression<Func<TEntity, TProperty?>> propertyExpression, Func<bool> keyTest, CancellationToken cancellationToken)
-         where TEntity : class
-         where TProperty : class
-    {
-        if (entity is null)
-            return null;
-        return await dbSet.Entry(entity).GetReferencedEntryAsync(propertyExpression, keyTest, cancellationToken);
-    }
-
-    /// <summary>
-    /// Asyncrhonously loads and gets the related entity for a navigation property.
-    /// </summary>
     /// <param name="entityEntry">The parent entity entry.</param>
     /// <param name="propertyExpression">The expression for the nagivation property.</param>
     /// <param name="cancellationToken">The token to observe while waiting for the task to complete.</param>
     /// <typeparam name="TEntity">The parent entity type.</typeparam>
     /// <typeparam name="TProperty">The related entity type.</typeparam>
     /// <returns>The related entity object or <see langword="null" /> if there is no related entity.</returns>
-    public static async Task<TProperty?> GetReferencedEntityAsync<TEntity, TProperty>(this EntityEntry<TEntity>? entityEntry, Expression<Func<TEntity, TProperty?>> propertyExpression, CancellationToken cancellationToken)
+    public static async Task<TProperty?> GetReferencedEntityAsync<TEntity, TProperty>(this EntityEntry<TEntity>? entry, Expression<Func<TEntity, TProperty?>> propertyExpression, CancellationToken cancellationToken)
          where TEntity : class
          where TProperty : class
     {
-        if (entityEntry is null)
+        if (entry is null)
             return null;
-        ReferenceEntry<TEntity, TProperty> referenceEntry = entityEntry.Reference(propertyExpression);
-        if (referenceEntry.CurrentValue is null && !referenceEntry.IsLoaded)
-            await referenceEntry.LoadAsync(cancellationToken);
-        return referenceEntry.CurrentValue;
-    }
-
-    /// <summary>
-    /// Asyncrhonously loads and gets the related entity for a navigation property.
-    /// </summary>
-    /// <param name="entityEntry">The parent entity entry.</param>
-    /// <param name="propertyExpression">The expression for the nagivation property.</param>
-    /// <param name="keyTest">Checks whether the associated key has a value.</param>
-    /// <param name="cancellationToken">The token to observe while waiting for the task to complete.</param>
-    /// <typeparam name="TEntity">The parent entity type.</typeparam>
-    /// <typeparam name="TProperty">The related entity type.</typeparam>
-    /// <returns>The related entity object or <see langword="null" /> if there is no related entity.</returns>
-    public static async Task<TProperty?> GetReferencedEntityAsync<TEntity, TProperty>(this EntityEntry<TEntity>? entityEntry, Expression<Func<TEntity, TProperty?>> propertyExpression, Func<bool> keyTest, CancellationToken cancellationToken)
-         where TEntity : class
-         where TProperty : class
-    {
-        if (entityEntry is null)
-            return null;
-        ReferenceEntry<TEntity, TProperty> referenceEntry = entityEntry.Reference(propertyExpression);
-        if (referenceEntry.CurrentValue is null && keyTest() && !referenceEntry.IsLoaded)
+        ReferenceEntry<TEntity, TProperty> referenceEntry = entry.Reference(propertyExpression);
+        if (referenceEntry.TargetEntry is not null)
+            return referenceEntry.CurrentValue;
+        if (!referenceEntry.IsLoaded && referenceEntry.Metadata is INavigation nav && nav.ForeignKey.Properties.Any(p => entry.Property(p).CurrentValue is not null))
             await referenceEntry.LoadAsync(cancellationToken);
         return referenceEntry.CurrentValue;
     }
@@ -214,27 +154,6 @@ public static class ExtensionMethods
             return null;
         TProperty? result = propertyAccessor(entity);
         return (result is null) ? (await dbSet.Entry(entity).GetReferencedEntryAsync(Expression.Lambda<Func<TEntity, TProperty?>>(Expression.Call(propertyAccessor.Method)), cancellationToken))?.Entity : result;
-    }
-
-    /// <summary>
-    /// Asyncrhonously loads and gets the related entity for a navigation property.
-    /// </summary>
-    /// <param name="entity">The parent entity object.</param>
-    /// <param name="dbSet">The database context property for the parent entity's table.</param>
-    /// <param name="propertyExpression">The expression for the nagivation property.</param>
-    /// <param name="keyTest">Checks whether the associated key has a value.</param>
-    /// <param name="cancellationToken">The token to observe while waiting for the task to complete.</param>
-    /// <typeparam name="TEntity">The parent entity type.</typeparam>
-    /// <typeparam name="TProperty">The related entity type.</typeparam>
-    /// <returns>The related entity object or <see langword="null" /> if there is no related entity.</returns>
-    public static async Task<TProperty?> GetReferencedEntityAsync<TEntity, TProperty>(this TEntity? entity, DbSet<TEntity> dbSet, Func<TEntity, TProperty?> propertyAccessor, Func<bool> keyTest, CancellationToken cancellationToken)
-         where TEntity : class
-         where TProperty : class
-    {
-        if (entity is null)
-            return null;
-        TProperty? result = propertyAccessor(entity);
-        return (result is null) ? (await dbSet.Entry(entity).GetReferencedEntryAsync<TEntity, TProperty>(Expression.Lambda<Func<TEntity, TProperty?>>(Expression.Call(propertyAccessor.Method)), keyTest, cancellationToken))?.Entity : result;
     }
 
     /// <summary>

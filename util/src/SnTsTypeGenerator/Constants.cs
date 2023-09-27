@@ -8,6 +8,16 @@ namespace SnTsTypeGenerator;
 internal static class Constants
 {
     /// <summary>
+    /// The Sqlite collation for case-insensitive matching.
+    /// </summary>
+    public const string COLLATION_NOCASE = "NOCASE";
+
+    /// <summary>
+    /// The Sqlite code for the current date and time.
+    /// </summary>
+    public const string DEFAULT_SQL_NOW = "(datetime('now','localtime'))";
+
+    /// <summary>
     /// URI path for the ServiceNow Table API.
     /// </summary>
     internal const string URI_PATH_API = "/api/now/table";

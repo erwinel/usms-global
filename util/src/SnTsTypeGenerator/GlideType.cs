@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -120,6 +121,9 @@ public class GlideType
 
     private SysPackage? _package;
     
+    /// <summary>
+    /// The source package of the type.
+    /// </summary>
     public SysPackage? Package
     {
         get => _package;
@@ -172,6 +176,9 @@ public class GlideType
 
     private SysScope? _scope;
 
+    /// <summary>
+    /// The scope for the type.
+    /// </summary>
     public SysScope? Scope
     {
         get => _scope;
@@ -213,6 +220,10 @@ public class GlideType
     }
 
     private SourceInfo? _source;
+    
+    /// <summary>
+    /// The record representing the source ServiceNow instance.
+    /// </summary>
     public SourceInfo? Source
     {
         get => _source;
@@ -257,6 +268,9 @@ public class GlideType
     {
         builder.HasKey(t => t.Name);
         builder.HasIndex(t => t.SysID).IsUnique();
+        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(Label)).UseCollation(COLLATION_NOCASE);
+        _ = builder.Property(nameof(SysID)).UseCollation(COLLATION_NOCASE);
         builder.HasOne(t => t.Source).WithMany(s => s.Types).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(t => t.Package).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(t => t.Scope).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
