@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using static SnTsTypeGenerator.Constants;
 
@@ -9,7 +10,7 @@ namespace SnTsTypeGenerator;
 /// <summary>
 /// Represents an explicit output file base name.
 /// </summary>
-public class OutputFile
+public class OutputFile : IValidatableObject
 {
     /// <summary>
     /// Gets or sets the unique identifier for the output file.
@@ -39,6 +40,32 @@ public class OutputFile
     {
         get => _name;
         set => _name = value ?? string.Empty;
+    }
+
+    IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+    {
+        var results = new List<ValidationResult>();
+        var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
+        if (entry is not null)
+        {
+            if (_name.Length switch
+            {
+                0 => true,
+                1 => char.IsWhiteSpace(_name[0]),
+                _ => _name.All(char.IsWhiteSpace),
+            })
+                results.Add(new ValidationResult("{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
+            if (_label.Length switch
+            {
+                0 => true,
+                1 => char.IsWhiteSpace(_label[0]),
+                _ => _label.All(char.IsWhiteSpace),
+            })
+                results.Add(new ValidationResult("{nameof(Name)} cannot be empty.", new[] { nameof(Label) }));
+            if (entry.State == EntityState.Added && Id.Equals(Guid.Empty))
+                Id = Guid.NewGuid();
+        }
+        return results;
     }
 
     internal static void OnBuildEntity(EntityTypeBuilder<OutputFile> builder)

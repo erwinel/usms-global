@@ -49,7 +49,7 @@ public sealed class MainWorkerService : BackgroundService
         bool isScoped = _appSettings.Value.Scoped ?? false;
         if (isScoped && (_appSettings.Value.Global ?? false))
         {
-            _logger.LogCriticalGlobalAndScopedSwitchesBothSetError();
+            _logger.LogCriticalGlobalAndScopedSwitchesBothSet();
             return;
         }
 
@@ -65,19 +65,19 @@ public sealed class MainWorkerService : BackgroundService
             {
                 if (!forceOverwrite)
                 {
-                    _logger.LogCriticalOutputFileAlreadyExistsError(fileInfo.FullName);
+                    _logger.LogOutputFileAlreadyExists(fileInfo.FullName);
                     return;
                 }
             }
             else if (!(fileInfo.Directory?.Exists ?? false))
             {
-                _logger.LogCriticalOutputFileAccessErrorError(fileInfo.FullName, "Parent subdirectory does not exist");
+                _logger.LogOutputFileAccessError(fileInfo.FullName, "Parent subdirectory does not exist");
                 return;
             }
         }
         catch (Exception exception)
         {
-            _logger.LogCriticalOutputFileAccessErrorError(outputFileName, exception);
+            _logger.LogOutputFileAccessError(outputFileName, exception);
             return;
         }
         var tableNames = _appSettings.Value.Table?.Where(t => !string.IsNullOrEmpty(t)) ?? Enumerable.Empty<string>();

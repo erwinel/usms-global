@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 
 namespace SnTsTypeGenerator;
@@ -64,14 +67,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for database initialization error.
     /// </summary>
-    public const int EVENT_ID_CriticalDbInitializationFailureError = 0x0003;
+    public const int EVENT_ID_CriticalDbInitializationFailure = 0x0003;
     
     /// <summary>
     /// Event ID for database initialization error.
     /// </summary>
-    public static readonly EventId CriticalDbInitializationFailureError = new(EVENT_ID_CriticalDbInitializationFailureError, nameof(CriticalDbInitializationFailureError));
+    public static readonly EventId CriticalDbInitializationFailure = new(EVENT_ID_CriticalDbInitializationFailure, nameof(CriticalDbInitializationFailure));
     
-    private static readonly Action<ILogger, string, Type, string, Exception> _criticalDbInitializationFailureError = LoggerMessage.Define<string, Type, string>(LogLevel.Critical, CriticalDbInitializationFailureError,
+    private static readonly Action<ILogger, string, Type, string, Exception> _criticalDbInitializationFailure = LoggerMessage.Define<string, Type, string>(LogLevel.Critical, CriticalDbInitializationFailure,
         "Unexpected error while executing DB initialization query {QueryString} for {Type} in {DbPath}.");
     
     /// <summary>
@@ -82,7 +85,7 @@ public static class LoggerMessages
     /// <param name="type">The DB entity object type.</param>
     /// <param name="dbpath">The path of the database file.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogCriticalDbInitializationFailureError(this ILogger logger, string querystring, Type type, string dbpath, Exception error) => _criticalDbInitializationFailureError(logger, querystring, type, dbpath, error);
+    public static void LogCriticalDbInitializationFailure(this ILogger logger, string querystring, Type type, string dbpath, Exception error) => _criticalDbInitializationFailure(logger, querystring, type, dbpath, error);
     
     #endregion
     
@@ -91,21 +94,21 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for missing user name.
     /// </summary>
-    public const int EVENT_ID_CriticalUserNameNotProvidedError = 0x0004;
+    public const int EVENT_ID_CriticalUserNameNotProvided = 0x0004;
     
     /// <summary>
     /// Event ID for missing user name.
     /// </summary>
-    public static readonly EventId CriticalUserNameNotProvidedError = new(EVENT_ID_CriticalUserNameNotProvidedError, nameof(CriticalUserNameNotProvidedError));
+    public static readonly EventId CriticalUserNameNotProvided = new(EVENT_ID_CriticalUserNameNotProvided, nameof(CriticalUserNameNotProvided));
     
-    private static readonly Action<ILogger, Exception?> _criticalUserNameNotProvidedError = LoggerMessage.Define(LogLevel.Critical, CriticalUserNameNotProvidedError,
+    private static readonly Action<ILogger, Exception?> _criticalUserNameNotProvided = LoggerMessage.Define(LogLevel.Critical, CriticalUserNameNotProvided,
         "User name was not provided.");
     
     /// <summary>
     /// Logs a missing user name event (UserNameNotProvided) with event code 0x0004.
     /// </summary>
     /// <param name="logger">The current logger.</param>
-    public static void LogCriticalUserNameNotProvidedError(this ILogger logger) => _criticalUserNameNotProvidedError(logger, null);
+    public static void LogCriticalUserNameNotProvided(this ILogger logger) => _criticalUserNameNotProvided(logger, null);
     
     #endregion
 
@@ -114,21 +117,21 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for missing password.
     /// </summary>
-    public const int EVENT_ID_CriticalPasswordNotProvidedError = 0x0005;
+    public const int EVENT_ID_CriticalPasswordNotProvided = 0x0005;
     
     /// <summary>
     /// Event ID for missing password.
     /// </summary>
-    public static readonly EventId CriticalPasswordNotProvidedError = new(EVENT_ID_CriticalPasswordNotProvidedError, nameof(CriticalPasswordNotProvidedError));
+    public static readonly EventId CriticalPasswordNotProvided = new(EVENT_ID_CriticalPasswordNotProvided, nameof(CriticalPasswordNotProvided));
     
-    private static readonly Action<ILogger, Exception?> _criticalPasswordNotProvidedError = LoggerMessage.Define(LogLevel.Critical, CriticalPasswordNotProvidedError,
+    private static readonly Action<ILogger, Exception?> _criticalPasswordNotProvided = LoggerMessage.Define(LogLevel.Critical, CriticalPasswordNotProvided,
         "Password was not provided.");
     
     /// <summary>
     /// Logs a missing password event (PasswordNotProvided) with event code 0x0005.
     /// </summary>
     /// <param name="logger">The current logger.</param>
-    public static void LogCriticalPasswordNotProvidedError(this ILogger logger) => _criticalPasswordNotProvidedError(logger, null);
+    public static void LogCriticalPasswordNotProvided(this ILogger logger) => _criticalPasswordNotProvided(logger, null);
     
     #endregion
 
@@ -137,21 +140,21 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for missing remote URL.
     /// </summary>
-    public const int EVENT_ID_CriticalRemoteInstanceUriNotProvidedError = 0x0006;
+    public const int EVENT_ID_CriticalRemoteInstanceUriNotProvided = 0x0006;
     
     /// <summary>
     /// Event ID for missing remote URL.
     /// </summary>
-    public static readonly EventId CriticalRemoteInstanceUriNotProvidedError = new(EVENT_ID_CriticalRemoteInstanceUriNotProvidedError, nameof(CriticalRemoteInstanceUriNotProvidedError));
+    public static readonly EventId CriticalRemoteInstanceUriNotProvided = new(EVENT_ID_CriticalRemoteInstanceUriNotProvided, nameof(CriticalRemoteInstanceUriNotProvided));
     
-    private static readonly Action<ILogger, Exception?> _criticalRemoteInstanceUriNotProvidedError = LoggerMessage.Define(LogLevel.Critical, CriticalRemoteInstanceUriNotProvidedError,
+    private static readonly Action<ILogger, Exception?> _criticalRemoteInstanceUriNotProvided = LoggerMessage.Define(LogLevel.Critical, CriticalRemoteInstanceUriNotProvided,
         "The remote ServiceNow instance URI was not provided.");
     
     /// <summary>
     /// Logs a missing remote URL event (RemoteInstanceUriNotProvided) with event code 0x0006.
     /// </summary>
     /// <param name="logger">The current logger.</param>
-    public static void LogCriticalRemoteInstanceUriNotProvidedError(this ILogger logger) => _criticalRemoteInstanceUriNotProvidedError(logger, null);
+    public static void LogCriticalRemoteInstanceUriNotProvided(this ILogger logger) => _criticalRemoteInstanceUriNotProvided(logger, null);
     
     #endregion
     
@@ -160,21 +163,21 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for invalid remote URL.
     /// </summary>
-    public const int EVENT_ID_CriticalInvalidRemoteInstanceUriError = 0x0007;
+    public const int EVENT_ID_CriticalInvalidRemoteInstanceUri = 0x0007;
     
     /// <summary>
     /// Event ID for invalid remote URL.
     /// </summary>
-    public static readonly EventId CriticalInvalidRemoteInstanceUriError = new(EVENT_ID_CriticalInvalidRemoteInstanceUriError, nameof(CriticalInvalidRemoteInstanceUriError));
+    public static readonly EventId CriticalInvalidRemoteInstanceUri = new(EVENT_ID_CriticalInvalidRemoteInstanceUri, nameof(CriticalInvalidRemoteInstanceUri));
     
-    private static readonly Action<ILogger, Exception?> _criticalInvalidRemoteInstanceUriError = LoggerMessage.Define(LogLevel.Critical, CriticalInvalidRemoteInstanceUriError,
+    private static readonly Action<ILogger, Exception?> _criticalInvalidRemoteInstanceUri = LoggerMessage.Define(LogLevel.Critical, CriticalInvalidRemoteInstanceUri,
         "The remote ServiceNow instance URI was not an absolute URI with the http or https scheme.");
     
     /// <summary>
     /// Logs an invalid remote URL event (InvalidRemoteInstanceUri) with event code 0x0007.
     /// </summary>
     /// <param name="logger">The current logger.</param>
-    public static void LogCriticalInvalidRemoteInstanceUriError(this ILogger logger) => _criticalInvalidRemoteInstanceUriError(logger, null);
+    public static void LogCriticalInvalidRemoteInstanceUri(this ILogger logger) => _criticalInvalidRemoteInstanceUri(logger, null);
     
     #endregion
     
@@ -207,14 +210,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for scope switch syntax error.
     /// </summary>
-    public const int EVENT_ID_CriticalGlobalAndScopedSwitchesBothSetError = 0x0009;
+    public const int EVENT_ID_CriticalGlobalAndScopedSwitchesBothSet = 0x0009;
     
     /// <summary>
     /// Event ID for scope switch syntax error.
     /// </summary>
-    public static readonly EventId CriticalGlobalAndScopedSwitchesBothSetError = new(EVENT_ID_CriticalGlobalAndScopedSwitchesBothSetError, nameof(CriticalGlobalAndScopedSwitchesBothSetError));
+    public static readonly EventId CriticalGlobalAndScopedSwitchesBothSet = new(EVENT_ID_CriticalGlobalAndScopedSwitchesBothSet, nameof(CriticalGlobalAndScopedSwitchesBothSet));
     
-    private static readonly Action<ILogger, Exception?> _criticalGlobalAndScopedSwitchesBothSetError = LoggerMessage.Define(LogLevel.Critical, CriticalGlobalAndScopedSwitchesBothSetError,
+    private static readonly Action<ILogger, Exception?> _criticalGlobalAndScopedSwitchesBothSet = LoggerMessage.Define(LogLevel.Critical, CriticalGlobalAndScopedSwitchesBothSet,
         $"The {nameof(AppSettings.Global)} ({AppSettings.SHORTHAND_g}) and {nameof(AppSettings.Scoped)} ({AppSettings.SHORTHAND_s}) options cannot be specified at the same time.");
     
     
@@ -223,7 +226,7 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogCriticalGlobalAndScopedSwitchesBothSetError(this ILogger logger) => _criticalGlobalAndScopedSwitchesBothSetError(logger, null);
+    public static void LogCriticalGlobalAndScopedSwitchesBothSet(this ILogger logger) => _criticalGlobalAndScopedSwitchesBothSet(logger, null);
     
     #endregion
 
@@ -232,14 +235,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for an already-existing output file.
     /// </summary>
-    public const int EVENT_ID_CriticalOutputFileAlreadyExistsError = 0x0010;
+    public const int EVENT_ID_OutputFileAlreadyExists = 0x0010;
     
     /// <summary>
     /// Event ID for an already-existing output file.
     /// </summary>
-    public static readonly EventId CriticalOutputFileAlreadyExistsError = new(EVENT_ID_CriticalOutputFileAlreadyExistsError, nameof(CriticalOutputFileAlreadyExistsError));
+    public static readonly EventId OutputFileAlreadyExists = new(EVENT_ID_OutputFileAlreadyExists, nameof(OutputFileAlreadyExists));
     
-    private static readonly Action<ILogger, string, Exception?> _criticalOutputFileAlreadyExistsError = LoggerMessage.Define<string>(LogLevel.Critical, CriticalOutputFileAlreadyExistsError,
+    private static readonly Action<ILogger, string, Exception?> _outputFileAlreadyExists = LoggerMessage.Define<string>(LogLevel.Critical, OutputFileAlreadyExists,
         "File {Path}");
     
     /// <summary>
@@ -248,26 +251,26 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="path">The path of the file.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogCriticalOutputFileAlreadyExistsError(this ILogger logger, string path) => _criticalOutputFileAlreadyExistsError(logger, path, null);
+    public static void LogOutputFileAlreadyExists(this ILogger logger, string path) => _outputFileAlreadyExists(logger, path, null);
     
     #endregion
 
-    #region Critical OutputFileAccessError Error (0x0011)
+    #region Critical OutputFileAccess Error (0x0011)
     
     /// <summary>
     /// Numerical event code for output file access error.
     /// </summary>
-    public const int EVENT_ID_CriticalOutputFileAccessErrorError = 0x0011;
+    public const int EVENT_ID_OutputFileAccessError = 0x0011;
     
     /// <summary>
     /// Event ID for output file access error.
     /// </summary>
-    public static readonly EventId CriticalOutputFileAccessErrorError = new(EVENT_ID_CriticalOutputFileAccessErrorError, nameof(CriticalOutputFileAccessErrorError));
+    public static readonly EventId OutputFileAccessError = new(EVENT_ID_OutputFileAccessError, nameof(OutputFileAccessError));
     
-    private static readonly Action<ILogger, string, Exception?> _criticalOutputFileAccessErrorError1 = LoggerMessage.Define<string>(LogLevel.Critical, CriticalOutputFileAccessErrorError,
+    private static readonly Action<ILogger, string, Exception?> _outputFileAccessError1 = LoggerMessage.Define<string>(LogLevel.Critical, OutputFileAccessError,
         "Error accessing output file {Path}.");
     
-    private static readonly Action<ILogger, string, string, Exception?> _criticalOutputFileAccessErrorError2 = LoggerMessage.Define<string, string>(LogLevel.Critical, CriticalOutputFileAccessErrorError,
+    private static readonly Action<ILogger, string, string, Exception?> _outputFileAccessError2 = LoggerMessage.Define<string, string>(LogLevel.Critical, OutputFileAccessError,
         "Error accessing output file {Path}: {Message}");
 
     /// <summary>
@@ -276,7 +279,7 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="path">The path of the output file.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogCriticalOutputFileAccessErrorError(this ILogger logger, string path, Exception? error = null) => _criticalOutputFileAccessErrorError1(logger, path, error);
+    public static void LogOutputFileAccessError(this ILogger logger, string path, Exception? error = null) => _outputFileAccessError1(logger, path, error);
     
     /// <summary>
     /// Logs an output file access error event (OutputFileAccessError) with event code 0x0011.
@@ -284,7 +287,7 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="path">The path of the output file.</param>
     /// <param name="message">The message describing the error.</param>
-    public static void LogCriticalOutputFileAccessErrorError(this ILogger logger, string path, string message) => _criticalOutputFileAccessErrorError2(logger, path, message, null);
+    public static void LogOutputFileAccessError(this ILogger logger, string path, string message) => _outputFileAccessError2(logger, path, message, null);
     
     #endregion
 
@@ -293,14 +296,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for HTTP request failure.
     /// </summary>
-    public const int EVENT_ID_HttpRequestFailedError = 0x0012;
+    public const int EVENT_ID_HttpRequestFailed = 0x0012;
     
     /// <summary>
     /// Event ID for HTTP request failure.
     /// </summary>
-    public static readonly EventId HttpRequestFailedError = new(EVENT_ID_HttpRequestFailedError, nameof(HttpRequestFailedError));
+    public static readonly EventId HttpRequestFailed = new(EVENT_ID_HttpRequestFailed, nameof(HttpRequestFailed));
     
-    private static readonly Action<ILogger, Uri, Exception?> _httpRequestFailedError = LoggerMessage.Define<Uri>(LogLevel.Error, HttpRequestFailedError,
+    private static readonly Action<ILogger, Uri, Exception?> _httpRequestFailed = LoggerMessage.Define<Uri>(LogLevel.Error, HttpRequestFailed,
         "Remote request failed ({URI}).");
     
     /// <summary>
@@ -309,7 +312,7 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI that failed.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogHttpRequestFailedError(this ILogger logger, Uri uri, HttpRequestException error) => _httpRequestFailedError(logger, uri, error);
+    public static void LogHttpRequestFailed(this ILogger logger, Uri uri, HttpRequestException error) => _httpRequestFailed(logger, uri, error);
     
     #endregion
 
@@ -318,14 +321,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for HTTP response parsing error.
     /// </summary>
-    public const int EVENT_ID_GetResponseContentFailedError = 0x0013;
+    public const int EVENT_ID_GetResponseContentFailed = 0x0013;
     
     /// <summary>
     /// Event ID for HTTP response parsing error.
     /// </summary>
-    public static readonly EventId GetResponseContentFailedError = new(EVENT_ID_GetResponseContentFailedError, nameof(GetResponseContentFailedError));
+    public static readonly EventId GetResponseContentFailed = new(EVENT_ID_GetResponseContentFailed, nameof(GetResponseContentFailed));
     
-    private static readonly Action<ILogger, Uri, Exception?> _getResponseContentFailedError = LoggerMessage.Define<Uri>(LogLevel.Error, GetResponseContentFailedError,
+    private static readonly Action<ILogger, Uri, Exception?> _getResponseContentFailed = LoggerMessage.Define<Uri>(LogLevel.Error, GetResponseContentFailed,
         "Failed to get text-based content from remote URI {URI}");
     
     /// <summary>
@@ -334,7 +337,7 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request uri.</param>
     /// <param name="error">The optional exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogGetResponseContentFailedError(this ILogger logger, Uri uri, Exception? error = null) => _getResponseContentFailedError(logger, uri, error);
+    public static void LogGetResponseContentFailed(this ILogger logger, Uri uri, Exception? error = null) => _getResponseContentFailed(logger, uri, error);
     
     #endregion
 
@@ -343,14 +346,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for JSON parsing error.
     /// </summary>
-    public const int EVENT_ID_JsonCouldNotBeParsedError = 0x0014;
+    public const int EVENT_ID_JsonCouldNotBeParsed = 0x0014;
     
     /// <summary>
     /// Event ID for JSON parsing error.
     /// </summary>
-    public static readonly EventId JsonCouldNotBeParsedError = new(EVENT_ID_JsonCouldNotBeParsedError, nameof(JsonCouldNotBeParsedError));
+    public static readonly EventId JsonCouldNotBeParsed = new(EVENT_ID_JsonCouldNotBeParsed, nameof(JsonCouldNotBeParsed));
     
-    private static readonly Action<ILogger, Uri, string, Exception?> _jsonCouldNotBeParsedError = LoggerMessage.Define<Uri, string>(LogLevel.Error, JsonCouldNotBeParsedError,
+    private static readonly Action<ILogger, Uri, string, Exception?> _jsonCouldNotBeParsed = LoggerMessage.Define<Uri, string>(LogLevel.Error, JsonCouldNotBeParsed,
         "Unable to parse response from {URI}; Content: {Content}");
     
     /// <summary>
@@ -360,7 +363,7 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="content">The content that could not be parsed.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogJsonCouldNotBeParsedError(this ILogger logger, Uri uri, string content, JsonException error) => _jsonCouldNotBeParsedError(logger, uri, content, error);
+    public static void LogJsonCouldNotBeParsed(this ILogger logger, Uri uri, string content, JsonException error) => _jsonCouldNotBeParsed(logger, uri, content, error);
     
     #endregion
 
@@ -369,14 +372,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for invalid HTTP response.
     /// </summary>
-    public const int EVENT_ID_InvalidHttpResponseError = 0x0015;
+    public const int EVENT_ID_InvalidHttpResponse = 0x0015;
     
     /// <summary>
     /// Event ID for invalid HTTP response.
     /// </summary>
-    public static readonly EventId InvalidHttpResponseError = new(EVENT_ID_InvalidHttpResponseError, nameof(InvalidHttpResponseError));
+    public static readonly EventId InvalidHttpResponse = new(EVENT_ID_InvalidHttpResponse, nameof(InvalidHttpResponse));
     
-    private static readonly Action<ILogger, Uri, string, Exception?> _invalidHttpResponseError = LoggerMessage.Define<Uri, string>(LogLevel.Error, InvalidHttpResponseError,
+    private static readonly Action<ILogger, Uri, string, Exception?> _invalidHttpResponse = LoggerMessage.Define<Uri, string>(LogLevel.Error, InvalidHttpResponse,
         "Response from {URI} did not match the expected type; Content: {Content}");
     
     /// <summary>
@@ -386,7 +389,178 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="content">The response text.</param>
     /// <param name="error">The exception that caused the event</param>
-    public static void LogInvalidHttpResponseError(this ILogger logger, Uri uri, string content) => _invalidHttpResponseError(logger, uri, content, null);
+    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, string content) => _invalidHttpResponse(logger, uri, content, null);
+
+    #endregion
+
+    #region ExecuteMethod Scope
+    
+    private static readonly Func<ILogger, string, IDisposable?> _executeMethodScope = LoggerMessage.DefineScope<string>("Execute method {MethodName}()");
+
+    /// <summary>
+    /// Formats the ExecuteMethod message and creates a scope.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="methodName">The name of the method.</param>
+    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
+    public static IDisposable? BeginExecuteMethodScope(this ILogger logger, string methodName) => _executeMethodScope(logger, methodName);
+    
+    private static readonly Func<ILogger, string, string, object?, IDisposable?> _executeMethodScope1 = LoggerMessage.DefineScope<string, string, object?>("Execute method {MethodName}({ParamName}: {ParamValue})");
+    
+    /// <summary>
+    /// Formats the ExecuteMethod1 message and creates a scope.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="methodName">The name of the method.</param>
+    /// <param name="paramName">The name of the method parameter.</param>
+    /// <param name="paramValue">The value of the method parameter.</param>
+    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
+    public static IDisposable? BeginExecuteMethodScope(this ILogger logger, string methodName, string paramName, object? paramValue) => _executeMethodScope1(logger, methodName, paramName, paramValue);
+    
+    #endregion
+
+    #region ValidatingEntity Trace (0x0016)
+    
+    /// <summary>
+    // Numerical event code for ValidatingEntity.
+    /// </summary>
+    public const int EVENT_ID_ValidatingEntity = 0x0016;
+    
+    /// <summary>
+    // Event ID for ValidatingEntity.
+    /// </summary>
+    public static readonly EventId ValidatingEntity = new(EVENT_ID_ValidatingEntity, nameof(ValidatingEntity));
+    
+    private static readonly Action<ILogger, EntityState, string, IValidatableObject, Exception?> _validatingEntity = LoggerMessage.Define<EntityState, string, IValidatableObject>(LogLevel.Trace, ValidatingEntity,
+        "Validating {State} {Name} {Entity}");
+    
+    /// <summary>
+    /// Logs a ValidatingEntity event with event code 0x0016.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="state">The entity state while being validated.</param>
+    /// <param name="metadata">The entity metadata.</param>
+    /// <param name="entity">The entity object.</param>
+    public static void LogValidatingEntity(this ILogger logger, EntityState state, IEntityType  metadata, IValidatableObject entity)
+    {
+        string displayName = metadata.DisplayName()?.Trim()!;
+        if (string.IsNullOrEmpty(displayName) && string.IsNullOrEmpty(displayName = metadata.Name?.Trim()!))
+        {
+            Type t = entity.GetType();
+            if (string.IsNullOrWhiteSpace(displayName = t.FullName!))
+                displayName = t.Name;
+        }
+        _validatingEntity(logger, state, displayName, entity, null);
+    }
+    
+    #endregion
+
+    #region EntityValidationFailure Error (0x0017)
+    
+    /// <summary>
+    // Numerical event code for EntityValidationFailure.
+    /// </summary>
+    public const int EVENT_ID_EntityValidationFailure = 0x0017;
+    
+    /// <summary>
+    // Event ID for EntityValidationFailure.
+    /// </summary>
+    public static readonly EventId EntityValidationFailure = new(EVENT_ID_EntityValidationFailure, nameof(EntityValidationFailure));
+    
+    private static readonly Action<ILogger, string, string, IValidatableObject, ValidationException> _entityValidationFailure1 = LoggerMessage.Define<string, string, IValidatableObject>(LogLevel.Error, EntityValidationFailure,
+        "Error Validating {Name} ({ValidationMessage}) {Entity}");
+    
+    private static readonly Action<ILogger, string, string, string, IValidatableObject, ValidationException> _entityValidationFailure2 = LoggerMessage.Define<string, string, string, IValidatableObject>(LogLevel.Error, EntityValidationFailure,
+        "Error Validating {Name} [{Properties}] ({ValidationMessage}) {Entity}");
+    
+    /// <summary>
+    /// Logs an EntityValidationFailure event with event code 0x0017.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="metadata">The entity metadata.</param>
+    /// <param name="entity">The entity object.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogEntityValidationFailure(this ILogger logger, IEntityType metadata, IValidatableObject entity, ValidationException error) // => _entityValidationFailure(logger, metadata, entity, error);
+    {
+        IEnumerable<string> memberNames = error.ValidationResult.MemberNames.Where(n => !string.IsNullOrWhiteSpace(n));
+        string name = metadata.DisplayName()?.Trim()!;
+        if (name.Length == 0)
+        {
+            Type t = entity.GetType();
+            if (string.IsNullOrWhiteSpace(name = t.FullName!))
+                name = t.Name;
+        }
+        string message = error.ValidationResult.ErrorMessage?.Trim()!;
+        if (string.IsNullOrEmpty(message) && string.IsNullOrEmpty(message = error.Message?.Trim()!))
+            _entityValidationFailure1(logger, name, memberNames.Any() ? $"Validation error on {string.Join(", ", memberNames)}" : "Validation Failure", entity, error);
+        else if (memberNames.Any())
+            _entityValidationFailure1(logger, name, message, entity, error);
+        else
+            _entityValidationFailure2(logger, name, string.Join(", ", memberNames), message, entity, error);
+    }
+    
+    #endregion
+
+    #region ValidationCompleted Trace (0x0018)
+    
+    /// <summary>
+    // Numerical event code for ValidationCompleted.
+    /// </summary>
+    public const int EVENT_ID_ValidationCompleted = 0x0018;
+    
+    /// <summary>
+    // Event ID for ValidationCompleted.
+    /// </summary>
+    public static readonly EventId ValidationCompleted = new(EVENT_ID_ValidationCompleted, nameof(ValidationCompleted));
+    
+    private static readonly Action<ILogger, EntityState, string, IValidatableObject, Exception?> _validationCompleted = LoggerMessage.Define<EntityState, string, IValidatableObject>(LogLevel.Trace, ValidationCompleted,
+        "Validation for {State} {Name} {Entity}");
+    
+    /// <summary>
+    /// Logs a ValidationCompleted event with event code 0x0018.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="state">The entity state during validation.</param>
+    /// <param name="metadata">The entity metadata.</param>
+    /// <param name="entity">The entity object.</param>
+    public static void LogValidationCompleted(this ILogger logger, EntityState state, IEntityType metadata, IValidatableObject entity)
+    {
+        string name = metadata.DisplayName()?.Trim()!;
+        if (name.Length == 0)
+        {
+            Type t = entity.GetType();
+            if (string.IsNullOrWhiteSpace(name = t.FullName!))
+                name = t.Name;
+        }
+        _validationCompleted(logger, state, name, entity, null);
+    }
+    
+    #endregion
+
+    #region DbSaveChangesCompleted Trace (0x0019)
+    
+    /// <summary>
+    // Numerical event code for DbSaveChangesCompleted.
+    /// </summary>
+    public const int EVENT_ID_DbSaveChangesCompletedTrace = 0x0019;
+    
+    /// <summary>
+    // Event ID for DbSaveChangesCompleted.
+    /// </summary>
+    public static readonly EventId DbSaveChangesCompletedTrace = new(EVENT_ID_DbSaveChangesCompletedTrace, nameof(DbSaveChangesCompletedTrace));
+    
+    private static readonly Action<ILogger, string, int, Exception?> _dbSaveChangesCompletedTrace = LoggerMessage.Define<string, int>(LogLevel.Trace, DbSaveChangesCompletedTrace,
+        "Message {MethodSignature} {ReturnValue}");
+    
+    /// <summary>
+    /// Logs an DbSaveChangesCompleted event with event code 0x0019.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="methodSignature">The first event parameter.</param>
+    /// <param name="returnValue">The second event parameter.</param>
+    public static void LogDbSaveChangesCompletedTrace(this ILogger logger, bool isAsync, bool? acceptAllChangesOnSuccess, int returnValue) => _dbSaveChangesCompletedTrace(logger, isAsync ?
+        (acceptAllChangesOnSuccess.HasValue ? $"SaveChangesAsync({acceptAllChangesOnSuccess.Value})" : "SaveChangesAsync()") :
+        acceptAllChangesOnSuccess.HasValue ? $"SaveChanges({acceptAllChangesOnSuccess.Value})" : "SaveChanges()", returnValue, null);
     
     #endregion
 }

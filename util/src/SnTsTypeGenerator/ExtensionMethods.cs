@@ -278,13 +278,13 @@ public static class ExtensionMethods
             try { response.EnsureSuccessStatusCode(); }
             catch (HttpRequestException exception)
             {
-                logger.LogHttpRequestFailedError(response.RequestMessage!.RequestUri!, exception);
+                logger.LogHttpRequestFailed(response.RequestMessage!.RequestUri!, exception);
                 return null;
             }
             try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
             catch (Exception exception)
             {
-                logger.LogGetResponseContentFailedError(response.RequestMessage!.RequestUri!, exception);
+                logger.LogGetResponseContentFailed(response.RequestMessage!.RequestUri!, exception);
                 return null;
             }
         }
@@ -297,13 +297,13 @@ public static class ExtensionMethods
             try { response.EnsureSuccessStatusCode(); }
             catch (HttpRequestException exception)
             {
-                logger.LogHttpRequestFailedError(response.RequestMessage!.RequestUri!, exception);
+                logger.LogHttpRequestFailed(response.RequestMessage!.RequestUri!, exception);
                 return null;
             }
             try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
             catch (Exception exception)
             {
-                logger.LogGetResponseContentFailedError(response.RequestMessage!.RequestUri!, exception);
+                logger.LogGetResponseContentFailed(response.RequestMessage!.RequestUri!, exception);
                 return null;
             }
         }
@@ -311,7 +311,7 @@ public static class ExtensionMethods
             return null;
         if (string.IsNullOrWhiteSpace(responseBody))
         {
-            logger.LogInvalidHttpResponseError(uri, responseBody);
+            logger.LogInvalidHttpResponse(uri, responseBody);
             return null;
         }
         
@@ -319,7 +319,7 @@ public static class ExtensionMethods
         try { doc = JsonDocument.Parse(responseBody); }
         catch (JsonException exception)
         {
-            logger.LogJsonCouldNotBeParsedError(uri, responseBody, exception);
+            logger.LogJsonCouldNotBeParsed(uri, responseBody, exception);
             return null;
         }
         using (doc)

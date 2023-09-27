@@ -62,7 +62,7 @@ public sealed class RemoteLoaderService
         if (string.IsNullOrWhiteSpace(remoteUri))
         {
             if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                _logger.LogCriticalRemoteInstanceUriNotProvidedError();
+                _logger.LogCriticalRemoteInstanceUriNotProvided();
             _remoteUri = new Uri(string.Empty);
             return;
         }
@@ -73,7 +73,7 @@ public sealed class RemoteLoaderService
             {
                 _remoteUri = uri;
                 if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                    _logger.LogCriticalInvalidRemoteInstanceUriError();
+                    _logger.LogCriticalInvalidRemoteInstanceUri();
                 return;
             }
             _remoteUri = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
@@ -84,7 +84,7 @@ public sealed class RemoteLoaderService
                     if (_appSettings.Value.Password is null)
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalUserNameNotProvidedError();
+                            _logger.LogCriticalUserNameNotProvided();
                         return;
                     }
                     Console.Write("User Name: ");
@@ -92,14 +92,14 @@ public sealed class RemoteLoaderService
                     if (string.IsNullOrEmpty(userName))
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalUserNameNotProvidedError();
+                            _logger.LogCriticalUserNameNotProvided();
                         return;
                     }
                     string? password = Console.ReadLine();
                     if (string.IsNullOrEmpty(password))
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalPasswordNotProvidedError();
+                            _logger.LogCriticalPasswordNotProvided();
                         return;
                     }
                     credentials = new(userName, password);
@@ -109,7 +109,7 @@ public sealed class RemoteLoaderService
                     if (_appSettings.Value.ClientSecret is null)
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalPasswordNotProvidedError();
+                            _logger.LogCriticalPasswordNotProvided();
                         return;
                     }
                     credentials = new(_appSettings.Value.ClientId, _appSettings.Value.ClientSecret);
@@ -121,7 +121,7 @@ public sealed class RemoteLoaderService
                 if (password is null && string.IsNullOrEmpty(password = Console.ReadLine()))
                 {
                     if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                        _logger.LogCriticalPasswordNotProvidedError();
+                        _logger.LogCriticalPasswordNotProvided();
                     return;
                 }
                 credentials = new(_appSettings.Value.UserName, password);
@@ -133,7 +133,7 @@ public sealed class RemoteLoaderService
         {
             _remoteUri = Uri.TryCreate(remoteUri, UriKind.Absolute, out uri) ? uri : new Uri(Uri.EscapeDataString(remoteUri), UriKind.Relative);
             if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                _logger.LogCriticalInvalidRemoteInstanceUriError();
+                _logger.LogCriticalInvalidRemoteInstanceUri();
         }
     }
 
@@ -153,32 +153,32 @@ public sealed class RemoteLoaderService
         try { response.EnsureSuccessStatusCode(); }
         catch (HttpRequestException exception)
         {
-            _logger.LogHttpRequestFailedError(response.RequestMessage!.RequestUri!, exception);
+            _logger.LogHttpRequestFailed(response.RequestMessage!.RequestUri!, exception);
             return null;
         }
         string responseBody;
         try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
         catch (Exception exception)
         {
-            _logger.LogGetResponseContentFailedError(response.RequestMessage!.RequestUri!, exception);
+            _logger.LogGetResponseContentFailed(response.RequestMessage!.RequestUri!, exception);
             return null;
         }
         if (string.IsNullOrWhiteSpace(responseBody))
         {
-            _logger.LogInvalidHttpResponseError(requestUri, responseBody);
+            _logger.LogInvalidHttpResponse(requestUri, responseBody);
             return null;
         }
         JsonDocument doc;
         try { doc = JsonDocument.Parse(responseBody); }
         catch (JsonException exception)
         {
-            _logger.LogJsonCouldNotBeParsedError(requestUri, responseBody, exception);
+            _logger.LogJsonCouldNotBeParsed(requestUri, responseBody, exception);
             return null;
         }
         using (doc)
         {
             if (doc.RootElement.ValueKind != JsonValueKind.Object || (tableInfo = await TableFromElementAsync(doc.RootElement, false, cancellationToken)) is null)
-                _logger.LogInvalidHttpResponseError(requestUri, responseBody ?? "");
+                _logger.LogInvalidHttpResponse(requestUri, responseBody ?? "");
         }
         return tableInfo;
     }
