@@ -240,7 +240,17 @@ public static class ExtensionMethods
         return new UriBuilder(baseUri)
         {
             Path = $"{URI_PATH_API}/{tableName}",
-            Query = $"sysparm_query={value}&sysparm_display_value=all",
+            Query = $"{URI_PARAM_QUERY}={value}&{URI_PARAM_DISPLAY_VALUE}=all",
+            Fragment = null
+        }.Uri;
+    }
+
+    public static Uri ToTableApiUri(this Uri baseUri, string tableName, string id)
+    {
+        return new UriBuilder(baseUri)
+        {
+            Path = $"{URI_PATH_API}/{tableName}/{id}",
+            Query = $"{URI_PARAM_DISPLAY_VALUE}=all",
             Fragment = null
         }.Uri;
     }
@@ -265,11 +275,11 @@ public static class ExtensionMethods
         T? result;
         Uri? uri;
         string responseBody;
-        if (linkElement.TryGetChildElementAsNonEmptyString(JSON_KEY_VALUE, out string? value))
+        if (linkElement.TryGetPropertyAsNonEmptyString(JSON_KEY_VALUE, out string? value))
         {
             if ((result = await lookupFunc(value)) is not null)
                 return result;
-            if (!(linkElement.TryGetChildElementAsNonEmptyString(JSON_KEY_LINK, out link) && Uri.TryCreate(link, UriKind.Absolute, out uri)))
+            if (!(linkElement.TryGetPropertyAsNonEmptyString(JSON_KEY_LINK, out link) && Uri.TryCreate(link, UriKind.Absolute, out uri)))
                 return null;
             using HttpClient client = new(clientHandler);
             HttpRequestMessage msg = new(HttpMethod.Get, uri);
@@ -288,7 +298,7 @@ public static class ExtensionMethods
                 return null;
             }
         }
-        else if (linkElement.TryGetChildElementAsNonEmptyString(JSON_KEY_LINK, out link) && Uri.TryCreate(link, UriKind.Absolute, out uri))
+        else if (linkElement.TryGetPropertyAsNonEmptyString(JSON_KEY_LINK, out link) && Uri.TryCreate(link, UriKind.Absolute, out uri))
         {
             using HttpClient client = new(clientHandler);
             HttpRequestMessage msg = new(HttpMethod.Get, uri);
@@ -330,49 +340,14 @@ public static class ExtensionMethods
         return null;
     }
 
-    public static bool TryGetNestedChildValueElement(this JsonElement source, string name, [NotNullWhen(true)] out JsonElement valueElement) =>
-        source.TryGetProperty(name, out valueElement) && valueElement.ValueKind == JsonValueKind.Object && valueElement.TryGetProperty(JSON_KEY_VALUE, out valueElement);
+    public static bool TryGetProperty(this JsonElement jsonObj, string propertyName, string innerPropertyName, out JsonElement value) => jsonObj.TryGetProperty(propertyName, out value) && jsonObj.TryGetProperty(innerPropertyName, out value);
 
-    public static bool TryGetNestedChildValueElement(this JsonElement source, string name, [NotNullWhen(true)] out JsonElement valueElement, out string? displayValue)
-    {
-        if (source.TryGetProperty(name, out JsonElement element) && element.ValueKind == JsonValueKind.Object)
-        {
-            if (element.TryGetProperty(JSON_KEY_VALUE, out valueElement))
-            {
-                _ = element.TryGetChildElementAsString(JSON_KEY_VALUE, out displayValue);
-                return true;
-            }
-        }
-        else
-            valueElement = element;
-        displayValue = null;
-        return false;
-    }
+    [Obsolete("Bad name")]
+    public static bool TryGetPropertyValueElement(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out JsonElement valueElement) =>
+        jsonObj.TryGetProperty(propertyName, out valueElement) && valueElement.ValueKind == JsonValueKind.Object && valueElement.TryGetProperty(JSON_KEY_VALUE, out valueElement);
 
-    public static bool TryGetNestedValueElementAsString(this JsonElement source, string name, [NotNullWhen(true)] out string? result)
-    {
-        if (source.TryGetNestedChildValueElement(name, out JsonElement element) && element.ValueKind == JsonValueKind.String)
-            return (result = element.GetString()) is not null;
-        result = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Tries to get the string value of a property.
-    /// </summary>
-    /// <param name="source">The source JSON object.</param>
-    /// <param name="name">The property name.</param>
-    /// <param name="result">The string value of the property or <see langword="null" /> if the property does not exist or it is not a <see cref="JsonValueKind.String"/>.</param>
-    /// <returns><see langword="true" /> if the property exists and it is a <see cref="JsonValueKind.String"/>; otherwise, <see langword="false" />.</returns>
-    public static bool TryGetChildElementAsString(this JsonElement source, string name, [NotNullWhen(true)] out string? result)
-    {
-        if (source.TryGetProperty(name, out JsonElement element) && element.ValueKind == JsonValueKind.String)
-            return (result = element.GetString()) is not null;
-        result = null;
-        return false;
-    }
-
-    public static bool GetNestedValueElementAsBoolean(this JsonElement source, string name, bool defaultValue = false) => source.TryGetNestedChildValueElement(name, out JsonElement element) ? element.ValueKind switch
+    [Obsolete("Bad name")]
+    public static bool GetNestedValueElementAsBoolean(this JsonElement source, string name, bool defaultValue = false) => source.TryGetPropertyValueElement(name, out JsonElement element) ? element.ValueKind switch
     {
         JsonValueKind.True => true,
         JsonValueKind.False => false,
@@ -380,46 +355,64 @@ public static class ExtensionMethods
         _ => defaultValue,
     } : defaultValue;
 
-    public static bool GetNestedValueElementAsBoolean(this JsonElement source, string name, out string displayValue)
+    public static bool TryGetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out bool result)
     {
-        if (source.TryGetNestedChildValueElement(name, out JsonElement element, out string? d))
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element))
             switch (element.ValueKind)
             {
                 case JsonValueKind.True:
-                    displayValue = string.IsNullOrEmpty(d) ? "true" : d;
+                    result = true;
                     return true;
                 case JsonValueKind.False:
-                    displayValue = string.IsNullOrEmpty(d) ? "false" : d;
+                    result = false;
+                    return true;
+                case JsonValueKind.Number:
+                    result = element.TryGetInt32(out int i) ? i != 0 : element.TryGetDouble(out double d) && d != 0.0;
                     return true;
             }
-        displayValue = "false";
+        result = false;
         return false;
     }
 
-    public static bool GetNestedValueElementAsBoolean(this JsonElement source, string name, bool defaultValue, out string displayValue)
+    public static bool TryGetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, string innerPropertyName, [NotNullWhen(true)] out bool result)
     {
-        if (source.TryGetNestedChildValueElement(name, out JsonElement element, out string? d))
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, innerPropertyName, out JsonElement element))
             switch (element.ValueKind)
             {
                 case JsonValueKind.True:
-                    displayValue = string.IsNullOrEmpty(d) ? "true" : d;
+                    result = true;
                     return true;
                 case JsonValueKind.False:
-                    displayValue = string.IsNullOrEmpty(d) ? "false" : d;
+                    result = false;
+                    return true;
+                case JsonValueKind.Number:
+                    result = element.TryGetInt32(out int i) ? i != 0 : element.TryGetDouble(out double d) && d != 0.0;
                     return true;
             }
-        displayValue = defaultValue ? "true" : "false";
-        return defaultValue;
+        result = false;
+        return false;
+    }
+    
+    public static bool TryGetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out bool value, out string? display_value)
+    {
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.TryGetPropertyAsBoolean(JSON_KEY_VALUE, out value))
+        {
+            display_value = element.TryGetProperty(JSON_KEY_DISPLAY_VALUE, out JsonElement d) ? d.GetString() : null;
+            return true;
+        }
+        value = false;
+        display_value = null;
+        return false;
     }
 
     /// <summary>
     /// Gets the boolean value of a property.
     /// </summary>
     /// <param name="element">The source JSON object.</param>
-    /// <param name="name">The property name.</param>
+    /// <param name="propertyName">The property name.</param>
     /// <param name="defaultValue">The default value to use if the property does not exist or it is not <see cref="JsonValueKind.True"/> or <see cref="JsonValueKind.False"/></param>
     /// <returns><see langword="true" /> if the property exists and it is <see cref="JsonValueKind.True"/>; <see langword="false" /> if it is <see cref="JsonValueKind.False"/>; otherwise, the value of <paramref name="defaultValue"/>.</returns>
-    public static bool GetChildElementAsBoolean(this JsonElement source, string name, bool defaultValue = false) => source.TryGetProperty(name, out JsonElement element) ? element.ValueKind switch
+    public static bool GetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, bool defaultValue = false) => jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) ? element.ValueKind switch
     {
         JsonValueKind.True => true,
         JsonValueKind.False => false,
@@ -427,78 +420,71 @@ public static class ExtensionMethods
         _ => defaultValue,
     } : defaultValue;
 
-    public static string GetNestedValueElementAsString(this JsonElement source, string name, string defaultValue = "") => source.TryGetNestedChildValueElement(name, out JsonElement element) ? element.ValueKind switch
+    public static bool GetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, string innerPropertyName, bool defaultValue = false) => jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, innerPropertyName, out JsonElement element) ? element.ValueKind switch
     {
-        JsonValueKind.Null or JsonValueKind.Undefined => defaultValue,
-        _ => element.GetString() ?? defaultValue,
+        JsonValueKind.True => true,
+        JsonValueKind.False => false,
+        JsonValueKind.Number => element.TryGetInt32(out int i) ? i != 0 : element.TryGetDouble(out double d) && d != 0.0,
+        _ => defaultValue,
     } : defaultValue;
 
-    public static string GetNestedValueElementAsString(this JsonElement source, string name, out string displayValue)
+    /// <summary>
+    /// Tries to get the string value of a property.
+    /// </summary>
+    /// <param name="jsonObj">The source JSON object.</param>
+    /// <param name="propertyName">The property name.</param>
+    /// <param name="result">The string value of the property or <see langword="null" /> if the property does not exist or it is not a <see cref="JsonValueKind.String"/>.</param>
+    /// <returns><see langword="true" /> if the property exists and it is a <see cref="JsonValueKind.String"/>; otherwise, <see langword="false" />.</returns>
+    public static bool TryGetPropertyAsString(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out string? result)
     {
-        if (source.TryGetNestedChildValueElement(name, out JsonElement element, out string? d))
-        {
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    break;
-                default:
-                    var result = element.GetString();
-                    if (result is not null)
-                    {
-                        displayValue = d ?? result;
-                        return result;
-                    }
-                    break;
-            }
-            displayValue = d ?? string.Empty;
-            return string.Empty;
-        }
-        displayValue = string.Empty;
-        return string.Empty;
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.ValueKind == JsonValueKind.String)
+            return (result = element.GetString()) is not null;
+        result = null;
+        return false;
     }
 
-    public static string GetNestedValueElementAsString(this JsonElement source, string name, string defaultValue, out string displayValue)
+    public static bool TryGetPropertyAsString(this JsonElement jsonObj, string propertyName, string innerPropertyName, [NotNullWhen(true)] out string? result)
     {
-        if (source.TryGetNestedChildValueElement(name, out JsonElement element, out string? d))
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, innerPropertyName, out JsonElement element) && element.ValueKind == JsonValueKind.String)
+            return (result = element.GetString()) is not null;
+        result = null;
+        return false;
+    }
+
+    public static bool TryGetPropertyAsString(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out string? value, out string? display_value)
+    {
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.TryGetPropertyAsString(JSON_KEY_VALUE, out value))
         {
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    break;
-                default:
-                    var result = element.GetString();
-                    if (result is not null)
-                    {
-                        displayValue = d ?? result;
-                        return result;
-                    }
-                    break;
-            }
-            displayValue = d ?? defaultValue;
-            return defaultValue;
+            display_value = element.TryGetProperty(JSON_KEY_DISPLAY_VALUE, out JsonElement d) ? d.GetString() : null;
+            return true;
         }
-        displayValue = defaultValue;
-        return defaultValue;
+        value = display_value = null;
+        return false;
     }
 
     /// <summary>
     /// Gets the string value of a property.
     /// </summary>
     /// <param name="element">The source JSON object.</param>
-    /// <param name="name">The property name.</param>
+    /// <param name="propertyName">The property name.</param>
     /// <param name="defaultValue">The default value to use if the property does not exist or it is not a <see cref="JsonValueKind.String"/>.</param>
     /// <returns>The value of the property if it exists and it is a <see cref="JsonValueKind.String"/>; otherwise, the value of <paramref name="defaultValue"/>.</returns>
-    public static string GetChildElementAsString(this JsonElement source, string name, string defaultValue = "") => source.TryGetProperty(name, out JsonElement element) ? element.ValueKind switch
+    public static string GetPropertyAsString(this JsonElement source, string propertyName, string defaultValue = "") => source.ValueKind == JsonValueKind.Object && source.TryGetProperty(propertyName, out JsonElement element) ? element.ValueKind switch
     {
         JsonValueKind.Null or JsonValueKind.Undefined => defaultValue,
         _ => element.GetString() ?? defaultValue,
     } : defaultValue;
 
+    public static string GetPropertyAsString(this JsonElement source, string propertyName, string innerPropertyName, string defaultValue) => source.ValueKind == JsonValueKind.Object && source.TryGetProperty(propertyName, innerPropertyName, out JsonElement element) ? element.ValueKind switch
+    {
+        JsonValueKind.Null or JsonValueKind.Undefined => defaultValue,
+        _ => element.GetString() ?? defaultValue,
+    } : defaultValue;
+
+    [Obsolete("Bad name")]
     public static bool TryGetNestedValueElementAsNonEmptyString(this JsonElement source, string name, [NotNullWhen(true)] out string? result)
     {
-        if (source.TryGetNestedChildValueElement(name, out JsonElement element))
+        if (source.TryGetPropertyValueElement(name, out JsonElement element))
             switch (element.ValueKind)
             {
                 case JsonValueKind.Null:
@@ -523,9 +509,9 @@ public static class ExtensionMethods
     /// <param name="name">The property name.</param>
     /// <param name="result">The non-empty string value of the property or <see langword="null" /> if the property does not exist, is not a <see cref="JsonValueKind.String"/> or is empty.</param>
     /// <returns><see langword="true" /> if the property exists, is a <see cref="JsonValueKind.String"/>, and is not empty; otherwise, <see langword="false" />.</returns>
-    public static bool TryGetChildElementAsNonEmptyString(this JsonElement source, string name, [NotNullWhen(true)] out string? result)
+    public static bool TryGetPropertyAsNonEmptyString(this JsonElement source, string name, [NotNullWhen(true)] out string? result)
     {
-        if (source.TryGetProperty(name, out JsonElement element))
+        if (source.ValueKind == JsonValueKind.Object && source.TryGetProperty(name, out JsonElement element))
             switch (element.ValueKind)
             {
                 case JsonValueKind.Null:
@@ -544,9 +530,42 @@ public static class ExtensionMethods
             return false;
     }
 
+    public static bool TryGetPropertyAsNonEmptyString(this JsonElement source, string propertyName, string innerPropertyName, [NotNullWhen(true)] out string? result)
+    {
+        if (source.ValueKind == JsonValueKind.Object && source.TryGetProperty(propertyName, innerPropertyName, out JsonElement element))
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.Null:
+                case JsonValueKind.Undefined:
+                    break;
+                default:
+                    var s = element.GetString();
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
+                        result = s;
+                        return true;
+                    }
+                    break;
+            }
+            result = null;
+            return false;
+    }
+
+    public static bool TryGetPropertyAsNonEmptyString(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out string? value, out string? display_value)
+    {
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.TryGetPropertyAsString(JSON_KEY_VALUE, out value) && !string.IsNullOrWhiteSpace(value))
+        {
+            display_value = element.TryGetProperty(JSON_KEY_DISPLAY_VALUE, out JsonElement d) ? d.GetString() : null;
+            return true;
+        }
+        value = display_value = null;
+        return false;
+    }
+
+    [Obsolete("Bad name")]
     public static string GetNestedValueElementAsNonEmptyString(this JsonElement source, string name, string defaultValue)
     {
-        if (source.TryGetNestedChildValueElement(name, out JsonElement element))
+        if (source.TryGetPropertyValueElement(name, out JsonElement element))
             switch (element.ValueKind)
             {
                 case JsonValueKind.Null:
@@ -563,12 +582,12 @@ public static class ExtensionMethods
     /// Gets the string value of a property.
     /// </summary>
     /// <param name="element">The source JSON object.</param>
-    /// <param name="name">The property name.</param>
+    /// <param name="propertyName">The property name.</param>
     /// <param name="defaultValue">The default value to use if the property does not exist, is not a <see cref="JsonValueKind.String"/>, or is empty.</param>
     /// <returns>The value of the property if it exists, is a <see cref="JsonValueKind.String"/>, and is not empty; otherwise, the value of <paramref name="defaultValue"/>.</returns>
-    public static string GetChildElementAsNonEmptyString(this JsonElement source, string name, string defaultValue)
+    public static string GetPropertyAsNonEmptyString(this JsonElement jsonObj, string propertyName, string defaultValue)
     {
-        if (source.TryGetProperty(name, out JsonElement element))
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element))
             switch (element.ValueKind)
             {
                 case JsonValueKind.Null:
@@ -578,6 +597,32 @@ public static class ExtensionMethods
                     var s = element.GetString();
                     return string.IsNullOrWhiteSpace(s) ? defaultValue : s;
             }
+        return defaultValue;
+    }
+    
+    public static string GetPropertyAsNonEmptyString(this JsonElement jsonObj, string propertyName, string innerPropertyName, string defaultValue)
+    {
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, innerPropertyName, out JsonElement element))
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.Null:
+                case JsonValueKind.Undefined:
+                    return defaultValue;
+                default:
+                    var s = element.GetString();
+                    return string.IsNullOrWhiteSpace(s) ? defaultValue : s;
+            }
+        return defaultValue;
+    }
+    
+    public static string GetPropertyAsNonEmptyString(this JsonElement jsonObj, string propertyName, string defaultValue, out string? display_value)
+    {
+        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.TryGetPropertyAsString(JSON_KEY_VALUE, out string? value) && !string.IsNullOrWhiteSpace(value))
+        {
+            display_value = element.TryGetProperty(JSON_KEY_DISPLAY_VALUE, out JsonElement d) ? d.GetString() : null;
+            return value;
+        }
+        display_value = null;
         return defaultValue;
     }
 }

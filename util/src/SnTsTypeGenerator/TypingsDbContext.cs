@@ -73,7 +73,7 @@ public class TypingsDbContext : DbContext
     }
 
     private void OnBeforeSave(CancellationToken cancellationToken = default)
-{
+    {
         if (cancellationToken.IsCancellationRequested)
             return;
         using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(OnBeforeSave));

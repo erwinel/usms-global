@@ -17,6 +17,10 @@ internal static class Constants
     /// </summary>
     public const string DEFAULT_SQL_NOW = "(datetime('now','localtime'))";
 
+    internal const string URI_PARAM_QUERY = "sysparm_query";
+
+    internal const string URI_PARAM_DISPLAY_VALUE = "sysparm_display_value";
+
     /// <summary>
     /// URI path for the ServiceNow Table API.
     /// </summary>
@@ -28,19 +32,14 @@ internal static class Constants
     internal const string TABLE_NAME_SYS_DB_OBJECT = "sys_db_object";
 
     /// <summary>
-    /// ServiceNow Table API URI path for ServiceNow table definitions.
+    /// Table name for ServiceNow table definitions.
     /// </summary>
-    internal const string URI_PATH_TABLE = $"{URI_PATH_API}/{TABLE_NAME_SYS_DB_OBJECT}";
-    
+    internal const string TABLE_NAME_SYS_SCOPE = "sys_scope";
+
     /// <summary>
     /// Table name for ServiceNow column (element) definitions.
     /// </summary>
     internal const string TABLE_NAME_SYS_DICTIONARY = "sys_dictionary";
-    
-    /// <summary>
-    /// ServiceNow Table API URI path for ServiceNow column (element) definitions.
-    /// </summary>
-    internal const string URI_PATH_COLUMN = $"{URI_PATH_API}/{TABLE_NAME_SYS_DICTIONARY}";
     
     /// <summary>
     /// Table name for ServiceNow type definitions.
@@ -67,6 +66,8 @@ internal static class Constants
     /// </summary>
     internal const string JSON_KEY_NAME = "name";
     
+    internal const string JSON_KEY_SHORT_DESCRIPTION = "short_description";
+
     /// <summary>
     /// "Label" Column (element) name.
     /// </summary>
