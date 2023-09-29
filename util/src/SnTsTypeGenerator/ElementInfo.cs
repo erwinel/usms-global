@@ -446,6 +446,8 @@ public class ElementInfo
         }
     }
 
+    internal bool OptionsEqualTo(ElementInfo other) => ReferenceEquals(this, other) || (Name == other.Name && TypeName == other.TypeName && RefTableName == other.RefTableName);
+    
     internal static IEnumerable<string> GetDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(ElementInfo)}"" (
