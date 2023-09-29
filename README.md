@@ -8,6 +8,27 @@ This is intended to be developed using VS Code. See [/.vscode/extensions.json](.
 
 Run `npm install` from the root folder of this repository to install dependencies.
 
+### Github Codespaces Initialization Issue
+
+If the language service fails to recognize namespaces from added packages such as `Microsoft.EntityFrameworkCore`, you may need to do the following:
+
+1. Remove subdirectories `util/src/SnTsTypeGenerator/bin` and `util/src/SnTsTypeGenerator/obj`
+2. Execute the command `dotnet restore util/src`
+3. From the command palette, select `.NET: Restart Language Server`.
+
+#### TODO: Possible fix
+
+Change `postCreateCommand` setting in [devcontainer.json](./.devcontainer/devcontainer.json) to:
+
+```json
+[
+    "npm install",
+    "git submodule update --init --recursive",
+    "pushd .; cd types/snc; git checkout master; popd"
+    "dotnet restore util/src"
+]
+```
+
 ### SNC Typings Submodule Maintenance
 
 #### Initialize Submodule after Repository Clone
