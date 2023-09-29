@@ -497,11 +497,6 @@ public class ElementInfo
         builder.HasOne(t => t.Reference).WithMany(s => s.ReferredBy).HasForeignKey(t => t.RefTableName).OnDelete(DeleteBehavior.Restrict);
     }
 
-    internal async Task<ElementInfo?> FromElementAsync(JsonElement source, RemoteLoaderService loaderService, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
     internal async Task RenderPropertyGlobalAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

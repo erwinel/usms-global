@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
@@ -305,8 +306,16 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId HttpRequestFailed = new(EVENT_ID_HttpRequestFailed, nameof(HttpRequestFailed));
     
-    private static readonly Action<ILogger, Uri, Exception?> _httpRequestFailed = LoggerMessage.Define<Uri>(LogLevel.Error, HttpRequestFailed,
-        "Remote request failed ({URI}).");
+    private static readonly Action<ILogger, Uri, Exception?> _httpRequestFailed1 = LoggerMessage.Define<Uri>(LogLevel.Error, HttpRequestFailed,
+        "Remote request {URI} failed.");
+    
+    private static readonly Action<ILogger, Uri, string, Exception?> _httpRequestFailed2 = LoggerMessage.Define<Uri, string>(LogLevel.Error, HttpRequestFailed,
+        "Remote request {URI} failed: {Message}");
+    
+    private static readonly Action<ILogger, Uri, int, string, Exception?> _httpRequestFailed3 = LoggerMessage.Define<Uri, int, string>(LogLevel.Error, HttpRequestFailed,
+        "Remote request {URI} failed with error code {ErrorCode} ({Description}).");
+    private static readonly Action<ILogger, Uri, int, string, string, Exception?> _httpRequestFailed4 = LoggerMessage.Define<Uri, int, string, string>(LogLevel.Error, HttpRequestFailed,
+    "Remote request {URI} failed with error code {ErrorCode} ({Description}): {Message}");
     
     /// <summary>
     /// Logs an HTTP request failure event (HttpRequestFailed) with event code 0x0012.
@@ -314,7 +323,22 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI that failed.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogHttpRequestFailed(this ILogger logger, Uri uri, HttpRequestException error) => _httpRequestFailed(logger, uri, error);
+    public static void LogHttpRequestFailed(this ILogger logger, Uri uri, HttpRequestException? error)
+    {
+        if (error is null)
+            _httpRequestFailed1(logger, uri, error);
+        else if (error.StatusCode.HasValue)
+        {
+            if (string.IsNullOrWhiteSpace(error.Message))
+                _httpRequestFailed3(logger, uri, (int)error.StatusCode.Value, error.StatusCode.Value.ToDisplayName(), error);
+            else
+                _httpRequestFailed4(logger, uri, (int)error.StatusCode.Value, error.StatusCode.Value.ToDisplayName(), error.Message, error);
+        }
+        else if (string.IsNullOrWhiteSpace(error.Message))
+            _httpRequestFailed1(logger, uri, error);
+        else
+            _httpRequestFailed2(logger, uri, error.Message, error);
+    }
     
     #endregion
 
@@ -365,7 +389,7 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="content">The content that could not be parsed.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogJsonCouldNotBeParsed(this ILogger logger, Uri uri, string content, JsonException error) => _jsonCouldNotBeParsed(logger, uri, content, error);
+    public static void LogJsonCouldNotBeParsed(this ILogger logger, Uri uri, string content, JsonException? error) => _jsonCouldNotBeParsed(logger, uri, content, error);
     
     #endregion
 
@@ -579,8 +603,11 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId InvalidResponseType = new(EVENT_ID_InvalidResponseType, nameof(InvalidResponseType));
     
-    private static readonly Action<ILogger, Uri, string, string, Exception?> _invalidResponseType = LoggerMessage.Define<Uri, string, string>(LogLevel.Error, InvalidResponseType,
-        "Response from  retuned unexecpected type . Actual Result: {URI} {Type} {Result}");
+    private static readonly Action<ILogger, Uri, Exception?> _invalidResponseType1 = LoggerMessage.Define<Uri>(LogLevel.Error, InvalidResponseType,
+        "Response from {URI} retuned null.");
+    
+    private static readonly Action<ILogger, Uri, string, string, Exception?> _invalidResponseType2 = LoggerMessage.Define<Uri, string, string>(LogLevel.Error, InvalidResponseType,
+        "Response from {URI} retuned unexpected type {Type}. Actual Result: {Result}");
     
     /// <summary>
     /// Logs an InvalidResponseType event with event code 0x0020.
@@ -589,14 +616,13 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="type">The unexpected type.</param>
     /// <param name="response">The actual response.</param>
-    public static void LogInvalidResponseType(this ILogger logger, Uri uri, Type type, string response) => _invalidResponseType(logger, uri, type.Name, response, null);
-
-    public static void LogInvalidResponseType(this ILogger logger, Uri uri, JsonValueKind type, string response) => logger.LogInvalidResponseType(uri, type switch
+    public static void LogInvalidResponseType(this ILogger logger, Uri uri, JsonNode? response)
     {
-        JsonValueKind.Object => typeof(JsonObject),
-        JsonValueKind.Array => typeof(JsonArray),
-        _ => typeof(JsonValue),
-    }, response);
+        if (response is null)
+            _invalidResponseType1(logger, uri, null);
+        else
+            _invalidResponseType2(logger, uri, response.GetType().Name, response.ToJsonString(), null);
+    }
 
     #endregion
 
@@ -621,8 +647,8 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
     /// <param name="response">The actual response.</param>
-    public static void LogResponseResultPropertyNotFound(this ILogger logger, Uri uri, string response) => _responseResultPropertyNotFoundError(logger, uri, response.ToString(), null);
-    
+    public static void LogResponseResultPropertyNotFound(this ILogger logger, Uri uri, JsonObject response) => _responseResultPropertyNotFoundError(logger, uri, response.ToJsonString(), null);
+
     #endregion
 
     #region NoResultsFromQuery Error (0x0022)
@@ -646,7 +672,7 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
     /// <param name="response">The actual response.</param>
-    public static void LogNoResultsFromQuery(this ILogger logger, Uri uri, string response) => _noResultsFromQuery(logger, uri, response.ToString(), null);
+    public static void LogNoResultsFromQuery(this ILogger logger, Uri uri, JsonObject response) => _noResultsFromQuery(logger, uri, response.ToJsonString(), null);
     
     #endregion
 
@@ -672,7 +698,7 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="additionalCount">The number of additional elements.</param>
     /// <param name="response">The actual response.</param>
-    public static void LogMultipleResponseItems(this ILogger logger, Uri uri, int additionalCount, string response) => _multipleResponseItems(logger, uri, additionalCount, response.ToString(), null);
+    public static void LogMultipleResponseItems(this ILogger logger, Uri uri, int additionalCount, JsonObject response) => _multipleResponseItems(logger, uri, additionalCount, response.ToJsonString(), null);
     
     #endregion
 

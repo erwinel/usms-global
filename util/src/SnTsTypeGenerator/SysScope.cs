@@ -130,11 +130,6 @@ public class SysScope
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
 
-    internal static SysScope? FromElement(JsonElement element)
-    {
-        throw new NotImplementedException();
-    }
-
     internal static void OnBuildEntity(EntityTypeBuilder<SysScope> builder)
     {
         _ = builder.HasKey(s => s.Value);

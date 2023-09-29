@@ -8,7 +8,7 @@ using static SnTsTypeGenerator.Constants;
 namespace SnTsTypeGenerator;
 
 /// <summary>
-/// Represents an explicit output file base name.
+/// This defines an explicit output file base name.
 /// </summary>
 public class OutputFile : IValidatableObject
 {

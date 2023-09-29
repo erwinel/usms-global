@@ -366,16 +366,6 @@ public class TableInfo
         return $"{_scopeValue}.{NS_NAME_fields}.{GetShortName()}";
     }
 
-    internal async Task<TableInfo?> FromElementAsync(JsonElement source, RemoteLoaderService loaderService, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    internal async Task<GlideType?> FromRefElementAsync(JsonElement? source, RemoteLoaderService loaderService, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
     internal static void OnBuildEntity(EntityTypeBuilder<TableInfo> builder)
     {
         _ = builder.HasKey(t => t.Name);

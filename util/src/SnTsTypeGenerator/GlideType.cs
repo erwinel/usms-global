@@ -254,16 +254,6 @@ public class GlideType
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
 
-    internal async Task<GlideType?> FromElementAsync(JsonElement source, RemoteLoaderService loaderService, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    internal async Task<GlideType?> FromRefElementAsync(JsonElement? source, RemoteLoaderService loaderService, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
     internal static void OnBuildEntity(EntityTypeBuilder<GlideType> builder)
     {
         builder.HasKey(t => t.Name);

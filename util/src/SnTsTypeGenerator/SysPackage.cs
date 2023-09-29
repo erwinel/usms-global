@@ -30,17 +30,17 @@ public class SysPackage
         set => _name = value ?? string.Empty;
     }
 
-    private string _value = string.Empty;
+    private string _sysId = string.Empty;
 
     /// <summary>
     /// Value of the package reference.
     /// </summary>
     [NotNull]
-    [BackingField(nameof(_value))]
-    public string Value
+    [BackingField(nameof(_sysId))]
+    public string SysId
     {
-        get => _value;
-        set => _value = value ?? string.Empty;
+        get => _sysId;
+        set => _sysId = value ?? string.Empty;
     }
 
     public string? ShortDescription { get; set; }
@@ -158,11 +158,6 @@ public class SysPackage
         }
     }
 
-    internal SysPackage? FromRefElement(JsonElement? source)
-    {
-        throw new NotImplementedException();
-    }
-    
     private HashSet<GlideType> _types = new();
 
     [NotNull]

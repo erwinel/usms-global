@@ -1,5 +1,7 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -226,6 +228,35 @@ public static class ExtensionMethods
         return (!value.Any(c => char.IsWhiteSpace(c)) && value.Length == result.Length - 2) ? value : result;
     }
 
+    public static async Task<JsonNode?> GetAPIJsonResult(this HttpClientHandler handler, Uri requestUri, ILogger logger, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using HttpClient httpClient = new(handler);
+        HttpRequestMessage message = new(HttpMethod.Get, requestUri);
+        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+        using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        try { response.EnsureSuccessStatusCode(); }
+        catch (HttpRequestException exception) { throw new RequestFailedException(requestUri, exception); }
+        string responseBody;
+        try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
+        catch (Exception exception) { throw new GetResponseContentFailedException(requestUri, exception); }
+        cancellationToken.ThrowIfCancellationRequested();
+        if (string.IsNullOrWhiteSpace(responseBody)) { throw new InvalidHttpResponseException(requestUri, responseBody); }
+        try
+        {
+            using JsonDocument doc = JsonDocument.Parse(responseBody);
+            return doc.RootElement.ValueKind switch
+            {
+                JsonValueKind.Undefined or JsonValueKind.Null => null,
+                JsonValueKind.Array => JsonArray.Create(doc.RootElement),
+                JsonValueKind.Object => JsonObject.Create(doc.RootElement),
+                _ => JsonValue.Create(doc.RootElement),
+            };
+        }
+        catch (JsonException exception) { throw new ResponseParsingException(requestUri, responseBody, exception); }
+    }
+    
     /// <summary>
     /// Creates a table API URI.
     /// </summary>
@@ -249,35 +280,35 @@ public static class ExtensionMethods
     {
         return new UriBuilder(baseUri)
         {
-            Path = $"{URI_PATH_API}/{tableName}/{id}",
+            Path = $"{URI_PATH_API}/{tableName}/{Uri.EscapeDataString(id)}",
             Query = $"{URI_PARAM_DISPLAY_VALUE}=all",
             Fragment = null
         }.Uri;
     }
     
-    public static async Task<string?> GetJsonResponseAsync(this HttpClientHandler? clientHandler, Uri requestUri, ILogger logger, CancellationToken cancellationToken)
-    {
-        if (clientHandler is null)
-            return null;
-        using HttpClient httpClient = new(clientHandler);
-        HttpRequestMessage message = new(HttpMethod.Get, requestUri);
-        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-        using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
-        if (cancellationToken.IsCancellationRequested)
-            return null;
-        try { response.EnsureSuccessStatusCode(); }
-        catch (HttpRequestException exception)
-        {
-            logger.LogHttpRequestFailed(requestUri, exception);
-            return null;
-        }
-        try { return await response.Content.ReadAsStringAsync(cancellationToken); }
-        catch (Exception exception)
-        {
-            logger.LogGetResponseContentFailed(requestUri, exception);
-            return null;
-        }
-    }
+    // public static async Task<string?> GetJsonResponseAsync(this HttpClientHandler? clientHandler, Uri requestUri, ILogger logger, CancellationToken cancellationToken)
+    // {
+    //     if (clientHandler is null)
+    //         return null;
+    //     using HttpClient httpClient = new(clientHandler);
+    //     HttpRequestMessage message = new(HttpMethod.Get, requestUri);
+    //     message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+    //     using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
+    //     if (cancellationToken.IsCancellationRequested)
+    //         return null;
+    //     try { response.EnsureSuccessStatusCode(); }
+    //     catch (HttpRequestException exception)
+    //     {
+    //         logger.LogHttpRequestFailed(requestUri, exception);
+    //         return null;
+    //     }
+    //     try { return await response.Content.ReadAsStringAsync(cancellationToken); }
+    //     catch (Exception exception)
+    //     {
+    //         logger.LogGetResponseContentFailed(requestUri, exception);
+    //         return null;
+    //     }
+    // }
 
     public static bool TryGetPropertyValue(this JsonObject source, string propertyName, string innerPropertyName, out JsonNode? jsonNode) =>
         source.TryGetPropertyValue(propertyName, out jsonNode) && jsonNode is JsonObject obj && obj.TryGetPropertyValue(innerPropertyName, out jsonNode);
@@ -682,392 +713,110 @@ public static class ExtensionMethods
     public static bool GetFieldAsBoolean(this JsonObject source, string propertyName, bool defaultValue = false) =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool? value)) ? value.Value : defaultValue;
 
-    /// <summary>
-    /// Gets the target of a link property.
-    /// </summary>
-    /// <param name="clientHandler">The HTTP message handler.</param>
-    /// <param name="element">The source JSON object.</param>
-    /// <param name="name">The link property name.</param>
-    /// <param name="lookupFunc">The function that retrieves the associated return value from the given link value.</param>
-    /// <param name="createFunc">The function that creates the return value from the results of a remote query.</param>
-    /// <param name="logger">The logger to use.</param>
-    /// <param name="cancellationToken">The token to observe while waiting for the task to complete.</param>
-    /// <typeparam name="T">The return object type.</typeparam>
-    // BUG: Need add sysparm_display_value=all query parameter to request URI so the returned the property schema is { display_value: string, value: string, link?: string; }
-    [Obsolete("Do not use")]
-    public static async Task<T?> GetLinkedObjectAsync<T>(this HttpClientHandler clientHandler, JsonElement element, string name, Func<string, Task<T?>> lookupFunc, Func<JsonElement, Task<T?>> createFunc, ILogger logger, CancellationToken cancellationToken) where T : class
+    public static string ToDisplayName(this HttpStatusCode statusCode) => statusCode switch
     {
-        if (!element.TryGetProperty(name, out JsonElement linkElement) || linkElement.ValueKind != JsonValueKind.Object)
-            return null;
-        string? link;
-        T? result;
-        Uri? uri;
-        string responseBody;
-        if (linkElement.TryGetPropertyAsNonEmptyString(JSON_KEY_VALUE, out string? value))
-        {
-            if ((result = await lookupFunc(value)) is not null)
-                return result;
-            if (!(linkElement.TryGetPropertyAsNonEmptyString(JSON_KEY_LINK, out link) && Uri.TryCreate(link, UriKind.Absolute, out uri)))
-                return null;
-            using HttpClient client = new(clientHandler);
-            HttpRequestMessage msg = new(HttpMethod.Get, uri);
-            msg.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-            using HttpResponseMessage response = await client.SendAsync(msg, cancellationToken);
-            try { response.EnsureSuccessStatusCode(); }
-            catch (HttpRequestException exception)
-            {
-                logger.LogHttpRequestFailed(response.RequestMessage!.RequestUri!, exception);
-                return null;
-            }
-            try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
-            catch (Exception exception)
-            {
-                logger.LogGetResponseContentFailed(response.RequestMessage!.RequestUri!, exception);
-                return null;
-            }
-        }
-        else if (linkElement.TryGetPropertyAsNonEmptyString(JSON_KEY_LINK, out link) && Uri.TryCreate(link, UriKind.Absolute, out uri))
-        {
-            using HttpClient client = new(clientHandler);
-            HttpRequestMessage msg = new(HttpMethod.Get, uri);
-            msg.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-            using HttpResponseMessage response = await client.SendAsync(msg, cancellationToken);
-            try { response.EnsureSuccessStatusCode(); }
-            catch (HttpRequestException exception)
-            {
-                logger.LogHttpRequestFailed(response.RequestMessage!.RequestUri!, exception);
-                return null;
-            }
-            try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
-            catch (Exception exception)
-            {
-                logger.LogGetResponseContentFailed(response.RequestMessage!.RequestUri!, exception);
-                return null;
-            }
-        }
-        else
-            return null;
-        if (string.IsNullOrWhiteSpace(responseBody))
-        {
-            logger.LogInvalidHttpResponse(uri, responseBody);
-            return null;
-        }
-        
-        JsonDocument doc;
-        try { doc = JsonDocument.Parse(responseBody); }
-        catch (JsonException exception)
-        {
-            logger.LogJsonCouldNotBeParsed(uri, responseBody, exception);
-            return null;
-        }
-        using (doc)
-        {
-            if (doc.RootElement.ValueKind == JsonValueKind.Object)
-                return await createFunc(doc.RootElement);
-        }
-        return null;
-    }
+        HttpStatusCode.Continue => "client can continue with its request",
+        HttpStatusCode.SwitchingProtocols => "Switching Protocols",
+        HttpStatusCode.EarlyHints => "Early Hints",
+        HttpStatusCode.NonAuthoritativeInformation => "Non Authoritative Information",
+        HttpStatusCode.NoContent => "No Content",
+        HttpStatusCode.ResetContent => "Reset Content",
+        HttpStatusCode.PartialContent => "Partial Content",
+        HttpStatusCode.MultiStatus => "Multi Status",
+        HttpStatusCode.AlreadyReported => "Already Reported",
+        HttpStatusCode.IMUsed => "IM Used",
+        HttpStatusCode.RedirectMethod => "Redirect Method",
+        HttpStatusCode.NotModified => "Not Modified",
+        HttpStatusCode.UseProxy => "Use Proxy",
+        HttpStatusCode.RedirectKeepVerb => "Redirect Keep Verb",
+        HttpStatusCode.PermanentRedirect => "Permanent Redirect",
+        HttpStatusCode.BadRequest => "Bad Request",
+        HttpStatusCode.PaymentRequired => "Payment Required",
+        HttpStatusCode.NotFound => "Not Found",
+        HttpStatusCode.MethodNotAllowed => "Method Not Allowed",
+        HttpStatusCode.NotAcceptable => "Not Acceptable",
+        HttpStatusCode.ProxyAuthenticationRequired => "Proxy Authentication Required",
+        HttpStatusCode.RequestTimeout => "Request Timeout",
+        HttpStatusCode.LengthRequired => "Length Required",
+        HttpStatusCode.PreconditionFailed => "Precondition Failed",
+        HttpStatusCode.RequestEntityTooLarge => "Request Entity Too Large",
+        HttpStatusCode.RequestUriTooLong => "Request URI Too Long",
+        HttpStatusCode.UnsupportedMediaType => "Unsupported Media Type",
+        HttpStatusCode.RequestedRangeNotSatisfiable => "Requested Range Not Satisfiable",
+        HttpStatusCode.ExpectationFailed => "Expectation Failed",
+        HttpStatusCode.MisdirectedRequest => "Misdirected Request",
+        HttpStatusCode.UnprocessableEntity => "Unprocessable Entity",
+        HttpStatusCode.FailedDependency => "Failed Dependency",
+        HttpStatusCode.UpgradeRequired => "Upgrade Required",
+        HttpStatusCode.PreconditionRequired => "Precondition Required",
+        HttpStatusCode.TooManyRequests => "Too Many Requests",
+        HttpStatusCode.RequestHeaderFieldsTooLarge => "Request Header Fields Too Large",
+        HttpStatusCode.UnavailableForLegalReasons => "Unavailable For Legal Reasons",
+        HttpStatusCode.InternalServerError => "Internal Server Error",
+        HttpStatusCode.NotImplemented => "Not Implemented",
+        HttpStatusCode.BadGateway => "Bad Gateway",
+        HttpStatusCode.ServiceUnavailable => "Service Unavailable",
+        HttpStatusCode.GatewayTimeout => "Gateway Timeout",
+        HttpStatusCode.HttpVersionNotSupported => "Http Version Not Supported",
+        HttpStatusCode.VariantAlsoNegotiates => "Variant Also Negotiates",
+        HttpStatusCode.InsufficientStorage => "Insufficient Storage",
+        HttpStatusCode.LoopDetected => "Loop Detected",
+        HttpStatusCode.NotExtended => "Not Extended",
+        HttpStatusCode.NetworkAuthenticationRequired => "Network Authentication Required",
+        _ => statusCode.ToString("F"),
+    };
 
-    [Obsolete("Do not use")]
-    public static bool TryGetProperty(this JsonElement jsonObj, string propertyName, string innerPropertyName, out JsonElement value) => jsonObj.TryGetProperty(propertyName, out value) && jsonObj.TryGetProperty(innerPropertyName, out value);
-
-    [Obsolete("Bad name")]
-    public static bool TryGetPropertyValueElement(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out JsonElement valueElement) =>
-        jsonObj.TryGetProperty(propertyName, out valueElement) && valueElement.ValueKind == JsonValueKind.Object && valueElement.TryGetProperty(JSON_KEY_VALUE, out valueElement);
-
-    [Obsolete("Bad name")]
-    public static bool GetNestedValueElementAsBoolean(this JsonElement source, string name, bool defaultValue = false) => source.TryGetPropertyValueElement(name, out JsonElement element) ? element.ValueKind switch
+    public static string? ToDescription(this HttpStatusCode statusCode) => statusCode switch
     {
-        JsonValueKind.True => true,
-        JsonValueKind.False => false,
-        JsonValueKind.Number => element.TryGetInt32(out int i) ? i != 0 : element.TryGetDouble(out double d) && d != 0.0,
-        _ => defaultValue,
-    } : defaultValue;
-
-    [Obsolete("Do not use")]
-    public static bool TryGetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out bool result)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element))
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.True:
-                    result = true;
-                    return true;
-                case JsonValueKind.False:
-                    result = false;
-                    return true;
-                case JsonValueKind.Number:
-                    result = element.TryGetInt32(out int i) ? i != 0 : element.TryGetDouble(out double d) && d != 0.0;
-                    return true;
-            }
-        result = false;
-        return false;
-    }
-
-    [Obsolete("Do not use")]
-    public static bool TryGetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, string innerPropertyName, [NotNullWhen(true)] out bool result)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, innerPropertyName, out JsonElement element))
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.True:
-                    result = true;
-                    return true;
-                case JsonValueKind.False:
-                    result = false;
-                    return true;
-                case JsonValueKind.Number:
-                    result = element.TryGetInt32(out int i) ? i != 0 : element.TryGetDouble(out double d) && d != 0.0;
-                    return true;
-            }
-        result = false;
-        return false;
-    }
-    
-    [Obsolete("Do not use")]
-    public static bool TryGetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out bool value, out string? display_value)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.TryGetPropertyAsBoolean(JSON_KEY_VALUE, out value))
-        {
-            display_value = element.TryGetProperty(JSON_KEY_DISPLAY_VALUE, out JsonElement d) ? d.GetString() : null;
-            return true;
-        }
-        value = false;
-        display_value = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Gets the boolean value of a property.
-    /// </summary>
-    /// <param name="element">The source JSON object.</param>
-    /// <param name="propertyName">The property name.</param>
-    /// <param name="defaultValue">The default value to use if the property does not exist or it is not <see cref="JsonValueKind.True"/> or <see cref="JsonValueKind.False"/></param>
-    /// <returns><see langword="true" /> if the property exists and it is <see cref="JsonValueKind.True"/>; <see langword="false" /> if it is <see cref="JsonValueKind.False"/>; otherwise, the value of <paramref name="defaultValue"/>.</returns>
-    [Obsolete("Do not use")]
-    public static bool GetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, bool defaultValue = false) => jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) ? element.ValueKind switch
-    {
-        JsonValueKind.True => true,
-        JsonValueKind.False => false,
-        JsonValueKind.Number => element.TryGetInt32(out int i) ? i != 0 : element.TryGetDouble(out double d) && d != 0.0,
-        _ => defaultValue,
-    } : defaultValue;
-
-    [Obsolete("Do not use")]
-    public static bool GetPropertyAsBoolean(this JsonElement jsonObj, string propertyName, string innerPropertyName, bool defaultValue = false) => jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, innerPropertyName, out JsonElement element) ? element.ValueKind switch
-    {
-        JsonValueKind.True => true,
-        JsonValueKind.False => false,
-        JsonValueKind.Number => element.TryGetInt32(out int i) ? i != 0 : element.TryGetDouble(out double d) && d != 0.0,
-        _ => defaultValue,
-    } : defaultValue;
-
-    /// <summary>
-    /// Tries to get the string value of a property.
-    /// </summary>
-    /// <param name="jsonObj">The source JSON object.</param>
-    /// <param name="propertyName">The property name.</param>
-    /// <param name="result">The string value of the property or <see langword="null" /> if the property does not exist or it is not a <see cref="JsonValueKind.String"/>.</param>
-    /// <returns><see langword="true" /> if the property exists and it is a <see cref="JsonValueKind.String"/>; otherwise, <see langword="false" />.</returns>
-    [Obsolete("Do not use")]
-    public static bool TryGetPropertyAsString(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out string? result)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.ValueKind == JsonValueKind.String)
-            return (result = element.GetString()) is not null;
-        result = null;
-        return false;
-    }
-
-    [Obsolete("Do not use")]
-    public static bool TryGetPropertyAsString(this JsonElement jsonObj, string propertyName, string innerPropertyName, [NotNullWhen(true)] out string? result)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, innerPropertyName, out JsonElement element) && element.ValueKind == JsonValueKind.String)
-            return (result = element.GetString()) is not null;
-        result = null;
-        return false;
-    }
-
-    [Obsolete("Do not use")]
-    public static bool TryGetPropertyAsString(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out string? value, out string? display_value)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.TryGetPropertyAsString(JSON_KEY_VALUE, out value))
-        {
-            display_value = element.TryGetProperty(JSON_KEY_DISPLAY_VALUE, out JsonElement d) ? d.GetString() : null;
-            return true;
-        }
-        value = display_value = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Gets the string value of a property.
-    /// </summary>
-    /// <param name="element">The source JSON object.</param>
-    /// <param name="propertyName">The property name.</param>
-    /// <param name="defaultValue">The default value to use if the property does not exist or it is not a <see cref="JsonValueKind.String"/>.</param>
-    /// <returns>The value of the property if it exists and it is a <see cref="JsonValueKind.String"/>; otherwise, the value of <paramref name="defaultValue"/>.</returns>
-    [Obsolete("Do not use")]
-    public static string GetPropertyAsString(this JsonElement source, string propertyName, string defaultValue = "") => source.ValueKind == JsonValueKind.Object && source.TryGetProperty(propertyName, out JsonElement element) ? element.ValueKind switch
-    {
-        JsonValueKind.Null or JsonValueKind.Undefined => defaultValue,
-        _ => element.GetString() ?? defaultValue,
-    } : defaultValue;
-
-    [Obsolete("Do not use")]
-    public static string GetPropertyAsString(this JsonElement source, string propertyName, string innerPropertyName, string defaultValue) => source.ValueKind == JsonValueKind.Object && source.TryGetProperty(propertyName, innerPropertyName, out JsonElement element) ? element.ValueKind switch
-    {
-        JsonValueKind.Null or JsonValueKind.Undefined => defaultValue,
-        _ => element.GetString() ?? defaultValue,
-    } : defaultValue;
-
-    [Obsolete("Bad name")]
-    public static bool TryGetNestedValueElementAsNonEmptyString(this JsonElement source, string name, [NotNullWhen(true)] out string? result)
-    {
-        if (source.TryGetPropertyValueElement(name, out JsonElement element))
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    break;
-                default:
-                    var s = element.GetString();
-                    if (!string.IsNullOrWhiteSpace(s))
-                    {
-                        result = s;
-                        return true;
-                    }
-                    break;
-            }
-            result = null;
-            return false;
-    }
-    /// <summary>
-    /// Tries to get a non-empty string property value.
-    /// </summary>
-    /// <param name="element">The source JSON object.</param>
-    /// <param name="name">The property name.</param>
-    /// <param name="result">The non-empty string value of the property or <see langword="null" /> if the property does not exist, is not a <see cref="JsonValueKind.String"/> or is empty.</param>
-    /// <returns><see langword="true" /> if the property exists, is a <see cref="JsonValueKind.String"/>, and is not empty; otherwise, <see langword="false" />.</returns>
-    [Obsolete("Do not use")]
-    public static bool TryGetPropertyAsNonEmptyString(this JsonElement source, string name, [NotNullWhen(true)] out string? result)
-    {
-        if (source.ValueKind == JsonValueKind.Object && source.TryGetProperty(name, out JsonElement element))
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    break;
-                default:
-                    var s = element.GetString();
-                    if (!string.IsNullOrWhiteSpace(s))
-                    {
-                        result = s;
-                        return true;
-                    }
-                    break;
-            }
-            result = null;
-            return false;
-    }
-
-    [Obsolete("Do not use")]
-    public static bool TryGetPropertyAsNonEmptyString(this JsonElement source, string propertyName, string innerPropertyName, [NotNullWhen(true)] out string? result)
-    {
-        if (source.ValueKind == JsonValueKind.Object && source.TryGetProperty(propertyName, innerPropertyName, out JsonElement element))
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    break;
-                default:
-                    var s = element.GetString();
-                    if (!string.IsNullOrWhiteSpace(s))
-                    {
-                        result = s;
-                        return true;
-                    }
-                    break;
-            }
-            result = null;
-            return false;
-    }
-
-    [Obsolete("Do not use")]
-    public static bool TryGetPropertyAsNonEmptyString(this JsonElement jsonObj, string propertyName, [NotNullWhen(true)] out string? value, out string? display_value)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.TryGetPropertyAsString(JSON_KEY_VALUE, out value) && !string.IsNullOrWhiteSpace(value))
-        {
-            display_value = element.TryGetProperty(JSON_KEY_DISPLAY_VALUE, out JsonElement d) ? d.GetString() : null;
-            return true;
-        }
-        value = display_value = null;
-        return false;
-    }
-
-    [Obsolete("Bad name")]
-    public static string GetNestedValueElementAsNonEmptyString(this JsonElement source, string name, string defaultValue)
-    {
-        if (source.TryGetPropertyValueElement(name, out JsonElement element))
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    return defaultValue;
-                default:
-                    var s = element.GetString();
-                    return string.IsNullOrWhiteSpace(s) ? defaultValue : s;
-            }
-        return defaultValue;
-    }
-
-    /// <summary>
-    /// Gets the string value of a property.
-    /// </summary>
-    /// <param name="element">The source JSON object.</param>
-    /// <param name="propertyName">The property name.</param>
-    /// <param name="defaultValue">The default value to use if the property does not exist, is not a <see cref="JsonValueKind.String"/>, or is empty.</param>
-    /// <returns>The value of the property if it exists, is a <see cref="JsonValueKind.String"/>, and is not empty; otherwise, the value of <paramref name="defaultValue"/>.</returns>
-    [Obsolete("Do not use")]
-    public static string GetPropertyAsNonEmptyString(this JsonElement jsonObj, string propertyName, string defaultValue)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element))
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    return defaultValue;
-                default:
-                    var s = element.GetString();
-                    return string.IsNullOrWhiteSpace(s) ? defaultValue : s;
-            }
-        return defaultValue;
-    }
-    
-    [Obsolete("Do not use")]
-    public static string GetPropertyAsNonEmptyString(this JsonElement jsonObj, string propertyName, string innerPropertyName, string defaultValue)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, innerPropertyName, out JsonElement element))
-            switch (element.ValueKind)
-            {
-                case JsonValueKind.Null:
-                case JsonValueKind.Undefined:
-                    return defaultValue;
-                default:
-                    var s = element.GetString();
-                    return string.IsNullOrWhiteSpace(s) ? defaultValue : s;
-            }
-        return defaultValue;
-    }
-    
-    [Obsolete("Do not use")]
-    public static string GetPropertyAsNonEmptyString(this JsonElement jsonObj, string propertyName, string defaultValue, out string? display_value)
-    {
-        if (jsonObj.ValueKind == JsonValueKind.Object && jsonObj.TryGetProperty(propertyName, out JsonElement element) && element.TryGetPropertyAsString(JSON_KEY_VALUE, out string? value) && !string.IsNullOrWhiteSpace(value))
-        {
-            display_value = element.TryGetProperty(JSON_KEY_DISPLAY_VALUE, out JsonElement d) ? d.GetString() : null;
-            return value;
-        }
-        display_value = null;
-        return defaultValue;
-    }
+        HttpStatusCode.Continue => "client can continue with its request",
+        HttpStatusCode.SwitchingProtocols => "Protocol version or protocol is being changed.",
+        HttpStatusCode.Processing => "Server has accepted the complete request but hasn't completed it yet.",
+        HttpStatusCode.EarlyHints => "Server is likely to send a final response with the header fields included in the informational response.",
+        HttpStatusCode.OK => "Request succeeded.",
+        HttpStatusCode.Created => "New resource created before response was sent.",
+        HttpStatusCode.Accepted => "Request accepted for further processing.",
+        HttpStatusCode.NonAuthoritativeInformation => "Returned meta information is from a cached copy.",
+        HttpStatusCode.NoContent => "Request has been successfully processed; Response is intentionally blank.",
+        HttpStatusCode.ResetContent => "Client should reset (not reload) the current resource.",
+        HttpStatusCode.PartialContent => "Response is partial.",
+        HttpStatusCode.MultiStatus => "Multiple status codes for single response from WebDAV operation.",
+        HttpStatusCode.AlreadyReported => "Members of WebDAV binding previously enumerated in preceding multistatus response not included.",
+        HttpStatusCode.IMUsed => "Response represents result of one or more instance-manipulations applied to current instance.",
+        HttpStatusCode.Ambiguous => "Requested information has multiple representations.",
+        HttpStatusCode.Moved => "Requested information moved to URI specified in Location header.",
+        HttpStatusCode.Found or HttpStatusCode.RedirectKeepVerb or HttpStatusCode.PermanentRedirect => "Requested information is located at URI specified in Location header.",
+        HttpStatusCode.RedirectMethod => "Redirect to the specified in Location header.",
+        HttpStatusCode.NotModified => "Cached copy is up to date.",
+        HttpStatusCode.UseProxy => "Use proxy server at URI specified in Location header.",
+        HttpStatusCode.Unused => "Extension to HTTP/1.1 specification not fully specified.",
+        HttpStatusCode.BadRequest => "Request not understood.",
+        HttpStatusCode.Unauthorized => "Requested resource requires authentication.",
+        HttpStatusCode.Forbidden => "Request fulfillment refused.",
+        HttpStatusCode.NotFound => "Requested resource does not exist.",
+        HttpStatusCode.MethodNotAllowed => "Request method not allowed on requested resource.",
+        HttpStatusCode.NotAcceptable => "Accept headers not available as representation of resource.",
+        HttpStatusCode.ProxyAuthenticationRequired => "Requested proxy requires authentication.",
+        HttpStatusCode.RequestTimeout => "Request not sent within expected timeframe.",
+        HttpStatusCode.Conflict => "Request not carried out due to conflict.",
+        HttpStatusCode.Gone => "Requested resource no longer available.",
+        HttpStatusCode.LengthRequired => "Content-length header missing.",
+        HttpStatusCode.RequestedRangeNotSatisfiable => "Range of requested data cannot be returned.",
+        HttpStatusCode.ExpectationFailed => "Expect header not be met by server.",
+        HttpStatusCode.MisdirectedRequest => "Request directed at server that is not able to produce a response.",
+        HttpStatusCode.UnprocessableEntity => "Well-formed request unable to be followed due to semantic errors.",
+        HttpStatusCode.Locked => "Source or destination resource is locked.",
+        HttpStatusCode.FailedDependency => "Method couldn't be performed on resource due to dependency upon another action.",
+        HttpStatusCode.UpgradeRequired => "Client should switch to a different protocol.",
+        HttpStatusCode.PreconditionRequired => "Request must be conditional.",
+        HttpStatusCode.NotImplemented => "Requested function not supported.",
+        HttpStatusCode.BadGateway => "Proxy server received a bad response from another proxy or the origin server.",
+        HttpStatusCode.ServiceUnavailable => "Server temporarily unavailable.",
+        HttpStatusCode.GatewayTimeout => "Proxy server timed out while waiting for a response.",
+        HttpStatusCode.VariantAlsoNegotiates => "Chosen variant resource not a proper endpoint in negotiation process because is configured to engage in transparent content negotiation.",
+        HttpStatusCode.InsufficientStorage => "Server is unable to store the representation needed to complete the request.",
+        HttpStatusCode.LoopDetected => "Operation terminated due to infinite loop.",
+        HttpStatusCode.NotExtended => "Further request extensions required for fulfillment.",
+        HttpStatusCode.NetworkAuthenticationRequired => "Authentication required for network access.",
+        _ => null,
+    };
 }

@@ -17,6 +17,8 @@ internal static class Constants
     /// </summary>
     public const string DEFAULT_SQL_NOW = "(datetime('now','localtime'))";
 
+    public static readonly Uri EmptyURI = new(string.Empty, UriKind.Relative);
+
     internal const string URI_PARAM_QUERY = "sysparm_query";
 
     internal const string URI_PARAM_DISPLAY_VALUE = "sysparm_display_value";

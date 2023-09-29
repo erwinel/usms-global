@@ -17,15 +17,15 @@ public sealed class MainWorkerService : BackgroundService
     private readonly ILogger _logger;
     private readonly TypingsDbContext _dbContext;
     private readonly IOptions<AppSettings> _appSettings;
-    private readonly RemoteLoaderService _remoteLoader;
+    private readonly DataLoaderService _dataLoader;
 
     // public MainWorkerService(ILogger<MainWorkerService> logger, IHostApplicationLifetime appLifetime, IOptions<AppSettings> appSettings)
-    public MainWorkerService(ILogger<MainWorkerService> logger, TypingsDbContext dbContext, IOptions<AppSettings> appSettings, RemoteLoaderService remoteLoader)
+    public MainWorkerService(ILogger<MainWorkerService> logger, TypingsDbContext dbContext, IOptions<AppSettings> appSettings, DataLoaderService dataLoader)
     {
         _logger = logger;
         _dbContext = dbContext;
         _appSettings = appSettings;
-        _remoteLoader = remoteLoader;
+        _dataLoader = dataLoader;
         // appLifetime.ApplicationStarted.Register(OnStarted);
         // appLifetime.ApplicationStopping.Register(OnStopping);
         // appLifetime.ApplicationStopped.Register(OnStopped);
@@ -43,7 +43,7 @@ public sealed class MainWorkerService : BackgroundService
             return;
         }
 
-        if (!_remoteLoader.HasHandler)
+        if (!_dataLoader.InitSuccessful)
             return;
 
         bool isScoped = _appSettings.Value.Scoped ?? false;
@@ -89,7 +89,7 @@ public sealed class MainWorkerService : BackgroundService
                 if (stoppingToken.IsCancellationRequested)
                     return;
                 var tableInfo = await _dbContext.Tables.Include(t => t.SuperClass).Include(t => t.Scope).FirstOrDefaultAsync(t => t.Name == name, stoppingToken);
-                if (tableInfo is null && (tableInfo = await _remoteLoader.GetTableByNameAsync(name, stoppingToken)) is not null)
+                if (tableInfo is null && (tableInfo = await _dataLoader.GetTableByNameAsync(name, stoppingToken)) is not null)
                     toRender.Add(tableInfo);
             }
             if (stoppingToken.IsCancellationRequested)
