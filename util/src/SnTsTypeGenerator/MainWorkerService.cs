@@ -89,7 +89,7 @@ public sealed class MainWorkerService : BackgroundService
                 if (stoppingToken.IsCancellationRequested)
                     return;
                 var tableInfo = await _dbContext.Tables.Include(t => t.SuperClass).Include(t => t.Scope).FirstOrDefaultAsync(t => t.Name == name, stoppingToken);
-                if (tableInfo is null && (tableInfo = await _remoteLoader.GetTableByName(name, stoppingToken)) is not null)
+                if (tableInfo is null && (tableInfo = await _remoteLoader.GetTableByNameAsync(name, stoppingToken)) is not null)
                     toRender.Add(tableInfo);
             }
             if (stoppingToken.IsCancellationRequested)

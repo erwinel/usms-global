@@ -2,8 +2,8 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static SnTsTypeGenerator.Constants;
@@ -18,8 +18,8 @@ public sealed class RemoteLoaderService
     private readonly HttpClientHandler? _handler;
     private readonly Uri _remoteUri;
     private SourceInfo? _source;
-    private Dictionary<string, string> _scopeMap = new(StringComparer.InvariantCultureIgnoreCase);
-    private Dictionary<string, string> _tableMap = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, string> _scopeMap = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, string> _tableMap = new(StringComparer.InvariantCultureIgnoreCase);
 
     internal bool HasHandler => _handler is not null;
 
@@ -30,6 +30,8 @@ public sealed class RemoteLoaderService
             string fqdn = _remoteUri.Host;
             if ((_source = await _dbContext.Sources.FirstOrDefaultAsync(s => s.FQDN == fqdn, cancellationToken)) is null)
             {
+                if (cancellationToken.IsCancellationRequested)
+                    return null!;
                 _source = new()
                 {
                     FQDN = fqdn,
@@ -38,19 +40,31 @@ public sealed class RemoteLoaderService
                     LastAccessed = DateTime.Now
                 };
                 await _dbContext.Sources.AddAsync(_source, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    return null!;
                 await _dbContext.SaveChangesAsync(cancellationToken);
             }
         }
         return _source;
     }
 
-
-    private async Task<SysScope?> ScopeFromElementAsync(JsonElement element, CancellationToken cancellationToken)
+    private async Task<SysScope?> DeserializeScopeAsync(JsonObject? sysScopeResult, Uri requestUri, CancellationToken cancellationToken)
     {
-        if (!(element.TryGetPropertyAsNonEmptyString(JSON_KEY_SYS_ID, JSON_KEY_VALUE, out string? sys_id) && element.TryGetPropertyAsNonEmptyString(JSON_KEY_SCOPE, JSON_KEY_VALUE, out string? value)))
+        if (sysScopeResult is null || cancellationToken.IsCancellationRequested)
             return null;
-        value = value.ToLower();
+        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
+        {
+            _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_ELEMENT, sysScopeResult);
+            return null;
+        }
+        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
+        {
+            _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_SYS_ID, sysScopeResult);
+            return null;
+        }
         var scope = await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         if (scope is not null)
         {
             if (!_scopeMap.ContainsKey(sys_id))
@@ -61,70 +75,318 @@ public sealed class RemoteLoaderService
         {
             SysID = sys_id,
             Value = value,
-            Name = element.GetPropertyAsNonEmptyString(JSON_KEY_NAME, JSON_KEY_VALUE, value),
-            ShortDescription = element.GetPropertyAsString(JSON_KEY_SHORT_DESCRIPTION),
+            Name = sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
+            ShortDescription = sysScopeResult.GetFieldAsNonEmptyOrNull(JSON_KEY_SHORT_DESCRIPTION),
             LastUpdated = DateTime.Now,
             Source = await GetSourceAsync(cancellationToken)
         };
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         await _dbContext.Scopes.AddAsync(scope, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         await _dbContext.SaveChangesAsync(cancellationToken);
         if (!_scopeMap.ContainsKey(sys_id))
             _scopeMap.Add(sys_id, scope.Value);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         return scope;
     }
 
-    private async Task<TableInfo?> TableFromElementAsync(JsonElement element, bool checkDb, CancellationToken cancellationToken)
+    private async Task DeserializeElementAsync(JsonNode? sysDictionaryResult, int index, TableInfo table, Uri requestUri, CancellationToken cancellationToken)
     {
-        if (!(element.TryGetPropertyAsNonEmptyString(JSON_KEY_SYS_ID, JSON_KEY_VALUE, out string? sys_id) && element.TryGetPropertyAsNonEmptyString(JSON_KEY_NAME, JSON_KEY_VALUE, out string? name)))
+        if (cancellationToken.IsCancellationRequested || sysDictionaryResult is null)
+            return;
+        if (sysDictionaryResult is not JsonObject jsonObject)
+        {
+            _logger.LogInvalidResultElementType(requestUri, sysDictionaryResult, index);
+            return;
+        }
+        if (!jsonObject.TryGetFieldAsNonEmpty(JSON_KEY_ELEMENT, out string? name))
+            _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_ELEMENT, index, jsonObject);
+        else if (!jsonObject.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
+            _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_SYS_ID, index, jsonObject);
+        else
+        {
+            GlideType? type = await GetGlideTypeAsync(jsonObject.GetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, TYPE_NAME_STRING, out string? type_display_value), type_display_value, cancellationToken);
+            if (type is null)
+                return;
+            SysPackage? package;
+            if (jsonObject.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? node) && node is JsonObject pkg)
+            {
+                package = await DeserializePackageAsync(pkg, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+            }
+            else
+                package = null;
+            SysScope? scope;
+            if (jsonObject.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? id))
+            {
+                scope = await GetScopeByIDAsync(id, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+            }
+            else
+                scope = null;
+            ElementInfo elementInfo = new()
+            {
+                SysID = sys_id,
+                Name = name,
+                IsActive = jsonObject.GetFieldAsBoolean(JSON_KEY_ACTIVE),
+                IsArray = jsonObject.GetFieldAsBoolean(JSON_KEY_ACTIVE),
+                MaxLength = jsonObject.GetFieldAsInt(JSON_KEY_MAX_LENGTH),
+                SizeClass = jsonObject.GetFieldAsInt(JSON_KEY_SIZECLASS),
+                Comments = jsonObject.GetFieldAsNonEmptyOrNull(JSON_KEY_COMMENTS),
+                DefaultValue = jsonObject.GetFieldAsNonEmptyOrNull(JSON_KEY_DEFAULT_VALUE),
+                IsDisplay = jsonObject.GetFieldAsBoolean(JSON_KEY_DISPLAY),
+                IsMandatory = jsonObject.GetFieldAsBoolean(JSON_KEY_MANDATORY),
+                IsPrimary = jsonObject.GetFieldAsBoolean(JSON_KEY_PRIMARY),
+                IsReadOnly = jsonObject.GetFieldAsBoolean(JSON_KEY_READ_ONLY),
+                IsCalculated = jsonObject.GetFieldAsBoolean(JSON_KEY_VIRTUAL),
+                IsUnique = jsonObject.GetFieldAsBoolean(JSON_KEY_UNIQUE),
+                Type = type,
+                LastUpdated = DateTime.Now,
+                Table = table,
+                Package = package,
+                Scope = scope,
+                Source = await GetSourceAsync(cancellationToken)
+            };
+            if (cancellationToken.IsCancellationRequested)
+                return;
+            await _dbContext.Elements.AddAsync(elementInfo, cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+                return;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            if (!cancellationToken.IsCancellationRequested)
+                table.Elements.Add(elementInfo);
+        }
+    }
+
+    private async Task<GlideType?> GetGlideTypeAsync(string name, string? label, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
             return null;
-        name = name.ToLower();
+        GlideType? glideType = await _dbContext.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        if (glideType is not null)
+            return glideType;
+        Uri requestUri = _remoteUri.ToTableApiUri(TABLE_NAME_SYS_GLIDE_OBJECT, JSON_KEY_NAME, name);
+        string? responseBody = await _handler.GetJsonResponseAsync(requestUri, _logger, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        if (string.IsNullOrWhiteSpace(responseBody))
+        {
+            _logger.LogInvalidHttpResponse(requestUri, responseBody ?? "");
+            return null;
+        }
+        JsonObject responseObj;
+        try
+        {
+            using JsonDocument doc = JsonDocument.Parse(responseBody);
+            if (doc.RootElement.ValueKind != JsonValueKind.Object)
+            {
+                _logger.LogInvalidResponseType(requestUri, doc.RootElement.ValueKind, responseBody);
+                return null;
+            }
+            responseObj = JsonObject.Create(doc.RootElement) ?? throw new InvalidOperationException("Could not parse as JSON object.");
+        }
+        catch (JsonException exception)
+        {
+            _logger.LogJsonCouldNotBeParsed(requestUri, responseBody, exception);
+            return null;
+        }
+        if (!responseObj.TryGetPropertyValue(JSON_KEY_RESULT, out JsonNode? jsonNode))
+            _logger.LogResponseResultPropertyNotFound(requestUri, responseBody);
+        else if (jsonNode is null)
+            _logger.LogNoResultsFromQuery(requestUri, responseBody);
+        else
+        {
+            if (jsonNode is not JsonObject resultObj)
+            {
+                if (jsonNode is not JsonArray arr)
+                {
+                    _logger.LogInvalidResponseType(requestUri, jsonNode.GetType(), responseBody);
+                    return null;
+                }
+                int length = arr.Count;
+                if (length == 0)
+                {
+                    _logger.LogNoResultsFromQuery(requestUri, responseBody);
+                    return null;
+                }
+                if (length> 1)
+                    _logger.LogMultipleResponseItems(requestUri, length - 1, responseBody);
+                
+                if ((jsonNode = arr[0]) is not JsonObject)
+                {
+                    _logger.LogInvalidResultElementType(requestUri, jsonNode, 0);
+                    return null;
+                }
+                resultObj = (JsonObject)jsonNode;
+            }
+            SysPackage? package;
+            if (resultObj.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? node) && node is JsonObject pkg)
+            {
+                package = await DeserializePackageAsync(pkg, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    return null;
+            }
+            else
+                package = null;
+            SysScope? scope;
+            if (resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? id))
+            {
+                scope = await GetScopeByIDAsync(id, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    return null;
+            }
+            else
+                scope = null;
+            glideType = new()
+            {
+                Name = resultObj.GetFieldAsNonEmpty(JSON_KEY_NAME, name),
+                SysID = resultObj.GetFieldAsNonEmpty(JSON_KEY_SYS_ID),
+                Label = resultObj.GetFieldAsNonEmpty(JSON_KEY_LABEL, string.IsNullOrWhiteSpace(label) ? name : label),
+                ScalarType = responseObj.GetFieldAsNonEmptyOrNull(JSON_KEY_SCALAR_TYPE),
+                ScalarLength = responseObj.GetFieldAsIntOrNull(JSON_KEY_SCALAR_LENGTH),
+                ClassName = responseObj.GetFieldAsNonEmptyOrNull(JSON_KEY_CLASS_NAME),
+                UseOriginalValue = responseObj.GetFieldAsBoolean(JSON_KEY_USE_ORIGINAL_VALUE),
+                IsVisible = responseObj.GetFieldAsBoolean(JSON_KEY_VISIBLE),
+                Scope = scope,
+                Package = package,
+                Source = await GetSourceAsync(cancellationToken),
+                LastUpdated = DateTime.Now
+            };
+        }
+        if (glideType is null)
+        {
+            if (name == TYPE_NAME_STRING)
+                return null;
+            glideType = new()
+            {
+                Name = name,
+                Label = string.IsNullOrWhiteSpace(label) ? name : label,
+                ScalarType = TYPE_NAME_STRING,
+                Source = await GetSourceAsync(cancellationToken),
+                LastUpdated = DateTime.Now
+            };
+        }
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        await _dbContext.Types.AddAsync(glideType, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return cancellationToken.IsCancellationRequested ? null : glideType;
+    }
+
+    private async Task<SysPackage?> DeserializePackageAsync(JsonObject packageFieldElement, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested || !packageFieldElement.TryGetPropertyAsNonEmpty(JSON_KEY_DISPLAY_VALUE, out string? pkgName))
+            return null;
+        SysPackage? package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == pkgName, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        if (package is not null)
+            return package;
+        package = new()
+        {
+            Name = pkgName,
+            Value = packageFieldElement.GetPropertyAsNonEmpty(JSON_KEY_VALUE),
+            Source = await GetSourceAsync(cancellationToken),
+            LastUpdated = DateTime.Now
+        };
+        await _dbContext.Packages.AddAsync(package, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return cancellationToken.IsCancellationRequested ? null : package;
+    }
+
+    private async Task<TableInfo?> DeserializeTableAsync(JsonObject? sysDbObjectResult, Uri requestUri, bool checkDb, CancellationToken cancellationToken)
+    {
+        if (sysDbObjectResult is null || cancellationToken.IsCancellationRequested)
+            return null;
+        if (!sysDbObjectResult.TryGetFieldAsNonEmpty(JSON_KEY_NAME, out string? name))
+        {
+            _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_ELEMENT, sysDbObjectResult);
+            return null;
+        }
+        if (!sysDbObjectResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
+        {
+            _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_SYS_ID, sysDbObjectResult);
+            return null;
+        }
         TableInfo? tableInfo;
         if (checkDb && (tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken)) is not null)
         {
             if (!_tableMap.ContainsKey(sys_id))
                 _tableMap.Add(sys_id, tableInfo.Name);
-            return tableInfo;
+            return cancellationToken.IsCancellationRequested ? null : tableInfo;
         }
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         SysPackage? package;
-        if (element.TryGetPropertyAsNonEmptyString(JSON_KEY_SYS_PACKAGE, JSON_KEY_DISPLAY_VALUE, out string? pkgName) &&
-            (package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == pkgName, cancellationToken)) is null)
+        if (sysDbObjectResult.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? node) && node is JsonObject pkg)
         {
-            package = new()
-            {
-                Name = pkgName,
-                Value = element.GetPropertyAsString(JSON_KEY_VALUE),
-                Source = await GetSourceAsync(cancellationToken),
-                LastUpdated = DateTime.Now
-            };
-            await _dbContext.Packages.AddAsync(package, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            package = await DeserializePackageAsync(pkg, cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+                return null;
         }
         else
             package = null;
+        SysScope? scope;
+        if (sysDbObjectResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? id))
+        {
+            scope = await GetScopeByIDAsync(id, cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+                return null;
+        }
+        else
+            scope = null;
         tableInfo = new()
         {
             SysID = sys_id,
             Name = name,
-            IsExtendable = element.GetPropertyAsBoolean(JSON_KEY_IS_EXTENDABLE, JSON_KEY_VALUE),
-            Label = element.GetPropertyAsString(JSON_KEY_LABEL, JSON_KEY_VALUE, name),
-            NumberPrefix = element.TryGetPropertyAsNonEmptyString(JSON_KEY_NUMBER_REF, JSON_KEY_DISPLAY_VALUE, out string? f) ? f : null,
-            Scope = await _handler!.GetLinkedObjectAsync(element, JSON_KEY_SCOPE,
-                async n => await _dbContext.Scopes.FindAsync(n), e => Task.FromResult(SysScope.FromElement(e)), _logger, cancellationToken),
+            IsExtendable = sysDbObjectResult.GetFieldAsBoolean(JSON_KEY_IS_EXTENDABLE),
+            Label = sysDbObjectResult.GetFieldAsNonEmpty(JSON_KEY_LABEL, name),
+            NumberPrefix = (sysDbObjectResult.TryGetPropertyValue(JSON_KEY_NUMBER_REF, out node) && node is JsonObject obj) ? obj.CoercePropertyAsNonEmptyOrNull(JSON_KEY_DISPLAY_VALUE) : null,
+            Scope = scope,
             Package = package,
-            Source = _source,
+            Source = await GetSourceAsync(cancellationToken),
             LastUpdated = DateTime.Now
         };
-        _dbContext.Tables.Add(tableInfo);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        await _dbContext.Tables.AddAsync(tableInfo, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         await _dbContext.SaveChangesAsync(cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         if (!_tableMap.ContainsKey(sys_id))
             _tableMap.Add(sys_id, tableInfo.Name);
-        if (element.TryGetPropertyAsNonEmptyString(JSON_KEY_SUPER_CLASS, JSON_KEY_VALUE, out sys_id) && (tableInfo.SuperClass = await GetTableByID(sys_id, cancellationToken)) is not null)
+        TableInfo? superClass;
+        if (sysDbObjectResult.TryGetFieldAsNonEmpty(JSON_KEY_SUPER_CLASS, out id) && (superClass = await GetTableByIDAsync(id, cancellationToken)) is not null)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                return null;
+            tableInfo.SuperClass = superClass;
             await _dbContext.SaveChangesAsync(cancellationToken);
-        var requestUri = _remoteUri.ToTableApiUri(TABLE_NAME_SYS_DICTIONARY, JSON_KEY_NAME, name);
+            if (cancellationToken.IsCancellationRequested)
+                return null;
+        }
+        else
+            superClass = null;
+        requestUri = _remoteUri.ToTableApiUri(TABLE_NAME_SYS_DICTIONARY, JSON_KEY_NAME, name);
         using HttpClient httpClient = new(_handler!);
         HttpRequestMessage message = new(HttpMethod.Get, requestUri);
         message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
         using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         try { response.EnsureSuccessStatusCode(); }
         catch (HttpRequestException exception)
         {
@@ -138,31 +400,240 @@ public sealed class RemoteLoaderService
             _logger.LogGetResponseContentFailed(response.RequestMessage!.RequestUri!, exception);
             return null;
         }
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         if (string.IsNullOrWhiteSpace(responseBody))
         {
             _logger.LogInvalidHttpResponse(requestUri, responseBody);
             return null;
         }
-        JsonDocument doc;
-        try { doc = JsonDocument.Parse(responseBody); }
+        JsonObject responseObj;
+        try
+        {
+            using JsonDocument doc = JsonDocument.Parse(responseBody);
+            if (doc.RootElement.ValueKind != JsonValueKind.Object)
+            {
+                _logger.LogInvalidResponseType(requestUri, doc.RootElement.ValueKind, responseBody);
+                return null;
+            }
+            responseObj = JsonObject.Create(doc.RootElement) ?? throw new InvalidOperationException("Could not parse as JSON object.");
+        }
         catch (JsonException exception)
         {
             _logger.LogJsonCouldNotBeParsed(requestUri, responseBody, exception);
             return null;
         }
-        
-        using (doc)
+        if (!responseObj.TryGetPropertyValue(JSON_KEY_RESULT, out JsonNode? jsonNode) || jsonNode is null)
+            _logger.LogResponseResultPropertyNotFound(requestUri, responseBody);
+        else if (jsonNode is not JsonArray arr)
+            _logger.LogInvalidResponseType(requestUri, jsonNode.GetType(), responseBody);
+        else
         {
-            // if (doc.RootElement.ValueKind == JsonValueKind.Object)
-            // {
-            //     TableInfo? tableInfo = await TableFromElementAsync(doc.RootElement, checkDb, cancellationToken);
-            //     if (tableInfo is not null)
-            //         return tableInfo;
-            // }
-            // _logger.LogInvalidHttpResponse(requestUri, responseBody ?? "");
+            int length = arr.Count;
+                if (length < 1)
+                    return tableInfo;
+            for (int index = 0; index < length; index++)
+            {
+                await DeserializeElementAsync(arr[index], index, tableInfo, requestUri, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    return null;
+            }
+            if (superClass is not null)
+            {
+                ElementInfo[] toRemove = tableInfo.Elements.Where(e => superClass.Elements.Any(s => e.OptionsEqualTo(s))).ToArray();
+                if (toRemove.Length > 0)
+                {
+                    foreach (ElementInfo e in toRemove)
+                    {
+                        tableInfo.Elements.Remove(e);
+                        _dbContext.Elements.Remove(e);
+                    }
+                    await _dbContext.SaveChangesAsync(cancellationToken);
+                    if (cancellationToken.IsCancellationRequested)
+                        return null;
+                }
+            }
+        }
+        return tableInfo;
+    }
+    
+    private async Task<TableInfo?> GetTableFromUri(Uri requestUri, bool checkDb, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        using HttpClient httpClient = new(_handler!);
+        HttpRequestMessage message = new(HttpMethod.Get, requestUri);
+        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+        using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        try { response.EnsureSuccessStatusCode(); }
+        catch (HttpRequestException exception)
+        {
+            _logger.LogHttpRequestFailed(response.RequestMessage!.RequestUri!, exception);
+            return null;
+        }
+        string responseBody;
+        try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
+        catch (Exception exception)
+        {
+            _logger.LogGetResponseContentFailed(response.RequestMessage!.RequestUri!, exception);
+            return null;
+        }
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        if (string.IsNullOrWhiteSpace(responseBody))
+        {
+            _logger.LogInvalidHttpResponse(requestUri, responseBody);
+            return null;
+        }
+        JsonObject responseObj;
+        try
+        {
+            using JsonDocument doc = JsonDocument.Parse(responseBody);
+            if (doc.RootElement.ValueKind != JsonValueKind.Object)
+            {
+                _logger.LogInvalidResponseType(requestUri, doc.RootElement.ValueKind, responseBody);
+                return null;
+            }
+            responseObj = JsonObject.Create(doc.RootElement) ?? throw new InvalidOperationException("Could not parse as JSON object.");
+        }
+        catch (JsonException exception)
+        {
+            _logger.LogJsonCouldNotBeParsed(requestUri, responseBody, exception);
+            return null;
+        }
+        if (!responseObj.TryGetPropertyValue(JSON_KEY_RESULT, out JsonNode? jsonNode))
+        {
+            _logger.LogResponseResultPropertyNotFound(requestUri, responseBody);
+            return null;
+        }
+        if (jsonNode is null)
+        {
+            _logger.LogNoResultsFromQuery(requestUri, responseBody);
+            return null;
+        }
+        if (jsonNode is not JsonObject resultObj)
+        {
+            if (jsonNode is not JsonArray arr)
+            {
+                _logger.LogInvalidResponseType(requestUri, jsonNode.GetType(), responseBody);
+                return null;
+            }
+            int length = arr.Count;
+            if (length == 0)
+            {
+                _logger.LogNoResultsFromQuery(requestUri, responseBody);
+                return null;
+            }
+            if (length> 1)
+                _logger.LogMultipleResponseItems(requestUri, length - 1, responseBody);
+            
+            if ((jsonNode = arr[0]) is not JsonObject)
+            {
+                _logger.LogInvalidResultElementType(requestUri, jsonNode, 0);
+                return null;
+            }
+            resultObj = (JsonObject)jsonNode;
+        }
+        
+        TableInfo? tableInfo = await DeserializeTableAsync(resultObj, requestUri, checkDb, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        if (tableInfo is not null)
+            return tableInfo;
+        _logger.LogInvalidHttpResponse(requestUri, responseBody ?? "");
+        return null;
+    }
+    
+    public async Task<TableInfo?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
+    {
+        if (_handler is null || cancellationToken.IsCancellationRequested)
+            return null;
+        name = name.ToLower();
+        var tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        if (tableInfo is not null)
+            return tableInfo;
+        return await GetTableFromUri(_remoteUri.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name), false, cancellationToken);
+    }
+
+    private async Task<SysScope?> GetScopeByIDAsync(string id, CancellationToken cancellationToken)
+    {
+        if (_handler is null || cancellationToken.IsCancellationRequested)
+            return null;
+        SysScope? scope;
+        if (_scopeMap.TryGetValue(id, out string? name) && (scope = await _dbContext.Scopes.FirstOrDefaultAsync(t => t.Name == name, cancellationToken)) is not null)
+            return cancellationToken.IsCancellationRequested ? null : scope;
+        id = id.ToLower();
+        if ((scope = await _dbContext.Scopes.FirstOrDefaultAsync(t => t.SysID == id, cancellationToken)) is not null)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                return null;
+            if (!_scopeMap.ContainsKey(id))
+                _scopeMap.Add(id, scope.Name);
+            return scope;
+        }
+        Uri requestUri = _remoteUri.ToTableApiUri(TABLE_NAME_SYS_SCOPE, id);
+        string? responseBody = await _handler.GetJsonResponseAsync(requestUri, _logger, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        if (string.IsNullOrWhiteSpace(responseBody))
+        {
+            _logger.LogInvalidHttpResponse(requestUri, responseBody ?? "");
+            return null;
+        }
+        JsonObject responseObj;
+        try
+        {
+            using JsonDocument doc = JsonDocument.Parse(responseBody);
+            if (doc.RootElement.ValueKind != JsonValueKind.Object)
+            {
+                _logger.LogInvalidResponseType(requestUri, doc.RootElement.ValueKind, responseBody);
+                return null;
+            }
+            responseObj = JsonObject.Create(doc.RootElement) ?? throw new InvalidOperationException("Could not parse as JSON object.");
+        }
+        catch (JsonException exception)
+        {
+            _logger.LogJsonCouldNotBeParsed(requestUri, responseBody, exception);
+            return null;
+        }
+        if (!responseObj.TryGetPropertyValue(JSON_KEY_RESULT, out JsonNode? jsonNode))
+            _logger.LogResponseResultPropertyNotFound(requestUri, responseBody);
+        else if (jsonNode is null)
+            _logger.LogNoResultsFromQuery(requestUri, responseBody);
+        else if (jsonNode is not JsonObject resultObj)
+            _logger.LogInvalidResponseType(requestUri, jsonNode.GetType(), responseBody);
+        else
+        {
+            if ((scope = await DeserializeScopeAsync(resultObj, requestUri, cancellationToken)) is not null)
+                return cancellationToken.IsCancellationRequested ? null : scope;
+            if (cancellationToken.IsCancellationRequested)
+                return null;
+            _logger.LogInvalidHttpResponse(requestUri, responseBody);
         }
         return null;
-        return tableInfo;
+    }
+    
+    private async Task<TableInfo?> GetTableByIDAsync(string id, CancellationToken cancellationToken)
+    {
+        if (_handler is null || cancellationToken.IsCancellationRequested)
+            return null;
+        TableInfo? tableInfo;
+        if (_tableMap.TryGetValue(id, out string? name) && (tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken)) is not null)
+            return cancellationToken.IsCancellationRequested ? null : tableInfo;
+        id = id.ToLower();
+        if ((tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.SysID == id, cancellationToken)) is not null)
+        {
+            if (!_tableMap.ContainsKey(id))
+                _tableMap.Add(id, tableInfo.Name);
+            return cancellationToken.IsCancellationRequested ? null : tableInfo;
+        }
+        if (cancellationToken.IsCancellationRequested)
+            return null;
+        return await GetTableFromUri(_remoteUri.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, id), true, cancellationToken);
     }
 
     public RemoteLoaderService(ILogger<RemoteLoaderService> logger, TypingsDbContext dbContext, IOptions<AppSettings> appSettings)
@@ -249,131 +720,4 @@ public sealed class RemoteLoaderService
         }
     }
 
-    private async Task<TableInfo?> GetTableFromUri(Uri requestUri, bool checkDb, CancellationToken cancellationToken)
-    {
-        using HttpClient httpClient = new(_handler!);
-        HttpRequestMessage message = new(HttpMethod.Get, requestUri);
-        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-        using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
-        try { response.EnsureSuccessStatusCode(); }
-        catch (HttpRequestException exception)
-        {
-            _logger.LogHttpRequestFailed(response.RequestMessage!.RequestUri!, exception);
-            return null;
-        }
-        string responseBody;
-        try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
-        catch (Exception exception)
-        {
-            _logger.LogGetResponseContentFailed(response.RequestMessage!.RequestUri!, exception);
-            return null;
-        }
-        if (string.IsNullOrWhiteSpace(responseBody))
-        {
-            _logger.LogInvalidHttpResponse(requestUri, responseBody);
-            return null;
-        }
-        JsonDocument doc;
-        try { doc = JsonDocument.Parse(responseBody); }
-        catch (JsonException exception)
-        {
-            _logger.LogJsonCouldNotBeParsed(requestUri, responseBody, exception);
-            return null;
-        }
-        
-        using (doc)
-        {
-            // BUG: root element is "result", and may either be an array or object
-            if (doc.RootElement.ValueKind == JsonValueKind.Object)
-            {
-                TableInfo? tableInfo = await TableFromElementAsync(doc.RootElement, checkDb, cancellationToken);
-                if (tableInfo is not null)
-                    return tableInfo;
-            }
-            _logger.LogInvalidHttpResponse(requestUri, responseBody ?? "");
-        }
-        return null;
-    }
-    
-    public async Task<TableInfo?> GetTableByName(string name, CancellationToken cancellationToken)
-    {
-        if (_handler is null || cancellationToken.IsCancellationRequested)
-            return null;
-        name = name.ToLower();
-        var tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        if (tableInfo is not null)
-            return tableInfo;
-        return await GetTableFromUri(_remoteUri.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name), false, cancellationToken);
-    }
-    
-    private async Task<SysScope?> GetScopeByID(string id, CancellationToken cancellationToken)
-    {
-        if (_handler is null || cancellationToken.IsCancellationRequested)
-            return null;
-        SysScope? scope;
-        if (_scopeMap.TryGetValue(id, out string? name) && (scope = await _dbContext.Scopes.FirstOrDefaultAsync(t => t.Name == name, cancellationToken)) is not null)
-            return scope;
-        id = id.ToLower();
-        if ((scope = await _dbContext.Scopes.FirstOrDefaultAsync(t => t.SysID == id, cancellationToken)) is not null)
-        {
-            if (!_scopeMap.ContainsKey(id))
-                _scopeMap.Add(id, scope.Name);
-            return scope;
-        }
-        using HttpClient httpClient = new(_handler!);
-        Uri requestUri = _remoteUri.ToTableApiUri(TABLE_NAME_SYS_SCOPE, id);
-        HttpRequestMessage message = new(HttpMethod.Get, requestUri);
-        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-        using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
-        try { response.EnsureSuccessStatusCode(); }
-        catch (HttpRequestException exception)
-        {
-            _logger.LogHttpRequestFailed(response.RequestMessage!.RequestUri!, exception);
-            return null;
-        }
-        string responseBody;
-        try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
-        catch (Exception exception)
-        {
-            _logger.LogGetResponseContentFailed(response.RequestMessage!.RequestUri!, exception);
-            return null;
-        }
-        if (string.IsNullOrWhiteSpace(responseBody))
-        {
-            _logger.LogInvalidHttpResponse(requestUri, responseBody);
-            return null;
-        }
-        JsonDocument doc;
-        try { doc = JsonDocument.Parse(responseBody); }
-        catch (JsonException exception)
-        {
-            _logger.LogJsonCouldNotBeParsed(requestUri, responseBody, exception);
-            return null;
-        }
-        
-        using (doc)
-        {
-            // BUG: root element is "result"
-            if (doc.RootElement.ValueKind == JsonValueKind.Object || (scope = await ScopeFromElementAsync(doc.RootElement, cancellationToken)) is null)
-                _logger.LogInvalidHttpResponse(requestUri, responseBody ?? "");
-        }
-        return scope;
-    }
-    
-    private async Task<TableInfo?> GetTableByID(string id, CancellationToken cancellationToken)
-    {
-        if (_handler is null || cancellationToken.IsCancellationRequested)
-            return null;
-        TableInfo? tableInfo;
-        if (_tableMap.TryGetValue(id, out string? name) && (tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken)) is not null)
-            return tableInfo;
-        id = id.ToLower();
-        if ((tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.SysID == id, cancellationToken)) is not null)
-        {
-            if (!_tableMap.ContainsKey(id))
-                _tableMap.Add(id, tableInfo.Name);
-            return tableInfo;
-        }
-        return await GetTableFromUri(_remoteUri.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, id), true, cancellationToken);
-    }
 }

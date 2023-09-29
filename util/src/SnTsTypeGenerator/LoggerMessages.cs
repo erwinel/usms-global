@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
+using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -561,6 +563,189 @@ public static class LoggerMessages
     public static void LogDbSaveChangesCompletedTrace(this ILogger logger, bool isAsync, bool? acceptAllChangesOnSuccess, int returnValue) => _dbSaveChangesCompletedTrace(logger, isAsync ?
         (acceptAllChangesOnSuccess.HasValue ? $"SaveChangesAsync({acceptAllChangesOnSuccess.Value})" : "SaveChangesAsync()") :
         acceptAllChangesOnSuccess.HasValue ? $"SaveChanges({acceptAllChangesOnSuccess.Value})" : "SaveChanges()", returnValue, null);
+    
+    #endregion
+
+    
+    #region InvalidResponseType Error (0x0020)
+    
+    /// <summary>
+    // Numerical event code for InvalidResponseType.
+    /// </summary>
+    public const int EVENT_ID_InvalidResponseType = 0x0020;
+    
+    /// <summary>
+    // Event ID for InvalidResponseType.
+    /// </summary>
+    public static readonly EventId InvalidResponseType = new(EVENT_ID_InvalidResponseType, nameof(InvalidResponseType));
+    
+    private static readonly Action<ILogger, Uri, string, string, Exception?> _invalidResponseType = LoggerMessage.Define<Uri, string, string>(LogLevel.Error, InvalidResponseType,
+        "Response from  retuned unexecpected type . Actual Result: {URI} {Type} {Result}");
+    
+    /// <summary>
+    /// Logs an InvalidResponseType event with event code 0x0020.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The request URI.</param>
+    /// <param name="type">The unexpected type.</param>
+    /// <param name="response">The actual response.</param>
+    public static void LogInvalidResponseType(this ILogger logger, Uri uri, Type type, string response) => _invalidResponseType(logger, uri, type.Name, response, null);
+
+    public static void LogInvalidResponseType(this ILogger logger, Uri uri, JsonValueKind type, string response) => logger.LogInvalidResponseType(uri, type switch
+    {
+        JsonValueKind.Object => typeof(JsonObject),
+        JsonValueKind.Array => typeof(JsonArray),
+        _ => typeof(JsonValue),
+    }, response);
+
+    #endregion
+
+    #region ResponseResultPropertyNotFound Error (0x0021)
+
+    /// <summary>
+    // Numerical event code for ResponseResultPropertyNotFound.
+    /// </summary>
+    public const int EVENT_ID_ResponseResultPropertyNotFoundError = 0x0021;
+    
+    /// <summary>
+    // Event ID for ResponseResultPropertyNotFound.
+    /// </summary>
+    public static readonly EventId ResponseResultPropertyNotFoundError = new(EVENT_ID_ResponseResultPropertyNotFoundError, nameof(ResponseResultPropertyNotFoundError));
+    
+    private static readonly Action<ILogger, Uri, string, Exception?> _responseResultPropertyNotFoundError = LoggerMessage.Define<Uri, string>(LogLevel.Error, ResponseResultPropertyNotFoundError,
+        $"Response from  {{URI}} did not contain a property named \"{JSON_KEY_RESULT}\". Actual Response: {{Response}}");
+    
+    /// <summary>
+    /// Logs an ResponseResultPropertyNotFound event with event code 0x0021.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The request URI.</param>
+    /// <param name="response">The actual response.</param>
+    public static void LogResponseResultPropertyNotFound(this ILogger logger, Uri uri, string response) => _responseResultPropertyNotFoundError(logger, uri, response.ToString(), null);
+    
+    #endregion
+
+    #region NoResultsFromQuery Error (0x0022)
+    
+    /// <summary>
+    // Numerical event code for NoResultsFromQuery.
+    /// </summary>
+    public const int EVENT_ID_NoResultsFromQuery = 0x0022;
+    
+    /// <summary>
+    // Event ID for NoResultsFromQuery.
+    /// </summary>
+    public static readonly EventId NoResultsFromQuery = new(EVENT_ID_NoResultsFromQuery, nameof(NoResultsFromQuery));
+    
+    private static readonly Action<ILogger, Uri, string, Exception?> _noResultsFromQuery = LoggerMessage.Define<Uri, string>(LogLevel.Error, NoResultsFromQuery,
+        "Response from {URI} returned no results. Actual response: {Response}");
+    
+    /// <summary>
+    /// Logs an NoResultsFromQuery event with event code 0x0022.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The request URI.</param>
+    /// <param name="response">The actual response.</param>
+    public static void LogNoResultsFromQuery(this ILogger logger, Uri uri, string response) => _noResultsFromQuery(logger, uri, response.ToString(), null);
+    
+    #endregion
+
+    #region MultipleResponseItems Warning (0x0023)
+    
+    /// <summary>
+    // Numerical event code for MultipleResponseItems.
+    /// </summary>
+    public const int EVENT_ID_MultipleResponseItems = 0x0023;
+    
+    /// <summary>
+    // Event ID for MultipleResponseItems.
+    /// </summary>
+    public static readonly EventId MultipleResponseItems = new(EVENT_ID_MultipleResponseItems, nameof(MultipleResponseItems));
+    
+    private static readonly Action<ILogger, Uri, int, string, Exception?> _multipleResponseItems = LoggerMessage.Define<Uri, int, string>(LogLevel.Warning, MultipleResponseItems,
+        "Response from  returned  additional values. Actual response: {URI} {AdditionalCount} {Response}");
+    
+    /// <summary>
+    /// Logs an MultipleResponseItems event with event code 0x0023.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The request URI.</param>
+    /// <param name="additionalCount">The number of additional elements.</param>
+    /// <param name="response">The actual response.</param>
+    public static void LogMultipleResponseItems(this ILogger logger, Uri uri, int additionalCount, string response) => _multipleResponseItems(logger, uri, additionalCount, response.ToString(), null);
+    
+    #endregion
+
+    #region InvalidResultElementType Error (0x0024)
+    
+    /// <summary>
+    // Numerical event code for InvalidResultElementType.
+    /// </summary>
+    public const int EVENT_ID_InvalidResultElementType = 0x0024;
+    
+    /// <summary>
+    // Event ID for InvalidResultElementType.
+    /// </summary>
+    public static readonly EventId InvalidResultElementType = new(EVENT_ID_InvalidResultElementType, nameof(InvalidResultElementType));
+    
+    private static readonly Action<ILogger, Uri, string, int, string, Exception?> _invalidResultElementType = LoggerMessage.Define<Uri, string, int, string>(LogLevel.Error, InvalidResultElementType,
+        "Response from {URI} had an unexpected type {Type} at index {Index}. Actual element: {JSON}");
+
+    /// <summary>
+    /// Logs an InvalidResultElementType event with event code 0x0024.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The request URI.</param>
+    /// <param name="type">The unexpected type.</param>
+    /// <param name="index">The element index.</param>
+    /// <param name="response">The actual element.</param>
+    public static void LogInvalidResultElementType(this ILogger logger, Uri uri, JsonNode? element, int index)
+    {
+        if (element is null)
+            _invalidResultElementType(logger, uri, "null", index, "", null);
+        else
+            _invalidResultElementType(logger, uri, element.GetType().Name, index, element.ToJsonString(), null);
+    }
+
+    #endregion
+
+    #region ExpectedPropertyNotFound Error (0x0025)
+    
+    /// <summary>
+    // Numerical event code for ExpectedPropertyNotFound.
+    /// </summary>
+    public const int EVENT_ID_ExpectedPropertyNotFoundError = 0x0025;
+    
+    /// <summary>
+    // Event ID for ExpectedPropertyNotFound.
+    /// </summary>
+    public static readonly EventId ExpectedPropertyNotFoundError = new(EVENT_ID_ExpectedPropertyNotFoundError, nameof(ExpectedPropertyNotFoundError));
+    
+    private static readonly Action<ILogger, Uri, string, int, string, Exception?> _expectedPropertyNotFoundError1 = LoggerMessage.Define<Uri, string, int, string>(LogLevel.Error, ExpectedPropertyNotFoundError,
+        "Response from {URI} is missing property {PropertyName} at index {Index}. Actual response: {Response}");
+    
+    private static readonly Action<ILogger, Uri, string, string, Exception?> _expectedPropertyNotFoundError2 = LoggerMessage.Define<Uri, string, string>(LogLevel.Error, ExpectedPropertyNotFoundError,
+        "Response from {URI} is missing property {PropertyName}. Actual response: {Response}");
+    
+    /// <summary>
+    /// Logs an ExpectedPropertyNotFound event with event code 0x0025.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The request URI.</param>
+    /// <param name="propertyname">The name of the missing field.</param>
+    /// <param name="index">The index of the result item.</param>
+    /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
+    public static void LogExpectedPropertyNotFoundError(this ILogger logger, Uri uri, string propertyname, int index, JsonObject element) => _expectedPropertyNotFoundError1(logger, uri, propertyname, index, element.ToJsonString(), null);
+    
+    /// <summary>
+    /// Logs an ExpectedPropertyNotFound event with event code 0x0025.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The request URI.</param>
+    /// <param name="propertyname">The name of the missing field.</param>
+    /// <param name="response">The actual response.</param>
+    /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
+    public static void LogExpectedPropertyNotFoundError(this ILogger logger, Uri uri, string propertyname, JsonObject element) => _expectedPropertyNotFoundError2(logger, uri, propertyname, element.ToJsonString(), null);
     
     #endregion
 }

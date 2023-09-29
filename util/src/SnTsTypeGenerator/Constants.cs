@@ -59,6 +59,11 @@ internal static class Constants
     /// <summary>
     /// "Sys ID" Column (element) name.
     /// </summary>
+    internal const string JSON_KEY_RESULT = "result";
+    
+    /// <summary>
+    /// "Sys ID" Column (element) name.
+    /// </summary>
     internal const string JSON_KEY_SYS_ID = "sys_id";
     
     /// <summary>
