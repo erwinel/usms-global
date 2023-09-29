@@ -231,6 +231,7 @@ public static class ExtensionMethods
     public static async Task<JsonNode?> GetAPIJsonResult(this HttpClientHandler handler, Uri requestUri, ILogger logger, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        logger.LogAPIRequestStart(requestUri);
         using HttpClient httpClient = new(handler);
         HttpRequestMessage message = new(HttpMethod.Get, requestUri);
         message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
@@ -243,10 +244,11 @@ public static class ExtensionMethods
         catch (Exception exception) { throw new GetResponseContentFailedException(requestUri, exception); }
         cancellationToken.ThrowIfCancellationRequested();
         if (string.IsNullOrWhiteSpace(responseBody)) { throw new InvalidHttpResponseException(requestUri, responseBody); }
+        JsonNode? result;
         try
         {
             using JsonDocument doc = JsonDocument.Parse(responseBody);
-            return doc.RootElement.ValueKind switch
+            result = doc.RootElement.ValueKind switch
             {
                 JsonValueKind.Undefined or JsonValueKind.Null => null,
                 JsonValueKind.Array => JsonArray.Create(doc.RootElement),
@@ -255,6 +257,8 @@ public static class ExtensionMethods
             };
         }
         catch (JsonException exception) { throw new ResponseParsingException(requestUri, responseBody, exception); }
+        logger.LogAPIRequestCompleted(requestUri, result);
+        return result;
     }
     
     /// <summary>

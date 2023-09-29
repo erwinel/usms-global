@@ -233,12 +233,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region Critical OutputFileAlreadyExists Error (0x0010)
+    #region Critical OutputFileAlreadyExists Error (0x000a)
     
     /// <summary>
     /// Numerical event code for an already-existing output file.
     /// </summary>
-    public const int EVENT_ID_OutputFileAlreadyExists = 0x0010;
+    public const int EVENT_ID_OutputFileAlreadyExists = 0x000a;
     
     /// <summary>
     /// Event ID for an already-existing output file.
@@ -249,7 +249,7 @@ public static class LoggerMessages
         "File {Path}");
     
     /// <summary>
-    /// Logs an already-existing output file event (OutputFileAlreadyExists) with event code 0x0010.
+    /// Logs an already-existing output file event (OutputFileAlreadyExists) with event code 0x000a.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="path">The path of the file.</param>
@@ -258,12 +258,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region Critical OutputFileAccess Error (0x0011)
+    #region Critical OutputFileAccess Error (0x000b)
     
     /// <summary>
     /// Numerical event code for output file access error.
     /// </summary>
-    public const int EVENT_ID_OutputFileAccessError = 0x0011;
+    public const int EVENT_ID_OutputFileAccessError = 0x000b;
     
     /// <summary>
     /// Event ID for output file access error.
@@ -277,7 +277,7 @@ public static class LoggerMessages
         "Error accessing output file {Path}: {Message}");
 
     /// <summary>
-    /// Logs an output file access error event (OutputFileAccessError) with event code 0x0011.
+    /// Logs an output file access error event (OutputFileAccessError) with event code 0x000b.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="path">The path of the output file.</param>
@@ -285,7 +285,7 @@ public static class LoggerMessages
     public static void LogOutputFileAccessError(this ILogger logger, string path, Exception? error = null) => _outputFileAccessError1(logger, path, error);
     
     /// <summary>
-    /// Logs an output file access error event (OutputFileAccessError) with event code 0x0011.
+    /// Logs an output file access error event (OutputFileAccessError) with event code 0x000b.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="path">The path of the output file.</param>
@@ -294,12 +294,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region HttpRequestFailed Error (0x0012)
+    #region HttpRequestFailed Error (0x000c)
     
     /// <summary>
     /// Numerical event code for HTTP request failure.
     /// </summary>
-    public const int EVENT_ID_HttpRequestFailed = 0x0012;
+    public const int EVENT_ID_HttpRequestFailed = 0x000c;
     
     /// <summary>
     /// Event ID for HTTP request failure.
@@ -318,7 +318,7 @@ public static class LoggerMessages
     "Remote request {URI} failed with error code {ErrorCode} ({Description}): {Message}");
     
     /// <summary>
-    /// Logs an HTTP request failure event (HttpRequestFailed) with event code 0x0012.
+    /// Logs an HTTP request failure event (HttpRequestFailed) with event code 0x000c.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI that failed.</param>
@@ -342,12 +342,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region GetResponseContentFailed Error (0x0013)
+    #region GetResponseContentFailed Error (0x000d)
     
     /// <summary>
     /// Numerical event code for HTTP response parsing error.
     /// </summary>
-    public const int EVENT_ID_GetResponseContentFailed = 0x0013;
+    public const int EVENT_ID_GetResponseContentFailed = 0x000d;
     
     /// <summary>
     /// Event ID for HTTP response parsing error.
@@ -358,7 +358,7 @@ public static class LoggerMessages
         "Failed to get text-based content from remote URI {URI}");
     
     /// <summary>
-    /// Logs a HTTP response parsing error event (GetResponseContentFailed) with event code 0x0013.
+    /// Logs a HTTP response parsing error event (GetResponseContentFailed) with event code 0x000d.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request uri.</param>
@@ -367,12 +367,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region JsonCouldNotBeParsed Error (0x0014)
+    #region JsonCouldNotBeParsed Error (0x000e)
     
     /// <summary>
     /// Numerical event code for JSON parsing error.
     /// </summary>
-    public const int EVENT_ID_JsonCouldNotBeParsed = 0x0014;
+    public const int EVENT_ID_JsonCouldNotBeParsed = 0x000e;
     
     /// <summary>
     /// Event ID for JSON parsing error.
@@ -383,7 +383,7 @@ public static class LoggerMessages
         "Unable to parse response from {URI}; Content: {Content}");
     
     /// <summary>
-    /// Logs a JSON parsing error event (JsonCouldNotBeParsed) with event code 0x0014.
+    /// Logs a JSON parsing error event (JsonCouldNotBeParsed) with event code 0x000e.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
@@ -393,12 +393,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region InvalidHttpResponse Error (0x0015)
+    #region InvalidHttpResponse Error (0x000f)
     
     /// <summary>
     /// Numerical event code for invalid HTTP response.
     /// </summary>
-    public const int EVENT_ID_InvalidHttpResponse = 0x0015;
+    public const int EVENT_ID_InvalidHttpResponse = 0x000f;
     
     /// <summary>
     /// Event ID for invalid HTTP response.
@@ -409,13 +409,13 @@ public static class LoggerMessages
         "Response from {URI} did not match the expected type; Content: {Content}");
     
     /// <summary>
-    /// Logs an invalid HTTP response event (InvalidHttpResponse) with event code 0x0015.
+    /// Logs an invalid HTTP response event (InvalidHttpResponse) with event code 0x000f.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
-    /// <param name="content">The response text.</param>
+    /// <param name="response">The response text.</param>
     /// <param name="error">The exception that caused the event</param>
-    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, string content) => _invalidHttpResponse(logger, uri, content, null);
+    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, JsonNode? response) => _invalidHttpResponse(logger, uri, (response is null) ? "null" : response.ToJsonString(), null);
 
     #endregion
 
@@ -445,12 +445,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region ValidatingEntity Trace (0x0016)
+    #region ValidatingEntity Trace (0x0010)
     
     /// <summary>
     // Numerical event code for ValidatingEntity.
     /// </summary>
-    public const int EVENT_ID_ValidatingEntity = 0x0016;
+    public const int EVENT_ID_ValidatingEntity = 0x0010;
     
     /// <summary>
     // Event ID for ValidatingEntity.
@@ -461,7 +461,7 @@ public static class LoggerMessages
         "Validating {State} {Name} {Entity}");
     
     /// <summary>
-    /// Logs a ValidatingEntity event with event code 0x0016.
+    /// Logs a ValidatingEntity event with event code 0x0010.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="state">The entity state while being validated.</param>
@@ -481,12 +481,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region EntityValidationFailure Error (0x0017)
+    #region EntityValidationFailure Error (0x0011)
     
     /// <summary>
     // Numerical event code for EntityValidationFailure.
     /// </summary>
-    public const int EVENT_ID_EntityValidationFailure = 0x0017;
+    public const int EVENT_ID_EntityValidationFailure = 0x0011;
     
     /// <summary>
     // Event ID for EntityValidationFailure.
@@ -500,7 +500,7 @@ public static class LoggerMessages
         "Error Validating {Name} [{Properties}] ({ValidationMessage}) {Entity}");
     
     /// <summary>
-    /// Logs an EntityValidationFailure event with event code 0x0017.
+    /// Logs an EntityValidationFailure event with event code 0x0011.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="metadata">The entity metadata.</param>
@@ -527,12 +527,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region ValidationCompleted Trace (0x0018)
+    #region ValidationCompleted Trace (0x0012)
     
     /// <summary>
     // Numerical event code for ValidationCompleted.
     /// </summary>
-    public const int EVENT_ID_ValidationCompleted = 0x0018;
+    public const int EVENT_ID_ValidationCompleted = 0x0012;
     
     /// <summary>
     // Event ID for ValidationCompleted.
@@ -543,7 +543,7 @@ public static class LoggerMessages
         "Validation for {State} {Name} {Entity}");
     
     /// <summary>
-    /// Logs a ValidationCompleted event with event code 0x0018.
+    /// Logs a ValidationCompleted event with event code 0x0012.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="state">The entity state during validation.</param>
@@ -563,12 +563,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region DbSaveChangesCompleted Trace (0x0019)
+    #region DbSaveChangesCompleted Trace (0x0013)
     
     /// <summary>
     // Numerical event code for DbSaveChangesCompleted.
     /// </summary>
-    public const int EVENT_ID_DbSaveChangesCompletedTrace = 0x0019;
+    public const int EVENT_ID_DbSaveChangesCompletedTrace = 0x0013;
     
     /// <summary>
     // Event ID for DbSaveChangesCompleted.
@@ -579,7 +579,7 @@ public static class LoggerMessages
         "Message {MethodSignature} {ReturnValue}");
     
     /// <summary>
-    /// Logs an DbSaveChangesCompleted event with event code 0x0019.
+    /// Logs an DbSaveChangesCompleted event with event code 0x0013.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="methodSignature">The first event parameter.</param>
@@ -591,12 +591,12 @@ public static class LoggerMessages
     #endregion
 
     
-    #region InvalidResponseType Error (0x0020)
+    #region InvalidResponseType Error (0x0014)
     
     /// <summary>
     // Numerical event code for InvalidResponseType.
     /// </summary>
-    public const int EVENT_ID_InvalidResponseType = 0x0020;
+    public const int EVENT_ID_InvalidResponseType = 0x0014;
     
     /// <summary>
     // Event ID for InvalidResponseType.
@@ -610,7 +610,7 @@ public static class LoggerMessages
         "Response from {URI} retuned unexpected type {Type}. Actual Result: {Result}");
     
     /// <summary>
-    /// Logs an InvalidResponseType event with event code 0x0020.
+    /// Logs an InvalidResponseType event with event code 0x0014.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
@@ -626,12 +626,12 @@ public static class LoggerMessages
 
     #endregion
 
-    #region ResponseResultPropertyNotFound Error (0x0021)
+    #region ResponseResultPropertyNotFound Error (0x0015)
 
     /// <summary>
     // Numerical event code for ResponseResultPropertyNotFound.
     /// </summary>
-    public const int EVENT_ID_ResponseResultPropertyNotFoundError = 0x0021;
+    public const int EVENT_ID_ResponseResultPropertyNotFoundError = 0x0015;
     
     /// <summary>
     // Event ID for ResponseResultPropertyNotFound.
@@ -642,7 +642,7 @@ public static class LoggerMessages
         $"Response from  {{URI}} did not contain a property named \"{JSON_KEY_RESULT}\". Actual Response: {{Response}}");
     
     /// <summary>
-    /// Logs an ResponseResultPropertyNotFound event with event code 0x0021.
+    /// Logs an ResponseResultPropertyNotFound event with event code 0x0015.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
@@ -651,12 +651,12 @@ public static class LoggerMessages
 
     #endregion
 
-    #region NoResultsFromQuery Error (0x0022)
+    #region NoResultsFromQuery Error (0x0016)
     
     /// <summary>
     // Numerical event code for NoResultsFromQuery.
     /// </summary>
-    public const int EVENT_ID_NoResultsFromQuery = 0x0022;
+    public const int EVENT_ID_NoResultsFromQuery = 0x0016;
     
     /// <summary>
     // Event ID for NoResultsFromQuery.
@@ -667,7 +667,7 @@ public static class LoggerMessages
         "Response from {URI} returned no results. Actual response: {Response}");
     
     /// <summary>
-    /// Logs an NoResultsFromQuery event with event code 0x0022.
+    /// Logs an NoResultsFromQuery event with event code 0x0016.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
@@ -676,12 +676,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region MultipleResponseItems Warning (0x0023)
+    #region MultipleResponseItems Warning (0x0017)
     
     /// <summary>
     // Numerical event code for MultipleResponseItems.
     /// </summary>
-    public const int EVENT_ID_MultipleResponseItems = 0x0023;
+    public const int EVENT_ID_MultipleResponseItems = 0x0017;
     
     /// <summary>
     // Event ID for MultipleResponseItems.
@@ -692,7 +692,7 @@ public static class LoggerMessages
         "Response from  returned  additional values. Actual response: {URI} {AdditionalCount} {Response}");
     
     /// <summary>
-    /// Logs an MultipleResponseItems event with event code 0x0023.
+    /// Logs an MultipleResponseItems event with event code 0x0017.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
@@ -702,12 +702,12 @@ public static class LoggerMessages
     
     #endregion
 
-    #region InvalidResultElementType Error (0x0024)
+    #region InvalidResultElementType Error (0x0018)
     
     /// <summary>
     // Numerical event code for InvalidResultElementType.
     /// </summary>
-    public const int EVENT_ID_InvalidResultElementType = 0x0024;
+    public const int EVENT_ID_InvalidResultElementType = 0x0018;
     
     /// <summary>
     // Event ID for InvalidResultElementType.
@@ -718,7 +718,7 @@ public static class LoggerMessages
         "Response from {URI} had an unexpected type {Type} at index {Index}. Actual element: {JSON}");
 
     /// <summary>
-    /// Logs an InvalidResultElementType event with event code 0x0024.
+    /// Logs an InvalidResultElementType event with event code 0x0018.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
@@ -735,12 +735,12 @@ public static class LoggerMessages
 
     #endregion
 
-    #region ExpectedPropertyNotFound Error (0x0025)
+    #region ExpectedPropertyNotFound Error (0x0019)
     
     /// <summary>
     // Numerical event code for ExpectedPropertyNotFound.
     /// </summary>
-    public const int EVENT_ID_ExpectedPropertyNotFoundError = 0x0025;
+    public const int EVENT_ID_ExpectedPropertyNotFoundError = 0x0019;
     
     /// <summary>
     // Event ID for ExpectedPropertyNotFound.
@@ -754,7 +754,7 @@ public static class LoggerMessages
         "Response from {URI} is missing property {PropertyName}. Actual response: {Response}");
     
     /// <summary>
-    /// Logs an ExpectedPropertyNotFound event with event code 0x0025.
+    /// Logs an ExpectedPropertyNotFound event with event code 0x0019.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
@@ -764,7 +764,7 @@ public static class LoggerMessages
     public static void LogExpectedPropertyNotFoundError(this ILogger logger, Uri uri, string propertyname, int index, JsonObject element) => _expectedPropertyNotFoundError1(logger, uri, propertyname, index, element.ToJsonString(), null);
     
     /// <summary>
-    /// Logs an ExpectedPropertyNotFound event with event code 0x0025.
+    /// Logs an ExpectedPropertyNotFound event with event code 0x0019.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
@@ -772,6 +772,175 @@ public static class LoggerMessages
     /// <param name="response">The actual response.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
     public static void LogExpectedPropertyNotFoundError(this ILogger logger, Uri uri, string propertyname, JsonObject element) => _expectedPropertyNotFoundError2(logger, uri, propertyname, element.ToJsonString(), null);
+    
+    #endregion
+
+    #region APIRequestStart Trace (0x001a)
+    
+    /// <summary>
+    // Numerical event code for APIRequestStart.
+    /// </summary>
+    public const int EVENT_ID_APIRequestStart = 0x001a;
+    
+    /// <summary>
+    // Event ID for APIRequestStart.
+    /// </summary>
+    public static readonly EventId APIRequestStart = new(EVENT_ID_APIRequestStart, nameof(APIRequestStart));
+    
+    private static readonly Action<ILogger, Uri, Exception?> _apiRequestStart = LoggerMessage.Define<Uri>(LogLevel.Trace, APIRequestStart,
+        "Sending API request to {URI}");
+    
+    /// <summary>
+    /// Logs an APIRequestStart event with event code 0x001a.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The API requst URL.</param>
+    public static void LogAPIRequestStart(this ILogger logger, Uri uri) => _apiRequestStart(logger, uri, null);
+    
+    #endregion
+
+    #region APIRequestCompleted Trace (0x001b)
+    
+    /// <summary>
+    // Numerical event code for APIRequestCompleted.
+    /// </summary>
+    public const int EVENT_ID_APIRequestCompleted = 0x001b;
+    
+    /// <summary>
+    // Event ID for APIRequestCompleted.
+    /// </summary>
+    public static readonly EventId APIRequestCompleted = new(EVENT_ID_APIRequestCompleted, nameof(APIRequestCompleted));
+    
+    private static readonly Action<ILogger, Uri, string, Exception?> _apirequestCompleted = LoggerMessage.Define<Uri, string>(LogLevel.Trace, APIRequestCompleted,
+        "API request  returned {URL} {Result}");
+    
+    /// <summary>
+    /// Logs an APIRequestCompleted event with event code 0x001b.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="url">The request URL.</param>
+    /// <param name="result">The parsed API result.</param>
+    public static void LogAPIRequestCompleted(this ILogger logger, Uri url, JsonNode? result) => _apirequestCompleted(logger, url, (result is null) ? "null" : result.ToJsonString(), null);
+    
+    #endregion
+
+    #region GettingTableByNameFromRemote Trace (0x001c)
+    
+    /// <summary>
+    // Numerical event code for GettingTableByNameFromRemote.
+    /// </summary>
+    public const int EVENT_ID_GettingTableByNameFromRemote = 0x001c;
+    
+    /// <summary>
+    // Event ID for GettingTableByNameFromRemote.
+    /// </summary>
+    public static readonly EventId GettingTableByNameFromRemote = new(EVENT_ID_GettingTableByNameFromRemote, nameof(GettingTableByNameFromRemote));
+    
+    private static readonly Action<ILogger, string, Exception?> _gettingTableByNameFromRemote = LoggerMessage.Define<string>(LogLevel.Trace, GettingTableByNameFromRemote,
+        "Getting table by name {Name} from remote instance.");
+    
+    /// <summary>
+    /// Logs an GettingTableByNameFromRemote event with event code 0x001c.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="name">The name of the table being looked up.</param>
+    public static void LogGettingTableByNameFromRemote(this ILogger logger, string name) => _gettingTableByNameFromRemote(logger, name, null);
+    
+    #endregion
+
+    #region GettingTableBySysIdFromRemote Trace (0x001d)
+    
+    /// <summary>
+    // Numerical event code for GettingTableBySysIdFromRemote.
+    /// </summary>
+    public const int EVENT_ID_GettingTableBySysIdFromRemot = 0x001d;
+    
+    /// <summary>
+    // Event ID for GettingTableBySysIdFromRemote.
+    /// </summary>
+    public static readonly EventId GettingTableBySysIdFromRemote = new(EVENT_ID_GettingTableBySysIdFromRemot, nameof(GettingTableBySysIdFromRemote));
+    
+    private static readonly Action<ILogger, string, Exception?> _gettingTableBySysIdFromRemote = LoggerMessage.Define<string>(LogLevel.Trace, GettingTableBySysIdFromRemote,
+        "Getting table by Sys ID {SysID} from remote instance.");
+    
+    /// <summary>
+    /// Logs an GettingTableBySysIdFromRemote event with event code 0x001d.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="sysID">The Sys ID of the table to look up.</param>
+    public static void LogGettingTableBySysIdFromRemote(this ILogger logger, string sysID) => _gettingTableBySysIdFromRemote(logger, sysID, null);
+    
+    #endregion
+
+    #region GettingElementsByTableNameFromRemote Trace (0x001e)
+    
+    /// <summary>
+    // Numerical event code for GettingElementsByTableNameFromRemote.
+    /// </summary>
+    public const int EVENT_ID_GettingElementsByTableNameFromRemote = 0x001e;
+    
+    /// <summary>
+    // Event ID for GettingElementsByTableNameFromRemote.
+    /// </summary>
+    public static readonly EventId GettingElementsByTableNameFromRemote = new(EVENT_ID_GettingElementsByTableNameFromRemote, nameof(GettingElementsByTableNameFromRemote));
+    
+    private static readonly Action<ILogger, string, Exception?> _gettingElementsByTableNameFromRemote = LoggerMessage.Define<string>(LogLevel.Trace, GettingElementsByTableNameFromRemote,
+        "Getting elements from remote instance with table name {TableName}.");
+    
+    /// <summary>
+    /// Logs an GettingElementsByTableNameFromRemote event with event code 0x001e.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="tableName">The name of the table.</param>
+    public static void LogGettingElementsByTableNameFromRemote(this ILogger logger, string tableName) => _gettingElementsByTableNameFromRemote(logger, tableName, null);
+    
+    #endregion
+
+    #region GettingScopeByIdentifierFromRemote Trace (0x001f)
+    
+    /// <summary>
+    // Numerical event code for GettingScopeByIdentifierFromRemote.
+    /// </summary>
+    public const int EVENT_ID_GettingScopeByIdentifierFromRemote = 0x001f;
+    
+    /// <summary>
+    // Event ID for GettingScopeByIdentifierFromRemote.
+    /// </summary>
+    public static readonly EventId GettingScopeByIdentifierFromRemote = new(EVENT_ID_GettingScopeByIdentifierFromRemote, nameof(GettingScopeByIdentifierFromRemote));
+    
+    private static readonly Action<ILogger, string, Exception?> _gettingScopeByIdentifierFromRemote = LoggerMessage.Define<string>(LogLevel.Trace, GettingScopeByIdentifierFromRemote,
+        "Getting scope by unique identifier {Identifer} from remote instance.");
+    
+    /// <summary>
+    /// Logs an GettingScopeByIdentifierFromRemote event with event code 0x001f.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="identifer">The unique identifier of the sys_scope.</param>
+    public static void LogGettingScopeByIdentifierFromRemote(this ILogger logger, string identifer) => _gettingScopeByIdentifierFromRemote(logger, identifer, null);
+    
+    #endregion
+
+    #region GettingTypeByNameFromRemote Trace (0x0020)
+    
+    /// <summary>
+    // Numerical event code for GettingTypeByNameFromRemote.
+    /// </summary>
+    public const int EVENT_ID_GettingTypeByNameFromRemoteTrace = 0x0020;
+    
+    /// <summary>
+    // Event ID for GettingTypeByNameFromRemote.
+    /// </summary>
+    public static readonly EventId GettingTypeByNameFromRemoteTrace = new(EVENT_ID_GettingTypeByNameFromRemoteTrace, nameof(GettingTypeByNameFromRemoteTrace));
+    
+    private static readonly Action<ILogger, string, Exception?> _gettingTypeByNameFromRemoteTrace = LoggerMessage.Define<string>(LogLevel.Trace, GettingTypeByNameFromRemoteTrace,
+        "Getting type by name {TypeName} from remote instance.");
+    
+    /// <summary>
+    /// Logs an GettingTypeByNameFromRemote event with event code 0x0020.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="typeName">The name of the sys_glide_object.</param>
+    public static void LogGettingTypeByNameFromRemoteTrace(this ILogger logger, string typeName) => _gettingTypeByNameFromRemoteTrace(logger, typeName, null);
     
     #endregion
 }

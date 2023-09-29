@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Mime;
-using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +17,10 @@ public sealed class TableAPIService : IDisposable
     private HttpClientHandler? _handler;
 
     public bool HasHandler => _handler is  not null;
-    
+
     public Uri BaseURI { get; }
 
-    internal bool IsInitialized() => BaseURI.IsAbsoluteUri && _handler is not null;
+    internal bool InitSuccessful => BaseURI.IsAbsoluteUri && _handler is not null;
 
     private SysPackage? GetPackage(JsonObject resultObj) => (resultObj.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? jsonNode) && jsonNode is JsonObject packageFieldElement && packageFieldElement.TryGetPropertyAsNonEmpty(JSON_KEY_DISPLAY_VALUE, out string? pkgName)) ? new SysPackage() { Name = pkgName, SysId = packageFieldElement.GetPropertyAsNonEmpty(JSON_KEY_VALUE), SourceFqdn = BaseURI.Host } : null;
 
@@ -31,11 +30,9 @@ public sealed class TableAPIService : IDisposable
 
     private async Task<TableInfo?> GetTableFromUri(Uri requestUri, CancellationToken cancellationToken)
     {
-        JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
-        if (jsonNode is null)
-            throw new InvalidHttpResponseException(requestUri, string.Empty);
+        JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken) ?? throw new InvalidHttpResponseException(requestUri, null);
         if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode.ToJsonString());
+            throw new InvalidHttpResponseException(requestUri, jsonNode);
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
             throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
         if (jsonNode is null)
@@ -89,6 +86,7 @@ public sealed class TableAPIService : IDisposable
             throw new ObjectDisposedException(nameof(TableAPIService));
         if (!BaseURI.IsAbsoluteUri)
             throw new InvalidOperationException();
+        _logger.LogGettingTableByNameFromRemote(name);
         return await GetTableFromUri(BaseURI.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name), cancellationToken);
     }
 
@@ -99,7 +97,7 @@ public sealed class TableAPIService : IDisposable
             throw new ObjectDisposedException(nameof(TableAPIService));
         if (!BaseURI.IsAbsoluteUri)
             throw new InvalidOperationException();
-        ;
+        _logger.LogGettingTableBySysIdFromRemote(sys_id);
         return await GetTableFromUri(BaseURI.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, sys_id), cancellationToken);
     }
 
@@ -110,6 +108,7 @@ public sealed class TableAPIService : IDisposable
             throw new ObjectDisposedException(nameof(TableAPIService));
         if (!BaseURI.IsAbsoluteUri)
             throw new InvalidOperationException();
+        _logger.LogGettingElementsByTableNameFromRemote(tableName);
         Uri requestUri = BaseURI.ToTableApiUri(TABLE_NAME_SYS_DICTIONARY, JSON_KEY_NAME, tableName);
         JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
         if (jsonNode is null)
@@ -169,6 +168,7 @@ public sealed class TableAPIService : IDisposable
             throw new ObjectDisposedException(nameof(TableAPIService));
         if (!BaseURI.IsAbsoluteUri)
             throw new InvalidOperationException();
+        _logger.LogGettingScopeByIdentifierFromRemote(id);
         Uri requestUri = BaseURI.ToTableApiUri(TABLE_NAME_SYS_SCOPE, id);
         JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
         if (jsonNode is null)
@@ -212,6 +212,7 @@ public sealed class TableAPIService : IDisposable
             throw new ObjectDisposedException(nameof(TableAPIService));
         if (!BaseURI.IsAbsoluteUri)
             throw new InvalidOperationException();
+        _logger.LogGettingTypeByNameFromRemoteTrace(name);
         Uri requestUri = BaseURI.ToTableApiUri(TABLE_NAME_SYS_GLIDE_OBJECT, JSON_KEY_NAME, name);
         JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
         if (jsonNode is null)
@@ -357,67 +358,5 @@ public sealed class TableAPIService : IDisposable
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
-    }
-}
-
-[Serializable]
-internal class ExpectedPropertyNotFound : Exception
-{
-    private Uri requestUri;
-    private JsonObject resultObj;
-    private string jSON_KEY_SYS_ID;
-
-    public ExpectedPropertyNotFound()
-    {
-    }
-
-    public ExpectedPropertyNotFound(string? message) : base(message)
-    {
-    }
-
-    public ExpectedPropertyNotFound(string? message, Exception? innerException) : base(message, innerException)
-    {
-    }
-
-    public ExpectedPropertyNotFound(Uri requestUri, JsonObject resultObj, string jSON_KEY_SYS_ID)
-    {
-        this.requestUri = requestUri;
-        this.resultObj = resultObj;
-        this.jSON_KEY_SYS_ID = jSON_KEY_SYS_ID;
-    }
-
-    protected ExpectedPropertyNotFound(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
-}
-
-[Serializable]
-internal class InvalidResultElementType : Exception
-{
-    private Uri requestUri;
-    private JsonObject resultObj;
-    private int v;
-
-    public InvalidResultElementType()
-    {
-    }
-
-    public InvalidResultElementType(string? message) : base(message)
-    {
-    }
-
-    public InvalidResultElementType(string? message, Exception? innerException) : base(message, innerException)
-    {
-    }
-
-    public InvalidResultElementType(Uri requestUri, JsonObject resultObj, int v)
-    {
-        this.requestUri = requestUri;
-        this.resultObj = resultObj;
-        this.v = v;
-    }
-
-    protected InvalidResultElementType(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
     }
 }

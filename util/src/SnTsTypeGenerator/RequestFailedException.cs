@@ -26,6 +26,10 @@ internal class RequestFailedException : Exception, ILogTrackable
 
     public RequestFailedException(string? message) : base(message) => RequestUri = EmptyURI;
 
+    internal RequestFailedException(Uri requestUri) => RequestUri = requestUri;
+
+    internal RequestFailedException(Uri requestUri, string? message) : base(message) => RequestUri = requestUri;
+
     internal RequestFailedException(Uri requestUri, HttpRequestException? innerException) : this(requestUri, null, innerException) { }
 
     internal RequestFailedException(Uri requestUri, string? message, HttpRequestException? innerException) : base(message, innerException) => RequestUri = requestUri;

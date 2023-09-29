@@ -26,9 +26,15 @@ internal class InvalidResponseTypeException : Exception, ILogTrackable
 
     public InvalidResponseTypeException(string? message) : base(message) => (RequestUri, Result) = (EmptyURI, null);
 
-    public InvalidResponseTypeException(Uri requestUri, JsonObject result, string? message = null, Exception? innerException = null) : base(message, innerException) => (RequestUri, Result) = (requestUri, result);
-
     public InvalidResponseTypeException(string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Result) = (EmptyURI, null);
+
+    public InvalidResponseTypeException(Uri requestUri, JsonObject result) => (RequestUri, Result) = (requestUri, result);
+
+    public InvalidResponseTypeException(Uri requestUri, JsonObject result, string? message) : base(message) => (RequestUri, Result) = (requestUri, result);
+
+    public InvalidResponseTypeException(Uri requestUri, JsonObject result, Exception? innerException) : this(requestUri, result, null, innerException) { }
+
+    public InvalidResponseTypeException(Uri requestUri, JsonObject result, string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Result) = (requestUri, result);
 
     protected InvalidResponseTypeException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
@@ -37,7 +43,7 @@ internal class InvalidResponseTypeException : Exception, ILogTrackable
         if (string.IsNullOrWhiteSpace(value))
             Result = null;
         else
-            try { Result = JsonObject.Parse(value); }
+            try { Result = JsonNode.Parse(value); }
             catch { Result = null; }
         RequestUri = string.IsNullOrEmpty(value = info.GetString(nameof(RequestUri))) ? EmptyURI : Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) ? uri : new Uri(value, UriKind.Relative);
     }
