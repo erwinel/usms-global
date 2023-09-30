@@ -443,8 +443,6 @@ public class ElementInfo
         }
     }
 
-    internal bool OptionsEqualTo(ElementInfo other) => ReferenceEquals(this, other) || (Name == other.Name && TypeName == other.TypeName && RefTableName == other.RefTableName);
-
     internal async Task RenderJsDocGlobalAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
