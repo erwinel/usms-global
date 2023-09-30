@@ -89,14 +89,16 @@ public sealed class MainWorkerService : BackgroundService
         }
         tableName = tableInfo.GetShortName();
         await writer.WriteLineAsync();
-        await writer.WriteLineAsync("/**");
-        if (tableName == tableInfo.Name)
-            await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(tableInfo.Label) || tableInfo.Label == tableName) ? tableName : tableInfo.Label.SmartQuoteJson())} glide record fields.");
-        else
-            await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(tableInfo.Label) || tableInfo.Label == tableName) ? tableName : tableInfo.Label.SmartQuoteJson())} ({tableInfo.Name}) glide record fields.");
-        await writer.WriteLineAsync($" * @see {{@link {tableInfo.GetGlideRecordTypeString(@namespace)}}}");
-        await writer.WriteLineAsync($" * @see {{@link {tableInfo.GetGlideElementTypeString(@namespace)}}}");
-        await writer.WriteLineAsync(" */");
+        await writer.WriteLinesAsync(cancellationToken,
+            "/**",
+            (tableName == tableInfo.Name) ?
+                $" * {((string.IsNullOrWhiteSpace(tableInfo.Label) || tableInfo.Label == tableName) ? tableName : tableInfo.Label.SmartQuoteJson())} glide record fields." :
+                $" * {((string.IsNullOrWhiteSpace(tableInfo.Label) || tableInfo.Label == tableName) ? tableName : tableInfo.Label.SmartQuoteJson())} ({tableInfo.Name}) glide record fields.",
+            $" * @see {{@link {tableInfo.GetGlideRecordTypeString(@namespace)}}}",
+            $" * @see {{@link {tableInfo.GetGlideElementTypeString(@namespace)}}}",
+            " */"
+        );
+        
         if (elements.Length > 0 || jsDocElements.Length > 0)
         {
             await writer.WriteAsync($"export interface {tableName} {extends}");
@@ -234,14 +236,15 @@ public sealed class MainWorkerService : BackgroundService
                         writer.Indent = 1;
                         foreach (TableInfo table in gns.OrderBy(g => g.Name))
                         {
+                            if (stoppingToken.IsCancellationRequested)
+                                return;
                             await writer.WriteLineAsync();
-                            await writer.WriteLineAsync("/**");
-                            await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.");
+                            await writer.WriteLinesAsync(stoppingToken,
+                                "/**",
+                                $" * {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record."
+                            );
                             if (!string.IsNullOrWhiteSpace(table.NumberPrefix))
-                            {
-                                await writer.WriteAsync(" * Auto-number Prefix: ");
-                                await writer.WriteLineAsync(table.NumberPrefix);
-                            }
+                                await writer.WriteLineAsync($" * Auto-number Prefix: {table.NumberPrefix}");
                             if (table.IsExtendable)
                                 await writer.WriteLineAsync(" * IsExtendable: true");
                             await writer.WriteLineAsync(" */");
@@ -258,12 +261,15 @@ public sealed class MainWorkerService : BackgroundService
                         writer.Indent = 1;
                         foreach (TableInfo table in gns.OrderBy(g => g.Name))
                         {
+                            if (stoppingToken.IsCancellationRequested)
+                                return;
                             await writer.WriteLineAsync();
-                            await writer.WriteLineAsync("/**");
-                            await writer.WriteLineAsync($" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name :
-                                table.Label.SmartQuoteJson())} glide record.");
-                            await writer.WriteLineAsync(" */");
-                            await writer.WriteLineAsync($"export type Reference<{table.GetInterfaceTypeString(AppSettings.DEFAULT_NAMESPACE)}, {table.GetGlideRecordTypeString(AppSettings.DEFAULT_NAMESPACE)}>;");
+                            await writer.WriteLinesAsync(stoppingToken,
+                                "/**",
+                                $" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.",
+                                " */",
+                                $"export type Reference<{table.GetInterfaceTypeString(AppSettings.DEFAULT_NAMESPACE)}, {table.GetGlideRecordTypeString(AppSettings.DEFAULT_NAMESPACE)}>;"
+                            );
                         }
                         writer.Indent = 0;
                         await writer.WriteLineAsync("}");
@@ -273,12 +279,20 @@ public sealed class MainWorkerService : BackgroundService
                         if (isScoped)
                         {
                             foreach (TableInfo table in gns.OrderBy(g => g.Name))
+                            {
+                                if (stoppingToken.IsCancellationRequested)
+                                    return;
                                 await RenderFieldsScopedAsync(table, writer, _dbContext, stoppingToken);
+                            }
                         }
                         else
                         {
                             foreach (TableInfo table in gns.OrderBy(g => g.Name))
+                            {
+                                if (stoppingToken.IsCancellationRequested)
+                                    return;
                                 await RenderFieldsGlobalAsync(table, writer, _dbContext, stoppingToken);
+                            }
                         }
                         writer.Indent = 0;
                         await writer.WriteLineAsync("}");
@@ -288,24 +302,27 @@ public sealed class MainWorkerService : BackgroundService
 
                     foreach (var nsg in nsGrouped.OrderBy(n => n.Key))
                     {
+                        if (stoppingToken.IsCancellationRequested)
+                            return;
                         var scope = nsg.First().Scope!;
-                        await writer.WriteAsync("/**");
-                        await writer.WriteAsync($" * {((string.IsNullOrWhiteSpace(scope.Name) || scope.Name == scope.Value) ? scope.Value : scope.Name.SmartQuoteJson())} scope.");
-                        await writer.WriteAsync(" */");
+                        await writer.WriteLinesAsync(stoppingToken,
+                            "/**",
+                            $" * {((string.IsNullOrWhiteSpace(scope.Name) || scope.Name == scope.Value) ? scope.Value : scope.Name.SmartQuoteJson())} scope.",
+                            " */"
+                        );
                         await writer.WriteAsync($"declare namespace {nsg.Key} {{");
                         writer.Indent = 1;
                         await writer.WriteAsync($"export namespace {NS_NAME_record} {{");
                         writer.Indent = 2;
                         foreach (TableInfo table in nsg.OrderBy(g => g.Name))
                         {
+                            if (stoppingToken.IsCancellationRequested)
+                                return;
                             await writer.WriteLineAsync();
                             await writer.WriteLineAsync("/**");
                             await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.");
                             if (!string.IsNullOrWhiteSpace(table.NumberPrefix))
-                            {
-                                await writer.WriteAsync(" * Auto-number Prefix: ");
-                                await writer.WriteLineAsync(table.NumberPrefix);
-                            }
+                                await writer.WriteLineAsync($" * Auto-number Prefix: {table.NumberPrefix}");
                             if (table.IsExtendable)
                                 await writer.WriteLineAsync(" * IsExtendable: true");
                             await writer.WriteLineAsync(" */");
@@ -321,13 +338,16 @@ public sealed class MainWorkerService : BackgroundService
                         await writer.WriteAsync($"export namespace {NS_NAME_element} {{");
                         writer.Indent = 2;
                         foreach (TableInfo table in nsg.OrderBy(g => g.Name))
-                        {
+                            {
+                            if (stoppingToken.IsCancellationRequested)
+                                return;
                             await writer.WriteLineAsync();
-                            await writer.WriteLineAsync("/**");
-                            await writer.WriteLineAsync($" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name :
-                                table.Label.SmartQuoteJson())} glide record.");
-                            await writer.WriteLineAsync(" */");
-                            await writer.WriteLineAsync($"export type Reference<{table.GetInterfaceTypeString(nsg.Key)}, {table.GetGlideRecordTypeString(nsg.Key)}>;");
+                            await writer.WriteLinesAsync(stoppingToken,
+                                "/**",
+                                $" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.",
+                                " */",
+                                $"export type Reference<{table.GetInterfaceTypeString(nsg.Key)}, {table.GetGlideRecordTypeString(nsg.Key)}>;"
+                            );
                         }
                         writer.Indent = 1;
                         await writer.WriteLineAsync("}");
@@ -337,12 +357,20 @@ public sealed class MainWorkerService : BackgroundService
                         if (isScoped)
                         {
                             foreach (TableInfo table in nsg.OrderBy(g => g.Name))
+                            {
+                                if (stoppingToken.IsCancellationRequested)
+                                    return;
                                 await RenderFieldsScopedAsync(table, writer, _dbContext, stoppingToken);
+                            }
                         }
                         else
                         {
                             foreach (TableInfo table in nsg.OrderBy(g => g.Name))
+                            {
+                                if (stoppingToken.IsCancellationRequested)
+                                    return;
                                 await RenderFieldsGlobalAsync(table, writer, _dbContext, stoppingToken);
+                            }
                         }
                         writer.Indent = 1;
                         await writer.WriteLineAsync("}");

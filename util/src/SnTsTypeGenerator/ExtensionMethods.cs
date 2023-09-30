@@ -869,4 +869,16 @@ public static class ExtensionMethods
             return $"{NS_NAME_fields}.{tableInfo.GetShortName()}";
         return $"{tableInfo.ScopeValue}.{NS_NAME_fields}.{tableInfo.GetShortName()}";
     }
+
+    public static async Task WriteLinesAsync(this TextWriter writer, IEnumerable<string> lines, CancellationToken cancellationToken)
+    {
+        foreach (string l in lines)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                break;
+            await writer.WriteLineAsync(l);
+        }
+    }
+
+    public static async Task WriteLinesAsync(this TextWriter writer, CancellationToken cancellationToken, params string[] lines) => await writer.WriteLinesAsync(lines, cancellationToken);
 }
