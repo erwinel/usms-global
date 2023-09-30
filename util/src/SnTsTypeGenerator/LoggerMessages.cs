@@ -943,4 +943,76 @@ public static class LoggerMessages
     public static void LogGettingTypeByNameFromRemoteTrace(this ILogger logger, string typeName) => _gettingTypeByNameFromRemoteTrace(logger, typeName, null);
     
     #endregion
+
+    #region AddingTableToDb Trace (0x0021)
+    
+    /// <summary>
+    // Numerical event code for AddingTableToDb.
+    /// </summary>
+    public const int EVENT_ID_AddingTableToDb = 0x0021;
+    
+    /// <summary>
+    // Event ID for AddingTableToDb.
+    /// </summary>
+    public static readonly EventId AddingTableToDb = new(EVENT_ID_AddingTableToDb, nameof(AddingTableToDb));
+    
+    private static readonly Action<ILogger, string, Exception?> _AddingTableToDb = LoggerMessage.Define<string>(LogLevel.Trace, AddingTableToDb,
+        "Adding table {TableName} to database.");
+    
+    /// <summary>
+    /// Logs an AddingTableToDb event with event code 0x0021.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="tableName">The name of the table being added.</param>
+    public static void LogAddingTableToDb(this ILogger logger, string tableName) => _AddingTableToDb(logger, tableName, null);
+    
+    #endregion
+
+    #region AddingElementsToDatabase Trace (0x0022)
+    
+    /// <summary>
+    // Numerical event code for AddingElementsToDatabase.
+    /// </summary>
+    public const int EVENT_ID_AddingElementsToDatabase = 0x0022;
+    
+    /// <summary>
+    // Event ID for AddingElementsToDatabase.
+    /// </summary>
+    public static readonly EventId AddingElementsToDatabase = new(EVENT_ID_AddingElementsToDatabase, nameof(AddingElementsToDatabase));
+    
+    private static readonly Action<ILogger, string, Exception?> _AddingElementsToDatabase = LoggerMessage.Define<string>(LogLevel.Trace, AddingElementsToDatabase,
+        "Adding elements for table {TableName} to database.");
+    
+    /// <summary>
+    /// Logs an AddingElementsToDatabase event with event code 0x0022.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="tableName">The name of the table.</param>
+    public static void LogAddingElementsToDatabase(this ILogger logger, string tableName) => _AddingElementsToDatabase(logger, tableName, null);
+    
+    #endregion
+
+    #region NewTableSaveComplete Trace (0x0023)
+    
+    /// <summary>
+    // Numerical event code for NewTableSaveComplete.
+    /// </summary>
+    public const int EVENT_ID_NewTableSaveCompleteTrace = 0x0023;
+    
+    /// <summary>
+    // Event ID for NewTableSaveComplete.
+    /// </summary>
+    public static readonly EventId NewTableSaveCompleteTrace = new(EVENT_ID_NewTableSaveCompleteTrace, nameof(NewTableSaveCompleteTrace));
+    
+    private static readonly Action<ILogger, string, Exception?> _newTableSaveCompleteTrace = LoggerMessage.Define<string>(LogLevel.Trace, NewTableSaveCompleteTrace,
+        "Table named {TableName} and related entites saved to database.");
+    
+    /// <summary>
+    /// Logs an NewTableSaveComplete event with event code 0x0023.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="tableName">The name of the table.</param>
+    public static void LogNewTableSaveCompleteTrace(this ILogger logger, string tableName) => _newTableSaveCompleteTrace(logger, tableName, null);
+    
+    #endregion
 }

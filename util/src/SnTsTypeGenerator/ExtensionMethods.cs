@@ -185,6 +185,24 @@ public static class ExtensionMethods
         return ie is not null && (ie.Comments != e.Comments || ie.DefaultValue != e.DefaultValue || ie.IsActive != ie.IsActive || ie.IsDisplay != ie.IsDisplay ||
             ie.IsReadOnly != ie.IsReadOnly || ie.IsUnique != ie.IsUnique || ie.Label != ie.Label || ie.MaxLength != ie.MaxLength || ie.IsArray != ie.IsArray);
     });
+
+    public static IEnumerable<(ElementInfo Inherited, ElementInfo Base, bool IsTypeOverride)> GetOverriddenElements(this IEnumerable<ElementInfo> inheritedElements, IEnumerable<ElementInfo> baseElements)
+    {
+        StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
+        return inheritedElements.Select<ElementInfo, (ElementInfo Inherited, ElementInfo Base, bool IsTypeOverride)>(e =>
+        {
+            string name = e.Name;
+            ElementInfo? b = baseElements.FirstOrDefault(o => o.Name == name);
+            if (b is null)
+                return (e, null!, false);
+            string tn = e.TypeName;
+            string? r = e.RefTableName;
+            if (r is null)
+                return (e, b, b.RefTableName is not null || !comparer.Equals(b.TypeName, tn));
+            return (e, b, b.RefTableName is null || !(comparer.Equals(b.TypeName, tn) && comparer.Equals(b.RefTableName, r)));
+        }).Where(t => t.Base is not null);
+    }
+        
     
     /// <summary>
     /// Gets the properties that aren't implemented by the IBaseRecord type.

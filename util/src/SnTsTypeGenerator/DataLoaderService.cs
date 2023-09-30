@@ -1,13 +1,5 @@
-using System.Diagnostics;
-using System.Net;
-using System.Net.Mime;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -123,54 +115,94 @@ public class DataLoaderService : IDisposable
         TableInfo? superClass = tableInfo.SuperClass;
         tableInfo.SuperClass = null;
         cancellationToken.ThrowIfCancellationRequested();
+        _logger.LogAddingTableToDb(tableInfo.Name);
         await _dbContext.Tables.AddAsync(tableInfo, cancellationToken);
         _tableIdMap.Add(tableInfo.SysID, tableInfo.Name);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
         if (superClass is not null && (tableInfo.SuperClass = await GetTableAsync(superClass, cancellationToken)) is not null)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
         cancellationToken.ThrowIfCancellationRequested();
+
         ElementInfo[] elements = await _tableAPIService!.GetElementsByTableNameAsync(tableInfo.Name, cancellationToken);
         if (elements.Length == 0)
+        {
+            _logger.LogNewTableSaveCompleteTrace(tableInfo.Name);
             return;
+        }
+
+        if (tableInfo.SuperClass is not null)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
+            elements = elements.GetOverriddenElements(await tableInfo.SuperClass.GetRelatedCollectionAsync(_dbContext.Tables, t => t.Elements, cancellationToken)).Where(a =>
+            {
+                (ElementInfo e, ElementInfo b, bool isTypeOverride) = a;
+                return isTypeOverride || e.IsActive != b.IsActive || e.IsArray != b.IsArray || e.MaxLength != b.MaxLength || e.IsDisplay != b.IsDisplay || e.SizeClass != b.SizeClass ||
+                    e.IsMandatory != b.IsMandatory || e.IsPrimary != b.IsPrimary || e.IsReadOnly != b.IsReadOnly || e.IsCalculated != b.IsCalculated || e.IsUnique != b.IsUnique ||
+                    !comparer.Equals(e.Label, b.Label) || ((e.Comments is null) ? b.Comments is not null : b.Comments is null || !comparer.Equals(e.Comments, b.Comments)) ||
+                    ((e.DefaultValue is null) ? b.DefaultValue is not null : b.DefaultValue is null || !comparer.Equals(e.Comments, b.DefaultValue)) ||
+                    ((e.PackageName is null) ? b.PackageName is not null : b.PackageName is null || !comparer.Equals(e.Comments, b.PackageName)) ||
+                    ((e.ScopeValue is null) ? b.ScopeValue is not null : b.ScopeValue is null || !comparer.Equals(e.Comments, b.ScopeValue));
+            }).Select(a => a.Inherited).ToArray();
+            if (elements.Length == 0)
+            {
+                _logger.LogNewTableSaveCompleteTrace(tableInfo.Name);
+                return;
+            }
+        }
+
         foreach (ElementInfo e in elements)
         {
             e.Table = tableInfo;
             e.Source = source;
         }
+
         foreach (var g in elements.Where(e => e.Package is not null).GroupBy(e => e.Package!.SysId))
         {
             ElementInfo[] arr = g.ToArray();
+            cancellationToken.ThrowIfCancellationRequested();
             SysPackage p = await GetPackageAsync(arr[0].Package!, cancellationToken);
             foreach (ElementInfo e in arr)
                 e.Package = p;
         }
+        
         foreach (var g in elements.Where(e => e.Scope is not null).GroupBy(e => e.Scope!.Value))
         {
             ElementInfo[] arr = g.ToArray();
+            cancellationToken.ThrowIfCancellationRequested();
             SysScope s = await GetScopeAsync(arr[0].Scope!, cancellationToken);
             foreach (ElementInfo e in arr)
                 e.Scope = s;
         }
+        
         foreach (var g in elements.Where(e => e.Type is not null).GroupBy(e => e.Type!.Name))
         {
             ElementInfo[] arr = g.ToArray();
+            cancellationToken.ThrowIfCancellationRequested();
             GlideType t = await GetGlideTypeAsync(arr[0].Type!, cancellationToken);
             foreach (ElementInfo e in arr)
                 e.Type = t;
         }
+        
         foreach (var g in elements.Where(e => e.Reference is not null).GroupBy(e => e.Reference!.SysID))
         {
             ElementInfo[] arr = g.ToArray();
+            cancellationToken.ThrowIfCancellationRequested();
             TableInfo t = await GetTableAsync(arr[0].Reference!, cancellationToken);
             foreach (ElementInfo e in arr)
                 e.Reference = t;
         }
+        
+        cancellationToken.ThrowIfCancellationRequested();
+        _logger.LogAddingElementsToDatabase(tableInfo.Name);
         await _dbContext.Elements.AddRangeAsync(elements, cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogNewTableSaveCompleteTrace(tableInfo.Name);
     }
 
     private async Task<TableInfo> GetTableAsync(TableInfo table, CancellationToken cancellationToken)
@@ -191,7 +223,7 @@ public class DataLoaderService : IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         if (_tableAPIService is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        TableInfo? tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name);
+        TableInfo? tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         if (tableInfo is null && (tableInfo = await _tableAPIService.GetTableByNameAsync(name, cancellationToken)) is not null)
             await SaveTableAsync(tableInfo, cancellationToken);
         return tableInfo;
