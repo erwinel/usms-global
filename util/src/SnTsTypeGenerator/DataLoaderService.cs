@@ -19,7 +19,7 @@ public class DataLoaderService : IDisposable
     /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
-    internal bool InitSuccessful => _tableAPIService is not null && _tableAPIService.InitSuccessful;
+    internal bool InitSuccessful => _tableAPIService is not null && _tableAPIService.InitSuccessful && _dbContext.InitSuccessful;
 
     private async Task<SourceInfo> GetSourceAsync(string fqdn, CancellationToken cancellationToken)
     {

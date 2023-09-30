@@ -1046,4 +1046,29 @@ public static class LoggerMessages
     public static void LogNewTableSaveCompleteTrace(this ILogger logger, string tableName) => _newTableSaveCompleteTrace(logger, tableName, null);
     
     #endregion
+
+
+    #region Critical UnexpecteException Error (0x00ff)
+    
+    /// <summary>
+    // Numerical event code for UnexpecteException.
+    /// </summary>
+    public const int EVENT_ID_UnexpecteException = 0x00ff;
+    
+    /// <summary>
+    // Event ID for UnexpecteException.
+    /// </summary>
+    public static readonly EventId UnexpecteException = new(EVENT_ID_UnexpecteException, nameof(UnexpecteException));
+    
+    private static readonly Action<ILogger, Exception?> _unexpecteException = LoggerMessage.Define(LogLevel.Critical, UnexpecteException,
+        "An unexpected exception has occurred.");
+    
+    /// <summary>
+    /// Logs an UnexpecteException event with event code 0x00ff.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
+    public static void LogUnexpecteException(this ILogger logger, Exception error) => _unexpecteException(logger, error);
+    
+    #endregion
 }
