@@ -3,6 +3,9 @@ using Microsoft.Extensions.Logging;
 
 namespace SnTsTypeGenerator;
 
+/// <summary>
+/// Loads data from the database and from the remote ServiceNow instance.
+/// </summary>
 public class DataLoaderService : IDisposable
 {
     private readonly TypingsDbContext _dbContext;
@@ -13,7 +16,10 @@ public class DataLoaderService : IDisposable
     private readonly Dictionary<string, string> _packageIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, SourceInfo> _sourceCache = new(StringComparer.InvariantCultureIgnoreCase);
 
-    public bool InitSuccessful => _tableAPIService is not null && _tableAPIService.InitSuccessful;
+    /// <summary>
+    /// Indicates whether service initialization was successful.
+    /// </summary>
+    internal bool InitSuccessful => _tableAPIService is not null && _tableAPIService.InitSuccessful;
 
     private async Task<SourceInfo> GetSourceAsync(string fqdn, CancellationToken cancellationToken)
     {
@@ -218,7 +224,13 @@ public class DataLoaderService : IDisposable
         return table;
     }
 
-    public async Task<TableInfo?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
+    /// <summary>
+    /// Loads information for the table that matches the specified name.
+    /// </summary>
+    /// <param name="name">The name of the table.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="TableInfo"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no table was found in the database or in the remote ServiceNow instance.</returns>
+    internal async Task<TableInfo?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_tableAPIService is null)
