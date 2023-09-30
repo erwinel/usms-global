@@ -325,49 +325,10 @@ public class TableInfo
     [BackingField(nameof(_referredBy))]
     public virtual HashSet<ElementInfo> ReferredBy { get => _referredBy; set => _referredBy = value ?? new(); }
 
-    internal string GetNamespace() => string.IsNullOrWhiteSpace(_scopeValue) ? AppSettings.DEFAULT_NAMESPACE : _scopeValue;
-
-    internal string GetShortName()
-    {
-        if (string.IsNullOrWhiteSpace(_scopeValue) || _scopeValue == AppSettings.DEFAULT_NAMESPACE || !_name.StartsWith(_scopeValue))
-            return _name;
-        int len = _scopeValue.Length + 1;
-        if (_name.Length <= len || _name[_scopeValue.Length] != '_')
-            return _name;
-        return _name[len..];
-    }
-
-    internal string GetGlideRecordTypeString(string targetNs)
-    {
-        if (string.IsNullOrWhiteSpace(_scopeValue) || _scopeValue == AppSettings.DEFAULT_NAMESPACE)
-            return $"{NS_NAME_GlideRecord}.{Name}";
-        if (targetNs == _scopeValue)
-            return $"{NS_NAME_record}.{GetShortName()}";
-        return $"{_scopeValue}.{NS_NAME_record}.{GetShortName()}";
-    }
-
-    internal string GetGlideElementTypeString(string targetNs)
-    {
-        if (string.IsNullOrWhiteSpace(_scopeValue) || _scopeValue == AppSettings.DEFAULT_NAMESPACE)
-            return $"{NS_NAME_GlideElement}.{Name}";
-        if (targetNs == _scopeValue)
-            return $"{NS_NAME_element}.{GetShortName()}";
-        return $"{_scopeValue}.{NS_NAME_element}.{GetShortName()}";
-    }
-
-    internal string GetInterfaceTypeString(string targetNs)
-    {
-        if (string.IsNullOrWhiteSpace(_scopeValue) || _scopeValue == AppSettings.DEFAULT_NAMESPACE)
-            return $"{NS_NAME_tableFields}.{Name}";
-        if (targetNs == _scopeValue)
-            return $"{NS_NAME_fields}.{GetShortName()}";
-        return $"{_scopeValue}.{NS_NAME_fields}.{GetShortName()}";
-    }
-
     private async Task RenderFieldsAsync(IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, Func<ElementInfo, string, Task> renderJsDocAsync,
         CancellationToken cancellationToken)
     {
-        string @namespace = GetNamespace();
+        string @namespace = this.GetNamespace();
         var tableName = Name;
         EntityEntry<TableInfo> entry = dbContext.Tables.Entry(this);
         var elements = (await entry.GetRelatedCollectionAsync(e => e.Elements, cancellationToken)).ToArray();
@@ -403,15 +364,15 @@ public class TableInfo
             jsDocElements = Array.Empty<ElementInfo>();
             extends = "{";
         }
-        tableName = GetShortName();
+        tableName = this.GetShortName();
         await writer.WriteLineAsync();
         await writer.WriteLineAsync("/**");
         if (tableName == Name)
             await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(Label) || Label == tableName) ? tableName : Label.SmartQuoteJson())} glide record fields.");
         else
             await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(Label) || Label == tableName) ? tableName : Label.SmartQuoteJson())} ({Name}) glide record fields.");
-        await writer.WriteLineAsync($" * @see {{@link {GetGlideRecordTypeString(@namespace)}}}");
-        await writer.WriteLineAsync($" * @see {{@link {GetGlideElementTypeString(@namespace)}}}");
+        await writer.WriteLineAsync($" * @see {{@link {this.GetGlideRecordTypeString(@namespace)}}}");
+        await writer.WriteLineAsync($" * @see {{@link {this.GetGlideElementTypeString(@namespace)}}}");
         await writer.WriteLineAsync(" */");
         if (elements.Length > 0 || jsDocElements.Length > 0)
         {

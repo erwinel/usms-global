@@ -830,4 +830,43 @@ public static class ExtensionMethods
         HttpStatusCode.NetworkAuthenticationRequired => "Authentication required for network access.",
         _ => null,
     };
+    
+    public static string GetNamespace(this TableInfo tableInfo) => string.IsNullOrWhiteSpace(tableInfo.ScopeValue) ? AppSettings.DEFAULT_NAMESPACE : tableInfo.ScopeValue;
+
+    public static string GetShortName(this TableInfo tableInfo)
+    {
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE || !tableInfo.Name.StartsWith(tableInfo.ScopeValue))
+            return tableInfo.Name;
+        int len = tableInfo.ScopeValue.Length + 1;
+        if (tableInfo.Name.Length <= len || tableInfo.Name[tableInfo.ScopeValue.Length] != '_')
+            return tableInfo.Name;
+        return tableInfo.Name[len..];
+    }
+
+    public static string GetGlideRecordTypeString(this TableInfo tableInfo, string targetNs)
+    {
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE)
+            return $"{NS_NAME_GlideRecord}.{tableInfo.Name}";
+        if (targetNs == tableInfo.ScopeValue)
+            return $"{NS_NAME_record}.{tableInfo.GetShortName()}";
+        return $"{tableInfo.ScopeValue}.{NS_NAME_record}.{tableInfo.GetShortName()}";
+    }
+
+    public static string GetGlideElementTypeString(this TableInfo tableInfo, string targetNs)
+    {
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE)
+            return $"{NS_NAME_GlideElement}.{tableInfo.Name}";
+        if (targetNs == tableInfo.ScopeValue)
+            return $"{NS_NAME_element}.{tableInfo.GetShortName()}";
+        return $"{tableInfo.ScopeValue}.{NS_NAME_element}.{tableInfo.GetShortName()}";
+    }
+
+    public static string GetInterfaceTypeString(this TableInfo tableInfo, string targetNs)
+    {
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE)
+            return $"{NS_NAME_tableFields}.{tableInfo.Name}";
+        if (targetNs == tableInfo.ScopeValue)
+            return $"{NS_NAME_fields}.{tableInfo.GetShortName()}";
+        return $"{tableInfo.ScopeValue}.{NS_NAME_fields}.{tableInfo.GetShortName()}";
+    }
 }
