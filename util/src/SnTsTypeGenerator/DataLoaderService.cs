@@ -6,7 +6,7 @@ namespace SnTsTypeGenerator;
 /// <summary>
 /// Loads data from the database and from the remote ServiceNow instance.
 /// </summary>
-public class DataLoaderService : IDisposable
+public sealed class DataLoaderService : IDisposable
 {
     private readonly TypingsDbContext _dbContext;
     private TableAPIService? _tableAPIService;
@@ -175,7 +175,7 @@ public class DataLoaderService : IDisposable
             foreach (ElementInfo e in arr)
                 e.Package = p;
         }
-        
+
         foreach (var g in elements.Where(e => e.Scope is not null).GroupBy(e => e.Scope!.Value))
         {
             ElementInfo[] arr = g.ToArray();
@@ -184,7 +184,7 @@ public class DataLoaderService : IDisposable
             foreach (ElementInfo e in arr)
                 e.Scope = s;
         }
-        
+
         foreach (var g in elements.Where(e => e.Type is not null).GroupBy(e => e.Type!.Name))
         {
             ElementInfo[] arr = g.ToArray();
@@ -193,7 +193,7 @@ public class DataLoaderService : IDisposable
             foreach (ElementInfo e in arr)
                 e.Type = t;
         }
-        
+
         foreach (var g in elements.Where(e => e.Reference is not null).GroupBy(e => e.Reference!.SysID))
         {
             ElementInfo[] arr = g.ToArray();
@@ -202,7 +202,7 @@ public class DataLoaderService : IDisposable
             foreach (ElementInfo e in arr)
                 e.Reference = t;
         }
-        
+
         cancellationToken.ThrowIfCancellationRequested();
         _logger.LogAddingElementsToDatabase(tableInfo.Name);
         await _dbContext.Elements.AddRangeAsync(elements, cancellationToken);
@@ -240,7 +240,7 @@ public class DataLoaderService : IDisposable
             await SaveTableAsync(tableInfo, cancellationToken);
         return tableInfo;
     }
-    
+
     public DataLoaderService(TypingsDbContext dbContext, TableAPIService tableAPIService, ILogger<DataLoaderService> logger)
     {
         _dbContext = dbContext;
@@ -253,7 +253,7 @@ public class DataLoaderService : IDisposable
         TableAPIService? tableAPIService = _tableAPIService;
         _tableAPIService = null;
         if (tableAPIService is not null && disposing)
-                tableAPIService.Dispose();
+            tableAPIService.Dispose();
     }
 
     public void Dispose()

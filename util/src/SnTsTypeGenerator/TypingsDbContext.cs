@@ -11,7 +11,7 @@ namespace SnTsTypeGenerator;
 /// <summary>
 /// The type definitions database context.
 /// </summary>
-public class TypingsDbContext : DbContext
+public partial class TypingsDbContext : DbContext
 {
     private readonly ILogger<TypingsDbContext> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
@@ -32,7 +32,7 @@ public class TypingsDbContext : DbContext
     CONSTRAINT ""PK_{nameof(OutputFile)}"" PRIMARY KEY(""{nameof(OutputFile.Id)}"")
 )";
     }
-    
+
     private static IEnumerable<string> GetSourceInfoDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SourceInfo)}"" (
@@ -44,7 +44,7 @@ public class TypingsDbContext : DbContext
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(SourceInfo)}_{nameof(SourceInfo.IsPersonalDev)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(SourceInfo.IsPersonalDev)}\")";
     }
-    
+
     private static IEnumerable<string> GetSysPackageDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysPackage)}"" (
@@ -56,7 +56,7 @@ public class TypingsDbContext : DbContext
     CONSTRAINT ""PK_{nameof(SysPackage)}"" PRIMARY KEY(""{nameof(SysPackage.Name)}"")
 )";
     }
-    
+
     private static IEnumerable<string> GetSysScopeDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysScope)}"" (
@@ -71,7 +71,7 @@ public class TypingsDbContext : DbContext
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(SysScope)}_{nameof(SysScope.SysID)}\" ON \"{nameof(SysScope)}\" (\"{nameof(SysScope.SysID)}\" COLLATE NOCASE)";
     }
-    
+
     private static IEnumerable<string> GetGlideTypeDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(GlideType)}"" (
@@ -94,7 +94,7 @@ public class TypingsDbContext : DbContext
         yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.UseOriginalValue)}\" ON \"{nameof(GlideType)}\" (\"{nameof(GlideType.UseOriginalValue)}\")";
         yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.IsVisible)}\" ON \"{nameof(GlideType)}\" (\"{nameof(GlideType.IsVisible)}\")";
     }
-    
+
     private static IEnumerable<string> GetTableInfoDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(TableInfo)}"" (
@@ -116,7 +116,7 @@ public class TypingsDbContext : DbContext
         yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(TableInfo.SysID)}\" COLLATE NOCASE)";
         yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.IsExtendable)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(TableInfo.IsExtendable)}\")";
     }
-    
+
     private static IEnumerable<string> GetElementInfoDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(ElementInfo)}"" (
@@ -150,7 +150,7 @@ public class TypingsDbContext : DbContext
         yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsDisplay)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.IsDisplay)}\")";
         yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsPrimary)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.IsPrimary)}\")";
     }
-    
+
     public TypingsDbContext(DbContextOptions<TypingsDbContext> options, ILogger<TypingsDbContext> logger, IServiceScopeFactory scopeFactory) : base(options)
     {
         _logger = logger;
@@ -296,7 +296,7 @@ public class TypingsDbContext : DbContext
         _logger.LogDbSaveChangesCompletedTrace(true, null, returnValue);
         return returnValue;
     }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         _ = modelBuilder.Entity<OutputFile>(builder =>
@@ -429,29 +429,4 @@ public class TypingsDbContext : DbContext
     /// Gets the ServiceNow table elements (columns).
     /// </summary>
     public virtual DbSet<ElementInfo> Elements { get; set; } = null!;
-
-    internal class DbContextServiceProvider : IServiceProvider
-    {
-        private readonly object _entity;
-        private readonly TypingsDbContext _dbContext;
-        private readonly IServiceProvider _backingServiceProvider;
-
-        internal DbContextServiceProvider(TypingsDbContext dbContext, IServiceProvider backingServiceProvider, object entity)
-        {
-            _dbContext = dbContext;
-            _entity = entity;
-            _backingServiceProvider = backingServiceProvider;
-        }
-
-        public object? GetService(Type serviceType)
-        {
-            if (serviceType is null)
-                return null;
-            if (serviceType.IsInstanceOfType(_entity))
-                return _entity;
-            if (serviceType.IsInstanceOfType(_dbContext._logger))
-                return _dbContext._logger;
-            return _backingServiceProvider.GetService(serviceType);
-        }
-    }
 }

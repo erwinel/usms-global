@@ -1,10 +1,6 @@
 using System.CodeDom.Compiler;
 using System.Collections.ObjectModel;
-using System.Net;
-using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,7 +25,6 @@ public sealed class MainWorkerService : BackgroundService
         // appLifetime.ApplicationStarted.Register(OnStarted);
         // appLifetime.ApplicationStopping.Register(OnStopping);
         // appLifetime.ApplicationStopped.Register(OnStopped);
-
     }
 
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -131,14 +126,15 @@ public sealed class MainWorkerService : BackgroundService
                 using (streamWriter)
                 {
                     using IndentedTextWriter writer = new(streamWriter, "    ");
-                    
+
                     var nsGrouped = toRender.GroupBy(t => t.GetNamespace()).OrderBy(g => g.Key).ToArray();
                     var gns = nsGrouped.FirstOrDefault(n => n.Key == AppSettings.DEFAULT_NAMESPACE);
                     if (gns is not null)
                     {
                         await writer.WriteAsync($"declare namespace {NS_NAME_GlideRecord} {{");
                         writer.Indent = 1;
-                        foreach (TableInfo table in gns.OrderBy(g => g.Name)) {
+                        foreach (TableInfo table in gns.OrderBy(g => g.Name))
+                        {
                             await writer.WriteLineAsync();
                             await writer.WriteLineAsync("/**");
                             await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.");
@@ -161,10 +157,12 @@ public sealed class MainWorkerService : BackgroundService
                         await writer.WriteLineAsync();
                         await writer.WriteAsync($"declare namespace {NS_NAME_GlideElement} {{");
                         writer.Indent = 1;
-                        foreach (TableInfo table in gns.OrderBy(g => g.Name)) {
+                        foreach (TableInfo table in gns.OrderBy(g => g.Name))
+                        {
                             await writer.WriteLineAsync();
                             await writer.WriteLineAsync("/**");
-                            await writer.WriteLineAsync($" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.");
+                            await writer.WriteLineAsync($" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name :
+                                table.Label.SmartQuoteJson())} glide record.");
                             await writer.WriteLineAsync(" */");
                             await writer.WriteLineAsync($"export type Reference<{table.GetInterfaceTypeString(AppSettings.DEFAULT_NAMESPACE)}, {table.GetGlideRecordTypeString(AppSettings.DEFAULT_NAMESPACE)}>;");
                         }
@@ -199,7 +197,8 @@ public sealed class MainWorkerService : BackgroundService
                         writer.Indent = 1;
                         await writer.WriteAsync($"export namespace {NS_NAME_record} {{");
                         writer.Indent = 2;
-                        foreach (TableInfo table in nsg.OrderBy(g => g.Name)) {
+                        foreach (TableInfo table in nsg.OrderBy(g => g.Name))
+                        {
                             await writer.WriteLineAsync();
                             await writer.WriteLineAsync("/**");
                             await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.");
@@ -222,10 +221,12 @@ public sealed class MainWorkerService : BackgroundService
                         await writer.WriteLineAsync();
                         await writer.WriteAsync($"export namespace {NS_NAME_element} {{");
                         writer.Indent = 2;
-                        foreach (TableInfo table in nsg.OrderBy(g => g.Name)) {
+                        foreach (TableInfo table in nsg.OrderBy(g => g.Name))
+                        {
                             await writer.WriteLineAsync();
                             await writer.WriteLineAsync("/**");
-                            await writer.WriteLineAsync($" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.");
+                            await writer.WriteLineAsync($" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name :
+                                table.Label.SmartQuoteJson())} glide record.");
                             await writer.WriteLineAsync(" */");
                             await writer.WriteLineAsync($"export type Reference<{table.GetInterfaceTypeString(nsg.Key)}, {table.GetGlideRecordTypeString(nsg.Key)}>;");
                         }

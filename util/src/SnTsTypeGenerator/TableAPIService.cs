@@ -25,11 +25,27 @@ public sealed class TableAPIService : IDisposable
     /// </summary>
     internal bool InitSuccessful => BaseURL.IsAbsoluteUri && _handler is not null;
 
-    private SysPackage? GetPackage(JsonObject resultObj) => (resultObj.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? jsonNode) && jsonNode is JsonObject packageFieldElement && packageFieldElement.TryGetPropertyAsNonEmpty(JSON_KEY_DISPLAY_VALUE, out string? pkgName)) ? new SysPackage() { Name = pkgName, SysId = packageFieldElement.GetPropertyAsNonEmpty(JSON_KEY_VALUE), SourceFqdn = BaseURL.Host } : null;
+    private SysPackage? GetPackage(JsonObject resultObj) => (resultObj.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? jsonNode) && jsonNode is JsonObject packageFieldElement &&
+        packageFieldElement.TryGetPropertyAsNonEmpty(JSON_KEY_DISPLAY_VALUE, out string? pkgName)) ? new()
+        {
+            Name = pkgName,
+            SysId = packageFieldElement.GetPropertyAsNonEmpty(JSON_KEY_VALUE),
+            SourceFqdn = BaseURL.Host
+        } : null;
 
-    private SysScope? GetScope(JsonObject resultObj) => resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value, out string? display_value) ? new() { SysID = value, Name = display_value ?? value, SourceFqdn = BaseURL.Host } : null;
+    private SysScope? GetScope(JsonObject resultObj) => resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value, out string? display_value) ? new()
+        {
+            SysID = value,
+            Name = display_value ?? value,
+            SourceFqdn = BaseURL.Host
+        } : null;
 
-    private TableInfo? GetTable(JsonObject resultObj, string propertyName) => resultObj.TryGetFieldAsNonEmpty(propertyName, out string? super_class, out string? label) ? new() { SysID = super_class, Label = label ?? super_class, SourceFqdn = BaseURL.Host } : null;
+    private TableInfo? GetTable(JsonObject resultObj, string propertyName) => resultObj.TryGetFieldAsNonEmpty(propertyName, out string? super_class, out string? label) ? new()
+        {
+            SysID = super_class,
+            Label = label ?? super_class,
+            SourceFqdn = BaseURL.Host
+        } : null;
 
     private async Task<TableInfo?> GetTableFromUri(Uri requestUri, CancellationToken cancellationToken)
     {
@@ -53,9 +69,9 @@ public sealed class TableAPIService : IDisposable
                 _logger.LogNoResultsFromQuery(requestUri, resultObj);
                 return null;
             }
-            if (length> 1)
+            if (length > 1)
                 _logger.LogMultipleResponseItems(requestUri, length - 1, resultObj);
-            
+
             if ((jsonNode = arr[0]) is not JsonObject)
                 throw new InvalidResultElementType(requestUri, resultObj, 0);
             resultObj = (JsonObject)jsonNode;
@@ -63,9 +79,9 @@ public sealed class TableAPIService : IDisposable
         else
             throw new InvalidResponseTypeException(requestUri, resultObj);
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_SYS_ID);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_NAME, out string? name))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_NAME);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_NAME);
         return new()
         {
             SysID = sys_id,
@@ -174,7 +190,12 @@ public sealed class TableAPIService : IDisposable
                     Reference = GetTable(resultObj, JSON_KEY_REFERENCE),
                     Package = GetPackage(resultObj),
                     Scope = GetScope(resultObj),
-                    Type = sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new GlideType() { Name = type, Label = displayValue ?? type, SourceFqdn = requestUri.Host } : null,
+                    Type = sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new GlideType()
+                        {
+                            Name = type,
+                            Label = displayValue ?? type,
+                            SourceFqdn = requestUri.Host
+                        } : null,
                     SourceFqdn = requestUri.Host
                 };
             return null!;
@@ -219,9 +240,9 @@ public sealed class TableAPIService : IDisposable
             throw new InvalidResponseTypeException(requestUri, resultObj);
         sysScopeResult = (JsonObject)jsonNode;
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_SYS_ID);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_SCOPE);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SCOPE);
         return new()
         {
             SysID = sys_id,
@@ -267,14 +288,14 @@ public sealed class TableAPIService : IDisposable
             _logger.LogNoResultsFromQuery(requestUri, resultObj);
             return null;
         }
-        if (length> 1)
+        if (length > 1)
             _logger.LogMultipleResponseItems(requestUri, length - 1, resultObj);
-        
+
         if ((jsonNode = arr[0]) is not JsonObject)
             throw new InvalidResultElementType(requestUri, resultObj, 0);
         resultObj = (JsonObject)jsonNode;
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_SYS_ID);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         return new()
         {
             SysID = sys_id,
@@ -383,7 +404,7 @@ public sealed class TableAPIService : IDisposable
         HttpClientHandler? handler = _handler;
         _handler = null;
         if (handler is not null && disposing)
-                handler.Dispose();
+            handler.Dispose();
     }
 
     public void Dispose()

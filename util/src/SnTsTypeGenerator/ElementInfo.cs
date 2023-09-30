@@ -1,11 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.CodeDom.Compiler;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
-using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -75,12 +72,12 @@ public class ElementInfo
     /// Value of the "Comments" (<see cref="Constants.JSON_KEY_COMMENTS" />) column.
     /// </summary>
     public string? Comments { get; set; }
-    
+
     /// <summary>
     /// Value of the "Default value" (<see cref="Constants.JSON_KEY_DEFAULT_VALUE" />) column.
     /// </summary>
     public string? DefaultValue { get; set; }
-    
+
     /// <summary>
     /// Value of the "Display" (<see cref="Constants.JSON_KEY_DISPLAY" />) column.
     /// </summary>
@@ -156,7 +153,7 @@ public class ElementInfo
     }
 
     private SysPackage? _package;
-    
+
     /// <summary>
     /// The source package for the element.
     /// </summary>
@@ -211,7 +208,7 @@ public class ElementInfo
     }
 
     private SysScope? _scope;
-    
+
     /// <summary>
     /// The scope for the element.
     /// </summary>
@@ -256,7 +253,7 @@ public class ElementInfo
     }
 
     private TableInfo? _table;
-    
+
     /// <summary>
     /// The table that the current element belongs to.
     /// </summary>
@@ -309,7 +306,7 @@ public class ElementInfo
     }
 
     private GlideType? _type;
-    
+
     /// <summary>
     /// The record representing the column type.
     /// </summary>
@@ -373,7 +370,7 @@ public class ElementInfo
     }
 
     private TableInfo? _reference;
-    
+
     /// <summary>
     /// The table the current column refers to.
     /// </summary>
@@ -418,7 +415,7 @@ public class ElementInfo
     }
 
     private SourceInfo? _source;
-    
+
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
@@ -447,7 +444,7 @@ public class ElementInfo
     }
 
     internal bool OptionsEqualTo(ElementInfo other) => ReferenceEquals(this, other) || (Name == other.Name && TypeName == other.TypeName && RefTableName == other.RefTableName);
-    
+
     internal async Task RenderJsDocGlobalAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

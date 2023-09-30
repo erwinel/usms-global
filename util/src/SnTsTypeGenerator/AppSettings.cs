@@ -18,7 +18,8 @@ public class AppSettings
     /// <summary>
     /// Specifies the relative or absolute path of the database file.
     /// </summary>
-    /// <remarks>If this path is not absolute, it will be resolved relative to the <see cref="Microsoft.Extensions.Hosting.ContentRootPath" />. The default value of this setting is defined in the <see cref="DEFAULT_DbFile" /> constant.</remarks>
+    /// <remarks>If this path is not absolute, it will be resolved relative to the <see cref="Microsoft.Extensions.Hosting.ContentRootPath" />. The default value of this setting is defined in
+    /// the <see cref="DEFAULT_DbFile" /> constant.</remarks>
     public string? DbFile { get; set; }
 
     /// <summary>
@@ -74,7 +75,7 @@ public class AppSettings
     public const string DEFAULT_NAMESPACE = "global";
 
     public const string DEFAULT_OUTPUT_FILENAME = "types.d.ts";
-    
+
     /// <summary>
     /// Gets the shorthand for the <c>--<see cref="Output" /></c> command line option.
     /// </summary>
@@ -124,7 +125,7 @@ public class AppSettings
     /// Gets the command line switch for the <see cref="Help" /> application option option.
     /// </summary>
     public const string SHORTHAND__3F_ = "-?";
-    
+
     /// <summary>
     /// Gets or sets the value indicating whether to write help information to the console.
     /// </summary>
@@ -143,12 +144,12 @@ public class AppSettings
         { SHORTHAND_h, nameof(Help) },
         { SHORTHAND__3F_, nameof(Help) }
     };
-    
+
     internal static void Configure(string[] args, ConfigurationManager configuration)
     {
         configuration.AddCommandLine(args, _switchMappings);
     }
-    
+
     internal static void WriteHelpToConsole()
     {
         string exe = Path.GetFileNameWithoutExtension(Environment.ProcessPath)!;

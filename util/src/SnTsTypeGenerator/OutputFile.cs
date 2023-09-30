@@ -2,8 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -68,16 +66,6 @@ public class OutputFile : IValidatableObject
         return results;
     }
 
-    internal static IEnumerable<string> GetDbInitCommands()
-    {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(OutputFile)}"" (
-    ""{nameof(Id)}"" UNIQUEIDENTIFIER NOt NULL COLLATE NOCASE,
-    ""{nameof(Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(OutputFile)}"" PRIMARY KEY(""{nameof(Id)}"")
-)";
-    }
-    
     private HashSet<SysPackage> _packages = new();
 
     [NotNull]

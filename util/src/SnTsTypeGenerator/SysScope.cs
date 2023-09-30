@@ -1,10 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
-using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -84,7 +81,7 @@ public class SysScope
     }
 
     private SourceInfo? _source;
-    
+
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
@@ -111,7 +108,7 @@ public class SysScope
             }
         }
     }
-    
+
     private HashSet<GlideType> _types = new();
 
     [NotNull]

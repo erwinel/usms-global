@@ -54,7 +54,7 @@ public class TableInfo
         get => _label;
         set => _label = value ?? string.Empty;
     }
-    
+
     /// <summary>
     /// Value of the "Extensible" (<see cref="Constants.JSON_KEY_NAME" />) column.
     /// </summary>
@@ -72,7 +72,7 @@ public class TableInfo
         get => _accessibleFrom;
         set => _accessibleFrom = value ?? string.Empty;
     }
-    
+
     /// <summary>
     /// Value of the "Extension model" (<see cref="Constants.JSON_KEY_EXTENSION_MODEL" />) column.
     /// </summary>
@@ -87,7 +87,7 @@ public class TableInfo
     /// Date and time that this record was last updated.
     /// </summary>
     public DateTime LastUpdated { get; set; }
-    
+
     /// <summary>
     /// Name of the associated record for the "Package" (<see cref="Constants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
@@ -123,7 +123,7 @@ public class TableInfo
     }
 
     private SysPackage? _package;
-    
+
     /// <summary>
     /// The source package of the table.
     /// </summary>
@@ -178,7 +178,7 @@ public class TableInfo
     }
 
     private SysScope? _scope;
-    
+
     /// <summary>
     /// The scope of the table.
     /// </summary>
@@ -279,7 +279,7 @@ public class TableInfo
     }
 
     private SourceInfo? _source;
-    
+
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
@@ -364,7 +364,8 @@ public class TableInfo
         return $"{_scopeValue}.{NS_NAME_fields}.{GetShortName()}";
     }
 
-    private async Task RenderFieldsAsync(IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, Func<ElementInfo, string, Task> renderJsDocAsync, CancellationToken cancellationToken)
+    private async Task RenderFieldsAsync(IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, Func<ElementInfo, string, Task> renderJsDocAsync,
+        CancellationToken cancellationToken)
     {
         string @namespace = GetNamespace();
         var tableName = Name;
