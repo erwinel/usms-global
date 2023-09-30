@@ -1,10 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.CodeDom.Compiler;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -324,82 +321,4 @@ public class TableInfo
     [NotNull]
     [BackingField(nameof(_referredBy))]
     public virtual HashSet<ElementInfo> ReferredBy { get => _referredBy; set => _referredBy = value ?? new(); }
-
-    private async Task RenderFieldsAsync(IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, Func<ElementInfo, string, Task> renderJsDocAsync,
-        CancellationToken cancellationToken)
-    {
-        string @namespace = this.GetNamespace();
-        var tableName = Name;
-        EntityEntry<TableInfo> entry = dbContext.Tables.Entry(this);
-        var elements = (await entry.GetRelatedCollectionAsync(e => e.Elements, cancellationToken)).ToArray();
-        TableInfo? superClass = await entry.GetReferencedEntityAsync(e => e.SuperClass, cancellationToken);
-        string extends;
-        ElementInfo[] jsDocElements;
-        if (superClass is not null)
-        {
-            extends = $"extends {superClass.GetInterfaceTypeString(@namespace)}{{";
-            if (elements.Length > 0)
-            {
-                var baseElements = await superClass.GetRelatedCollectionAsync(dbContext.Tables, t => t.Elements, cancellationToken);
-                if (baseElements.Any())
-                {
-                    var withBase = elements.GetBaseElements(baseElements);
-                    jsDocElements = withBase.Where(a => a.Base is not null && !a.IsTypeOverride).Select(a => a.Inherited).ToArray();
-                    elements = withBase.Where(a => a.Base is null || a.IsTypeOverride).Select(a => a.Inherited).ToArray();
-                }
-                else
-                    jsDocElements = Array.Empty<ElementInfo>();
-            }
-            else
-                jsDocElements = Array.Empty<ElementInfo>();
-        }
-        else if (elements.ExtendsBaseRecord())
-        {
-            jsDocElements = Array.Empty<ElementInfo>();
-            elements = elements.GetNonBaseRecordElements().ToArray();
-            extends = "extends IBaseRecord {";
-        }
-        else
-        {
-            jsDocElements = Array.Empty<ElementInfo>();
-            extends = "{";
-        }
-        tableName = this.GetShortName();
-        await writer.WriteLineAsync();
-        await writer.WriteLineAsync("/**");
-        if (tableName == Name)
-            await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(Label) || Label == tableName) ? tableName : Label.SmartQuoteJson())} glide record fields.");
-        else
-            await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(Label) || Label == tableName) ? tableName : Label.SmartQuoteJson())} ({Name}) glide record fields.");
-        await writer.WriteLineAsync($" * @see {{@link {this.GetGlideRecordTypeString(@namespace)}}}");
-        await writer.WriteLineAsync($" * @see {{@link {this.GetGlideElementTypeString(@namespace)}}}");
-        await writer.WriteLineAsync(" */");
-        if (elements.Length > 0 || jsDocElements.Length > 0)
-        {
-            await writer.WriteAsync($"export interface {tableName} {extends}");
-            var indent = writer.Indent + 1;
-            foreach (ElementInfo e in jsDocElements)
-            {
-                writer.Indent = indent;
-                await renderJsDocAsync(e, @namespace);
-            }
-            foreach (ElementInfo e in elements)
-            {
-                writer.Indent = indent;
-                await renderPropertyAsync(e, @namespace);
-            }
-            writer.Indent = indent - 1;
-            await writer.WriteLineAsync("}");
-        }
-        else
-            await writer.WriteLineAsync($"export interface {tableName} {extends} }}");
-    }
-
-    internal async Task RenderFieldsGlobalAsync(IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
-        await RenderFieldsAsync(writer, dbContext, async (e, ns) => await e.RenderPropertyGlobalAsync(writer, ns, cancellationToken),
-            async (e, ns) => await e.RenderJsDocGlobalAsync(writer, ns, cancellationToken), cancellationToken);
-
-    internal async Task RenderFieldsScopedAsync(IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
-        await RenderFieldsAsync(writer, dbContext, async (e, ns) => await e.RenderPropertyScopedAsync(writer, ns, cancellationToken),
-            async (e, ns) => await e.RenderJsDocScopedAsync(writer, ns, cancellationToken), cancellationToken);
 }

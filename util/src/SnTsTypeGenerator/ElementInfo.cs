@@ -442,24 +442,4 @@ public class ElementInfo
             }
         }
     }
-
-    internal async Task RenderJsDocGlobalAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    internal async Task RenderPropertyGlobalAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    internal async Task RenderJsDocScopedAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    internal async Task RenderPropertyScopedAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
 }

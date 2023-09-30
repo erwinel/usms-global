@@ -1,6 +1,7 @@
 using System.CodeDom.Compiler;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -26,6 +27,104 @@ public sealed class MainWorkerService : BackgroundService
         // appLifetime.ApplicationStopping.Register(OnStopping);
         // appLifetime.ApplicationStopped.Register(OnStopped);
     }
+
+    internal async Task RenderJsDocGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal async Task RenderPropertyGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal async Task RenderJsDocScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal async Task RenderPropertyScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task RenderFieldsAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, Func<ElementInfo, string, Task> renderJsDocAsync,
+        CancellationToken cancellationToken)
+    {
+        string @namespace = tableInfo.GetNamespace();
+        var tableName = tableInfo.Name;
+        EntityEntry<TableInfo> entry = dbContext.Tables.Entry(tableInfo);
+        var elements = (await entry.GetRelatedCollectionAsync(e => e.Elements, cancellationToken)).ToArray();
+        TableInfo? superClass = await entry.GetReferencedEntityAsync(e => e.SuperClass, cancellationToken);
+        string extends;
+        ElementInfo[] jsDocElements;
+        if (superClass is not null)
+        {
+            extends = $"extends {superClass.GetInterfaceTypeString(@namespace)}{{";
+            if (elements.Length > 0)
+            {
+                var baseElements = await superClass.GetRelatedCollectionAsync(dbContext.Tables, t => t.Elements, cancellationToken);
+                if (baseElements.Any())
+                {
+                    var withBase = elements.GetBaseElements(baseElements);
+                    jsDocElements = withBase.Where(a => a.Base is not null && !a.IsTypeOverride).Select(a => a.Inherited).ToArray();
+                    elements = withBase.Where(a => a.Base is null || a.IsTypeOverride).Select(a => a.Inherited).ToArray();
+                }
+                else
+                    jsDocElements = Array.Empty<ElementInfo>();
+            }
+            else
+                jsDocElements = Array.Empty<ElementInfo>();
+        }
+        else if (elements.ExtendsBaseRecord())
+        {
+            jsDocElements = Array.Empty<ElementInfo>();
+            elements = elements.GetNonBaseRecordElements().ToArray();
+            extends = "extends IBaseRecord {";
+        }
+        else
+        {
+            jsDocElements = Array.Empty<ElementInfo>();
+            extends = "{";
+        }
+        tableName = tableInfo.GetShortName();
+        await writer.WriteLineAsync();
+        await writer.WriteLineAsync("/**");
+        if (tableName == tableInfo.Name)
+            await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(tableInfo.Label) || tableInfo.Label == tableName) ? tableName : tableInfo.Label.SmartQuoteJson())} glide record fields.");
+        else
+            await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(tableInfo.Label) || tableInfo.Label == tableName) ? tableName : tableInfo.Label.SmartQuoteJson())} ({tableInfo.Name}) glide record fields.");
+        await writer.WriteLineAsync($" * @see {{@link {tableInfo.GetGlideRecordTypeString(@namespace)}}}");
+        await writer.WriteLineAsync($" * @see {{@link {tableInfo.GetGlideElementTypeString(@namespace)}}}");
+        await writer.WriteLineAsync(" */");
+        if (elements.Length > 0 || jsDocElements.Length > 0)
+        {
+            await writer.WriteAsync($"export interface {tableName} {extends}");
+            var indent = writer.Indent + 1;
+            foreach (ElementInfo e in jsDocElements)
+            {
+                writer.Indent = indent;
+                await renderJsDocAsync(e, @namespace);
+            }
+            foreach (ElementInfo e in elements)
+            {
+                writer.Indent = indent;
+                await renderPropertyAsync(e, @namespace);
+            }
+            writer.Indent = indent - 1;
+            await writer.WriteLineAsync("}");
+        }
+        else
+            await writer.WriteLineAsync($"export interface {tableName} {extends} }}");
+    }
+
+    private async Task RenderFieldsGlobalAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
+        await RenderFieldsAsync(tableInfo, writer, dbContext, async (e, ns) => await RenderPropertyGlobalAsync(e, writer, ns, cancellationToken),
+            async (e, ns) => await RenderJsDocGlobalAsync(e, writer, ns, cancellationToken), cancellationToken);
+
+    private async Task RenderFieldsScopedAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
+        await RenderFieldsAsync(tableInfo, writer, dbContext, async (e, ns) => await RenderPropertyScopedAsync(e, writer, ns, cancellationToken),
+            async (e, ns) => await RenderJsDocScopedAsync(e, writer, ns, cancellationToken), cancellationToken);
 
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -174,12 +273,12 @@ public sealed class MainWorkerService : BackgroundService
                         if (isScoped)
                         {
                             foreach (TableInfo table in gns.OrderBy(g => g.Name))
-                                await table.RenderFieldsScopedAsync(writer, _dbContext, stoppingToken);
+                                await RenderFieldsScopedAsync(table, writer, _dbContext, stoppingToken);
                         }
                         else
                         {
                             foreach (TableInfo table in gns.OrderBy(g => g.Name))
-                                await table.RenderFieldsGlobalAsync(writer, _dbContext, stoppingToken);
+                                await RenderFieldsGlobalAsync(table, writer, _dbContext, stoppingToken);
                         }
                         writer.Indent = 0;
                         await writer.WriteLineAsync("}");
@@ -238,12 +337,12 @@ public sealed class MainWorkerService : BackgroundService
                         if (isScoped)
                         {
                             foreach (TableInfo table in nsg.OrderBy(g => g.Name))
-                                await table.RenderFieldsScopedAsync(writer, _dbContext, stoppingToken);
+                                await RenderFieldsScopedAsync(table, writer, _dbContext, stoppingToken);
                         }
                         else
                         {
                             foreach (TableInfo table in nsg.OrderBy(g => g.Name))
-                                await table.RenderFieldsGlobalAsync(writer, _dbContext, stoppingToken);
+                                await RenderFieldsGlobalAsync(table, writer, _dbContext, stoppingToken);
                         }
                         writer.Indent = 1;
                         await writer.WriteLineAsync("}");
