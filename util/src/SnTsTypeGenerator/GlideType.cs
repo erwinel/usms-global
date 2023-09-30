@@ -254,18 +254,6 @@ public class GlideType
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
 
-    internal static void OnBuildEntity(EntityTypeBuilder<GlideType> builder)
-    {
-        builder.HasKey(t => t.Name);
-        builder.HasIndex(t => t.SysID).IsUnique();
-        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(Label)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SysID)).UseCollation(COLLATION_NOCASE);
-        builder.HasOne(t => t.Source).WithMany(s => s.Types).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.Package).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.Scope).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
-    }
-
     internal static IEnumerable<string> GetDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(GlideType)}"" (

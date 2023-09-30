@@ -482,22 +482,17 @@ public class ElementInfo
         yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(IsPrimary)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(IsPrimary)}\")";
     }
 
-    internal static void OnBuildEntity(EntityTypeBuilder<ElementInfo> builder)
+    internal async Task RenderJsDocGlobalAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
-        builder.HasKey(t => t.Name);
-        builder.HasIndex(t => t.SysID).IsUnique();
-        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(Label)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SysID)).UseCollation(COLLATION_NOCASE);
-        builder.HasOne(t => t.Source).WithMany(s => s.Elements).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.Table).WithMany(s => s.Elements).HasForeignKey(t => t.TableName).IsRequired().OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.Type).WithMany(s => s.Elements).HasForeignKey(t => t.TypeName).IsRequired().OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.Package).WithMany(s => s.Elements).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.Scope).WithMany(s => s.Elements).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
-        builder.HasOne(t => t.Reference).WithMany(s => s.ReferredBy).HasForeignKey(t => t.RefTableName).OnDelete(DeleteBehavior.Restrict);
+        throw new NotImplementedException();
     }
 
     internal async Task RenderPropertyGlobalAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal async Task RenderJsDocScopedAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

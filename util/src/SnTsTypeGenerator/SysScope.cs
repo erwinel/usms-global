@@ -130,18 +130,6 @@ public class SysScope
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
 
-    internal static void OnBuildEntity(EntityTypeBuilder<SysScope> builder)
-    {
-        _ = builder.HasKey(s => s.Value);
-        _ = builder.HasIndex(s => s.SysID).IsUnique();
-        _ = builder.Property(nameof(Value)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(ShortDescription)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SysID)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SourceFqdn)).UseCollation(COLLATION_NOCASE);
-        _ = builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-    }
-
     internal static IEnumerable<string> GetDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysScope)}"" (

@@ -144,10 +144,10 @@ public class DataLoaderService : IDisposable
         {
             cancellationToken.ThrowIfCancellationRequested();
             StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
-            elements = elements.GetOverriddenElements(await tableInfo.SuperClass.GetRelatedCollectionAsync(_dbContext.Tables, t => t.Elements, cancellationToken)).Where(a =>
+            elements = elements.GetBaseElements(await tableInfo.SuperClass.GetRelatedCollectionAsync(_dbContext.Tables, t => t.Elements, cancellationToken)).Where(a =>
             {
-                (ElementInfo e, ElementInfo b, bool isTypeOverride) = a;
-                return isTypeOverride || e.IsActive != b.IsActive || e.IsArray != b.IsArray || e.MaxLength != b.MaxLength || e.IsDisplay != b.IsDisplay || e.SizeClass != b.SizeClass ||
+                (ElementInfo e, ElementInfo? b, bool isTypeOverride) = a;
+                return isTypeOverride || b is null || e.IsActive != b.IsActive || e.IsArray != b.IsArray || e.MaxLength != b.MaxLength || e.IsDisplay != b.IsDisplay || e.SizeClass != b.SizeClass ||
                     e.IsMandatory != b.IsMandatory || e.IsPrimary != b.IsPrimary || e.IsReadOnly != b.IsReadOnly || e.IsCalculated != b.IsCalculated || e.IsUnique != b.IsUnique ||
                     !comparer.Equals(e.Label, b.Label) || ((e.Comments is null) ? b.Comments is not null : b.Comments is null || !comparer.Equals(e.Comments, b.Comments)) ||
                     ((e.DefaultValue is null) ? b.DefaultValue is not null : b.DefaultValue is null || !comparer.Equals(e.Comments, b.DefaultValue)) ||

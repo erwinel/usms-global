@@ -159,19 +159,6 @@ public static class ExtensionMethods
     }
 
     /// <summary>
-    /// Gets elements that do not inherit from a super class.
-    /// </summary>
-    /// <param name="source">The elements of the inheriting class.</param>
-    /// <param name="inherited">The elements of the inherited class.</param>
-    /// <returns>The elements from <paramref name="source"/> where <paramref name="inherited"/> has no element that  matching the same <see cref="ElementInfo.Name"/> and <see cref="ElementInfo.TypeName"/>.</returns>
-    public static IEnumerable<ElementInfo> NewElements(this IEnumerable<ElementInfo> source, IEnumerable<ElementInfo>? inherited) => (inherited is null) ? source : source.Where(e =>
-    {
-        string n = e.Name;
-        string t = e.TypeName;
-        return !inherited.Any(i => i.Name  == n && i.TypeName == t);
-    });
-    
-    /// <summary>
     /// Gets elements that inherit from a super class with different properties.
     /// </summary>
     /// <param name="source">The elements of the inheriting class.</param>
@@ -186,24 +173,23 @@ public static class ExtensionMethods
             ie.IsReadOnly != ie.IsReadOnly || ie.IsUnique != ie.IsUnique || ie.Label != ie.Label || ie.MaxLength != ie.MaxLength || ie.IsArray != ie.IsArray);
     });
 
-    public static IEnumerable<(ElementInfo Inherited, ElementInfo Base, bool IsTypeOverride)> GetOverriddenElements(this IEnumerable<ElementInfo> inheritedElements, IEnumerable<ElementInfo> baseElements)
+    public static IEnumerable<(ElementInfo Inherited, ElementInfo? Base, bool IsTypeOverride)> GetBaseElements(this IEnumerable<ElementInfo> inheritedElements, IEnumerable<ElementInfo> baseElements)
     {
         StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
-        return inheritedElements.Select<ElementInfo, (ElementInfo Inherited, ElementInfo Base, bool IsTypeOverride)>(e =>
+        return inheritedElements.Select<ElementInfo, (ElementInfo Inherited, ElementInfo? Base, bool IsTypeOverride)>(e =>
         {
             string name = e.Name;
             ElementInfo? b = baseElements.FirstOrDefault(o => o.Name == name);
             if (b is null)
-                return (e, null!, false);
+                return (e, null, false);
             string tn = e.TypeName;
             string? r = e.RefTableName;
             if (r is null)
                 return (e, b, b.RefTableName is not null || !comparer.Equals(b.TypeName, tn));
             return (e, b, b.RefTableName is null || !(comparer.Equals(b.TypeName, tn) && comparer.Equals(b.RefTableName, r)));
-        }).Where(t => t.Base is not null);
+        });
     }
-        
-    
+
     /// <summary>
     /// Gets the properties that aren't implemented by the IBaseRecord type.
     /// </summary>

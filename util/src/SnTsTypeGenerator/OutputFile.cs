@@ -68,14 +68,6 @@ public class OutputFile : IValidatableObject
         return results;
     }
 
-    internal static void OnBuildEntity(EntityTypeBuilder<OutputFile> builder)
-    {
-        _ = builder.HasKey(s => s.Id);
-        _ = builder.HasIndex(s => s.Name).IsUnique();
-        _ = builder.Property(nameof(Label)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
-    }
-
     internal static IEnumerable<string> GetDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(OutputFile)}"" (

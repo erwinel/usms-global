@@ -74,14 +74,6 @@ public class SourceInfo
     [BackingField(nameof(_packages))]
     public virtual HashSet<SysPackage> Packages { get => _packages; set => _packages = value ?? new(); }
 
-    internal static void OnBuildEntity(EntityTypeBuilder<SourceInfo> builder)
-    {
-        _ = builder.HasKey(s => s.FQDN);
-        _ = builder.HasIndex(t => t.IsPersonalDev);
-        _ = builder.Property(nameof(FQDN)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(Label)).UseCollation(COLLATION_NOCASE);
-    }
-
     internal static IEnumerable<string> GetDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SourceInfo)}"" (

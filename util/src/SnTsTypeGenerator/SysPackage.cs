@@ -176,16 +176,6 @@ public class SysPackage
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
 
-    internal static void OnBuildEntity(EntityTypeBuilder<SysPackage> builder)
-    {
-        _ = builder.HasKey(s => s.Name);
-        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(ShortDescription)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SourceFqdn)).UseCollation(COLLATION_NOCASE);
-        _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-        _ = builder.HasOne(t => t.Output).WithMany(s => s.Packages).HasForeignKey(t => t.OutputId).IsRequired().OnDelete(DeleteBehavior.Restrict);
-    }
-
     internal static IEnumerable<string> GetDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysPackage)}"" (

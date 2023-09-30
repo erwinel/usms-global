@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -141,13 +142,100 @@ public class TypingsDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        _ = modelBuilder.Entity<OutputFile>(OutputFile.OnBuildEntity)
-            .Entity<SourceInfo>(SourceInfo.OnBuildEntity)
-            .Entity<SysPackage>(SysPackage.OnBuildEntity)
-            .Entity<SysScope>(SysScope.OnBuildEntity)
-            .Entity<GlideType>(GlideType.OnBuildEntity)
-            .Entity<TableInfo>(TableInfo.OnBuildEntity)
-            .Entity<ElementInfo>(ElementInfo.OnBuildEntity);
+        _ = modelBuilder.Entity<OutputFile>(builder =>
+            {
+                _ = builder.HasKey(s => s.Id);
+                _ = builder.HasIndex(s => s.Name).IsUnique();
+                _ = builder.Property(nameof(OutputFile.Label)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(OutputFile.Name)).UseCollation(COLLATION_NOCASE);
+            })
+            .Entity<SourceInfo>(builder =>
+            {
+                _ = builder.HasKey(s => s.FQDN);
+                _ = builder.HasIndex(t => t.IsPersonalDev);
+                _ = builder.Property(nameof(SourceInfo.FQDN)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SourceInfo.Label)).UseCollation(COLLATION_NOCASE);
+            })
+            .Entity<SysPackage>(builder =>
+            {
+                _ = builder.HasKey(s => s.Name);
+                _ = builder.Property(nameof(SysPackage.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SysPackage.SysId)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SysPackage.ShortDescription)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SysPackage.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Output).WithMany(s => s.Packages).HasForeignKey(t => t.OutputId).IsRequired().OnDelete(DeleteBehavior.Restrict);
+            })
+            .Entity<SysScope>(builder =>
+            {
+                _ = builder.HasKey(s => s.Value);
+                _ = builder.HasIndex(s => s.SysID).IsUnique();
+                _ = builder.Property(nameof(SysScope.Value)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SysScope.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SysScope.ShortDescription)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SysScope.SysID)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SysScope.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+            })
+            .Entity<GlideType>(builder =>
+            {
+                _ = builder.HasKey(t => t.Name);
+                _ = builder.HasIndex(t => t.SysID).IsUnique();
+                _ = builder.Property(nameof(GlideType.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(GlideType.Label)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(GlideType.SysID)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(GlideType.ScalarType)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(GlideType.ClassName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(GlideType.PackageName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(GlideType.ScopeValue)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(GlideType.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.HasOne(t => t.Source).WithMany(s => s.Types).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Package).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Scope).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
+            })
+            .Entity<TableInfo>(builder =>
+            {
+                _ = builder.HasKey(t => t.Name);
+                _ = builder.HasIndex(t => t.SysID).IsUnique();
+                _ = builder.HasIndex(t => t.IsExtendable);
+                _ = builder.Property(nameof(TableInfo.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.Label)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.SysID)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.NumberPrefix)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.AccessibleFrom)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.ExtensionModel)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.PackageName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.ScopeValue)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.SuperClassName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(TableInfo.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.HasOne(t => t.Source).WithMany(s => s.Tables).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Scope).WithMany(s => s.Tables).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.SuperClass).WithMany(s => s.Derived).HasForeignKey(t => t.SuperClassName).OnDelete(DeleteBehavior.Restrict);
+            })
+            .Entity<ElementInfo>(builder =>
+            {
+                _ = builder.HasKey(t => t.Name);
+                _ = builder.HasIndex(t => t.SysID).IsUnique();
+                _ = builder.Property(nameof(ElementInfo.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.Label)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.SysID)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.Comments)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.DefaultValue)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.PackageName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.ScopeValue)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.TableName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.TypeName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.RefTableName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(ElementInfo.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.HasOne(t => t.Source).WithMany(s => s.Elements).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Table).WithMany(s => s.Elements).HasForeignKey(t => t.TableName).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Type).WithMany(s => s.Elements).HasForeignKey(t => t.TypeName).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Package).WithMany(s => s.Elements).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Scope).WithMany(s => s.Elements).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
+                _ = builder.HasOne(t => t.Reference).WithMany(s => s.ReferredBy).HasForeignKey(t => t.RefTableName).OnDelete(DeleteBehavior.Restrict);
+            });
     }
 
     /// <summary>

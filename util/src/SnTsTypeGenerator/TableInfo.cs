@@ -366,27 +366,6 @@ public class TableInfo
         return $"{_scopeValue}.{NS_NAME_fields}.{GetShortName()}";
     }
 
-    internal static void OnBuildEntity(EntityTypeBuilder<TableInfo> builder)
-    {
-        _ = builder.HasKey(t => t.Name);
-        _ = builder.HasIndex(t => t.SysID).IsUnique();
-        _ = builder.HasIndex(t => t.IsExtendable);
-        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(Label)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SysID)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(NumberPrefix)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(AccessibleFrom)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(ExtensionModel)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SourceFqdn)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(PackageName)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(ScopeValue)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SuperClassName)).UseCollation(COLLATION_NOCASE);
-        _ = builder.HasOne(t => t.Source).WithMany(s => s.Tables).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-        _ = builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
-        _ = builder.HasOne(t => t.Scope).WithMany(s => s.Tables).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
-        _ = builder.HasOne(t => t.SuperClass).WithMany(s => s.Derived).HasForeignKey(t => t.SuperClassName).OnDelete(DeleteBehavior.Restrict);
-    }
-
     internal static IEnumerable<string> GetDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(TableInfo)}"" (
@@ -409,26 +388,44 @@ public class TableInfo
         yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(IsExtendable)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(IsExtendable)}\")";
     }
 
-    private async Task RenderFieldsAsync(IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, CancellationToken cancellationToken)
+    private async Task RenderFieldsAsync(IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, Func<ElementInfo, string, Task> renderJsDocAsync, CancellationToken cancellationToken)
     {
         string @namespace = GetNamespace();
         var tableName = Name;
         EntityEntry<TableInfo> entry = dbContext.Tables.Entry(this);
-        var elements = await entry.GetRelatedCollectionAsync(e => e.Elements, cancellationToken);
+        var elements = (await entry.GetRelatedCollectionAsync(e => e.Elements, cancellationToken)).ToArray();
         TableInfo? superClass = await entry.GetReferencedEntityAsync(e => e.SuperClass, cancellationToken);
         string extends;
+        ElementInfo[] jsDocElements;
         if (superClass is not null)
         {
             extends = $"extends {superClass.GetInterfaceTypeString(@namespace)}{{";
-            elements = elements.NewElements(await superClass.GetRelatedCollectionAsync(dbContext.Tables, t => t.Elements, cancellationToken));
+            if (elements.Length > 0)
+            {
+                var baseElements = await superClass.GetRelatedCollectionAsync(dbContext.Tables, t => t.Elements, cancellationToken);
+                if (baseElements.Any())
+                {
+                    var withBase = elements.GetBaseElements(baseElements);
+                    jsDocElements = withBase.Where(a => a.Base is not null && !a.IsTypeOverride).Select(a => a.Inherited).ToArray();
+                    elements = withBase.Where(a => a.Base is null || a.IsTypeOverride).Select(a => a.Inherited).ToArray();
+                }
+                else
+                    jsDocElements = Array.Empty<ElementInfo>();
+            }
+            else
+                jsDocElements = Array.Empty<ElementInfo>();
         }
         else if (elements.ExtendsBaseRecord())
         {
-            elements = elements.GetNonBaseRecordElements();
+            jsDocElements = Array.Empty<ElementInfo>();
+            elements = elements.GetNonBaseRecordElements().ToArray();
             extends = "extends IBaseRecord {";
         }
         else
+        {
+            jsDocElements = Array.Empty<ElementInfo>();
             extends = "{";
+        }
         tableName = GetShortName();
         await writer.WriteLineAsync();
         await writer.WriteLineAsync("/**");
@@ -439,10 +436,15 @@ public class TableInfo
         await writer.WriteLineAsync($" * @see {{@link {GetGlideRecordTypeString(@namespace)}}}");
         await writer.WriteLineAsync($" * @see {{@link {GetGlideElementTypeString(@namespace)}}}");
         await writer.WriteLineAsync(" */");
-        if (elements.Any())
+        if (elements.Length > 0 || jsDocElements.Length > 0)
         {
             await writer.WriteAsync($"export interface {tableName} {extends}");
             var indent = writer.Indent + 1;
+            foreach (ElementInfo e in jsDocElements)
+            {
+                writer.Indent = indent;
+                await renderJsDocAsync(e, @namespace);
+            }
             foreach (ElementInfo e in elements)
             {
                 writer.Indent = indent;
@@ -455,13 +457,11 @@ public class TableInfo
             await writer.WriteLineAsync($"export interface {tableName} {extends} }}");
     }
 
-    internal async Task RenderFieldsGlobalAsync(IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
-    {
-        await RenderFieldsAsync(writer, dbContext, async (e, ns) => await e.RenderPropertyGlobalAsync(writer, ns, cancellationToken), cancellationToken);
-    }
-    
-    internal async Task RenderFieldsScopedAsync(IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
-    {
-        await RenderFieldsAsync(writer, dbContext, async (e, ns) => await e.RenderPropertyScopedAsync(writer, ns, cancellationToken), cancellationToken);
-    }
+    internal async Task RenderFieldsGlobalAsync(IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
+        await RenderFieldsAsync(writer, dbContext, async (e, ns) => await e.RenderPropertyGlobalAsync(writer, ns, cancellationToken),
+            async (e, ns) => await e.RenderJsDocGlobalAsync(writer, ns, cancellationToken), cancellationToken);
+
+    internal async Task RenderFieldsScopedAsync(IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
+        await RenderFieldsAsync(writer, dbContext, async (e, ns) => await e.RenderPropertyScopedAsync(writer, ns, cancellationToken),
+            async (e, ns) => await e.RenderJsDocScopedAsync(writer, ns, cancellationToken), cancellationToken);
 }
