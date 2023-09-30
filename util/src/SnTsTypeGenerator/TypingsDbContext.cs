@@ -16,23 +16,167 @@ public class TypingsDbContext : DbContext
     private readonly ILogger<TypingsDbContext> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 
+    private bool _pathValidated;
+
+    /// <summary>
+    /// Indicates whether service initialization was successful.
+    /// </summary>
+    internal bool InitSuccessful => _pathValidated && Database.CanConnect();
+
+    private static IEnumerable<string> GetOutputFileDbInitCommands()
+    {
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(OutputFile)}"" (
+    ""{nameof(OutputFile.Id)}"" UNIQUEIDENTIFIER NOt NULL COLLATE NOCASE,
+    ""{nameof(OutputFile.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(OutputFile.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(OutputFile)}"" PRIMARY KEY(""{nameof(OutputFile.Id)}"")
+)";
+    }
+    
+    private static IEnumerable<string> GetSourceInfoDbInitCommands()
+    {
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SourceInfo)}"" (
+    ""{nameof(SourceInfo.FQDN)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SourceInfo.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SourceInfo.IsPersonalDev)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(SourceInfo.LastAccessed)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    CONSTRAINT ""PK_{nameof(SourceInfo)}"" PRIMARY KEY(""{nameof(SourceInfo.FQDN)}"")
+)";
+        yield return $"CREATE INDEX \"IDX_{nameof(SourceInfo)}_{nameof(SourceInfo.IsPersonalDev)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(SourceInfo.IsPersonalDev)}\")";
+    }
+    
+    private static IEnumerable<string> GetSysPackageDbInitCommands()
+    {
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysPackage)}"" (
+    ""{nameof(SysPackage.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SysPackage.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(SysPackage.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    ""{nameof(SysPackage.OutputId)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(OutputFile)}"" REFERENCES ""{nameof(OutputFile)}""(""{nameof(OutputFile.Id)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(SysPackage.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(SysPackage)}"" PRIMARY KEY(""{nameof(SysPackage.Name)}"")
+)";
+    }
+    
+    private static IEnumerable<string> GetSysScopeDbInitCommands()
+    {
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysScope)}"" (
+    ""{nameof(SysScope.Value)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SysScope.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SysScope.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(SysScope.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SysScope.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    ""{nameof(SysScope.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysScope)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(SysScope)}"" PRIMARY KEY(""{nameof(SysScope.Value)}""),
+    CONSTRAINT ""UK_{nameof(SysScope)}_{nameof(SysScope.SysID)}"" UNIQUE(""{nameof(SysScope.SysID)}"")
+)";
+        yield return $"CREATE INDEX \"IDX_{nameof(SysScope)}_{nameof(SysScope.SysID)}\" ON \"{nameof(SysScope)}\" (\"{nameof(SysScope.SysID)}\" COLLATE NOCASE)";
+    }
+    
+    private static IEnumerable<string> GetGlideTypeDbInitCommands()
+    {
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(GlideType)}"" (
+    ""{nameof(GlideType.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.ScalarType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.ScalarLength)}"" INT DEFAULT NULL,
+    ""{nameof(GlideType.ClassName)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.UseOriginalValue)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.IsVisible)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.LastUpdated)}"" DATETIME NOT NULL,
+    ""{nameof(GlideType.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(GlideType)}"" PRIMARY KEY(""{nameof(GlideType.Name)}""),
+    CONSTRAINT ""UK_{nameof(GlideType)}_{nameof(GlideType.SysID)}"" UNIQUE(""{nameof(GlideType.SysID)}"")
+)";
+        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.SysID)}\" ON \"{nameof(GlideType)}\" (\"{nameof(GlideType.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.UseOriginalValue)}\" ON \"{nameof(GlideType)}\" (\"{nameof(GlideType.UseOriginalValue)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.IsVisible)}\" ON \"{nameof(GlideType)}\" (\"{nameof(GlideType.IsVisible)}\")";
+    }
+    
+    private static IEnumerable<string> GetTableInfoDbInitCommands()
+    {
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(TableInfo)}"" (
+    ""{nameof(TableInfo.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(TableInfo.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(TableInfo.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(TableInfo.NumberPrefix)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(TableInfo.AccessibleFrom)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(TableInfo.ExtensionModel)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(TableInfo.IsExtendable)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(TableInfo.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    ""{nameof(TableInfo.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(TableInfo.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(TableInfo.SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(TableInfo.SuperClass)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(TableInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(TableInfo)}"" PRIMARY KEY(""{nameof(TableInfo.Name)}""),
+    CONSTRAINT ""UK_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}"" UNIQUE(""{nameof(TableInfo.SysID)}"")
+)";
+        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(TableInfo.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.IsExtendable)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(TableInfo.IsExtendable)}\")";
+    }
+    
+    private static IEnumerable<string> GetElementInfoDbInitCommands()
+    {
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(ElementInfo)}"" (
+    ""{nameof(ElementInfo.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(ElementInfo.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(ElementInfo.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(ElementInfo.IsActive)}"" BIT NOT NULL DEFAULT 1,
+    ""{nameof(ElementInfo.IsArray)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(ElementInfo.MaxLength)}"" INT DEFAULT NULL,
+    ""{nameof(ElementInfo.SizeClass)}"" INT DEFAULT NULL,
+    ""{nameof(ElementInfo.Comments)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(ElementInfo.DefaultValue)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(ElementInfo.IsDisplay)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(ElementInfo.IsMandatory)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(ElementInfo.IsPrimary)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(ElementInfo.IsReadOnly)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(ElementInfo.IsCalculated)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(ElementInfo.IsUnique)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(ElementInfo.LastUpdated)}"" DATETIME NOT NULL,
+    ""{nameof(ElementInfo.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.TableName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(ElementInfo.Table)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(ElementInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.TypeName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(GlideType)}"" REFERENCES ""{nameof(GlideType)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.RefTableName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(TableInfo)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(ElementInfo)}"" PRIMARY KEY(""{nameof(ElementInfo.Name)}""),
+    CONSTRAINT ""UK_{nameof(ElementInfo)}_{nameof(ElementInfo.SysID)}"" UNIQUE(""{nameof(ElementInfo.SysID)}"")
+)";
+        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.SysID)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsActive)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.IsActive)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsDisplay)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.IsDisplay)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsPrimary)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.IsPrimary)}\")";
+    }
+    
     public TypingsDbContext(DbContextOptions<TypingsDbContext> options, ILogger<TypingsDbContext> logger, IServiceScopeFactory scopeFactory) : base(options)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
         SqliteConnectionStringBuilder csb;
-        string dbFile = Database.GetConnectionString()!;
-        try
-        {
-            dbFile = (csb = new(dbFile)).DataSource;
-            if (File.Exists(dbFile))
-                return;
-        }
+        string connectionString = Database.GetConnectionString()!;
+        FileInfo dbFile;
+        try { dbFile = new((csb = new(connectionString)).DataSource); }
         catch (Exception exception)
         {
-            _logger.LogCriticalDbfileValidationError(dbFile, exception);
+            _logger.LogDbfileValidationError(connectionString, exception);
+            _pathValidated = false;
             return;
         }
+        if (dbFile.Exists)
+        {
+            _pathValidated = true;
+            return;
+        }
+        if (dbFile.Directory is null || !dbFile.Directory.Exists)
+        {
+            _logger.LogDbFileDirectoryNotFound(dbFile);
+            _pathValidated = false;
+            return;
+        }
+
         csb.Mode = SqliteOpenMode.ReadWriteCreate;
         SqliteConnection connection;
         try
@@ -42,34 +186,47 @@ public class TypingsDbContext : DbContext
         }
         catch (Exception exception)
         {
-            _logger.LogCriticalDbfileAccessError(dbFile, exception);
+            _logger.LogDbfileAccessError(connectionString, exception);
+            _pathValidated = false;
             return;
         }
-        using (connection)
+        try
         {
-            var transaction = connection.BeginTransaction();
-            bool execDbInitCommands<T>(IEnumerable<string> commands)
+            using (connection)
             {
-                foreach (string query in commands)
+                var transaction = connection.BeginTransaction();
+                bool executeDbInitCommands<T>(IEnumerable<string> commands)
                 {
-                    using SqliteCommand command = connection.CreateCommand();
-                    command.CommandText = query;
-                    command.CommandType = System.Data.CommandType.Text;
-                    try { _ = command.ExecuteNonQuery(); }
-                    catch (Exception exception)
+                    foreach (string query in commands)
                     {
-                        _logger.LogCriticalDbInitializationFailure(query, typeof(OutputFile), dbFile, exception);
-                        return true;
+                        using SqliteCommand command = connection.CreateCommand();
+                        command.CommandText = query;
+                        command.CommandType = System.Data.CommandType.Text;
+                        try { _ = command.ExecuteNonQuery(); }
+                        catch (Exception exception)
+                        {
+                            _logger.LogCriticalDbInitializationFailure(query, typeof(T), dbFile, exception);
+                            return true;
+                        }
                     }
+                    return false;
                 }
-                return false;
-            }
-            if (execDbInitCommands<OutputFile>(OutputFile.GetDbInitCommands()) || execDbInitCommands<SourceInfo>(SourceInfo.GetDbInitCommands()) || execDbInitCommands<SysPackage>(SysPackage.GetDbInitCommands()) ||
-                    execDbInitCommands<SysScope>(SysScope.GetDbInitCommands()) || execDbInitCommands<GlideType>(GlideType.GetDbInitCommands()) || execDbInitCommands<TableInfo>(TableInfo.GetDbInitCommands()) ||
-                    execDbInitCommands<ElementInfo>(ElementInfo.GetDbInitCommands()))
-                transaction.Rollback();
-            else
+                if (executeDbInitCommands<OutputFile>(GetOutputFileDbInitCommands()) || executeDbInitCommands<SourceInfo>(GetSourceInfoDbInitCommands()) || executeDbInitCommands<SysPackage>(GetSysPackageDbInitCommands()) ||
+                    executeDbInitCommands<SysScope>(GetSysScopeDbInitCommands()) || executeDbInitCommands<GlideType>(GetGlideTypeDbInitCommands()) || executeDbInitCommands<TableInfo>(GetTableInfoDbInitCommands()) ||
+                    executeDbInitCommands<ElementInfo>(GetElementInfoDbInitCommands()))
+                {
+                    transaction.Rollback();
+                    _pathValidated = false;
+                    return;
+                }
                 transaction.Commit();
+            }
+            _pathValidated = true;
+        }
+        catch (Exception error)
+        {
+            _logger.LogCriticalDbInitializationFailure(dbFile, error);
+            _pathValidated = false;
         }
     }
 

@@ -448,40 +448,6 @@ public class ElementInfo
 
     internal bool OptionsEqualTo(ElementInfo other) => ReferenceEquals(this, other) || (Name == other.Name && TypeName == other.TypeName && RefTableName == other.RefTableName);
     
-    internal static IEnumerable<string> GetDbInitCommands()
-    {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(ElementInfo)}"" (
-    ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(IsActive)}"" BIT NOT NULL DEFAULT 1,
-    ""{nameof(IsArray)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(MaxLength)}"" INT DEFAULT NULL,
-    ""{nameof(SizeClass)}"" INT DEFAULT NULL,
-    ""{nameof(Comments)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(DefaultValue)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(IsDisplay)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(IsMandatory)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(IsPrimary)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(IsReadOnly)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(IsCalculated)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(IsUnique)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(TableName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(Table)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(TypeName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(GlideType)}"" REFERENCES ""{nameof(GlideType)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(RefTableName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(TableInfo)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(ElementInfo)}"" PRIMARY KEY(""{nameof(Name)}""),
-    CONSTRAINT ""UK_{nameof(ElementInfo)}_{nameof(SysID)}"" UNIQUE(""{nameof(SysID)}"")
-)";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(SysID)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(IsActive)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(IsActive)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(IsDisplay)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(IsDisplay)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(IsPrimary)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(IsPrimary)}\")";
-    }
-
     internal async Task RenderJsDocGlobalAsync(IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

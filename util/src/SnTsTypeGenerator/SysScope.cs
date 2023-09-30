@@ -129,19 +129,4 @@ public class SysScope
     [NotNull]
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
-
-    internal static IEnumerable<string> GetDbInitCommands()
-    {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysScope)}"" (
-    ""{nameof(Value)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysScope)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(SysScope)}"" PRIMARY KEY(""{nameof(Value)}""),
-    CONSTRAINT ""UK_{nameof(SysScope)}_{nameof(SysID)}"" UNIQUE(""{nameof(SysID)}"")
-)";
-        yield return $"CREATE INDEX \"IDX_{nameof(SysScope)}_{nameof(SysID)}\" ON \"{nameof(SysScope)}\" (\"{nameof(SysID)}\" COLLATE NOCASE)";
-    }
 }

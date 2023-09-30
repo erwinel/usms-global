@@ -253,27 +253,4 @@ public class GlideType
     [NotNull]
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
-
-    internal static IEnumerable<string> GetDbInitCommands()
-    {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(GlideType)}"" (
-    ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(ScalarType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(ScalarLength)}"" INT DEFAULT NULL,
-    ""{nameof(ClassName)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(UseOriginalValue)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(IsVisible)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(GlideType)}"" PRIMARY KEY(""{nameof(Name)}""),
-    CONSTRAINT ""UK_{nameof(GlideType)}_{nameof(SysID)}"" UNIQUE(""{nameof(SysID)}"")
-)";
-        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(SysID)}\" ON \"{nameof(GlideType)}\" (\"{nameof(SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(UseOriginalValue)}\" ON \"{nameof(GlideType)}\" (\"{nameof(UseOriginalValue)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(IsVisible)}\" ON \"{nameof(GlideType)}\" (\"{nameof(IsVisible)}\")";
-    }
 }

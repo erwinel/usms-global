@@ -1,11 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.CodeDom.Compiler;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
@@ -364,28 +362,6 @@ public class TableInfo
         if (targetNs == _scopeValue)
             return $"{NS_NAME_fields}.{GetShortName()}";
         return $"{_scopeValue}.{NS_NAME_fields}.{GetShortName()}";
-    }
-
-    internal static IEnumerable<string> GetDbInitCommands()
-    {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(TableInfo)}"" (
-    ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(NumberPrefix)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(AccessibleFrom)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(ExtensionModel)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(IsExtendable)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SuperClass)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(TableInfo)}"" PRIMARY KEY(""{nameof(Name)}""),
-    CONSTRAINT ""UK_{nameof(TableInfo)}_{nameof(SysID)}"" UNIQUE(""{nameof(SysID)}"")
-)";
-        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(SysID)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(IsExtendable)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(IsExtendable)}\")";
     }
 
     private async Task RenderFieldsAsync(IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, Func<ElementInfo, string, Task> renderJsDocAsync, CancellationToken cancellationToken)

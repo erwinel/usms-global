@@ -1,9 +1,5 @@
-using System.Diagnostics;
 using System.Net;
-using System.Net.Mime;
-using System.Text.Json;
 using System.Text.Json.Nodes;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static SnTsTypeGenerator.Constants;
@@ -153,9 +149,9 @@ public sealed class TableAPIService : IDisposable
             if (node is not JsonObject sysDictionary)
                 _logger.LogInvalidResultElementType(requestUri, node, index);
             else if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_ELEMENT, out string? name))
-                _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_ELEMENT, index, sysDictionary);
+                _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_ELEMENT, index, sysDictionary);
             else if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-                _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_SYS_ID, index, sysDictionary);
+                _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_SYS_ID, index, sysDictionary);
             else
                 return new ElementInfo()
                 {
@@ -304,7 +300,7 @@ public sealed class TableAPIService : IDisposable
         if (string.IsNullOrWhiteSpace(remoteUri))
         {
             if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                _logger.LogCriticalRemoteInstanceUriNotProvided();
+                _logger.LogRemoteInstanceUriNotProvided();
             BaseURL = EmptyURI;
             return;
         }
@@ -314,7 +310,7 @@ public sealed class TableAPIService : IDisposable
             {
                 BaseURL = EmptyURI;
                 if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                    _logger.LogCriticalInvalidRemoteInstanceUri();
+                    _logger.LogInvalidRemoteInstanceUri();
                 return;
             }
             uri = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
@@ -325,7 +321,7 @@ public sealed class TableAPIService : IDisposable
                     if (_appSettings.Value.Password is null)
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalUserNameNotProvided();
+                            _logger.LogUserNameNotProvided();
                         BaseURL = EmptyURI;
                         return;
                     }
@@ -334,7 +330,7 @@ public sealed class TableAPIService : IDisposable
                     if (string.IsNullOrEmpty(userName))
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalUserNameNotProvided();
+                            _logger.LogUserNameNotProvided();
                         BaseURL = EmptyURI;
                         return;
                     }
@@ -342,7 +338,7 @@ public sealed class TableAPIService : IDisposable
                     if (string.IsNullOrEmpty(password))
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalPasswordNotProvided();
+                            _logger.LogPasswordNotProvided();
                         BaseURL = EmptyURI;
                         return;
                     }
@@ -353,7 +349,7 @@ public sealed class TableAPIService : IDisposable
                     if (_appSettings.Value.ClientSecret is null)
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalPasswordNotProvided();
+                            _logger.LogPasswordNotProvided();
                         BaseURL = EmptyURI;
                         return;
                     }
@@ -366,7 +362,7 @@ public sealed class TableAPIService : IDisposable
                 if (password is null && string.IsNullOrEmpty(password = Console.ReadLine()))
                 {
                     if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                        _logger.LogCriticalPasswordNotProvided();
+                        _logger.LogPasswordNotProvided();
                     BaseURL = EmptyURI;
                     return;
                 }
@@ -378,7 +374,7 @@ public sealed class TableAPIService : IDisposable
         {
             BaseURL = EmptyURI;
             if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                _logger.LogCriticalInvalidRemoteInstanceUri();
+                _logger.LogInvalidRemoteInstanceUri();
         }
     }
 

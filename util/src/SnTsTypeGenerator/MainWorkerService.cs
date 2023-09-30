@@ -49,7 +49,7 @@ public sealed class MainWorkerService : BackgroundService
         bool isScoped = _appSettings.Value.Scoped ?? false;
         if (isScoped && (_appSettings.Value.Global ?? false))
         {
-            _logger.LogCriticalGlobalAndScopedSwitchesBothSet();
+            _logger.LogGlobalAndScopedSwitchesBothSet();
             return;
         }
 
