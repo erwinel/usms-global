@@ -10,6 +10,8 @@ namespace SnTsTypeGenerator;
 
 public static class LoggerMessages
 {
+    // TODO: Add events with codes 0x0006, and 0x0007
+    
     #region Critical DbfileValidation Error (0x0001)
 
     /// <summary>
@@ -157,66 +159,6 @@ public static class LoggerMessages
             _criticalSettingValueNotProvided2(logger, settingName, cmdLineSwitch, null);
     }
     
-    #endregion
-
-    #region Critical UserNameNotProvided Error (0x0005)
-
-    /// <summary>
-    /// Numerical event code for missing user name.
-    /// </summary>
-    public const int EVENT_ID_UserNameNotProvided = 0x0005;
-
-    /// <summary>
-    /// Event ID for missing user name.
-    /// </summary>
-    public static readonly EventId UserNameNotProvided = new(EVENT_ID_UserNameNotProvided, nameof(UserNameNotProvided));
-
-    private static readonly Action<ILogger, Exception?> _userNameNotProvided = LoggerMessage.Define(LogLevel.Critical, UserNameNotProvided,
-        "User name was not provided.");
-
-    [Obsolete("Use LogCriticalSettingValueNotProvided")]
-    public static void LogUserNameNotProvided(this ILogger logger) => _userNameNotProvided(logger, null);
-
-    #endregion
-
-    #region Critical PasswordNotProvided Error (0x0006)
-
-    /// <summary>
-    /// Numerical event code for missing password.
-    /// </summary>
-    public const int EVENT_ID_PasswordNotProvided = 0x0006;
-
-    /// <summary>
-    /// Event ID for missing password.
-    /// </summary>
-    public static readonly EventId PasswordNotProvided = new(EVENT_ID_PasswordNotProvided, nameof(PasswordNotProvided));
-
-    private static readonly Action<ILogger, Exception?> _passwordNotProvided = LoggerMessage.Define(LogLevel.Critical, PasswordNotProvided,
-        "Password was not provided.");
-
-    [Obsolete("Use LogCriticalSettingValueNotProvided")]
-    public static void LogPasswordNotProvided(this ILogger logger) => _passwordNotProvided(logger, null);
-
-    #endregion
-
-    #region Critical RemoteInstanceUriNotProvided Error (0x0007)
-
-    /// <summary>
-    /// Numerical event code for missing remote URL.
-    /// </summary>
-    public const int EVENT_ID_RemoteInstanceUriNotProvided = 0x0007;
-
-    /// <summary>
-    /// Event ID for missing remote URL.
-    /// </summary>
-    public static readonly EventId RemoteInstanceUriNotProvided = new(EVENT_ID_RemoteInstanceUriNotProvided, nameof(RemoteInstanceUriNotProvided));
-
-    private static readonly Action<ILogger, Exception?> _remoteInstanceUriNotProvided = LoggerMessage.Define(LogLevel.Critical, RemoteInstanceUriNotProvided,
-        "The remote ServiceNow instance URI was not provided.");
-
-    [Obsolete("Use LogCriticalSettingValueNotProvided")]
-    public static void LogRemoteInstanceUriNotProvided(this ILogger logger) => _remoteInstanceUriNotProvided(logger, null);
-
     #endregion
 
     #region Critical InvalidRemoteInstanceUri Error (0x0008)
