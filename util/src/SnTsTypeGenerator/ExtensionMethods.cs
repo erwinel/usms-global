@@ -1,13 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Net;
-using System.Net.Mime;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Logging;
 using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
