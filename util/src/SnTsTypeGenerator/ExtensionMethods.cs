@@ -235,66 +235,15 @@ public static class ExtensionMethods
         return (!value.Any(c => char.IsWhiteSpace(c)) && value.Length == result.Length - 2) ? value : result;
     }
 
-    public static async Task<JsonNode?> GetAPIJsonResult(this HttpClientHandler handler, Uri requestUri, ILogger logger, CancellationToken cancellationToken)
+    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string id, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        logger.LogAPIRequestStart(requestUri);
-        using HttpClient httpClient = new(handler);
-        HttpRequestMessage message = new(HttpMethod.Get, requestUri);
-        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-        using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
-        cancellationToken.ThrowIfCancellationRequested();
-        try { response.EnsureSuccessStatusCode(); }
-        catch (HttpRequestException exception) { throw new RequestFailedException(requestUri, exception); }
-        string responseBody;
-        try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
-        catch (Exception exception) { throw new GetResponseContentFailedException(requestUri, exception); }
-        cancellationToken.ThrowIfCancellationRequested();
-        if (string.IsNullOrWhiteSpace(responseBody)) { throw new InvalidHttpResponseException(requestUri, responseBody); }
-        JsonNode? result;
-        try
-        {
-            using JsonDocument doc = JsonDocument.Parse(responseBody);
-            result = doc.RootElement.ValueKind switch
-            {
-                JsonValueKind.Undefined or JsonValueKind.Null => null,
-                JsonValueKind.Array => JsonArray.Create(doc.RootElement),
-                JsonValueKind.Object => JsonObject.Create(doc.RootElement),
-                _ => JsonValue.Create(doc.RootElement),
-            };
-        }
-        catch (JsonException exception) { throw new ResponseParsingException(requestUri, responseBody, exception); }
-        logger.LogAPIRequestCompleted(requestUri, result);
-        return result;
+        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName}/{Uri.EscapeDataString(id)}", $"{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
     }
 
-    /// <summary>
-    /// Creates a table API URI.
-    /// </summary>
-    /// <param name="baseUri">The base URI.</param>
-    /// <param name="tableName">The table name.</param>
-    /// <param name="element">The element name.</param>
-    /// <param name="value">The element value.</param>
-    /// <returns>A <see cref="URI"/> to look up a table based upon a element name and value.</returns>
-    public static Uri ToTableApiUri(this Uri baseUri, string tableName, string element, string value)
+    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string element, string value, CancellationToken cancellationToken)
     {
         value = Uri.EscapeDataString($"{element}={value}");
-        return new UriBuilder(baseUri)
-        {
-            Path = $"{URI_PATH_API}/{tableName}",
-            Query = $"{URI_PARAM_QUERY}={value}&{URI_PARAM_DISPLAY_VALUE}=all",
-            Fragment = null
-        }.Uri;
-    }
-
-    public static Uri ToTableApiUri(this Uri baseUri, string tableName, string id)
-    {
-        return new UriBuilder(baseUri)
-        {
-            Path = $"{URI_PATH_API}/{tableName}/{Uri.EscapeDataString(id)}",
-            Query = $"{URI_PARAM_DISPLAY_VALUE}=all",
-            Fragment = null
-        }.Uri;
+        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName}", $"{URI_PARAM_QUERY}={value}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
     }
 
     // public static async Task<string?> GetJsonResponseAsync(this HttpClientHandler? clientHandler, Uri requestUri, ILogger logger, CancellationToken cancellationToken)
@@ -400,22 +349,17 @@ public static class ExtensionMethods
         return defaultValue;
     }
 
-    public static bool TryCoercePropertyAsInt(this JsonObject source, string propertyName, [NotNullWhen(true)] out int? result)
+    public static bool TryCoercePropertyAsInt(this JsonObject source, string propertyName, out int result)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue)
         {
-            if (jsonValue.TryGetValue(out result))
+            if (jsonValue.TryGetValue(out result) || jsonValue.TryGetValue(out string? s) && int.TryParse(s, out result))
                 return true;
-            if (jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i))
-            {
-                result = i;
-                return true;
-            }
         }
-        result = null;
+        else
+            result = default;
         return false;
     }
-
     public static int? CoercePropertyAsIntOrNull(this JsonObject source, string propertyName) =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out int? result) ? result :
             (jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i)) ? i : null) : null;
@@ -424,7 +368,7 @@ public static class ExtensionMethods
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out int? result) ? result.Value :
             (jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i)) ? i : defaultValue) : defaultValue;
 
-    public static bool TryCoercePropertyAsBoolean(this JsonObject source, string propertyName, [NotNullWhen(true)] out bool? result)
+    public static bool TryCoercePropertyAsBoolean(this JsonObject source, string propertyName, out bool result)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue)
         {
@@ -436,7 +380,7 @@ public static class ExtensionMethods
                 return true;
             }
         }
-        result = null;
+        result = false;
         return false;
     }
 
@@ -586,7 +530,7 @@ public static class ExtensionMethods
     public static string GetFieldAsNonEmpty(this JsonObject source, string propertyName, string defaultValue = "") =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.GetFieldAsString(JSON_KEY_VALUE, defaultValue) : defaultValue;
 
-    public static bool TryGetFieldAsInt(this JsonObject source, string propertyName, [NotNullWhen(true)] out int? value, out string? display_value)
+    public static bool TryGetFieldAsInt(this JsonObject source, string propertyName, [NotNullWhen(true)] out int value, out string? display_value)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
@@ -597,16 +541,16 @@ public static class ExtensionMethods
             }
         }
         else
-            value = null;
+            value = default;
         display_value = null;
         return false;
     }
 
-    public static bool TryGetFieldAsInt(this JsonObject source, string propertyName, [NotNullWhen(true)] out int? value)
+    public static bool TryGetFieldAsInt(this JsonObject source, string propertyName, [NotNullWhen(true)] out int value)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
             return field.TryCoercePropertyAsInt(JSON_KEY_VALUE, out value);
-        value = null;
+        value = default;
         return false;
     }
 
@@ -615,7 +559,7 @@ public static class ExtensionMethods
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
             display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
-            if (field.TryCoercePropertyAsInt(JSON_KEY_VALUE, out int? value))
+            if (field.TryCoercePropertyAsInt(JSON_KEY_VALUE, out int value))
                 return value;
         }
         else
@@ -631,8 +575,8 @@ public static class ExtensionMethods
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
             display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
-            if (field.TryCoercePropertyAsInt(JSON_KEY_VALUE, out int? value))
-                return value.Value;
+            if (field.TryCoercePropertyAsInt(JSON_KEY_VALUE, out int value))
+                return value;
         }
         else
             display_value = null;
@@ -644,8 +588,8 @@ public static class ExtensionMethods
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
             display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
-            if (field.TryCoercePropertyAsInt(JSON_KEY_VALUE, out int? value))
-                return value.Value;
+            if (field.TryCoercePropertyAsInt(JSON_KEY_VALUE, out int value))
+                return value;
         }
         else
             display_value = null;
@@ -655,7 +599,7 @@ public static class ExtensionMethods
     public static int GetFieldAsInt(this JsonObject source, string propertyName, int defaultValue = 0) =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.GetFieldAsInt(JSON_KEY_VALUE, defaultValue) : defaultValue;
 
-    public static bool TryGetFieldAsBoolean(this JsonObject source, string propertyName, [NotNullWhen(true)] out bool? value, out string? display_value)
+    public static bool TryGetFieldAsBoolean(this JsonObject source, string propertyName, [NotNullWhen(true)] out bool value, out string? display_value)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
@@ -666,16 +610,16 @@ public static class ExtensionMethods
             }
         }
         else
-            value = null;
+            value = false;
         display_value = null;
         return false;
     }
 
-    public static bool TryGetFieldAsBoolean(this JsonObject source, string propertyName, [NotNullWhen(true)] out bool? value)
+    public static bool TryGetFieldAsBoolean(this JsonObject source, string propertyName, [NotNullWhen(true)] out bool value)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
             return field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out value);
-        value = null;
+        value = false;
         return false;
     }
 
@@ -684,7 +628,7 @@ public static class ExtensionMethods
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
             display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
-            if (field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool? value))
+            if (field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool value))
                 return value;
         }
         else
@@ -700,8 +644,8 @@ public static class ExtensionMethods
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
             display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
-            if (field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool? value))
-                return value.Value;
+            if (field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool value))
+                return value;
         }
         else
             display_value = null;
@@ -713,8 +657,8 @@ public static class ExtensionMethods
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
             display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
-            if (field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool? value))
-                return value.Value;
+            if (field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool value))
+                return value;
         }
         else
             display_value = null;
@@ -722,7 +666,7 @@ public static class ExtensionMethods
     }
 
     public static bool GetFieldAsBoolean(this JsonObject source, string propertyName, bool defaultValue = false) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool? value)) ? value.Value : defaultValue;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool value)) ? value : defaultValue;
 
     public static string ToDisplayName(this HttpStatusCode statusCode) => statusCode switch
     {

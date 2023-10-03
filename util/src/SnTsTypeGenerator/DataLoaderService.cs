@@ -6,7 +6,7 @@ namespace SnTsTypeGenerator;
 /// <summary>
 /// Loads data from the database and from the remote ServiceNow instance.
 /// </summary>
-public sealed class DataLoaderService : IDisposable
+public sealed class DataLoaderService
 {
     private readonly TypingsDbContext _dbContext;
     private TableAPIService? _tableAPIService;
@@ -246,20 +246,5 @@ public sealed class DataLoaderService : IDisposable
         _dbContext = dbContext;
         _tableAPIService = tableAPIService;
         _logger = logger;
-    }
-
-    private void Dispose(bool disposing)
-    {
-        TableAPIService? tableAPIService = _tableAPIService;
-        _tableAPIService = null;
-        if (tableAPIService is not null && disposing)
-            tableAPIService.Dispose();
-    }
-
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 }

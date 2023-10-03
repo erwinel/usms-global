@@ -124,6 +124,41 @@ public static class LoggerMessages
 
     #endregion
 
+    #region Critical CriticalSettingValueNotProvided Error (0x0005)
+    
+    /// <summary>
+    // Numerical event code for CriticalSettingValueNotProvided.
+    /// </summary>
+    public const int EVENT_ID_CriticalSettingValueNotProvided = 0x0005;
+    
+    /// <summary>
+    // Event ID for CriticalSettingValueNotProvided.
+    /// </summary>
+    public static readonly EventId CriticalSettingValueNotProvided = new(EVENT_ID_CriticalSettingValueNotProvided, nameof(CriticalSettingValueNotProvided));
+    
+    private static readonly Action<ILogger, string, Exception?> _criticalSettingValueNotProvided1= LoggerMessage.Define<string>(LogLevel.Critical, CriticalSettingValueNotProvided,
+        "{SettingName} setting is missing.");
+    
+    private static readonly Action<ILogger, string, string, Exception?> _criticalSettingValueNotProvided2 = LoggerMessage.Define<string, string>(LogLevel.Critical, CriticalSettingValueNotProvided,
+        "{SettingName} ({CmdLineSwitch}) not provided.");
+    
+    /// <summary>
+    /// Logs an CriticalSettingValueNotProvided event with event code 0x0005.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="settingName">The name of the setting.</param>
+    /// <param name="cmdLineSwitch">The command-line switch</param>
+    /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
+    public static void LogCriticalSettingValueNotProvided(this ILogger logger, string settingName, string? cmdLineSwitch = null)
+    {
+        if (string.IsNullOrWhiteSpace(cmdLineSwitch))
+            _criticalSettingValueNotProvided1(logger, settingName, null);
+        else
+            _criticalSettingValueNotProvided2(logger, settingName, cmdLineSwitch, null);
+    }
+    
+    #endregion
+
     #region Critical UserNameNotProvided Error (0x0005)
 
     /// <summary>
@@ -139,10 +174,7 @@ public static class LoggerMessages
     private static readonly Action<ILogger, Exception?> _userNameNotProvided = LoggerMessage.Define(LogLevel.Critical, UserNameNotProvided,
         "User name was not provided.");
 
-    /// <summary>
-    /// Logs a missing user name event (UserNameNotProvided) with event code 0x0005.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
+    [Obsolete("Use LogCriticalSettingValueNotProvided")]
     public static void LogUserNameNotProvided(this ILogger logger) => _userNameNotProvided(logger, null);
 
     #endregion
@@ -162,10 +194,7 @@ public static class LoggerMessages
     private static readonly Action<ILogger, Exception?> _passwordNotProvided = LoggerMessage.Define(LogLevel.Critical, PasswordNotProvided,
         "Password was not provided.");
 
-    /// <summary>
-    /// Logs a missing password event (PasswordNotProvided) with event code 0x0006.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
+    [Obsolete("Use LogCriticalSettingValueNotProvided")]
     public static void LogPasswordNotProvided(this ILogger logger) => _passwordNotProvided(logger, null);
 
     #endregion
@@ -185,10 +214,7 @@ public static class LoggerMessages
     private static readonly Action<ILogger, Exception?> _remoteInstanceUriNotProvided = LoggerMessage.Define(LogLevel.Critical, RemoteInstanceUriNotProvided,
         "The remote ServiceNow instance URI was not provided.");
 
-    /// <summary>
-    /// Logs a missing remote URL event (RemoteInstanceUriNotProvided) with event code 0x0007.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
+    [Obsolete("Use LogCriticalSettingValueNotProvided")]
     public static void LogRemoteInstanceUriNotProvided(this ILogger logger) => _remoteInstanceUriNotProvided(logger, null);
 
     #endregion

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -32,7 +33,8 @@ public sealed class MainWorkerService : BackgroundService
         if (stoppingToken.IsCancellationRequested)
             return;
 
-        if (_appSettings.Value.Help.HasValue && _appSettings.Value.Help.Value)
+        AppSettings settings = _appSettings.Value;
+        if (settings.Help.HasValue && settings.Help.Value)
         {
             AppSettings.WriteHelpToConsole();
             return;
@@ -41,8 +43,8 @@ public sealed class MainWorkerService : BackgroundService
         if (!(_dataLoader.InitSuccessful && _renderer.InitSuccessful))
             return;
 
-        var tableNames = _appSettings.Value.Table?.Where(t => !string.IsNullOrEmpty(t)) ?? Enumerable.Empty<string>();
-        if (tableNames.Any() || (tableNames = _appSettings.Value.DbFile?.Split(',').Where(t => !string.IsNullOrEmpty(t)) ?? Enumerable.Empty<string>()).Any())
+        var tableNames = settings.Table?.Where(t => !string.IsNullOrEmpty(t)) ?? Enumerable.Empty<string>();
+        if (tableNames.Any() || (tableNames = settings.DbFile?.Split(',').Where(t => !string.IsNullOrEmpty(t)) ?? Enumerable.Empty<string>()).Any())
         {
             Collection<TableInfo> toRender = new();
             foreach (string name in tableNames.Select(n => n.Trim().ToLower()).Distinct())

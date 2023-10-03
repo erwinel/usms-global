@@ -19,6 +19,11 @@ internal static class Constants
     internal const string URI_PARAM_DISPLAY_VALUE = "sysparm_display_value";
 
     /// <summary>
+    /// URI path for the Auth Token API.
+    /// </summary>
+    internal const string URI_PATH_AUTH_TOKEN = "/oauth_token.do";
+
+    /// <summary>
     /// URI path for the ServiceNow Table API.
     /// </summary>
     internal const string URI_PATH_API = "/api/now/table";
@@ -52,6 +57,18 @@ internal static class Constants
     /// Response header name for accept type.
     /// </summary>
     internal const string HEADER_KEY_ACCEPT = "Accept";
+
+    internal const string HEADER_KEY_CLIENT_ID = "client_id";
+
+    internal const string HEADER_KEY_CLIENT_SECRET = "client_secret";
+
+    internal const string HEADER_KEY_GRANT_TYPE = "grant_type";
+
+    internal const string HEADER_KEY_USERNAME = "username";
+
+    internal const string HEADER_KEY_PASSWORD = "password";
+
+    internal const string HEADER_KEY_REFRESH_TOKEN = "refresh_token";
 
     /// <summary>
     /// "Sys ID" Column (element) name.
@@ -270,6 +287,10 @@ internal static class Constants
     /// </summary>
     internal const string JSON_KEY_SYS_UPDATED_ON = "sys_updated_on";
 
+    internal const string JSON_KEY_ACCESS_TOKEN = "access_token";
+
+    internal const string JSON_KEY_REFRESH_TOKEN = "refresh_token";
+    
     /// <summary>
     /// "GUID" type name.
     /// </summary>

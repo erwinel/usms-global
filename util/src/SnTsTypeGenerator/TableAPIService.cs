@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.Mime;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,47 +11,40 @@ namespace SnTsTypeGenerator;
 /// <summary>
 /// Gets table information from a remote ServiceNow instance.
 /// </summary>
-public sealed class TableAPIService : IDisposable
+public sealed class TableAPIService
 {
     private readonly ILogger<TableAPIService> _logger;
-    private readonly IOptions<AppSettings> _appSettings;
-    private HttpClientHandler? _handler;
-
-    /// <summary>
-    /// Gets the base URL of the remote ServiceNow instance.
-    /// </summary>
-    internal Uri BaseURL { get; }
+    private SnClientHandlerService? _handler;
 
     /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
-    internal bool InitSuccessful => BaseURL.IsAbsoluteUri && _handler is not null;
+    internal bool InitSuccessful => _handler?.InitSuccessful ?? false;
 
     private SysPackage? GetPackage(JsonObject resultObj) => (resultObj.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? jsonNode) && jsonNode is JsonObject packageFieldElement &&
         packageFieldElement.TryGetPropertyAsNonEmpty(JSON_KEY_DISPLAY_VALUE, out string? pkgName)) ? new()
         {
             Name = pkgName,
             SysId = packageFieldElement.GetPropertyAsNonEmpty(JSON_KEY_VALUE),
-            SourceFqdn = BaseURL.Host
+            SourceFqdn = (_handler ?? throw new InvalidOperationException()).BaseURL.Host
         } : null;
 
     private SysScope? GetScope(JsonObject resultObj) => resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value, out string? display_value) ? new()
         {
             SysID = value,
             Name = display_value ?? value,
-            SourceFqdn = BaseURL.Host
+            SourceFqdn = (_handler ?? throw new InvalidOperationException()).BaseURL.Host
         } : null;
 
     private TableInfo? GetTable(JsonObject resultObj, string propertyName) => resultObj.TryGetFieldAsNonEmpty(propertyName, out string? super_class, out string? label) ? new()
         {
             SysID = super_class,
             Label = label ?? super_class,
-            SourceFqdn = BaseURL.Host
+            SourceFqdn = (_handler ?? throw new InvalidOperationException()).BaseURL.Host
         } : null;
 
-    private async Task<TableInfo?> GetTableFromUri(Uri requestUri, bool expectArray, CancellationToken cancellationToken)
+    private TableInfo? GetTableFromResponse(Uri requestUri, JsonNode? jsonNode, bool expectArray)
     {
-        JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken) ?? throw new InvalidHttpResponseException(requestUri, null);
         if (jsonNode is not JsonObject resultObj)
             throw new InvalidHttpResponseException(requestUri, jsonNode);
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
@@ -113,10 +108,11 @@ public sealed class TableAPIService : IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURL.IsAbsoluteUri)
+        if (!_handler.InitSuccessful)
             throw new InvalidOperationException();
         _logger.LogGettingTableByNameFromRemote(name);
-        return await GetTableFromUri(BaseURL.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name), true, cancellationToken);
+        (Uri requestUri, JsonNode? response) = await _handler.GetTableApiJsonResponseAsync(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name, cancellationToken);
+        return GetTableFromResponse(requestUri, response, true);
     }
 
     /// <summary>
@@ -130,10 +126,11 @@ public sealed class TableAPIService : IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURL.IsAbsoluteUri)
+        if (!_handler.InitSuccessful)
             throw new InvalidOperationException();
         _logger.LogGettingTableBySysIdFromRemote(sys_id);
-        return await GetTableFromUri(BaseURL.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, sys_id), false, cancellationToken);
+        (Uri requestUri, JsonNode? response) = await _handler.GetTableApiJsonResponseAsync(TABLE_NAME_SYS_DB_OBJECT, sys_id, cancellationToken);
+        return GetTableFromResponse(requestUri, response, false);
     }
 
     /// <summary>
@@ -147,11 +144,10 @@ public sealed class TableAPIService : IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURL.IsAbsoluteUri)
+        if (!_handler.InitSuccessful)
             throw new InvalidOperationException();
         _logger.LogGettingElementsByTableNameFromRemote(tableName);
-        Uri requestUri = BaseURL.ToTableApiUri(TABLE_NAME_SYS_DICTIONARY, JSON_KEY_NAME, tableName);
-        JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
+        (Uri requestUri, JsonNode? jsonNode) = await _handler.GetTableApiJsonResponseAsync(TABLE_NAME_SYS_DICTIONARY, JSON_KEY_NAME, tableName, cancellationToken);
         if (jsonNode is not JsonObject resultObj)
             throw new InvalidHttpResponseException(requestUri, jsonNode);
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
@@ -214,11 +210,10 @@ public sealed class TableAPIService : IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURL.IsAbsoluteUri)
+        if (!_handler.InitSuccessful)
             throw new InvalidOperationException();
         _logger.LogGettingScopeByIdentifierFromRemote(id);
-        Uri requestUri = BaseURL.ToTableApiUri(TABLE_NAME_SYS_SCOPE, id);
-        JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
+        (Uri requestUri, JsonNode? jsonNode) = await _handler.GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
         if (jsonNode is null)
             throw new InvalidHttpResponseException(requestUri, string.Empty);
         if (jsonNode is not JsonObject resultObj)
@@ -259,11 +254,10 @@ public sealed class TableAPIService : IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURL.IsAbsoluteUri)
+        if (!_handler.InitSuccessful)
             throw new InvalidOperationException();
         _logger.LogGettingTypeByNameFromRemoteTrace(name);
-        Uri requestUri = BaseURL.ToTableApiUri(TABLE_NAME_SYS_GLIDE_OBJECT, JSON_KEY_NAME, name);
-        JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
+        (Uri requestUri, JsonNode? jsonNode) = await _handler.GetTableApiJsonResponseAsync(TABLE_NAME_SYS_GLIDE_OBJECT, JSON_KEY_NAME, name, cancellationToken);
         if (jsonNode is not JsonObject resultObj)
             throw new InvalidHttpResponseException(requestUri, jsonNode);
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
@@ -300,105 +294,9 @@ public sealed class TableAPIService : IDisposable
         };
     }
 
-    public TableAPIService(IOptions<AppSettings> appSettings, ILogger<TableAPIService> logger)
+    public TableAPIService(SnClientHandlerService handler, ILogger<TableAPIService> logger)
     {
         _logger = logger;
-        _appSettings = appSettings;
-        _handler = new();
-        var remoteUri = _appSettings.Value.RemoteURL;
-        if (string.IsNullOrWhiteSpace(remoteUri))
-        {
-            if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                _logger.LogRemoteInstanceUriNotProvided();
-            BaseURL = EmptyURI;
-            return;
-        }
-        if (Uri.TryCreate(remoteUri, UriKind.Absolute, out Uri? uri))
-        {
-            if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
-            {
-                BaseURL = EmptyURI;
-                if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                    _logger.LogInvalidRemoteInstanceUri();
-                return;
-            }
-            uri = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
-            if (_appSettings.Value.UserName is null)
-            {
-                if (_appSettings.Value.ClientId is null)
-                {
-                    if (_appSettings.Value.Password is null)
-                    {
-                        if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogUserNameNotProvided();
-                        BaseURL = EmptyURI;
-                        return;
-                    }
-                    Console.Write("User Name: ");
-                    string? userName = Console.ReadLine();
-                    if (string.IsNullOrEmpty(userName))
-                    {
-                        if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogUserNameNotProvided();
-                        BaseURL = EmptyURI;
-                        return;
-                    }
-                    string? password = Console.ReadLine();
-                    if (string.IsNullOrEmpty(password))
-                    {
-                        if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogPasswordNotProvided();
-                        BaseURL = EmptyURI;
-                        return;
-                    }
-                    _handler.Credentials = new NetworkCredential(userName, password);
-                }
-                else
-                {
-                    if (_appSettings.Value.ClientSecret is null)
-                    {
-                        if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogPasswordNotProvided();
-                        BaseURL = EmptyURI;
-                        return;
-                    }
-                    _handler.Credentials = new NetworkCredential(_appSettings.Value.ClientId, _appSettings.Value.ClientSecret);
-                }
-            }
-            else
-            {
-                string? password = _appSettings.Value.Password;
-                if (password is null && string.IsNullOrEmpty(password = Console.ReadLine()))
-                {
-                    if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                        _logger.LogPasswordNotProvided();
-                    BaseURL = EmptyURI;
-                    return;
-                }
-                _handler.Credentials = new NetworkCredential(_appSettings.Value.UserName, password);
-            }
-            BaseURL = uri;
-        }
-        else
-        {
-            BaseURL = EmptyURI;
-            if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                _logger.LogInvalidRemoteInstanceUri();
-        }
-    }
-
-    private void Dispose(bool disposing)
-    {
-        HttpClientHandler? handler = _handler;
-        _handler = null;
-        if (handler is not null && disposing)
-            handler.Dispose();
-    }
-
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        _handler = handler;
     }
 }

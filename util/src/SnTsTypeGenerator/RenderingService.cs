@@ -19,6 +19,7 @@ public class RenderingService
     /// </summary>
     internal bool InitSuccessful => _outputFile is not null;
 
+#pragma warning disable CS1998
     internal async Task RenderJsDocGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
@@ -38,6 +39,7 @@ public class RenderingService
     {
         throw new NotImplementedException();
     }
+#pragma warning restore CS1998
 
     private async Task RenderFieldsAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, Func<ElementInfo, string, Task> renderJsDocAsync,
         CancellationToken cancellationToken)

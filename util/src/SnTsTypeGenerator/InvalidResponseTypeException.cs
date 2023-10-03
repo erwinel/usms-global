@@ -28,13 +28,13 @@ internal class InvalidResponseTypeException : Exception, ILogTrackable
 
     public InvalidResponseTypeException(string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Result) = (EmptyURI, null);
 
-    public InvalidResponseTypeException(Uri requestUri, JsonObject result) => (RequestUri, Result) = (requestUri, result);
+    public InvalidResponseTypeException(Uri requestUri, JsonNode?result) => (RequestUri, Result) = (requestUri, result);
 
-    public InvalidResponseTypeException(Uri requestUri, JsonObject result, string? message) : base(message) => (RequestUri, Result) = (requestUri, result);
+    public InvalidResponseTypeException(Uri requestUri, JsonNode? result, string? message) : base(message) => (RequestUri, Result) = (requestUri, result);
 
-    public InvalidResponseTypeException(Uri requestUri, JsonObject result, Exception? innerException) : this(requestUri, result, null, innerException) { }
+    public InvalidResponseTypeException(Uri requestUri, JsonNode? result, Exception? innerException) : this(requestUri, result, null, innerException) { }
 
-    public InvalidResponseTypeException(Uri requestUri, JsonObject result, string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Result) = (requestUri, result);
+    public InvalidResponseTypeException(Uri requestUri, JsonNode? result, string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Result) = (requestUri, result);
 
     protected InvalidResponseTypeException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
