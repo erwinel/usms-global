@@ -12,7 +12,7 @@
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/util/src/SnTsTypeGenerator/bin/Debug/net7.0/SnTsTypeGenerator.dll",
             "args": [
-                "--Dbfile=sys_metadata,sys_user,task,incident,sc_request,sc_request_item"
+                "--Table=sys_metadata,sys_user,task,incident,sc_request,sc_request_item"
             ],
             "cwd": "${workspaceFolder}/util/src/SnTsTypeGenerator",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
