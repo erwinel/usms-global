@@ -13,7 +13,6 @@ namespace SnTsTypeGenerator;
 public sealed class SnClientHandlerService
 {
     private readonly ILogger<SnClientHandlerService> _logger;
-    private readonly IOptions<AppSettings> _appSettings;
 
     private SnAccessToken? _token;
 
@@ -284,7 +283,7 @@ public sealed class SnClientHandlerService
     public SnClientHandlerService(IOptions<AppSettings> appSettings, ILogger<SnClientHandlerService> logger)
     {
         _logger = logger;
-        AppSettings settings = (_appSettings = appSettings).Value;
+        AppSettings settings = appSettings.Value;
         var remoteUri = settings.RemoteURL;
         bool showHelp = appSettings.Value.Help.HasValue && appSettings.Value.Help.Value;
         if (string.IsNullOrWhiteSpace(remoteUri))
