@@ -47,22 +47,17 @@ public sealed class TableAPIService : IDisposable
             SourceFqdn = BaseURL.Host
         } : null;
 
-    private async Task<TableInfo?> GetTableFromUri(Uri requestUri, CancellationToken cancellationToken)
+    private async Task<TableInfo?> GetTableFromUri(Uri requestUri, bool expectArray, CancellationToken cancellationToken)
     {
         JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken) ?? throw new InvalidHttpResponseException(requestUri, null);
         if (jsonNode is not JsonObject resultObj)
             throw new InvalidHttpResponseException(requestUri, jsonNode);
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
             throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
-        if (jsonNode is null)
+        if (expectArray)
         {
-            _logger.LogNoResultsFromQuery(requestUri, resultObj);
-            return null;
-        }
-        if (jsonNode is JsonObject)
-            resultObj = (JsonObject)jsonNode;
-        else if (jsonNode is JsonArray arr)
-        {
+            if (jsonNode is not JsonArray arr)
+                throw new InvalidResponseTypeException(requestUri, resultObj);
             int length = arr.Count;
             if (length == 0)
             {
@@ -76,8 +71,17 @@ public sealed class TableAPIService : IDisposable
                 throw new InvalidResultElementType(requestUri, resultObj, 0);
             resultObj = (JsonObject)jsonNode;
         }
+        else if (jsonNode is JsonObject)
+            resultObj = (JsonObject)jsonNode;
         else
+        {
+            if (jsonNode is JsonArray arr && arr.Count == 0)
+            {
+                _logger.LogNoResultsFromQuery(requestUri, resultObj);
+                return null;
+            }
             throw new InvalidResponseTypeException(requestUri, resultObj);
+        }
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_NAME, out string? name))
@@ -112,7 +116,7 @@ public sealed class TableAPIService : IDisposable
         if (!BaseURL.IsAbsoluteUri)
             throw new InvalidOperationException();
         _logger.LogGettingTableByNameFromRemote(name);
-        return await GetTableFromUri(BaseURL.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name), cancellationToken);
+        return await GetTableFromUri(BaseURL.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name), true, cancellationToken);
     }
 
     /// <summary>
@@ -129,7 +133,7 @@ public sealed class TableAPIService : IDisposable
         if (!BaseURL.IsAbsoluteUri)
             throw new InvalidOperationException();
         _logger.LogGettingTableBySysIdFromRemote(sys_id);
-        return await GetTableFromUri(BaseURL.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, sys_id), cancellationToken);
+        return await GetTableFromUri(BaseURL.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, sys_id), false, cancellationToken);
     }
 
     /// <summary>
@@ -148,14 +152,10 @@ public sealed class TableAPIService : IDisposable
         _logger.LogGettingElementsByTableNameFromRemote(tableName);
         Uri requestUri = BaseURL.ToTableApiUri(TABLE_NAME_SYS_DICTIONARY, JSON_KEY_NAME, tableName);
         JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
-        if (jsonNode is null)
-            throw new InvalidHttpResponseException(requestUri, string.Empty);
         if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode.ToJsonString());
+            throw new InvalidHttpResponseException(requestUri, jsonNode);
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
             throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
-        if (jsonNode is null)
-            return Array.Empty<ElementInfo>();
         if (jsonNode is not JsonArray arr)
             throw new InvalidResponseTypeException(requestUri, resultObj);
         if (arr.Count == 0)
@@ -187,9 +187,9 @@ public sealed class TableAPIService : IDisposable
                     IsUnique = sysDictionary.GetFieldAsBoolean(JSON_KEY_UNIQUE),
                     MaxLength = sysDictionary.GetFieldAsIntOrNull(JSON_KEY_MAX_LENGTH),
                     SizeClass = sysDictionary.GetFieldAsIntOrNull(JSON_KEY_SIZECLASS),
-                    Reference = GetTable(resultObj, JSON_KEY_REFERENCE),
-                    Package = GetPackage(resultObj),
-                    Scope = GetScope(resultObj),
+                    Reference = GetTable(sysDictionary, JSON_KEY_REFERENCE),
+                    Package = GetPackage(sysDictionary),
+                    Scope = GetScope(sysDictionary),
                     Type = sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new GlideType()
                         {
                             Name = type,
@@ -222,26 +222,21 @@ public sealed class TableAPIService : IDisposable
         if (jsonNode is null)
             throw new InvalidHttpResponseException(requestUri, string.Empty);
         if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode.ToJsonString());
+            throw new InvalidHttpResponseException(requestUri, jsonNode);
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
             throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
-        if (jsonNode is null)
-            throw new InvalidHttpResponseException(requestUri, string.Empty);
         if (jsonNode is not JsonObject sysScopeResult)
-            throw new InvalidHttpResponseException(requestUri, jsonNode.ToJsonString());
-        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
-            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
-        if (jsonNode is null)
         {
-            _logger.LogNoResultsFromQuery(requestUri, resultObj);
-            return null;
+            if (jsonNode is JsonArray arr && arr.Count == 0)
+            {
+                _logger.LogNoResultsFromQuery(requestUri, resultObj);
+                return null;
+            }
+            throw new InvalidHttpResponseException(requestUri, string.Empty);
         }
-        if (jsonNode is not JsonObject)
-            throw new InvalidResponseTypeException(requestUri, resultObj);
-        sysScopeResult = (JsonObject)jsonNode;
-        if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
+        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
-        if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
+        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SCOPE);
         return new()
         {
@@ -269,17 +264,10 @@ public sealed class TableAPIService : IDisposable
         _logger.LogGettingTypeByNameFromRemoteTrace(name);
         Uri requestUri = BaseURL.ToTableApiUri(TABLE_NAME_SYS_GLIDE_OBJECT, JSON_KEY_NAME, name);
         JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
-        if (jsonNode is null)
-            throw new InvalidHttpResponseException(requestUri, string.Empty);
         if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode.ToJsonString());
+            throw new InvalidHttpResponseException(requestUri, jsonNode);
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
             throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
-        if (jsonNode is null)
-        {
-            _logger.LogNoResultsFromQuery(requestUri, resultObj);
-            return null;
-        }
         if (jsonNode is not JsonArray arr)
             throw new InvalidResponseTypeException(requestUri, resultObj);
         int length = arr.Count;
