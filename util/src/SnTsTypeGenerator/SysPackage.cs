@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 /// <summary>
@@ -175,26 +168,4 @@ public class SysPackage
     [NotNull]
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
-
-    internal static void OnBuildEntity(EntityTypeBuilder<SysPackage> builder)
-    {
-        _ = builder.HasKey(s => s.Name);
-        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(ShortDescription)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SourceFqdn)).UseCollation(COLLATION_NOCASE);
-        _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-        _ = builder.HasOne(t => t.Output).WithMany(s => s.Packages).HasForeignKey(t => t.OutputId).IsRequired().OnDelete(DeleteBehavior.Restrict);
-    }
-
-    internal static IEnumerable<string> GetDbInitCommands()
-    {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysPackage)}"" (
-    ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(OutputId)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(OutputFile)}"" REFERENCES ""{nameof(OutputFile)}""(""{nameof(OutputFile.Id)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(SysPackage)}"" PRIMARY KEY(""{nameof(Name)}"")
-)";
-    }
 }

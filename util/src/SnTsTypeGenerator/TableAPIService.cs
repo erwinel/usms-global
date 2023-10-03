@@ -1,32 +1,51 @@
-using System.Diagnostics;
 using System.Net;
-using System.Net.Mime;
-using System.Text.Json;
 using System.Text.Json.Nodes;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
+/// <summary>
+/// Gets table information from a remote ServiceNow instance.
+/// </summary>
 public sealed class TableAPIService : IDisposable
 {
     private readonly ILogger<TableAPIService> _logger;
     private readonly IOptions<AppSettings> _appSettings;
     private HttpClientHandler? _handler;
 
-    public bool HasHandler => _handler is  not null;
+    /// <summary>
+    /// Gets the base URL of the remote ServiceNow instance.
+    /// </summary>
+    internal Uri BaseURL { get; }
 
-    public Uri BaseURI { get; }
+    /// <summary>
+    /// Indicates whether service initialization was successful.
+    /// </summary>
+    internal bool InitSuccessful => BaseURL.IsAbsoluteUri && _handler is not null;
 
-    internal bool InitSuccessful => BaseURI.IsAbsoluteUri && _handler is not null;
+    private SysPackage? GetPackage(JsonObject resultObj) => (resultObj.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? jsonNode) && jsonNode is JsonObject packageFieldElement &&
+        packageFieldElement.TryGetPropertyAsNonEmpty(JSON_KEY_DISPLAY_VALUE, out string? pkgName)) ? new()
+        {
+            Name = pkgName,
+            SysId = packageFieldElement.GetPropertyAsNonEmpty(JSON_KEY_VALUE),
+            SourceFqdn = BaseURL.Host
+        } : null;
 
-    private SysPackage? GetPackage(JsonObject resultObj) => (resultObj.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? jsonNode) && jsonNode is JsonObject packageFieldElement && packageFieldElement.TryGetPropertyAsNonEmpty(JSON_KEY_DISPLAY_VALUE, out string? pkgName)) ? new SysPackage() { Name = pkgName, SysId = packageFieldElement.GetPropertyAsNonEmpty(JSON_KEY_VALUE), SourceFqdn = BaseURI.Host } : null;
+    private SysScope? GetScope(JsonObject resultObj) => resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value, out string? display_value) ? new()
+        {
+            SysID = value,
+            Name = display_value ?? value,
+            SourceFqdn = BaseURL.Host
+        } : null;
 
-    private SysScope? GetScope(JsonObject resultObj) => resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value, out string? display_value) ? new() { SysID = value, Name = display_value ?? value, SourceFqdn = BaseURI.Host } : null;
-
-    private TableInfo? GetTable(JsonObject resultObj, string propertyName) => resultObj.TryGetFieldAsNonEmpty(propertyName, out string? super_class, out string? label) ? new() { SysID = super_class, Label = label ?? super_class, SourceFqdn = BaseURI.Host } : null;
+    private TableInfo? GetTable(JsonObject resultObj, string propertyName) => resultObj.TryGetFieldAsNonEmpty(propertyName, out string? super_class, out string? label) ? new()
+        {
+            SysID = super_class,
+            Label = label ?? super_class,
+            SourceFqdn = BaseURL.Host
+        } : null;
 
     private async Task<TableInfo?> GetTableFromUri(Uri requestUri, CancellationToken cancellationToken)
     {
@@ -50,9 +69,9 @@ public sealed class TableAPIService : IDisposable
                 _logger.LogNoResultsFromQuery(requestUri, resultObj);
                 return null;
             }
-            if (length> 1)
+            if (length > 1)
                 _logger.LogMultipleResponseItems(requestUri, length - 1, resultObj);
-            
+
             if ((jsonNode = arr[0]) is not JsonObject)
                 throw new InvalidResultElementType(requestUri, resultObj, 0);
             resultObj = (JsonObject)jsonNode;
@@ -60,9 +79,9 @@ public sealed class TableAPIService : IDisposable
         else
             throw new InvalidResponseTypeException(requestUri, resultObj);
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_SYS_ID);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_NAME, out string? name))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_NAME);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_NAME);
         return new()
         {
             SysID = sys_id,
@@ -79,37 +98,55 @@ public sealed class TableAPIService : IDisposable
         };
     }
 
-    public async Task<TableInfo?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
+    /// <summary>
+    /// Gets the table from the remote ServiceNow instance that matches the specified name.
+    /// </summary>
+    /// <param name="name">The name of the table.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="TableInfo"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no table was found in the remote ServiceNow instance.</returns>
+    internal async Task<TableInfo?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURI.IsAbsoluteUri)
+        if (!BaseURL.IsAbsoluteUri)
             throw new InvalidOperationException();
         _logger.LogGettingTableByNameFromRemote(name);
-        return await GetTableFromUri(BaseURI.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name), cancellationToken);
+        return await GetTableFromUri(BaseURL.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name), cancellationToken);
     }
 
-    public async Task<TableInfo?> GetTableByIdAsync(string sys_id, CancellationToken cancellationToken)
+    /// <summary>
+    /// Gets the table from the remote ServiceNow instance that matches the specified Sys ID.
+    /// </summary>
+    /// <param name="sys_id">The Sys ID of the table.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="TableInfo"/> record that matches the specified <paramref name="sys_id"/> or <see langword="null" /> if no table was found in the remote ServiceNow instance.</returns>
+    internal async Task<TableInfo?> GetTableByIdAsync(string sys_id, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURI.IsAbsoluteUri)
+        if (!BaseURL.IsAbsoluteUri)
             throw new InvalidOperationException();
         _logger.LogGettingTableBySysIdFromRemote(sys_id);
-        return await GetTableFromUri(BaseURI.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, sys_id), cancellationToken);
+        return await GetTableFromUri(BaseURL.ToTableApiUri(TABLE_NAME_SYS_DB_OBJECT, sys_id), cancellationToken);
     }
 
+    /// <summary>
+    /// Gets the elements (columns) from the remote ServiceNow instance that matches the specified table name.
+    /// </summary>
+    /// <param name="tableName">The name of the table.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="ElementInfo"/> records that match the specified <paramref name="tableName"/>.</returns>
     public async Task<ElementInfo[]> GetElementsByTableNameAsync(string tableName, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURI.IsAbsoluteUri)
+        if (!BaseURL.IsAbsoluteUri)
             throw new InvalidOperationException();
         _logger.LogGettingElementsByTableNameFromRemote(tableName);
-        Uri requestUri = BaseURI.ToTableApiUri(TABLE_NAME_SYS_DICTIONARY, JSON_KEY_NAME, tableName);
+        Uri requestUri = BaseURL.ToTableApiUri(TABLE_NAME_SYS_DICTIONARY, JSON_KEY_NAME, tableName);
         JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
         if (jsonNode is null)
             throw new InvalidHttpResponseException(requestUri, string.Empty);
@@ -128,9 +165,9 @@ public sealed class TableAPIService : IDisposable
             if (node is not JsonObject sysDictionary)
                 _logger.LogInvalidResultElementType(requestUri, node, index);
             else if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_ELEMENT, out string? name))
-                _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_ELEMENT, index, sysDictionary);
+                _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_ELEMENT, index, sysDictionary);
             else if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-                _logger.LogExpectedPropertyNotFoundError(requestUri, JSON_KEY_SYS_ID, index, sysDictionary);
+                _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_SYS_ID, index, sysDictionary);
             else
                 return new ElementInfo()
                 {
@@ -153,7 +190,12 @@ public sealed class TableAPIService : IDisposable
                     Reference = GetTable(resultObj, JSON_KEY_REFERENCE),
                     Package = GetPackage(resultObj),
                     Scope = GetScope(resultObj),
-                    Type = sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new GlideType() { Name = type, Label = displayValue ?? type, SourceFqdn = requestUri.Host } : null,
+                    Type = sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new GlideType()
+                        {
+                            Name = type,
+                            Label = displayValue ?? type,
+                            SourceFqdn = requestUri.Host
+                        } : null,
                     SourceFqdn = requestUri.Host
                 };
             return null!;
@@ -161,15 +203,21 @@ public sealed class TableAPIService : IDisposable
 
     }
 
-    public async Task<SysScope?> GetScopeByIDAsync(string id, CancellationToken cancellationToken)
+    /// <summary>
+    /// Gets the scope from the remote ServiceNow instance that matches the specified unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the scope record.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="SysScope"/> record that matches the specified <paramref name="id"/> or <see langword="null" /> if no scope was found in the remote ServiceNow instance.</returns>
+    internal async Task<SysScope?> GetScopeByIDAsync(string id, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURI.IsAbsoluteUri)
+        if (!BaseURL.IsAbsoluteUri)
             throw new InvalidOperationException();
         _logger.LogGettingScopeByIdentifierFromRemote(id);
-        Uri requestUri = BaseURI.ToTableApiUri(TABLE_NAME_SYS_SCOPE, id);
+        Uri requestUri = BaseURL.ToTableApiUri(TABLE_NAME_SYS_SCOPE, id);
         JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
         if (jsonNode is null)
             throw new InvalidHttpResponseException(requestUri, string.Empty);
@@ -192,9 +240,9 @@ public sealed class TableAPIService : IDisposable
             throw new InvalidResponseTypeException(requestUri, resultObj);
         sysScopeResult = (JsonObject)jsonNode;
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_SYS_ID);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_SCOPE);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SCOPE);
         return new()
         {
             SysID = sys_id,
@@ -205,15 +253,21 @@ public sealed class TableAPIService : IDisposable
         };
     }
 
-    public async Task<GlideType?> GetGlideTypeByNameAsync(string name, CancellationToken cancellationToken)
+    /// <summary>
+    /// Gets the type information from the remote ServiceNow instance that matches the specified name.
+    /// </summary>
+    /// <param name="name">The name of the type record.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="GlideType"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no type record was found in the remote ServiceNow instance.</returns>
+    internal async Task<GlideType?> GetGlideTypeByNameAsync(string name, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
             throw new ObjectDisposedException(nameof(TableAPIService));
-        if (!BaseURI.IsAbsoluteUri)
+        if (!BaseURL.IsAbsoluteUri)
             throw new InvalidOperationException();
         _logger.LogGettingTypeByNameFromRemoteTrace(name);
-        Uri requestUri = BaseURI.ToTableApiUri(TABLE_NAME_SYS_GLIDE_OBJECT, JSON_KEY_NAME, name);
+        Uri requestUri = BaseURL.ToTableApiUri(TABLE_NAME_SYS_GLIDE_OBJECT, JSON_KEY_NAME, name);
         JsonNode? jsonNode = await _handler!.GetAPIJsonResult(requestUri, _logger, cancellationToken);
         if (jsonNode is null)
             throw new InvalidHttpResponseException(requestUri, string.Empty);
@@ -234,14 +288,14 @@ public sealed class TableAPIService : IDisposable
             _logger.LogNoResultsFromQuery(requestUri, resultObj);
             return null;
         }
-        if (length> 1)
+        if (length > 1)
             _logger.LogMultipleResponseItems(requestUri, length - 1, resultObj);
-        
+
         if ((jsonNode = arr[0]) is not JsonObject)
             throw new InvalidResultElementType(requestUri, resultObj, 0);
         resultObj = (JsonObject)jsonNode;
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-            throw new ExpectedPropertyNotFound(requestUri, resultObj, JSON_KEY_SYS_ID);
+            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         return new()
         {
             SysID = sys_id,
@@ -267,17 +321,17 @@ public sealed class TableAPIService : IDisposable
         if (string.IsNullOrWhiteSpace(remoteUri))
         {
             if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                _logger.LogCriticalRemoteInstanceUriNotProvided();
-            BaseURI = EmptyURI;
+                _logger.LogRemoteInstanceUriNotProvided();
+            BaseURL = EmptyURI;
             return;
         }
         if (Uri.TryCreate(remoteUri, UriKind.Absolute, out Uri? uri))
         {
             if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
             {
-                BaseURI = EmptyURI;
+                BaseURL = EmptyURI;
                 if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                    _logger.LogCriticalInvalidRemoteInstanceUri();
+                    _logger.LogInvalidRemoteInstanceUri();
                 return;
             }
             uri = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
@@ -288,8 +342,8 @@ public sealed class TableAPIService : IDisposable
                     if (_appSettings.Value.Password is null)
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalUserNameNotProvided();
-                        BaseURI = EmptyURI;
+                            _logger.LogUserNameNotProvided();
+                        BaseURL = EmptyURI;
                         return;
                     }
                     Console.Write("User Name: ");
@@ -297,16 +351,16 @@ public sealed class TableAPIService : IDisposable
                     if (string.IsNullOrEmpty(userName))
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalUserNameNotProvided();
-                        BaseURI = EmptyURI;
+                            _logger.LogUserNameNotProvided();
+                        BaseURL = EmptyURI;
                         return;
                     }
                     string? password = Console.ReadLine();
                     if (string.IsNullOrEmpty(password))
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalPasswordNotProvided();
-                        BaseURI = EmptyURI;
+                            _logger.LogPasswordNotProvided();
+                        BaseURL = EmptyURI;
                         return;
                     }
                     _handler.Credentials = new NetworkCredential(userName, password);
@@ -316,8 +370,8 @@ public sealed class TableAPIService : IDisposable
                     if (_appSettings.Value.ClientSecret is null)
                     {
                         if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                            _logger.LogCriticalPasswordNotProvided();
-                        BaseURI = EmptyURI;
+                            _logger.LogPasswordNotProvided();
+                        BaseURL = EmptyURI;
                         return;
                     }
                     _handler.Credentials = new NetworkCredential(_appSettings.Value.ClientId, _appSettings.Value.ClientSecret);
@@ -329,19 +383,19 @@ public sealed class TableAPIService : IDisposable
                 if (password is null && string.IsNullOrEmpty(password = Console.ReadLine()))
                 {
                     if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                        _logger.LogCriticalPasswordNotProvided();
-                    BaseURI = EmptyURI;
+                        _logger.LogPasswordNotProvided();
+                    BaseURL = EmptyURI;
                     return;
                 }
                 _handler.Credentials = new NetworkCredential(_appSettings.Value.UserName, password);
             }
-            BaseURI = uri;
+            BaseURL = uri;
         }
         else
         {
-            BaseURI = EmptyURI;
+            BaseURL = EmptyURI;
             if (!(appSettings.Value.Help.HasValue && appSettings.Value.Help.Value))
-                _logger.LogCriticalInvalidRemoteInstanceUri();
+                _logger.LogInvalidRemoteInstanceUri();
         }
     }
 
@@ -350,7 +404,7 @@ public sealed class TableAPIService : IDisposable
         HttpClientHandler? handler = _handler;
         _handler = null;
         if (handler is not null && disposing)
-                handler.Dispose();
+            handler.Dispose();
     }
 
     public void Dispose()

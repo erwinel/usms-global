@@ -1,10 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
-using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -84,7 +81,7 @@ public class SysScope
     }
 
     private SourceInfo? _source;
-    
+
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
@@ -111,7 +108,7 @@ public class SysScope
             }
         }
     }
-    
+
     private HashSet<GlideType> _types = new();
 
     [NotNull]
@@ -129,31 +126,4 @@ public class SysScope
     [NotNull]
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
-
-    internal static void OnBuildEntity(EntityTypeBuilder<SysScope> builder)
-    {
-        _ = builder.HasKey(s => s.Value);
-        _ = builder.HasIndex(s => s.SysID).IsUnique();
-        _ = builder.Property(nameof(Value)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(Name)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(ShortDescription)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SysID)).UseCollation(COLLATION_NOCASE);
-        _ = builder.Property(nameof(SourceFqdn)).UseCollation(COLLATION_NOCASE);
-        _ = builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-    }
-
-    internal static IEnumerable<string> GetDbInitCommands()
-    {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysScope)}"" (
-    ""{nameof(Value)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysScope)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(SysScope)}"" PRIMARY KEY(""{nameof(Value)}""),
-    CONSTRAINT ""UK_{nameof(SysScope)}_{nameof(SysID)}"" UNIQUE(""{nameof(SysID)}"")
-)";
-        yield return $"CREATE INDEX \"IDX_{nameof(SysScope)}_{nameof(SysID)}\" ON \"{nameof(SysScope)}\" (\"{nameof(SysID)}\" COLLATE NOCASE)";
-    }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Net;
@@ -7,7 +6,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using static SnTsTypeGenerator.Constants;
@@ -42,7 +40,8 @@ public static class ExtensionMethods
     /// <typeparam name="TEntity">The parent entity type.</typeparam>
     /// <typeparam name="TProperty">The related entity type.</typeparam>
     /// <returns>The related entity objects.</returns>
-    public static async Task<IEnumerable<TProperty>> GetRelatedCollectionAsync<TEntity, TProperty>(this EntityEntry<TEntity>? entry, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression, CancellationToken cancellationToken)
+    public static async Task<IEnumerable<TProperty>> GetRelatedCollectionAsync<TEntity, TProperty>(this EntityEntry<TEntity>? entry, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression,
+            CancellationToken cancellationToken)
          where TEntity : class
          where TProperty : class
     {
@@ -64,7 +63,8 @@ public static class ExtensionMethods
     /// <typeparam name="TEntity">The parent entity type.</typeparam>
     /// <typeparam name="TProperty">The related entity type.</typeparam>
     /// <returns>The related entity objects.</returns>
-    public static async Task<IEnumerable<TProperty>> GetRelatedCollectionAsync<TEntity, TProperty>(this TEntity? entity, DbSet<TEntity> dbSet, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression, CancellationToken cancellationToken)
+    public static async Task<IEnumerable<TProperty>> GetRelatedCollectionAsync<TEntity, TProperty>(this TEntity? entity, DbSet<TEntity> dbSet, Expression<Func<TEntity, IEnumerable<TProperty>>> propertyExpression,
+            CancellationToken cancellationToken)
          where TEntity : class
          where TProperty : class
     {
@@ -82,7 +82,8 @@ public static class ExtensionMethods
     /// <typeparam name="TEntity">The parent entity type.</typeparam>
     /// <typeparam name="TProperty">The related entity type.</typeparam>
     /// <returns>The entry related entity or <see langword="null" /> if there is no related entity.</returns>
-    public static async Task<EntityEntry<TProperty>?> GetReferencedEntryAsync<TEntity, TProperty>(this EntityEntry<TEntity>? entry, Expression<Func<TEntity, TProperty?>> propertyExpression, CancellationToken cancellationToken)
+    public static async Task<EntityEntry<TProperty>?> GetReferencedEntryAsync<TEntity, TProperty>(this EntityEntry<TEntity>? entry, Expression<Func<TEntity, TProperty?>> propertyExpression,
+            CancellationToken cancellationToken)
          where TEntity : class
          where TProperty : class
     {
@@ -106,7 +107,8 @@ public static class ExtensionMethods
     /// <typeparam name="TEntity">The parent entity type.</typeparam>
     /// <typeparam name="TProperty">The related entity type.</typeparam>
     /// <returns>The entry related entity or <see langword="null" /> if there is no related entity.</returns>
-    public static async Task<EntityEntry<TProperty>?> GetReferencedEntryAsync<TEntity, TProperty>(this TEntity? entity, DbSet<TEntity> dbSet, Expression<Func<TEntity, TProperty?>> propertyExpression, CancellationToken cancellationToken)
+    public static async Task<EntityEntry<TProperty>?> GetReferencedEntryAsync<TEntity, TProperty>(this TEntity? entity, DbSet<TEntity> dbSet, Expression<Func<TEntity, TProperty?>> propertyExpression,
+            CancellationToken cancellationToken)
          where TEntity : class
          where TProperty : class
     {
@@ -159,33 +161,38 @@ public static class ExtensionMethods
     }
 
     /// <summary>
-    /// Gets elements that do not inherit from a super class.
-    /// </summary>
-    /// <param name="source">The elements of the inheriting class.</param>
-    /// <param name="inherited">The elements of the inherited class.</param>
-    /// <returns>The elements from <paramref name="source"/> where <paramref name="inherited"/> has no element that  matching the same <see cref="ElementInfo.Name"/> and <see cref="ElementInfo.TypeName"/>.</returns>
-    public static IEnumerable<ElementInfo> NewElements(this IEnumerable<ElementInfo> source, IEnumerable<ElementInfo>? inherited) => (inherited is null) ? source : source.Where(e =>
-    {
-        string n = e.Name;
-        string t = e.TypeName;
-        return !inherited.Any(i => i.Name  == n && i.TypeName == t);
-    });
-    
-    /// <summary>
     /// Gets elements that inherit from a super class with different properties.
     /// </summary>
     /// <param name="source">The elements of the inheriting class.</param>
     /// <param name="inherited">The elements of the inherited class.</param>
-    /// <returns>The elements from <paramref name="source"/> where <paramref name="inherited"/> matches an element with the <see cref="ElementInfo.Name"/> and <see cref="ElementInfo.TypeName"/>, but has at least one other property that differs.</returns>
+    /// <returns>The elements from <paramref name="source"/> where <paramref name="inherited"/> matches an element with the <see cref="ElementInfo.Name"/> and <see cref="ElementInfo.TypeName"/>,
+    /// but has at least one other property that differs.</returns>
     public static IEnumerable<ElementInfo> OverriddenElements(this IEnumerable<ElementInfo> source, IEnumerable<ElementInfo>? inherited) => (inherited is null) ? Enumerable.Empty<ElementInfo>() : source.Where(e =>
     {
         string n = e.Name;
         string t = e.TypeName;
-        ElementInfo? ie = inherited.FirstOrDefault(i => i.Name  == n && i.TypeName == t);
+        ElementInfo? ie = inherited.FirstOrDefault(i => i.Name == n && i.TypeName == t);
         return ie is not null && (ie.Comments != e.Comments || ie.DefaultValue != e.DefaultValue || ie.IsActive != ie.IsActive || ie.IsDisplay != ie.IsDisplay ||
             ie.IsReadOnly != ie.IsReadOnly || ie.IsUnique != ie.IsUnique || ie.Label != ie.Label || ie.MaxLength != ie.MaxLength || ie.IsArray != ie.IsArray);
     });
-    
+
+    public static IEnumerable<(ElementInfo Inherited, ElementInfo? Base, bool IsTypeOverride)> GetBaseElements(this IEnumerable<ElementInfo> inheritedElements, IEnumerable<ElementInfo> baseElements)
+    {
+        StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
+        return inheritedElements.Select<ElementInfo, (ElementInfo Inherited, ElementInfo? Base, bool IsTypeOverride)>(e =>
+        {
+            string name = e.Name;
+            ElementInfo? b = baseElements.FirstOrDefault(o => o.Name == name);
+            if (b is null)
+                return (e, null, false);
+            string tn = e.TypeName;
+            string? r = e.RefTableName;
+            if (r is null)
+                return (e, b, b.RefTableName is not null || !comparer.Equals(b.TypeName, tn));
+            return (e, b, b.RefTableName is null || !(comparer.Equals(b.TypeName, tn) && comparer.Equals(b.RefTableName, r)));
+        });
+    }
+
     /// <summary>
     /// Gets the properties that aren't implemented by the IBaseRecord type.
     /// </summary>
@@ -199,7 +206,7 @@ public static class ExtensionMethods
         JSON_KEY_SYS_MOD_COUNT => e.TypeName != TYPE_NAME_INTEGER,
         _ => true,
     });
-    
+
     /// <summary>
     /// Tests whether all fields implemented by the IBaseRecord type are present.
     /// </summary>
@@ -212,7 +219,7 @@ public static class ExtensionMethods
         elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_INTEGER) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_STRING) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_GLIDE_DATE_TIME);
-    
+
     /// <summary>
     /// Surrounds a string with quotes if it contains spaces or specific symbols.
     /// </summary>
@@ -260,7 +267,7 @@ public static class ExtensionMethods
         logger.LogAPIRequestCompleted(requestUri, result);
         return result;
     }
-    
+
     /// <summary>
     /// Creates a table API URI.
     /// </summary>
@@ -289,7 +296,7 @@ public static class ExtensionMethods
             Fragment = null
         }.Uri;
     }
-    
+
     // public static async Task<string?> GetJsonResponseAsync(this HttpClientHandler? clientHandler, Uri requestUri, ILogger logger, CancellationToken cancellationToken)
     // {
     //     if (clientHandler is null)
@@ -316,7 +323,7 @@ public static class ExtensionMethods
 
     public static bool TryGetPropertyValue(this JsonObject source, string propertyName, string innerPropertyName, out JsonNode? jsonNode) =>
         source.TryGetPropertyValue(propertyName, out jsonNode) && jsonNode is JsonObject obj && obj.TryGetPropertyValue(innerPropertyName, out jsonNode);
-    
+
     public static bool TryGetPropertyAsString(this JsonObject source, string propertyName, [NotNullWhen(true)] out string? result)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue)
@@ -416,7 +423,7 @@ public static class ExtensionMethods
     public static int CoercePropertyAsInt(this JsonObject source, string propertyName, int defaultValue = 0) =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out int? result) ? result.Value :
             (jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i)) ? i : defaultValue) : defaultValue;
-    
+
     public static bool TryCoercePropertyAsBoolean(this JsonObject source, string propertyName, [NotNullWhen(true)] out bool? result)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue)
@@ -440,7 +447,7 @@ public static class ExtensionMethods
     public static bool CoercePropertyAsBoolean(this JsonObject source, string propertyName, bool defaultValue = false) =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out bool? result) ? result.Value :
             (jsonValue.TryGetValue(out string? s) && bool.TryParse(s, out bool b)) ? b : defaultValue) : defaultValue;
-    
+
     public static bool TryGetFieldAsString(this JsonObject source, string propertyName, [NotNullWhen(true)] out string? value, out string? display_value)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
@@ -823,4 +830,55 @@ public static class ExtensionMethods
         HttpStatusCode.NetworkAuthenticationRequired => "Authentication required for network access.",
         _ => null,
     };
+    
+    public static string GetNamespace(this TableInfo tableInfo) => string.IsNullOrWhiteSpace(tableInfo.ScopeValue) ? AppSettings.DEFAULT_NAMESPACE : tableInfo.ScopeValue;
+
+    public static string GetShortName(this TableInfo tableInfo)
+    {
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE || !tableInfo.Name.StartsWith(tableInfo.ScopeValue))
+            return tableInfo.Name;
+        int len = tableInfo.ScopeValue.Length + 1;
+        if (tableInfo.Name.Length <= len || tableInfo.Name[tableInfo.ScopeValue.Length] != '_')
+            return tableInfo.Name;
+        return tableInfo.Name[len..];
+    }
+
+    public static string GetGlideRecordTypeString(this TableInfo tableInfo, string targetNs)
+    {
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE)
+            return $"{NS_NAME_GlideRecord}.{tableInfo.Name}";
+        if (targetNs == tableInfo.ScopeValue)
+            return $"{NS_NAME_record}.{tableInfo.GetShortName()}";
+        return $"{tableInfo.ScopeValue}.{NS_NAME_record}.{tableInfo.GetShortName()}";
+    }
+
+    public static string GetGlideElementTypeString(this TableInfo tableInfo, string targetNs)
+    {
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE)
+            return $"{NS_NAME_GlideElement}.{tableInfo.Name}";
+        if (targetNs == tableInfo.ScopeValue)
+            return $"{NS_NAME_element}.{tableInfo.GetShortName()}";
+        return $"{tableInfo.ScopeValue}.{NS_NAME_element}.{tableInfo.GetShortName()}";
+    }
+
+    public static string GetInterfaceTypeString(this TableInfo tableInfo, string targetNs)
+    {
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE)
+            return $"{NS_NAME_tableFields}.{tableInfo.Name}";
+        if (targetNs == tableInfo.ScopeValue)
+            return $"{NS_NAME_fields}.{tableInfo.GetShortName()}";
+        return $"{tableInfo.ScopeValue}.{NS_NAME_fields}.{tableInfo.GetShortName()}";
+    }
+
+    public static async Task WriteLinesAsync(this TextWriter writer, IEnumerable<string> lines, CancellationToken cancellationToken)
+    {
+        foreach (string l in lines)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                break;
+            await writer.WriteLineAsync(l);
+        }
+    }
+
+    public static async Task WriteLinesAsync(this TextWriter writer, CancellationToken cancellationToken, params string[] lines) => await writer.WriteLinesAsync(lines, cancellationToken);
 }

@@ -11,7 +11,7 @@ internal class InvalidResultElementType : Exception, ILogTrackable
     public Uri RequestUri { get; }
 
     public JsonObject Element { get; }
-    
+
     public int Index { get; }
 
     public bool IsLogged { get; private set; }

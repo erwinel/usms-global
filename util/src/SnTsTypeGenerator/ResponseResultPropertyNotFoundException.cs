@@ -34,7 +34,8 @@ internal class ResponseResultPropertyNotFoundException : Exception, ILogTrackabl
 
     public ResponseResultPropertyNotFoundException(Uri requestUri, JsonObject result, Exception? innerException) : this(requestUri, result, null, innerException) { }
 
-    public ResponseResultPropertyNotFoundException(Uri requestUri, JsonObject result, string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Result) = (requestUri, result);
+    public ResponseResultPropertyNotFoundException(Uri requestUri, JsonObject result, string? message, Exception? innerException) : base(message, innerException) =>
+        (RequestUri, Result) = (requestUri, result);
 
     protected ResponseResultPropertyNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
