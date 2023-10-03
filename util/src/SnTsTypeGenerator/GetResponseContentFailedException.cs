@@ -23,11 +23,15 @@ internal class GetResponseContentFailedException : Exception, ILogTrackable
 
     public GetResponseContentFailedException(string? message) : base(message) => RequestUri = EmptyURI;
 
-    public GetResponseContentFailedException(Uri requestUri, Exception? innerException) : this(requestUri, null, innerException) { }
+    public GetResponseContentFailedException(string? message, Exception? innerException) : base(message, innerException) => RequestUri = EmptyURI;
 
-    public GetResponseContentFailedException(string? message, Exception? innerException = null) : base(message, innerException) => RequestUri = EmptyURI;
+    internal GetResponseContentFailedException(Uri requestUri) => RequestUri = requestUri;
 
-    internal GetResponseContentFailedException(Uri requestUri, string? message = null, Exception? innerException = null) : base(message, innerException) => RequestUri = requestUri;
+    internal GetResponseContentFailedException(Uri requestUri, string? message) : base(message) => RequestUri = requestUri;
+
+    internal GetResponseContentFailedException(Uri requestUri, Exception? innerException) : this(requestUri, null, innerException) { }
+
+    internal GetResponseContentFailedException(Uri requestUri, string? message, Exception? innerException) : base(message, innerException) => RequestUri = requestUri;
 
     protected GetResponseContentFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
     {

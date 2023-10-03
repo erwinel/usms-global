@@ -26,11 +26,15 @@ internal class ResponseParsingException : Exception, ILogTrackable
 
     public ResponseParsingException(string? message) : base(message) => (RequestUri, ResponseBody) = (EmptyURI, string.Empty);
 
-    public ResponseParsingException(string? message, JsonException? innerException) : base(message, innerException) => (RequestUri, ResponseBody) = (EmptyURI, string.Empty);
+    public ResponseParsingException(string? message, Exception? innerException) : base(message, innerException) => (RequestUri, ResponseBody) = (EmptyURI, string.Empty);
+
+    internal ResponseParsingException(Uri requestUri, string responseBody) => (RequestUri, ResponseBody) = (requestUri, responseBody);
+
+    internal ResponseParsingException(Uri requestUri, string responseBody, string? message) : base(message) => (RequestUri, ResponseBody) = (requestUri, responseBody);
 
     internal ResponseParsingException(Uri requestUri, string responseBody, JsonException? innerException) : this(requestUri, responseBody, null, innerException) { }
 
-    internal ResponseParsingException(Uri requestUri, string responseBody, string? message = null, JsonException? innerException = null) : base(message, innerException) => (RequestUri, ResponseBody) = (requestUri, responseBody);
+    internal ResponseParsingException(Uri requestUri, string responseBody, string? message, JsonException? innerException) : base(message, innerException) => (RequestUri, ResponseBody) = (requestUri, responseBody);
 
     protected ResponseParsingException(SerializationInfo info, StreamingContext context) : base(info, context)
     {

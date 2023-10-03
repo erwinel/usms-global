@@ -21,7 +21,7 @@ public class DataLoaderService : IDisposable
     private readonly Dictionary<string, string> _packageIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, SourceInfo> _sourceCache = new(StringComparer.InvariantCultureIgnoreCase);
 
-    public bool InitSuccessful => _tableAPIService is not null && _tableAPIService.HasHandler && _tableAPIService.BaseURI.IsAbsoluteUri;
+    public bool InitSuccessful => _tableAPIService is not null && _tableAPIService.InitSuccessful;
 
     private async Task<SourceInfo> GetSourceAsync(string fqdn, CancellationToken cancellationToken)
     {

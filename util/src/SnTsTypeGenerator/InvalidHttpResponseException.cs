@@ -1,5 +1,6 @@
 using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using static SnTsTypeGenerator.Constants;
 
@@ -10,7 +11,7 @@ internal class InvalidHttpResponseException : Exception, ILogTrackable
 {
     public Uri RequestUri { get; }
 
-    private string ResponseBody { get; }
+    public JsonNode? Response { get; }
 
     public bool IsLogged { get; private set; }
 
@@ -18,35 +19,41 @@ internal class InvalidHttpResponseException : Exception, ILogTrackable
     {
         if (IsLogged && !force)
             return;
-        logger.LogInvalidHttpResponse(RequestUri, ResponseBody);
+        logger.LogInvalidHttpResponse(RequestUri, Response);
         IsLogged = true;
     }
 
-    public InvalidHttpResponseException() => (RequestUri, ResponseBody) = (EmptyURI, string.Empty);
+    public InvalidHttpResponseException() => (RequestUri, Response) = (EmptyURI, null);
 
-    public InvalidHttpResponseException(string? message) : base(message) => (RequestUri, ResponseBody) = (EmptyURI, string.Empty);
+    public InvalidHttpResponseException(string? message) : base(message) => (RequestUri, Response) = (EmptyURI, null);
 
-    public InvalidHttpResponseException(Uri requestUri, string responseBody, Exception? innerException) : this(requestUri, responseBody, null, innerException) { }
+    public InvalidHttpResponseException(string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Response) = (EmptyURI, null);
 
-    public InvalidHttpResponseException(string? message, Exception? innerException) : base(message, innerException) => (RequestUri, ResponseBody) = (EmptyURI, string.Empty);
+    internal InvalidHttpResponseException(Uri requestUri, JsonNode? response) => (RequestUri, Response) = (requestUri, response);
 
-    internal InvalidHttpResponseException(Uri requestUri, string responseBody, JsonException? innerException) : this(requestUri, responseBody, null, innerException) { }
+    internal InvalidHttpResponseException(Uri requestUri, JsonNode? response, string? message) : base(message) => (RequestUri, Response) = (requestUri, response);
 
-    internal InvalidHttpResponseException(Uri requestUri, string responseBody, string? message = null, Exception? innerException = null) : base(message, innerException) => (RequestUri, ResponseBody) = (requestUri, responseBody);
+    internal InvalidHttpResponseException(Uri requestUri, JsonNode? response, JsonException? innerException) : this(requestUri, response, null, innerException) { }
+
+    internal InvalidHttpResponseException(Uri requestUri, JsonNode? response, string? message, JsonException? innerException) : base(message, innerException) => (RequestUri, Response) = (requestUri, response);
 
     protected InvalidHttpResponseException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
         IsLogged = info.GetBoolean(nameof(IsLogged));
-        ResponseBody = info.GetString(nameof(ResponseBody)) ?? string.Empty;
-        string? uriString = info.GetString(nameof(RequestUri));
-        RequestUri = string.IsNullOrEmpty(uriString) ? EmptyURI : Uri.TryCreate(uriString, UriKind.Absolute, out Uri? uri) ? uri : new Uri(uriString, UriKind.Relative);
+        string? value = info.GetString(nameof(Response));
+        if (string.IsNullOrWhiteSpace(value))
+            Response = null;
+        else
+            try { Response = JsonNode.Parse(value); }
+            catch { Response = null; }
+        RequestUri = string.IsNullOrEmpty(value = info.GetString(nameof(RequestUri))) ? EmptyURI : Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) ? uri : new Uri(value, UriKind.Relative);
     }
 
     public override void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         base.GetObjectData(info, context);
         info.AddValue(nameof(RequestUri), RequestUri.OriginalString);
-        info.AddValue(nameof(ResponseBody), ResponseBody);
+        info.AddValue(nameof(Response), Response?.ToJsonString());
         info.AddValue(nameof(IsLogged), IsLogged);
     }
 }
