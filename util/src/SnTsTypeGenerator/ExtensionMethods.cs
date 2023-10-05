@@ -772,11 +772,11 @@ public static class ExtensionMethods
         _ => null,
     };
     
-    public static string GetNamespace(this TableInfo tableInfo) => string.IsNullOrWhiteSpace(tableInfo.ScopeValue) ? AppSettings.DEFAULT_NAMESPACE : tableInfo.ScopeValue;
+    public static string GetNamespace(this TableInfo tableInfo) => string.IsNullOrWhiteSpace(tableInfo.ScopeValue) ? DEFAULT_NAMESPACE : tableInfo.ScopeValue;
 
     public static string GetShortName(this TableInfo tableInfo)
     {
-        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE || !tableInfo.Name.StartsWith(tableInfo.ScopeValue))
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == DEFAULT_NAMESPACE || !tableInfo.Name.StartsWith(tableInfo.ScopeValue))
             return tableInfo.Name;
         int len = tableInfo.ScopeValue.Length + 1;
         if (tableInfo.Name.Length <= len || tableInfo.Name[tableInfo.ScopeValue.Length] != '_')
@@ -786,7 +786,7 @@ public static class ExtensionMethods
 
     public static string GetGlideRecordTypeString(this TableInfo tableInfo, string targetNs)
     {
-        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE)
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == DEFAULT_NAMESPACE)
             return $"{NS_NAME_GlideRecord}.{tableInfo.Name}";
         if (targetNs == tableInfo.ScopeValue)
             return $"{NS_NAME_record}.{tableInfo.GetShortName()}";
@@ -795,7 +795,7 @@ public static class ExtensionMethods
 
     public static string GetGlideElementTypeString(this TableInfo tableInfo, string targetNs)
     {
-        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE)
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == DEFAULT_NAMESPACE)
             return $"{NS_NAME_GlideElement}.{tableInfo.Name}";
         if (targetNs == tableInfo.ScopeValue)
             return $"{NS_NAME_element}.{tableInfo.GetShortName()}";
@@ -804,7 +804,7 @@ public static class ExtensionMethods
 
     public static string GetInterfaceTypeString(this TableInfo tableInfo, string targetNs)
     {
-        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == AppSettings.DEFAULT_NAMESPACE)
+        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == DEFAULT_NAMESPACE)
             return $"{NS_NAME_tableFields}.{tableInfo.Name}";
         if (targetNs == tableInfo.ScopeValue)
             return $"{NS_NAME_fields}.{tableInfo.GetShortName()}";
