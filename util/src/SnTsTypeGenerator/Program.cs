@@ -17,7 +17,6 @@ internal class Program
         var env = builder.Environment;
         if (env.IsDevelopment())
             builder.Configuration.AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly(), true);
-        builder.Configuration.AddCommandLine(args);
         builder.Logging.AddConsole();
         builder.Services
             .Configure<AppSettings>(builder.Configuration.GetSection(nameof(SnTsTypeGenerator)))
@@ -25,7 +24,7 @@ internal class Program
             {
                 var dbFile = builder.Configuration.Get<AppSettings>()?.DbFile;
                 if (string.IsNullOrEmpty(dbFile))
-                    dbFile = AppSettings.DEFAULT_DbFile;
+                    dbFile = Constants.DEFAULT_DbFile;
                 try { dbFile = new FileInfo((Path.IsPathFullyQualified(dbFile) || Path.IsPathRooted(dbFile)) ? dbFile : Path.Combine(builder.Environment.ContentRootPath, dbFile)).FullName; }
                 catch { }
                 options.UseSqlite(new SqliteConnectionStringBuilder

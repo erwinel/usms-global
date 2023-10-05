@@ -146,7 +146,7 @@ public class RenderingService
                 using IndentedTextWriter writer = new(streamWriter, "    ");
 
                 var nsGrouped = toRender.GroupBy(t => t.GetNamespace()).OrderBy(g => g.Key).ToArray();
-                var gns = nsGrouped.FirstOrDefault(n => n.Key == AppSettings.DEFAULT_NAMESPACE);
+                var gns = nsGrouped.FirstOrDefault(n => n.Key == DEFAULT_NAMESPACE);
                 if (gns is not null)
                 {
                     await writer.WriteAsync($"declare namespace {NS_NAME_GlideRecord} {{");
@@ -165,11 +165,11 @@ public class RenderingService
                         if (table.IsExtendable)
                             await writer.WriteLineAsync(" * IsExtendable: true");
                         await writer.WriteLineAsync(" */");
-                        await writer.WriteAsync($"export type {table.Name} = {table.GetInterfaceTypeString(AppSettings.DEFAULT_NAMESPACE)}");
+                        await writer.WriteAsync($"export type {table.Name} = {table.GetInterfaceTypeString(DEFAULT_NAMESPACE)}");
                         if (table.SuperClass is null)
                             await writer.WriteLineAsync($" & {TS_NAME_GlideRecord};");
                         else
-                            await writer.WriteLineAsync($" & {table.SuperClass.GetGlideRecordTypeString(AppSettings.DEFAULT_NAMESPACE)};");
+                            await writer.WriteLineAsync($" & {table.SuperClass.GetGlideRecordTypeString(DEFAULT_NAMESPACE)};");
                     }
                     writer.Indent = 0;
                     await writer.WriteLineAsync("}");
@@ -185,7 +185,7 @@ public class RenderingService
                             "/**",
                             $" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.",
                             " */",
-                            $"export type Reference<{table.GetInterfaceTypeString(AppSettings.DEFAULT_NAMESPACE)}, {table.GetGlideRecordTypeString(AppSettings.DEFAULT_NAMESPACE)}>;"
+                            $"export type Reference<{table.GetInterfaceTypeString(DEFAULT_NAMESPACE)}, {table.GetGlideRecordTypeString(DEFAULT_NAMESPACE)}>;"
                         );
                     }
                     writer.Indent = 0;
@@ -213,7 +213,7 @@ public class RenderingService
                     }
                     writer.Indent = 0;
                     await writer.WriteLineAsync("}");
-                    if ((nsGrouped = nsGrouped.Where(n => n.Key == AppSettings.DEFAULT_NAMESPACE).ToArray()).Length > 0)
+                    if ((nsGrouped = nsGrouped.Where(n => n.Key == DEFAULT_NAMESPACE).ToArray()).Length > 0)
                         await writer.WriteLineAsync();
                 }
 
@@ -344,7 +344,7 @@ public class RenderingService
         _forceOverwrite = settings.Force ?? false;
         string outputFileName = settings.Output!;
         if (string.IsNullOrEmpty(outputFileName))
-            outputFileName = AppSettings.DEFAULT_OUTPUT_FILENAME;
+            outputFileName = DEFAULT_OUTPUT_FILENAME;
         try
         {
             FileInfo outputFile = new(outputFileName);

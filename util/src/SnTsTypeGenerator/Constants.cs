@@ -5,14 +5,23 @@ internal static class Constants
     /// <summary>
     /// The Sqlite collation for case-insensitive matching.
     /// </summary>
-    public const string COLLATION_NOCASE = "NOCASE";
+    internal const string COLLATION_NOCASE = "NOCASE";
 
     /// <summary>
     /// The Sqlite code for the current date and time.
     /// </summary>
-    public const string DEFAULT_SQL_NOW = "(datetime('now','localtime'))";
+    internal const string DEFAULT_SQL_NOW = "(datetime('now','localtime'))";
 
-    public static readonly Uri EmptyURI = new(string.Empty, UriKind.Relative);
+    internal const string DEFAULT_NAMESPACE = "global";
+
+    /// <summary>
+    /// Default name of database file.
+    /// </summary>
+    public const string DEFAULT_DbFile = $"Typings.db";
+
+    internal const string DEFAULT_OUTPUT_FILENAME = "types.d.ts";
+
+    internal static readonly Uri EmptyURI = new(string.Empty, UriKind.Relative);
 
     internal const string URI_PARAM_QUERY = "sysparm_query";
 
