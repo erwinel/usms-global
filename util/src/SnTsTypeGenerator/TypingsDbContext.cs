@@ -151,10 +151,10 @@ public partial class TypingsDbContext : DbContext
         yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsPrimary)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.IsPrimary)}\")";
     }
 
-    public TypingsDbContext(DbContextOptions<TypingsDbContext> options, ILogger<TypingsDbContext> logger, IServiceScopeFactory scopeFactory) : base(options)
+    public TypingsDbContext(DbContextOptions<TypingsDbContext> options) : base(options)
     {
-        _logger = logger;
-        _scopeFactory = scopeFactory;
+        _logger = Program.Host.Services.GetRequiredService<ILogger<TypingsDbContext>>();
+        _scopeFactory = Program.Host.Services.GetRequiredService<IServiceScopeFactory>();
         SqliteConnectionStringBuilder csb;
         string connectionString = Database.GetConnectionString()!;
         FileInfo dbFile;
