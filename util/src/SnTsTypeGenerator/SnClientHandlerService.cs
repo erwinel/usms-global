@@ -300,7 +300,7 @@ public sealed class SnClientHandlerService
             {
                 BaseURL = EmptyURI;
                 if (!showHelp)
-                    _logger.LogInvalidRemoteInstanceUri();
+                    _logger.LogInvalidRemoteInstanceUrl(uri);
                 ClientCredentials = UserCredentials = null!;
                 return;
             }
@@ -348,6 +348,7 @@ public sealed class SnClientHandlerService
             string? password = settings.Password;
             if (string.IsNullOrWhiteSpace(password))
             {
+                Console.Write("Password: ");
                 password = Console.ReadLine();
                 if (string.IsNullOrEmpty(password))
                 {
@@ -363,7 +364,7 @@ public sealed class SnClientHandlerService
         {
             BaseURL = EmptyURI;
             if (!showHelp)
-                _logger.LogInvalidRemoteInstanceUri();
+                _logger.LogInvalidRemoteInstanceUrl(Uri.TryCreate(remoteUri, UriKind.Relative, out uri) ? uri : new Uri(Uri.EscapeDataString(remoteUri), UriKind.Relative));
             ClientCredentials = UserCredentials = null!;
         }
     }

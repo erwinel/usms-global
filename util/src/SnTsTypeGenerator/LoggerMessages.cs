@@ -10,8 +10,6 @@ namespace SnTsTypeGenerator;
 
 public static class LoggerMessages
 {
-    // TODO: Add events with codes 0x0006, and 0x0007
-    
     #region Critical DbfileValidation Error (0x0001)
 
     /// <summary>
@@ -139,10 +137,10 @@ public static class LoggerMessages
     public static readonly EventId CriticalSettingValueNotProvided = new(EVENT_ID_CriticalSettingValueNotProvided, nameof(CriticalSettingValueNotProvided));
     
     private static readonly Action<ILogger, string, Exception?> _criticalSettingValueNotProvided1= LoggerMessage.Define<string>(LogLevel.Critical, CriticalSettingValueNotProvided,
-        "{SettingName} setting is missing.");
+        "The {SettingName} setting is empty or was not provided.");
     
     private static readonly Action<ILogger, string, string, Exception?> _criticalSettingValueNotProvided2 = LoggerMessage.Define<string, string>(LogLevel.Critical, CriticalSettingValueNotProvided,
-        "{SettingName} ({CmdLineSwitch}) not provided.");
+        "The {SettingName} setting ({CmdLineSwitch}) is empty or was not not provided.");
     
     /// <summary>
     /// Logs an CriticalSettingValueNotProvided event with event code 0x0005.
@@ -161,26 +159,99 @@ public static class LoggerMessages
     
     #endregion
 
-    #region Critical InvalidRemoteInstanceUri Error (0x0008)
+    #region RenderMode Trace (0x0006)
+    
+    /// <summary>
+    // Numerical event code for RenderMode.
+    /// </summary>
+    public const int EVENT_ID_RenderMode = 0x0006;
+    
+    /// <summary>
+    // Event ID for RenderMode.
+    /// </summary>
+    public static readonly EventId RenderMode = new(EVENT_ID_RenderMode, nameof(RenderMode));
+    
+    private static readonly Action<ILogger, string, string, bool, Exception?> _renderMode1 = LoggerMessage.Define<string, string, bool>(LogLevel.Trace, RenderMode,
+        "Setting {Setting} ({Switch}) is {Value}.");
+    
+    private static readonly Action<ILogger, string, string, bool, Exception?> _renderMode2 = LoggerMessage.Define<string, string, bool>(LogLevel.Trace, RenderMode,
+        "Setting {Setting} ({Switch}) defaulted to {Value}.");
+    
+
+    /// <summary>
+    /// Logs an RenderMode event with event code 0x0006.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="value">Indicates value of <see cref="AppSettings.Scoped"/> setting.</param>
+    public static void LogScopedSettingValue(this ILogger logger, bool value) => _renderMode1(logger, nameof(AppSettings.Scoped), AppSettings.SHORTHAND_s, value, null);
+    
+    public static void LogGlobalSettingValue(this ILogger logger, bool value) => _renderMode1(logger, nameof(AppSettings.Global), AppSettings.SHORTHAND_g, value, null);
+    
+    public static void LogDefaultRenderMode(this ILogger logger, bool isGlobal)
+    {
+        if (isGlobal)
+            _renderMode2(logger, nameof(AppSettings.Global), AppSettings.SHORTHAND_g, true, null);
+        else
+            _renderMode2(logger, nameof(AppSettings.Scoped), AppSettings.SHORTHAND_s, true, null);
+    }
+    
+    #endregion
+
+    #region UsingOutputFile Trace (0x0007)
+    
+    /// <summary>
+    // Numerical event code for UsingOutputFile.
+    /// </summary>
+    public const int EVENT_ID_UsingOutputFile = 0x0007;
+    
+    /// <summary>
+    // Event ID for UsingOutputFile.
+    /// </summary>
+    public static readonly EventId UsingOutputFile = new(EVENT_ID_UsingOutputFile, nameof(UsingOutputFile));
+    
+    private static readonly Action<ILogger, string, bool, Exception?> _usingOutputFile = LoggerMessage.Define<string, bool>(LogLevel.Trace, UsingOutputFile,
+        "Message {Path} {OverWrite}");
+    
+    /// <summary>
+    /// Logs an UsingOutputFile event with event code 0x0007.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="path">The output file path.</param>
+    /// <param name="overWrite">The value of the <see cref="AppSettings.Force"/> setting.</param>
+    public static void LogUsingOutputFile(this ILogger logger, string path, bool overWrite) => _usingOutputFile(logger, path, overWrite, null);
+    
+    #endregion
+
+    #region Critical InvalidRemoteInstanceUrl Error (0x0008)
 
     /// <summary>
     /// Numerical event code for invalid remote URL.
     /// </summary>
-    public const int EVENT_ID_InvalidRemoteInstanceUri = 0x0008;
+    public const int EVENT_ID_InvalidRemoteInstanceUrl = 0x0008;
 
     /// <summary>
     /// Event ID for invalid remote URL.
     /// </summary>
-    public static readonly EventId InvalidRemoteInstanceUri = new(EVENT_ID_InvalidRemoteInstanceUri, nameof(InvalidRemoteInstanceUri));
+    public static readonly EventId InvalidRemoteInstanceUrl = new(EVENT_ID_InvalidRemoteInstanceUrl, nameof(InvalidRemoteInstanceUrl));
 
-    private static readonly Action<ILogger, Exception?> _invalidRemoteInstanceUri = LoggerMessage.Define(LogLevel.Critical, InvalidRemoteInstanceUri,
-        "The remote ServiceNow instance URI was not an absolute URI with the http or https scheme.");
+    private static readonly Action<ILogger, string, Exception?> _invalidRemoteInstanceUrl1 = LoggerMessage.Define<string>(LogLevel.Critical, InvalidRemoteInstanceUrl,
+        $"The {nameof(AppSettings.RemoteURL)} setting ({AppSettings.SHORTHAND_r}) contains an invalid URL: {{URI}} does not use the http or https scheme.");
+
+    private static readonly Action<ILogger, string, Exception?> _invalidRemoteInstanceUrl2 = LoggerMessage.Define<string>(LogLevel.Critical, InvalidRemoteInstanceUrl,
+        $"The {nameof(AppSettings.RemoteURL)} setting ({AppSettings.SHORTHAND_r}) contains an invalid URL: {{URI}} is not an absolute URI.");
 
     /// <summary>
-    /// Logs an invalid remote URL event (InvalidRemoteInstanceUri) with event code 0x0008.
+    /// Logs an invalid remote URL event (InvalidRemoteInstanceUrl) with event code 0x0008.
     /// </summary>
     /// <param name="logger">The current logger.</param>
-    public static void LogInvalidRemoteInstanceUri(this ILogger logger) => _invalidRemoteInstanceUri(logger, null);
+    /// <param name="uri">The invalid URI.</param>
+    public static void LogInvalidRemoteInstanceUrl(this ILogger logger, Uri uri)
+    {
+        if (uri.IsAbsoluteUri)
+            _invalidRemoteInstanceUrl1(logger, uri.OriginalString, null);
+        else
+            _invalidRemoteInstanceUrl2(logger, uri.OriginalString, null);
+    }
 
     #endregion
 
@@ -589,7 +660,6 @@ public static class LoggerMessages
         acceptAllChangesOnSuccess.HasValue ? $"SaveChanges({acceptAllChangesOnSuccess.Value})" : "SaveChanges()", returnValue, null);
 
     #endregion
-
 
     #region InvalidResponseType Error (0x0015)
 
@@ -1016,7 +1086,6 @@ public static class LoggerMessages
     public static void LogNewTableSaveCompleteTrace(this ILogger logger, string tableName) => _newTableSaveCompleteTrace(logger, tableName, null);
 
     #endregion
-
 
     #region Critical UnexpecteException Error (0x00ff)
 

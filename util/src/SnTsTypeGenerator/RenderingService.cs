@@ -313,14 +313,36 @@ public class RenderingService
     {
         _logger = logger;
         _dbContext = dbContext;
-        _isScoped = appSettings.Value.Scoped ?? false;
-        if (_isScoped && (appSettings.Value.Global ?? false))
+        AppSettings settings = appSettings.Value;
+        if (settings.Scoped.HasValue)
         {
-            _logger.LogGlobalAndScopedSwitchesBothSet();
-            return;
+            if (settings.Global.HasValue)
+            {
+                if (settings.Scoped.Value && settings.Global.Value)
+                {
+                    _logger.LogGlobalAndScopedSwitchesBothSet();
+                    return;
+                }
+                _logger.LogGlobalSettingValue(settings.Global.Value);
+            }
+            _isScoped = settings.Scoped.Value;
+            _logger.LogScopedSettingValue(_isScoped);
         }
-        _forceOverwrite = appSettings.Value.Force ?? false;
-        string outputFileName = appSettings.Value.Output!;
+        else if (settings.Global.HasValue)
+        {
+            _logger.LogGlobalSettingValue(settings.Global.Value);
+            _isScoped = !settings.Global.Value;
+            if (_isScoped)
+                _logger.LogDefaultRenderMode(false);
+        }
+        else
+        {
+            _isScoped = false;
+            _logger.LogDefaultRenderMode(true);
+        }
+
+        _forceOverwrite = settings.Force ?? false;
+        string outputFileName = settings.Output!;
         if (string.IsNullOrEmpty(outputFileName))
             outputFileName = AppSettings.DEFAULT_OUTPUT_FILENAME;
         try
@@ -335,6 +357,7 @@ public class RenderingService
                     return;
                 }
                 _outputFile = outputFile;
+                _logger.LogUsingOutputFile(outputFileName, _forceOverwrite);
             }
             else if (!(outputFile.Directory?.Exists ?? false))
             {
