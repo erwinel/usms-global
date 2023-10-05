@@ -16,19 +16,6 @@ If the language service fails to recognize namespaces from added packages such a
 2. Execute the command `dotnet restore util/src`
 3. From the command palette, select `.NET: Restart Language Server`.
 
-#### TODO: Possible fix
-
-Change `postCreateCommand` setting in [devcontainer.json](./.devcontainer/devcontainer.json) to:
-
-```json
-[
-    "npm install",
-    "git submodule update --init --recursive",
-    "pushd .; cd types/snc; git checkout master; popd"
-    "dotnet restore util/src"
-]
-```
-
 ### SNC Typings Submodule Maintenance
 
 #### Initialize Submodule after Repository Clone
