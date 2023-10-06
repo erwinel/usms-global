@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,9 @@ public sealed class MainWorkerService : BackgroundService
 {
     private readonly ILogger _logger;
     private readonly IServiceScope _scope;
-    private readonly AppSettings _appSettings;
+    private readonly ImmutableArray<string> _tableNames;
+
+    // private readonly AppSettings _appSettings;
     // private readonly TypingsDbContext _dbContext;
     // private readonly DataLoaderService _dataLoader;
     // private readonly RenderingService _renderer;
@@ -22,10 +25,21 @@ public sealed class MainWorkerService : BackgroundService
     {
         _logger = logger;
         _scope = services.CreateScope();
-        _appSettings = appSettings.Value;
-        // appLifetime.ApplicationStarted.Register(OnStarted);
-        // appLifetime.ApplicationStopping.Register(OnStopping);
-        // appLifetime.ApplicationStopped.Register(OnStopped);
+        AppSettings _appSettings = appSettings.Value;
+        if (_appSettings.Help.HasValue && _appSettings.Help.Value)
+            WriteHelpToConsole();
+        else
+        {
+            var tableNames = _appSettings.Table?.Split(',').Where(t => !string.IsNullOrEmpty(t));
+            if ((tableNames is not null && tableNames.Any()) || ((tableNames = _appSettings.Tables?.Where(t => !string.IsNullOrEmpty(t))) is not null))
+            {
+                _tableNames = tableNames.Select(n => n.Trim().ToLower()).Distinct().ToImmutableArray();
+                return;
+            }
+            _logger.LogNoTableNamesSpecifiedWarning();
+        }
+        
+        _tableNames = ImmutableArray.Create<string>();
     }
 
     internal static void WriteHelpToConsole()
@@ -160,48 +174,37 @@ public sealed class MainWorkerService : BackgroundService
 
         DataLoaderService _dataLoader = _scope.ServiceProvider.GetRequiredService<DataLoaderService>();
         RenderingService _renderer = _scope.ServiceProvider.GetRequiredService<RenderingService>();
-        if (_appSettings.Help.HasValue && _appSettings.Help.Value)
-        {
-            WriteHelpToConsole();
-            return;
-        }
 
         if (!(_dataLoader.InitSuccessful && _renderer.InitSuccessful))
             return;
 
-        var tableNames = _appSettings.Table?.Split(',').Where(t => !string.IsNullOrEmpty(t));
-        if ((tableNames is not null && tableNames.Any()) || ((tableNames = _appSettings.Tables?.Where(t => !string.IsNullOrEmpty(t))) is not null && tableNames.Any()))
+        Collection<TableInfo> toRender = new();
+        foreach (string name in _tableNames)
         {
-            Collection<TableInfo> toRender = new();
-            foreach (string name in tableNames.Select(n => n.Trim().ToLower()).Distinct())
+            if (stoppingToken.IsCancellationRequested)
+                return;
+            try
+            {
+                var tableInfo = await _dataLoader.GetTableByNameAsync(name, stoppingToken);
+                if (tableInfo is not null)
+                    toRender.Add(tableInfo);
+            }
+            catch (Exception exception)
             {
                 if (stoppingToken.IsCancellationRequested)
                     return;
-                try
+                if (exception is ILogTrackable logTrackable)
                 {
-                    var tableInfo = await _dataLoader.GetTableByNameAsync(name, stoppingToken);
-                    if (tableInfo is not null)
-                        toRender.Add(tableInfo);
+                    if (!logTrackable.IsLogged)
+                        logTrackable.Log(_logger);
                 }
-                catch (Exception exception)
-                {
-                    if (stoppingToken.IsCancellationRequested)
-                        return;
-                    if (exception is ILogTrackable logTrackable)
-                    {
-                        if (!logTrackable.IsLogged)
-                            logTrackable.Log(_logger);
-                    }
-                    else
-                        _logger.LogUnexpecteException(exception);
-                    return;
-                }
+                else
+                    _logger.LogUnexpecteException(exception);
+                return;
             }
-            if (!stoppingToken.IsCancellationRequested)
-                await _renderer.RenderAsync(toRender, stoppingToken);
         }
-        else
-            _logger.LogNoTableNamesSpecifiedWarning();
+        if (!stoppingToken.IsCancellationRequested)
+            await _renderer.RenderAsync(toRender, stoppingToken);
     }
 
     public override void Dispose()
