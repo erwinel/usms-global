@@ -1068,7 +1068,9 @@ class FieldInfo {
                     $jsType = 'GlideElementWorkflow';
                     break;
                 }
-                { $_ -eq "glide_date_time" -or $_ -eq "glide_date" -or $_ -eq "glide_time" -or $_ -eq "timer" -or $_ -eq "glide_duration" -or $_ -eq "glide_utc_time" -or $_ -eq "due_date" -or $_ -eq "glide_precise_time" -or $_ -eq "calendar_date_time" -or $_ -eq "user_input" -or $_ -eq "journal_input" -or $_ -eq "journal_list" -or $_ -eq "html" -or $_ -eq "glide_list" -or $_ -eq "journal" -or $_ -eq "glide_action_list" -or $_ -eq "date" -or $_ -eq "day_of_week" -or $_ -eq "month_of_year" -or $_ -eq "week_of_month" } {
+                { $_ -eq "glide_date_time" -or $_ -eq "glide_date" -or $_ -eq "glide_time" -or $_ -eq "timer" -or $_ -eq "glide_duration" -or $_ -eq "glide_utc_time" -or $_ -eq "due_date" -or $_ -eq "glide_precise_time" -or
+                    $_ -eq "calendar_date_time" -or $_ -eq "user_input" -or $_ -eq "journal_input" -or $_ -eq "journal_list" -or $_ -eq "html" -or $_ -eq "glide_list" -or $_ -eq "journal" -or $_ -eq "glide_action_list" -or
+                    $_ -eq "date" -or $_ -eq "day_of_week" -or $_ -eq "month_of_year" -or $_ -eq "week_of_month" } {
                     if ($TypeDb.Types.TryGetValue($this.type, [ref]$GlideType)) {
                         $scalarType = $GlideType.scalar_type;
                         $Writer.Write(' * Type: ');
