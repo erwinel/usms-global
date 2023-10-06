@@ -40,7 +40,7 @@ internal class Program
             .AddTransient<SnClientHandlerService>()
             .AddTransient<TableAPIService>()
             .AddTransient<DataLoaderService>()
-            .AddTransient<RenderingService>();
+            .AddSingleton<RenderingService>();
         Host = builder.Build();
         Host.Run();
     }

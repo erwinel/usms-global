@@ -1,6 +1,7 @@
 using System.CodeDom.Compiler;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static SnTsTypeGenerator.Constants;
@@ -9,8 +10,9 @@ namespace SnTsTypeGenerator;
 
 public class RenderingService
 {
-    private ILogger<MainWorkerService> _logger;
-    private TypingsDbContext _dbContext;
+    private ILogger<RenderingService> _logger;
+    private readonly IServiceProvider _services;
+    // private TypingsDbContext _dbContext;
     private readonly FileInfo? _outputFile;
     private readonly bool _forceOverwrite;
     private readonly bool _isScoped;
@@ -40,7 +42,7 @@ public class RenderingService
             yield return "Is Unique: true";
     }
 
-    private async Task RenderJsDocGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    private async Task RenderJsDocGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, TypingsDbContext dbContext, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         await writer.WriteLineAsync();
@@ -50,7 +52,7 @@ public class RenderingService
         );
         if (elementInfo.TypeName is not null && IsExplicitScalarTypeGlobal(elementInfo.TypeName))
         {
-            GlideType? type = await elementInfo.GetReferencedEntityAsync(_dbContext.Elements, e => e.Type, cancellationToken);
+            GlideType? type = await elementInfo.GetReferencedEntityAsync(dbContext.Elements, e => e.Type, cancellationToken);
             if (type is null)
                 await writer.WriteLineAsync($" * Type: {elementInfo.TypeName}");
             else if (type.Name.Equals(type.Label, StringComparison.InvariantCultureIgnoreCase))
@@ -73,21 +75,21 @@ public class RenderingService
                 await writer.WriteLineAsync($"; {values[^1]}");
                 break;
         }
-        
+
         throw new NotImplementedException();
     }
 
-    private async Task RenderPropertyGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    private async Task RenderPropertyGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, TypingsDbContext dbContext, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    private async Task RenderJsDocScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    private async Task RenderJsDocScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, TypingsDbContext dbContext, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    private async Task RenderPropertyScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    private async Task RenderPropertyScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, TypingsDbContext dbContext, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
@@ -144,7 +146,7 @@ public class RenderingService
             $" * @see {{@link {tableInfo.GetGlideElementTypeString(@namespace)}}}",
             " */"
         );
-        
+
         if (elements.Length > 0 || jsDocElements.Length > 0)
         {
             await writer.WriteAsync($"export interface {tableName} {extends}");
@@ -167,89 +169,90 @@ public class RenderingService
     }
 
     private async Task RenderFieldsGlobalAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
-        await RenderFieldsAsync(tableInfo, writer, dbContext, async (e, ns) => await RenderPropertyGlobalAsync(e, writer, ns, cancellationToken),
-            async (e, ns) => await RenderJsDocGlobalAsync(e, writer, ns, cancellationToken), cancellationToken);
+        await RenderFieldsAsync(tableInfo, writer, dbContext, async (e, ns) => await RenderPropertyGlobalAsync(e, writer, ns, dbContext, cancellationToken),
+            async (e, ns) => await RenderJsDocGlobalAsync(e, writer, ns, dbContext, cancellationToken), cancellationToken);
 
     private async Task RenderFieldsScopedAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
-        await RenderFieldsAsync(tableInfo, writer, dbContext, async (e, ns) => await RenderPropertyScopedAsync(e, writer, ns, cancellationToken),
-            async (e, ns) => await RenderJsDocScopedAsync(e, writer, ns, cancellationToken), cancellationToken);
+        await RenderFieldsAsync(tableInfo, writer, dbContext, async (e, ns) => await RenderPropertyScopedAsync(e, writer, ns, dbContext, cancellationToken),
+            async (e, ns) => await RenderJsDocScopedAsync(e, writer, ns, dbContext, cancellationToken), cancellationToken);
 
     private static string GetScopedElementName(string typeName) => typeName switch
-        {
-            "journal" or "glide_list" or "glide_action_list" or "user_input" or "journal_input" or "journal_list" => "JournalGlideElement",
-            "glide_date_time" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or "calendar_date_time" => "GlideDateTimeElement",
-            "reference" or "currency2" or "domain_id" or "document_id" or "source_id" => "GlideElementReference",
-            _ => "GlideElement",
-        };
+    {
+        "journal" or "glide_list" or "glide_action_list" or "user_input" or "journal_input" or "journal_list" => "JournalGlideElement",
+        "glide_date_time" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or "calendar_date_time" => "GlideDateTimeElement",
+        "reference" or "currency2" or "domain_id" or "document_id" or "source_id" => "GlideElementReference",
+        _ => "GlideElement",
+    };
 
     private static bool IsExplicitScalarTypeScoped(string typeName) => typeName switch
-        {
-            "glide_list" or "glide_action_list" or "user_input" or "journal_input" or "journal_list" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or
-                "glide_precise_time" or "calendar_date_time" or "currency2" or "domain_id" or "document_id" or "source_id" => true,
-            _ => false,
-        };
+    {
+        "glide_list" or "glide_action_list" or "user_input" or "journal_input" or "journal_list" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or
+            "glide_precise_time" or "calendar_date_time" or "currency2" or "domain_id" or "document_id" or "source_id" => true,
+        _ => false,
+    };
 
     private static string GetGlobalElementName(string typeName) => typeName switch
-        {
-            "boolean" => "GlideElementBoolean",
-            "integer" or "decimal" or "float" or "percent_complete" or "order_index" or "longint" => "GlideElementNumeric",
-            "sys_class_name" => "GlideElementSysClassName",
-            "document_id" => "GlideElementDocumentId",
-            "domain_id" => "GlideElementDomainId",
-            "related_tags" => "GlideElementRelatedTags",
-            "translated_field" => "GlideElementTranslatedField",
-            "documentation_field" => "GlideElementDocumentation",
-            "script" or "script_plain" or "xml" => "GlideElementScript",
-            "conditions" => "GlideElementConditions",
-            "variables" => "GlideElementVariables",
-            "password" => "GlideElementPassword",
-            "user_image" => "GlideElementUserImage",
-            "translated_text" => "GlideElementTranslatedText",
-            "counter" => "GlideElementCounter",
-            "currency" => "GlideElementCurrency",
-            "price" => "GlideElementPrice",
-            "short_field_name" => "GlideElementShortFieldName",
-            "audio" => "GlideElementAudio",
-            "replication_payload" => "GlideElementReplicationPayload",
-            "breakdown_element" => "GlideElementBreakdownElement",
-            "compressed" => "GlideElementCompressed",
-            "translated_html" => "GlideElementTranslatedHTML",
-            "url" => "GlideElementURL",
-            "template_value" => "GlideElementWorkflowConditions",
-            "short_table_name" => "GlideElementShortTableName",
-            "data_object" => "GlideElementDataObject",
-            "string_full_utf8" => "GlideElementFullUTF8",
-            "icon" => "GlideElementIcon",
-            "glide_var" => "GlideElementGlideVar",
-            "internal_type" => "GlideElementInternalType",
-            "simple_name_values" => "GlideElementSimpleNameValue",
-            "name_values" => "GlideElementNameValue",
-            "source_name" => "GlideElementSourceName",
-            "source_table" => "GlideElementSourceTable",
-            "password2" => "GlideElementPassword2",
-            "reference" => "GlideElementReference",
-            "wiki_text" => "GlideElementWikiText",
-            "workflow" => "GlideElementWorkflow",
-            "glide_date_time" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or "calendar_date_time" or "user_input" or "journal_input" or "journal_list" or
-                "html" or "glide_list" or "journal" or "glide_action_list" or "date" or "day_of_week" or "month_of_year" or "week_of_month" => "GlideElementGlideObject",
-            "phone_number" or "caller_phone_number" or "phone_number_e164" => "GlideElementPhoneNumber",
-            "ip_addr" => "GlideElementIPAddress",
-            _ => "GlideElement",
-        };
+    {
+        "boolean" => "GlideElementBoolean",
+        "integer" or "decimal" or "float" or "percent_complete" or "order_index" or "longint" => "GlideElementNumeric",
+        "sys_class_name" => "GlideElementSysClassName",
+        "document_id" => "GlideElementDocumentId",
+        "domain_id" => "GlideElementDomainId",
+        "related_tags" => "GlideElementRelatedTags",
+        "translated_field" => "GlideElementTranslatedField",
+        "documentation_field" => "GlideElementDocumentation",
+        "script" or "script_plain" or "xml" => "GlideElementScript",
+        "conditions" => "GlideElementConditions",
+        "variables" => "GlideElementVariables",
+        "password" => "GlideElementPassword",
+        "user_image" => "GlideElementUserImage",
+        "translated_text" => "GlideElementTranslatedText",
+        "counter" => "GlideElementCounter",
+        "currency" => "GlideElementCurrency",
+        "price" => "GlideElementPrice",
+        "short_field_name" => "GlideElementShortFieldName",
+        "audio" => "GlideElementAudio",
+        "replication_payload" => "GlideElementReplicationPayload",
+        "breakdown_element" => "GlideElementBreakdownElement",
+        "compressed" => "GlideElementCompressed",
+        "translated_html" => "GlideElementTranslatedHTML",
+        "url" => "GlideElementURL",
+        "template_value" => "GlideElementWorkflowConditions",
+        "short_table_name" => "GlideElementShortTableName",
+        "data_object" => "GlideElementDataObject",
+        "string_full_utf8" => "GlideElementFullUTF8",
+        "icon" => "GlideElementIcon",
+        "glide_var" => "GlideElementGlideVar",
+        "internal_type" => "GlideElementInternalType",
+        "simple_name_values" => "GlideElementSimpleNameValue",
+        "name_values" => "GlideElementNameValue",
+        "source_name" => "GlideElementSourceName",
+        "source_table" => "GlideElementSourceTable",
+        "password2" => "GlideElementPassword2",
+        "reference" => "GlideElementReference",
+        "wiki_text" => "GlideElementWikiText",
+        "workflow" => "GlideElementWorkflow",
+        "glide_date_time" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or "calendar_date_time" or "user_input" or "journal_input" or "journal_list" or
+            "html" or "glide_list" or "journal" or "glide_action_list" or "date" or "day_of_week" or "month_of_year" or "week_of_month" => "GlideElementGlideObject",
+        "phone_number" or "caller_phone_number" or "phone_number_e164" => "GlideElementPhoneNumber",
+        "ip_addr" => "GlideElementIPAddress",
+        _ => "GlideElement",
+    };
 
     private static bool IsExplicitScalarTypeGlobal(string typeName) => typeName switch
-        {
-            "decimal" or "float" or "percent_complete" or "order_index" or "longint" or "script_plain" or "xml" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or
-                "calendar_date_time" or "user_input" or "journal_input" or "journal_list" or "html" or "glide_list" or "journal" or "glide_action_list" or "date" or "day_of_week" or "month_of_year" or "week_of_month" or
-                "caller_phone_number" or "phone_number_e164" => true,
-            _ => false,
-        };
+    {
+        "decimal" or "float" or "percent_complete" or "order_index" or "longint" or "script_plain" or "xml" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or
+            "calendar_date_time" or "user_input" or "journal_input" or "journal_list" or "html" or "glide_list" or "journal" or "glide_action_list" or "date" or "day_of_week" or "month_of_year" or "week_of_month" or
+            "caller_phone_number" or "phone_number_e164" => true,
+        _ => false,
+    };
 
     internal async Task RenderAsync(IEnumerable<TableInfo> toRender, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_outputFile is null)
             return;
+        using var dbContext = _services.GetRequiredService<TypingsDbContext>();
         StreamWriter streamWriter;
         try
         {
@@ -324,7 +327,7 @@ public class RenderingService
                         {
                             if (cancellationToken.IsCancellationRequested)
                                 return;
-                            await RenderFieldsScopedAsync(table, writer, _dbContext, cancellationToken);
+                            await RenderFieldsScopedAsync(table, writer, dbContext, cancellationToken);
                         }
                     }
                     else
@@ -333,7 +336,7 @@ public class RenderingService
                         {
                             if (cancellationToken.IsCancellationRequested)
                                 return;
-                            await RenderFieldsGlobalAsync(table, writer, _dbContext, cancellationToken);
+                            await RenderFieldsGlobalAsync(table, writer, dbContext, cancellationToken);
                         }
                     }
                     writer.Indent = 0;
@@ -380,7 +383,7 @@ public class RenderingService
                     await writer.WriteAsync($"export namespace {NS_NAME_element} {{");
                     writer.Indent = 2;
                     foreach (TableInfo table in nsg.OrderBy(g => g.Name))
-                        {
+                    {
                         if (cancellationToken.IsCancellationRequested)
                             return;
                         await writer.WriteLineAsync();
@@ -402,7 +405,7 @@ public class RenderingService
                         {
                             if (cancellationToken.IsCancellationRequested)
                                 return;
-                            await RenderFieldsScopedAsync(table, writer, _dbContext, cancellationToken);
+                            await RenderFieldsScopedAsync(table, writer, dbContext, cancellationToken);
                         }
                     }
                     else
@@ -411,7 +414,7 @@ public class RenderingService
                         {
                             if (cancellationToken.IsCancellationRequested)
                                 return;
-                            await RenderFieldsGlobalAsync(table, writer, _dbContext, cancellationToken);
+                            await RenderFieldsGlobalAsync(table, writer, dbContext, cancellationToken);
                         }
                     }
                     writer.Indent = 1;
@@ -434,29 +437,31 @@ public class RenderingService
         catch (Exception error) { _logger.LogUnexpecteException(error); }
     }
 
-    public RenderingService(ILogger<MainWorkerService> logger, TypingsDbContext dbContext, IOptions<AppSettings> appSettings)
+    // public RenderingService(ILogger<MainWorkerService> logger, TypingsDbContext dbContext, IOptions<AppSettings> appSettingsOptions)
+    public RenderingService(ILogger<RenderingService> logger, IServiceProvider services, IOptions<AppSettings> appSettingsOptions)
     {
         _logger = logger;
-        _dbContext = dbContext;
-        AppSettings settings = appSettings.Value;
-        if (settings.Scoped.HasValue)
+        _services = services;
+        // _dbContext = dbContext;
+        AppSettings appSettings = appSettingsOptions.Value;
+        if (appSettings.Scoped.HasValue)
         {
-            if (settings.Global.HasValue)
+            if (appSettings.Global.HasValue)
             {
-                if (settings.Scoped.Value && settings.Global.Value)
+                if (appSettings.Scoped.Value && appSettings.Global.Value)
                 {
                     _logger.LogGlobalAndScopedSwitchesBothSet();
                     return;
                 }
-                _logger.LogGlobalSettingValue(settings.Global.Value);
+                _logger.LogGlobalSettingValue(appSettings.Global.Value);
             }
-            _isScoped = settings.Scoped.Value;
+            _isScoped = appSettings.Scoped.Value;
             _logger.LogScopedSettingValue(_isScoped);
         }
-        else if (settings.Global.HasValue)
+        else if (appSettings.Global.HasValue)
         {
-            _logger.LogGlobalSettingValue(settings.Global.Value);
-            _isScoped = !settings.Global.Value;
+            _logger.LogGlobalSettingValue(appSettings.Global.Value);
+            _isScoped = !appSettings.Global.Value;
             if (_isScoped)
                 _logger.LogDefaultRenderMode(false);
         }
@@ -466,8 +471,8 @@ public class RenderingService
             _logger.LogDefaultRenderMode(true);
         }
 
-        _forceOverwrite = settings.Force ?? false;
-        string outputFileName = settings.Output!;
+        _forceOverwrite = appSettings.Force ?? false;
+        string outputFileName = appSettings.Output!;
         if (string.IsNullOrEmpty(outputFileName))
             outputFileName = DEFAULT_OUTPUT_FILENAME;
         try
