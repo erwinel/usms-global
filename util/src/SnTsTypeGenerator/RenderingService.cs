@@ -1,4 +1,5 @@
 using System.CodeDom.Compiler;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,23 +20,74 @@ public class RenderingService
     /// </summary>
     internal bool InitSuccessful => _outputFile is not null;
 
-#pragma warning disable CS1998
-    internal async Task RenderJsDocGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    private static IEnumerable<string> GetFlags(ElementInfo elementInfo)
+    {
+        if (elementInfo.IsPrimary)
+            yield return "Is Primary: true";
+        else if (elementInfo.IsMandatory)
+            yield return "Is Mandatory: true";
+        if (!elementInfo.IsActive)
+            yield return "Is Active: false";
+        if (elementInfo.IsArray)
+            yield return "Is Array: true";
+        if (elementInfo.IsReadOnly)
+            yield return "Is Read-only: true";
+        if (elementInfo.IsDisplay)
+            yield return "Is Display: true";
+        if (elementInfo.IsCalculated)
+            yield return "Is Calculated: true";
+        if (elementInfo.IsUnique)
+            yield return "Is Unique: true";
+    }
+
+    private async Task RenderJsDocGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        await writer.WriteLineAsync();
+        await writer.WriteLinesAsync(cancellationToken,
+            $"/**",
+            $" * {elementInfo.Label.SmartQuoteJson()} element."
+        );
+        if (elementInfo.TypeName is not null && IsExplicitScalarTypeGlobal(elementInfo.TypeName))
+        {
+            GlideType? type = await elementInfo.GetReferencedEntityAsync(_dbContext.Elements, e => e.Type, cancellationToken);
+            if (type is null)
+                await writer.WriteLineAsync($" * Type: {elementInfo.TypeName}");
+            else if (type.Name.Equals(type.Label, StringComparison.InvariantCultureIgnoreCase))
+                await writer.WriteLineAsync($" * Type: {type.Label.SmartQuoteJson()}");
+            else
+                await writer.WriteLineAsync($" * Type: {type.Label.SmartQuoteJson()} ({type.Name})");
+        }
+        string[] values = GetFlags(elementInfo).ToArray();
+        switch (values.Length)
+        {
+            case 0:
+                break;
+            case 1:
+                await writer.WriteLineAsync($" * {values[0]}");
+                break;
+            default:
+                await writer.WriteAsync($" * {values[0]}");
+                foreach (string l in values.Skip(1).SkipLast(1))
+                    await writer.WriteAsync($"; {l}");
+                await writer.WriteLineAsync($"; {values[^1]}");
+                break;
+        }
+        
+        throw new NotImplementedException();
+    }
+
+    private async Task RenderPropertyGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    internal async Task RenderPropertyGlobalAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    private async Task RenderJsDocScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    internal async Task RenderJsDocScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    internal async Task RenderPropertyScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
+    private async Task RenderPropertyScopedAsync(ElementInfo elementInfo, IndentedTextWriter writer, string @namespace, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
@@ -44,6 +96,7 @@ public class RenderingService
     private async Task RenderFieldsAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync, Func<ElementInfo, string, Task> renderJsDocAsync,
         CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         string @namespace = tableInfo.GetNamespace();
         var tableName = tableInfo.Name;
         EntityEntry<TableInfo> entry = dbContext.Tables.Entry(tableInfo);
@@ -121,8 +174,80 @@ public class RenderingService
         await RenderFieldsAsync(tableInfo, writer, dbContext, async (e, ns) => await RenderPropertyScopedAsync(e, writer, ns, cancellationToken),
             async (e, ns) => await RenderJsDocScopedAsync(e, writer, ns, cancellationToken), cancellationToken);
 
+    private static string GetScopedElementName(string typeName) => typeName switch
+        {
+            "journal" or "glide_list" or "glide_action_list" or "user_input" or "journal_input" or "journal_list" => "JournalGlideElement",
+            "glide_date_time" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or "calendar_date_time" => "GlideDateTimeElement",
+            "reference" or "currency2" or "domain_id" or "document_id" or "source_id" => "GlideElementReference",
+            _ => "GlideElement",
+        };
+
+    private static bool IsExplicitScalarTypeScoped(string typeName) => typeName switch
+        {
+            "glide_list" or "glide_action_list" or "user_input" or "journal_input" or "journal_list" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or
+                "glide_precise_time" or "calendar_date_time" or "currency2" or "domain_id" or "document_id" or "source_id" => true,
+            _ => false,
+        };
+
+    private static string GetGlobalElementName(string typeName) => typeName switch
+        {
+            "boolean" => "GlideElementBoolean",
+            "integer" or "decimal" or "float" or "percent_complete" or "order_index" or "longint" => "GlideElementNumeric",
+            "sys_class_name" => "GlideElementSysClassName",
+            "document_id" => "GlideElementDocumentId",
+            "domain_id" => "GlideElementDomainId",
+            "related_tags" => "GlideElementRelatedTags",
+            "translated_field" => "GlideElementTranslatedField",
+            "documentation_field" => "GlideElementDocumentation",
+            "script" or "script_plain" or "xml" => "GlideElementScript",
+            "conditions" => "GlideElementConditions",
+            "variables" => "GlideElementVariables",
+            "password" => "GlideElementPassword",
+            "user_image" => "GlideElementUserImage",
+            "translated_text" => "GlideElementTranslatedText",
+            "counter" => "GlideElementCounter",
+            "currency" => "GlideElementCurrency",
+            "price" => "GlideElementPrice",
+            "short_field_name" => "GlideElementShortFieldName",
+            "audio" => "GlideElementAudio",
+            "replication_payload" => "GlideElementReplicationPayload",
+            "breakdown_element" => "GlideElementBreakdownElement",
+            "compressed" => "GlideElementCompressed",
+            "translated_html" => "GlideElementTranslatedHTML",
+            "url" => "GlideElementURL",
+            "template_value" => "GlideElementWorkflowConditions",
+            "short_table_name" => "GlideElementShortTableName",
+            "data_object" => "GlideElementDataObject",
+            "string_full_utf8" => "GlideElementFullUTF8",
+            "icon" => "GlideElementIcon",
+            "glide_var" => "GlideElementGlideVar",
+            "internal_type" => "GlideElementInternalType",
+            "simple_name_values" => "GlideElementSimpleNameValue",
+            "name_values" => "GlideElementNameValue",
+            "source_name" => "GlideElementSourceName",
+            "source_table" => "GlideElementSourceTable",
+            "password2" => "GlideElementPassword2",
+            "reference" => "GlideElementReference",
+            "wiki_text" => "GlideElementWikiText",
+            "workflow" => "GlideElementWorkflow",
+            "glide_date_time" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or "calendar_date_time" or "user_input" or "journal_input" or "journal_list" or
+                "html" or "glide_list" or "journal" or "glide_action_list" or "date" or "day_of_week" or "month_of_year" or "week_of_month" => "GlideElementGlideObject",
+            "phone_number" or "caller_phone_number" or "phone_number_e164" => "GlideElementPhoneNumber",
+            "ip_addr" => "GlideElementIPAddress",
+            _ => "GlideElement",
+        };
+
+    private static bool IsExplicitScalarTypeGlobal(string typeName) => typeName switch
+        {
+            "decimal" or "float" or "percent_complete" or "order_index" or "longint" or "script_plain" or "xml" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or
+                "calendar_date_time" or "user_input" or "journal_input" or "journal_list" or "html" or "glide_list" or "journal" or "glide_action_list" or "date" or "day_of_week" or "month_of_year" or "week_of_month" or
+                "caller_phone_number" or "phone_number_e164" => true,
+            _ => false,
+        };
+
     internal async Task RenderAsync(IEnumerable<TableInfo> toRender, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (_outputFile is null)
             return;
         StreamWriter streamWriter;
