@@ -12,7 +12,7 @@ public sealed class MainWorkerService : BackgroundService
 {
     private readonly ILogger _logger;
     private readonly IServiceScope _scope;
-    private readonly IOptions<AppSettings> _appSettings;
+    private readonly AppSettings _appSettings;
     // private readonly TypingsDbContext _dbContext;
     // private readonly DataLoaderService _dataLoader;
     // private readonly RenderingService _renderer;
@@ -22,7 +22,7 @@ public sealed class MainWorkerService : BackgroundService
     {
         _logger = logger;
         _scope = services.CreateScope();
-        _appSettings = appSettings;
+        _appSettings = appSettings.Value;
         // appLifetime.ApplicationStarted.Register(OnStarted);
         // appLifetime.ApplicationStopping.Register(OnStopping);
         // appLifetime.ApplicationStopped.Register(OnStopped);
@@ -160,8 +160,7 @@ public sealed class MainWorkerService : BackgroundService
 
         DataLoaderService _dataLoader = _scope.ServiceProvider.GetRequiredService<DataLoaderService>();
         RenderingService _renderer = _scope.ServiceProvider.GetRequiredService<RenderingService>();
-        AppSettings settings = _appSettings.Value;
-        if (settings.Help.HasValue && settings.Help.Value)
+        if (_appSettings.Help.HasValue && _appSettings.Help.Value)
         {
             WriteHelpToConsole();
             return;
@@ -170,8 +169,8 @@ public sealed class MainWorkerService : BackgroundService
         if (!(_dataLoader.InitSuccessful && _renderer.InitSuccessful))
             return;
 
-        var tableNames = settings.Table?.Split(',').Where(t => !string.IsNullOrEmpty(t));
-        if ((tableNames is not null && tableNames.Any()) || ((tableNames = settings.Tables?.Where(t => !string.IsNullOrEmpty(t))) is not null && tableNames.Any()))
+        var tableNames = _appSettings.Table?.Split(',').Where(t => !string.IsNullOrEmpty(t));
+        if ((tableNames is not null && tableNames.Any()) || ((tableNames = _appSettings.Tables?.Where(t => !string.IsNullOrEmpty(t))) is not null && tableNames.Any()))
         {
             Collection<TableInfo> toRender = new();
             foreach (string name in tableNames.Select(n => n.Trim().ToLower()).Distinct())
