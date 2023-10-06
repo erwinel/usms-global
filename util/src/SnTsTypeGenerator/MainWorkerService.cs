@@ -13,18 +13,14 @@ public sealed class MainWorkerService : BackgroundService
 {
     private readonly ILogger _logger;
     private readonly IServiceScope _scope;
+    private readonly IHostApplicationLifetime _applicationLifetime;
     private readonly ImmutableArray<string> _tableNames;
 
-    // private readonly AppSettings _appSettings;
-    // private readonly TypingsDbContext _dbContext;
-    // private readonly DataLoaderService _dataLoader;
-    // private readonly RenderingService _renderer;
-
-    // public MainWorkerService(ILogger<MainWorkerService> logger, IHostApplicationLifetime appLifetime, IOptions<AppSettings> appSettings)
-    public MainWorkerService(ILogger<MainWorkerService> logger, IServiceProvider services, IOptions<AppSettings> appSettings)
+    public MainWorkerService(ILogger<MainWorkerService> logger, IServiceProvider services, IOptions<AppSettings> appSettings, IHostApplicationLifetime applicationLifetime)
     {
         _logger = logger;
         _scope = services.CreateScope();
+        _applicationLifetime = applicationLifetime;
         AppSettings _appSettings = appSettings.Value;
         if (_appSettings.Help.HasValue && _appSettings.Help.Value)
             WriteHelpToConsole();
@@ -169,68 +165,54 @@ public sealed class MainWorkerService : BackgroundService
 
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (stoppingToken.IsCancellationRequested)
-            return;
-
-        DataLoaderService _dataLoader = _scope.ServiceProvider.GetRequiredService<DataLoaderService>();
-        RenderingService _renderer = _scope.ServiceProvider.GetRequiredService<RenderingService>();
-
-        if (!(_dataLoader.InitSuccessful && _renderer.InitSuccessful))
-            return;
-
-        Collection<TableInfo> toRender = new();
-        foreach (string name in _tableNames)
+        try
         {
             if (stoppingToken.IsCancellationRequested)
                 return;
-            try
-            {
-                var tableInfo = await _dataLoader.GetTableByNameAsync(name, stoppingToken);
-                if (tableInfo is not null)
-                    toRender.Add(tableInfo);
-            }
-            catch (Exception exception)
+
+            DataLoaderService _dataLoader = _scope.ServiceProvider.GetRequiredService<DataLoaderService>();
+            RenderingService _renderer = _scope.ServiceProvider.GetRequiredService<RenderingService>();
+
+            if (!(_dataLoader.InitSuccessful && _renderer.InitSuccessful))
+                return;
+
+            Collection<TableInfo> toRender = new();
+            foreach (string name in _tableNames)
             {
                 if (stoppingToken.IsCancellationRequested)
                     return;
-                if (exception is ILogTrackable logTrackable)
+                try
                 {
-                    if (!logTrackable.IsLogged)
-                        logTrackable.Log(_logger);
+                    var tableInfo = await _dataLoader.GetTableByNameAsync(name, stoppingToken);
+                    if (tableInfo is not null)
+                        toRender.Add(tableInfo);
                 }
-                else
-                    _logger.LogUnexpecteException(exception);
-                return;
+                catch (Exception exception)
+                {
+                    if (stoppingToken.IsCancellationRequested)
+                        return;
+                    if (exception is ILogTrackable logTrackable)
+                    {
+                        if (!logTrackable.IsLogged)
+                            logTrackable.Log(_logger);
+                    }
+                    else
+                        _logger.LogUnexpecteException(exception);
+                    return;
+                }
             }
+            if (!stoppingToken.IsCancellationRequested)
+                await _renderer.RenderAsync(toRender, stoppingToken);
         }
-        if (!stoppingToken.IsCancellationRequested)
-            await _renderer.RenderAsync(toRender, stoppingToken);
+        catch (OperationCanceledException) { throw; }
+        catch (Exception error)
+        {
+            _logger.LogUnexpectedServiceException<MainWorkerService>(error);
+        }
+        finally
+        {
+            if (!stoppingToken.IsCancellationRequested)
+                _applicationLifetime.StopApplication();
+        }
     }
-
-    public override void Dispose()
-    {
-        _scope.Dispose();
-        base.Dispose();
-    }
-    // public Task StopAsync(CancellationToken cancellationToken)
-    // {
-    //     _logger.LogInformation("StopAsync has been called.");
-
-    //     return Task.CompletedTask;
-    // }
-
-    // private void OnStarted()
-    // {
-    //     _logger.LogInformation("2. OnStarted has been called.");
-    // }
-
-    // private void OnStopping()
-    // {
-    //     _logger.LogInformation("3. OnStopping has been called.");
-    // }
-
-    // private void OnStopped()
-    // {
-    //     _logger.LogInformation("5. OnStopped has been called.");
-    // }
 }
