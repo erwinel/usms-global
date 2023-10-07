@@ -14,8 +14,7 @@ internal class Program
     {
         HostApplicationBuilder builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
         builder.Environment.ContentRootPath = Directory.GetCurrentDirectory();
-        var env = builder.Environment;
-        if (env.IsDevelopment())
+        if (builder.Environment.IsDevelopment())
             builder.Configuration.AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly(), true);
         builder.Logging.AddConsole();
         builder.Services.Configure<AppSettings>(builder.Configuration.GetSection(nameof(SnTsTypeGenerator)));
