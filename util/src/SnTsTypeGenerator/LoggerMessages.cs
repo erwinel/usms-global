@@ -10,6 +10,61 @@ namespace SnTsTypeGenerator;
 
 public static class LoggerMessages
 {
+    #region UnexpectedService Error (0x0001)
+
+    public const int EVENT_ID_UnexpectedServiceError = 0x0001;
+    public static readonly EventId UnexpectedServiceError = new(EVENT_ID_UnexpectedServiceError, nameof(UnexpectedServiceError));
+    private static readonly Action<ILogger, string, Exception?> _unexpectedServiceError = LoggerMessage.Define<string>(LogLevel.Error,
+        UnexpectedServiceError, "Error executing {TypeFullName}.");
+    /// <summary>
+    /// Logs an UnexpectedService event with event code 0x0001.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="type">The type of service that threw the exception.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogUnexpectedServiceError(this ILogger logger, Type type, Exception error) => _unexpectedServiceError(logger, type.FullName ?? type.Name, error);
+    /// <summary>
+    /// Logs an UnexpectedService event with event code 0x0001.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    /// <typeparam name="T">The type of service that threw the exception.</typeparam>
+    public static void LogUnexpectedServiceError<T>(this ILogger logger, Exception error) => LogUnexpectedServiceError(logger, typeof(T), error);
+
+    #endregion
+    #region Critical UnexpectedServiceException Error (0xffff)
+    
+    /// <summary>
+    // Numerical event code for UnexpectedServiceException.
+    /// </summary>
+    public const int EVENT_ID_UnexpectedServiceException = 0xffff;
+    
+    /// <summary>
+    // Event ID for UnexpectedServiceException.
+    /// </summary>
+    public static readonly EventId UnexpectedServiceException = new(EVENT_ID_UnexpectedServiceException, nameof(UnexpectedServiceException));
+    
+    private static readonly Action<ILogger, string, Exception?> _unexpectedServiceException = LoggerMessage.Define<string>(LogLevel.Critical, UnexpectedServiceException,
+        "Unexpected error executing service {TypeName}");
+    
+    /// <summary>
+    /// Logs an UnexpectedServiceException event with event code 0xffff.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="type">The service type that failed.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogUnexpectedServiceException(this ILogger logger, Type type, Exception? error) => _unexpectedServiceException(logger, type.FullName ?? type.Name, error);
+    
+    /// <summary>
+    /// Logs an UnexpectedServiceException event with event code 0xffff.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    /// <typeparam name="T">The service type that failed.</typeparam>
+    public static void LogUnexpectedServiceException<T>(this ILogger logger, Exception error) => LogUnexpectedServiceException(logger, typeof(T), error);
+    
+    #endregion
+
     #region Critical DbfileValidation Error (0x0001)
 
     /// <summary>
@@ -139,7 +194,7 @@ public static class LoggerMessages
     private static readonly Action<ILogger, string, Exception?> _criticalSettingValueNotProvided1= LoggerMessage.Define<string>(LogLevel.Critical, CriticalSettingValueNotProvided,
         "The {SettingName} setting is empty or was not provided.");
     
-    private static readonly Action<ILogger, string, string, Exception?> _criticalSettingValueNotProvided2 = LoggerMessage.Define<string, string>(LogLevel.Critical, CriticalSettingValueNotProvided,
+    private static readonly Action<ILogger, string, char, Exception?> _criticalSettingValueNotProvided2 = LoggerMessage.Define<string, char>(LogLevel.Critical, CriticalSettingValueNotProvided,
         "The {SettingName} setting ({CmdLineSwitch}) is empty or was not not provided.");
     
     /// <summary>
@@ -149,12 +204,12 @@ public static class LoggerMessages
     /// <param name="settingName">The name of the setting.</param>
     /// <param name="cmdLineSwitch">The command-line switch</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogCriticalSettingValueNotProvided(this ILogger logger, string settingName, string? cmdLineSwitch = null)
+    public static void LogCriticalSettingValueNotProvided(this ILogger logger, string settingName, char? cmdLineSwitch = null)
     {
-        if (string.IsNullOrWhiteSpace(cmdLineSwitch))
-            _criticalSettingValueNotProvided1(logger, settingName, null);
+        if (cmdLineSwitch.HasValue)
+            _criticalSettingValueNotProvided2(logger, settingName, cmdLineSwitch.Value, null);
         else
-            _criticalSettingValueNotProvided2(logger, settingName, cmdLineSwitch, null);
+            _criticalSettingValueNotProvided1(logger, settingName, null);
     }
     
     #endregion
@@ -171,11 +226,11 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId RenderMode = new(EVENT_ID_RenderMode, nameof(RenderMode));
     
-    private static readonly Action<ILogger, string, string, bool, Exception?> _renderMode1 = LoggerMessage.Define<string, string, bool>(LogLevel.Trace, RenderMode,
-        "Setting {Setting} ({Switch}) is {Value}.");
+    private static readonly Action<ILogger, string, char, bool, Exception?> _renderMode1 = LoggerMessage.Define<string, char, bool>(LogLevel.Trace, RenderMode,
+        "Setting {Setting} (-{Switch}) is {Value}.");
     
-    private static readonly Action<ILogger, string, string, bool, Exception?> _renderMode2 = LoggerMessage.Define<string, string, bool>(LogLevel.Trace, RenderMode,
-        "Setting {Setting} ({Switch}) defaulted to {Value}.");
+    private static readonly Action<ILogger, string, char, bool, Exception?> _renderMode2 = LoggerMessage.Define<string, char, bool>(LogLevel.Trace, RenderMode,
+        "Setting {Setting} (-{Switch}) defaulted to {Value}.");
     
 
     /// <summary>

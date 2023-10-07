@@ -280,12 +280,12 @@ public sealed class SnClientHandlerService
         return (requestUri, await PostJsonAsync(handler, requestUri, content, configureHeaders, cancellationToken));
     }
 
-    public SnClientHandlerService(IOptions<AppSettings> appSettings, ILogger<SnClientHandlerService> logger)
+    public SnClientHandlerService(IOptions<AppSettings> appSettingsOptions, ILogger<SnClientHandlerService> logger)
     {
         _logger = logger;
-        AppSettings settings = appSettings.Value;
-        var remoteUri = settings.RemoteURL;
-        bool showHelp = appSettings.Value.Help.HasValue && appSettings.Value.Help.Value;
+        AppSettings appSettings = appSettingsOptions.Value;
+        var remoteUri = appSettings.RemoteURL;
+        bool showHelp = appSettingsOptions.Value.Help.HasValue && appSettingsOptions.Value.Help.Value;
         if (string.IsNullOrWhiteSpace(remoteUri))
         {
             if (!showHelp)
@@ -305,7 +305,7 @@ public sealed class SnClientHandlerService
                 return;
             }
             BaseURL = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
-            string? clientId = settings.ClientId;
+            string? clientId = appSettings.ClientId;
             if (string.IsNullOrWhiteSpace(clientId))
             {
                 Console.Write("Client ID: ");
@@ -318,7 +318,7 @@ public sealed class SnClientHandlerService
                     return;
                 }
             }
-            string? clientSecret = settings.ClientSecret;
+            string? clientSecret = appSettings.ClientSecret;
             if (string.IsNullOrWhiteSpace(clientSecret))
             {
                 Console.Write("Client Secret: ");
@@ -332,7 +332,7 @@ public sealed class SnClientHandlerService
                 }
             }
             ClientCredentials = new(clientId, clientSecret);
-            string? userName = settings.UserName;
+            string? userName = appSettings.UserName;
             if (string.IsNullOrWhiteSpace(userName))
             {
                 Console.Write("User Name: ");
@@ -345,7 +345,7 @@ public sealed class SnClientHandlerService
                     return;
                 }
             }
-            string? password = settings.Password;
+            string? password = appSettings.Password;
             if (string.IsNullOrWhiteSpace(password))
             {
                 Console.Write("Password: ");
@@ -358,7 +358,7 @@ public sealed class SnClientHandlerService
                     return;
                 }
             }
-            UserCredentials = new NetworkCredential(settings.UserName, password);
+            UserCredentials = new NetworkCredential(appSettings.UserName, password);
         }
         else
         {

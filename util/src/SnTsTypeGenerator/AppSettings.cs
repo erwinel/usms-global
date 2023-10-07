@@ -9,7 +9,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="Dbfile" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_d = "-d";
+    public const char SHORTHAND_d = 'd';
 
     /// <summary>
     /// Specifies the relative or absolute path of the database file.
@@ -21,7 +21,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="Table" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_t = "-t";
+    public const char SHORTHAND_t = 't';
 
     /// <summary>
     /// Comma-separated database table names to generate typings for.
@@ -36,7 +36,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="UserName" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_u = "-u";
+    public const char SHORTHAND_u = 'u';
 
     /// <summary>
     /// Login user name.
@@ -46,7 +46,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="Password" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_p = "-p";
+    public const char SHORTHAND_p = 'p';
 
     /// <summary>
     /// Password credential.
@@ -56,7 +56,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="ClientId" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_i = "-i";
+    public const char SHORTHAND_i = 'i';
 
     /// <summary>
     /// Gets or sets the client ID in the remote ServiceNow instance's Application Registry.
@@ -66,7 +66,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="ClientSecret" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_x = "-x";
+    public const char SHORTHAND_x = 'x';
 
     /// <summary>
     /// Gets or sets the client secret in the remote ServiceNow instance's Application Registry.
@@ -76,7 +76,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="RemoteURL" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_r = "-r";
+    public const char SHORTHAND_r = 'r';
 
     /// <summary>
     /// The remote ServiceNow instance URI.
@@ -86,7 +86,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="Output" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_o = "-o";
+    public const char SHORTHAND_o = 'o';
 
     /// <summary>
     /// The output file name.
@@ -96,7 +96,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="Force" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_f = "-f";
+    public const char SHORTHAND_f = 'f';
 
     /// <summary>
     /// Force overwrite of output file.
@@ -106,7 +106,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="Scoped" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_s = "-s";
+    public const char SHORTHAND_s = 's';
 
     /// <summary>
     /// Generate typings for use in scoped applications.
@@ -116,7 +116,7 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="Global" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_g = "-g";
+    public const char SHORTHAND_g = 'g';
 
     /// <summary>
     /// Generate typings for use in global applications.
@@ -126,12 +126,12 @@ public class AppSettings
     /// <summary>
     /// Gets the command line option for the <c><see cref="Help" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_h = "-h";
+    public const char SHORTHAND_h = 'h';
 
     /// <summary>
     /// Gets the command line switch for the <see cref="Help" /> application option option.
     /// </summary>
-    public const string SHORTHAND__3F_ = "-?";
+    public const char SHORTHAND__3F_ = '?';
 
     /// <summary>
     /// Gets or sets the value indicating whether to write help information to the console.
@@ -141,19 +141,19 @@ public class AppSettings
 
     private static readonly Dictionary<string, string> _switchMappings = new()
     {
-        { SHORTHAND_d, $"{nameof(SnTsTypeGenerator)}:{nameof(DbFile)}" },
-        { SHORTHAND_t, $"{nameof(SnTsTypeGenerator)}:{nameof(Table)}" },
-        { SHORTHAND_u, $"{nameof(SnTsTypeGenerator)}:{nameof(UserName)}" },
-        { SHORTHAND_p, $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
-        { SHORTHAND_r, $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
-        { SHORTHAND_g, $"{nameof(SnTsTypeGenerator)}:{nameof(Global)}" },
-        { SHORTHAND_s, $"{nameof(SnTsTypeGenerator)}:{nameof(Scoped)}" },
-        { SHORTHAND_h, $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
-        { SHORTHAND__3F_, $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" }
+        { $"-{SHORTHAND_d}", $"{nameof(SnTsTypeGenerator)}:{nameof(DbFile)}" },
+        { $"-{SHORTHAND_t}", $"{nameof(SnTsTypeGenerator)}:{nameof(Table)}" },
+        { $"-{SHORTHAND_u}", $"{nameof(SnTsTypeGenerator)}:{nameof(UserName)}" },
+        { $"-{SHORTHAND_p}", $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
+        { $"-{SHORTHAND_r}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
+        { $"-{SHORTHAND_g}", $"{nameof(SnTsTypeGenerator)}:{nameof(Global)}" },
+        { $"-{SHORTHAND_s}", $"{nameof(SnTsTypeGenerator)}:{nameof(Scoped)}" },
+        { $"-{SHORTHAND_h}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
+        { $"-{SHORTHAND__3F_}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" }
     };
 
-    internal static void Configure(string[] args, ConfigurationManager configuration)
+    internal static void Configure(string[] args, IConfigurationBuilder builder)
     {
-        configuration.AddCommandLine(args, _switchMappings);
+        builder.AddCommandLine(args, _switchMappings);
     }
 }
