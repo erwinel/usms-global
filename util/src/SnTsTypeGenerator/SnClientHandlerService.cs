@@ -80,12 +80,13 @@ public sealed class SnClientHandlerService
             using HttpClient httpClient = new(handler);
             requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
             HttpRequestMessage message = new(HttpMethod.Post, requestUri);
-            message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+            // BUG: The content-type of the OAuth API should be application/x-www-form-urlencoded.
+            message.Headers.Add(HEADER_KEY_GRANT_TYPE, HEADER_KEY_PASSWORD);
             message.Headers.Add(HEADER_KEY_CLIENT_ID, ClientCredentials.UserName);
             message.Headers.Add(HEADER_KEY_CLIENT_SECRET, ClientCredentials.Password);
-            message.Headers.Add(HEADER_KEY_GRANT_TYPE, HEADER_KEY_PASSWORD);
             message.Headers.Add(HEADER_KEY_USERNAME, UserCredentials.UserName);
             message.Headers.Add(HEADER_KEY_PASSWORD, UserCredentials.Password);
+            message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
             jsonNode = await GetJsonResponseAsync(handler, message, requestUri, cancellationToken);
         }
         else
@@ -97,6 +98,7 @@ public sealed class SnClientHandlerService
             using HttpClient httpClient = new(handler);
             requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
             HttpRequestMessage message = new(HttpMethod.Post, requestUri);
+            // BUG: The content-type of the OAuth API should be application/x-www-form-urlencoded.
             message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
             message.Headers.Add(HEADER_KEY_CLIENT_ID, ClientCredentials.UserName);
             message.Headers.Add(HEADER_KEY_CLIENT_SECRET, ClientCredentials.Password);
@@ -116,19 +118,23 @@ public sealed class SnClientHandlerService
 
     private async Task<JsonNode?> GetJsonAsync(HttpClientHandler handler, Uri requestUri, Action<HttpRequestHeaders>? configureHeaders, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        // TODO: Add access token
+        // SnAccessToken accessToken = await GetAccessTokenAsync(cancellationToken);
         HttpRequestMessage message = new(HttpMethod.Get, requestUri);
         message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+        // message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, accessToken.AccessToken);
         configureHeaders?.Invoke(message.Headers);
         return await GetJsonResponseAsync(handler, message, requestUri, cancellationToken);
     }
 
     private async Task<JsonNode?> PostJsonAsync(HttpClientHandler handler, Uri requestUri, JsonNode? content, Action<HttpRequestHeaders>? configureHeaders, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        // TODO: Add access token
+        // SnAccessToken accessToken = await GetAccessTokenAsync(cancellationToken);
         using HttpClient httpClient = new(handler);
         HttpRequestMessage message = new(HttpMethod.Post, requestUri);
         message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+        // message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, accessToken.AccessToken);
         configureHeaders?.Invoke(message.Headers);
         if (content is not null)
             message.Content = JsonContent.Create(content, new MediaTypeHeaderValue(MediaTypeNames.Application.Json));

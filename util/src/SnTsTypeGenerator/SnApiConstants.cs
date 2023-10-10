@@ -50,6 +50,8 @@ internal static class SnApiConstants
     /// </summary>
     internal const string HEADER_KEY_ACCEPT = "Accept";
 
+    internal const string HEADER_KEY_ACCESS_TOKEN = "access_token";
+
     internal const string HEADER_KEY_CLIENT_ID = "client_id";
 
     internal const string HEADER_KEY_CLIENT_SECRET = "client_secret";
