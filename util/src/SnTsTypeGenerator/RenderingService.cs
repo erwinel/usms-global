@@ -532,14 +532,14 @@ public class RenderingService
                     _logger.LogOutputFileAlreadyExists(outputFile.FullName);
                     return;
                 }
-                _outputFile = outputFile;
-                _logger.LogUsingOutputFile(outputFileName, _forceOverwrite);
             }
             else if (!(outputFile.Directory?.Exists ?? false))
             {
                 _logger.LogOutputFileAccessError(outputFile.FullName, "Parent subdirectory does not exist");
                 return;
             }
+            _logger.LogUsingOutputFile(outputFileName, _forceOverwrite);
+            _outputFile = outputFile;
         }
         catch (Exception exception)
         {
