@@ -4,56 +4,56 @@ Creates `.d.ts` from ServiceNow tables, using the [ServiceNow Table REST API](ht
 
 ## Command Line Options
 
-`-d`=*filename*: The Path to the typings database.
+`-d=`*filename*: The Path to the typings database.
 This path is relative to the subdirectory containing the executable.
 If this option is not present, then this will use the `SnTsTypeGenerator:DbFile` setting in `appsettings.json`, if defined; otherwise it will use a database named `Typings.db` in the same subdirectory as the executable.
 
-`-t`=*name,name,...*
+`-t=`*name,name,...*
 The names of the table to generate typings for.
 If this option is not present, then this will use the `SnTsTypeGenerator:Table` setting in `appsettings.json`, if defined.
 
-`-u`=*login*
+`-u=`*login*
 The user name credentials to use when connecting to the remote instance.
 If this option is not present, then this will use the `SnTsTypeGenerator:UserName` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the user name.
 
-`-p`=*password*
+`-p=`*password*
 The password credentials to use when connecting to the remote instance.
 If this option is not present, then this will use the `SnTsTypeGenerator:Password` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the password.
 
-`-i`=*id*
+`-i=`*id*
 Specifies client ID in the remote ServiceNow instance's Application Registry.
 If this option is not present, then this will use the `SnTsTypeGenerator:ClientId` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the client ID.
 
-`-x`=*secret*
+`-x=`*secret*
 The the client secret in the remote ServiceNow instance's Application Registry.
 If this option is not present, then this will use the `SnTsTypeGenerator:ClientSecret` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the client secret.
 
-`-r`=*url*
+`-r=`*url*
 The base URL of the remote ServiceNow instance.
 If this option is not present, then this will use the `SnTsTypeGenerator:RemoteURL` setting in `appsettings.json`, if defined; otherwise, an error message will be displayed.
 
-`-s`=*true*
+`-s=true`
 Generate typings for use with scoped apps.
 This cannot be used with the `-g=true` option.
 If this option is not present, then this will use the `SnTsTypeGenerator:Scoped` setting in `appsettings.json`, if it is set to true.
 
-`-g`=*true*
+`-g=true`
 Generate typings for use with scoped apps.
 This cannot be used with the `-s=true` option.
 If this option is not present, then this will use the `SnTsTypeGenerator:Global` setting in `appsettings.json`, if it is set to true.
 This is the default behaviour if neither this option, the `SnTsTypeGenerator:Global` setting, the `-s=true` option, nor the `SnTsTypeGenerator:Scoped` is present.
 
-`-o`=*filename.d.ts*
+`-o=`*filename*`.d.ts`
 The output file name.
 If this option is not present, then this will use the `SnTsTypeGenerator:Output` setting in `appsettings.json`, if present; otherwise, an error message will be displayed.
 
-`-f`=*filename.d.ts*
+`-f=true`
 Force overwrite of the output file.
 If this option is not present, then this will use the `SnTsTypeGenerator:Force` setting in `appsettings.json`, if set to true; otherwise, it will write the output to a file named `types.d.ts` in the current working directory.
 
-`-?`=*true*
+`-?=true`
   or
-`-h`=*true*
+`-h=true`
 Displays this help information.
 If this option is used, then all other options are ignored.
 
