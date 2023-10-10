@@ -32,16 +32,10 @@ If this option is not present, then this will use the `SnTsTypeGenerator:ClientS
 The base URL of the remote ServiceNow instance.
 If this option is not present, then this will use the `SnTsTypeGenerator:RemoteURL` setting in `appsettings.json`, if defined; otherwise, an error message will be displayed.
 
-`-s=true`
-Generate typings for use with scoped apps.
-This cannot be used with the `-g=true` option.
-If this option is not present, then this will use the `SnTsTypeGenerator:Scoped` setting in `appsettings.json`, if it is set to true.
-
-`-g=true`
-Generate typings for use with scoped apps.
-This cannot be used with the `-s=true` option.
-If this option is not present, then this will use the `SnTsTypeGenerator:Global` setting in `appsettings.json`, if it is set to true.
-This is the default behaviour if neither this option, the `SnTsTypeGenerator:Global` setting, the `-s=true` option, nor the `SnTsTypeGenerator:Scoped` is present.
+`-m=`*scoped*`|`*s*`|`*global*`|`*g*
+The typing generation mode.
+The *scoped* (*s*) option generates typings for use with scoped apps, and *global* (*g*) generates typings for globally-scoped scripting.
+If this option is not present, then this will use the `SnTsTypeGenerator:Mode` setting in `appsettings.json`, if present; otherwise generates typings for globally-scoped scripting.
 
 `-o=`*filename*`.d.ts`
 The output file name.
