@@ -135,22 +135,6 @@ public class AppSettings
     /// </summary>
     public const string MODE_SCOPED = "scoped";
     
-    /// <summary>
-    /// Gets the command line option for the <c><see cref="Help" /></c> setting.
-    /// </summary>
-    public const char SHORTHAND_h = 'h';
-
-    /// <summary>
-    /// Gets the command line switch for the <see cref="Help" /> application option option.
-    /// </summary>
-    public const char SHORTHAND__3F_ = '?';
-
-    /// <summary>
-    /// Gets or sets the value indicating whether to write help information to the console.
-    /// </summary>
-    /// <remarks>If this option is used, then all other options are ignored.</remarks>
-    public bool? Help { get; set; }
-
     private static readonly Dictionary<string, string> _switchMappings = new()
     {
         { $"-{SHORTHAND_d}", $"{nameof(SnTsTypeGenerator)}:{nameof(DbFile)}" },
@@ -158,9 +142,7 @@ public class AppSettings
         { $"-{SHORTHAND_u}", $"{nameof(SnTsTypeGenerator)}:{nameof(UserName)}" },
         { $"-{SHORTHAND_p}", $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
         { $"-{SHORTHAND_r}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
-        { $"-{SHORTHAND_m}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" },
-        { $"-{SHORTHAND_h}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
-        { $"-{SHORTHAND__3F_}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" }
+        { $"-{SHORTHAND_m}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" }
     };
 
     internal static void Configure(string[] args, IConfigurationBuilder builder)

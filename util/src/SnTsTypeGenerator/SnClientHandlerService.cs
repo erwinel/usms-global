@@ -285,11 +285,9 @@ public sealed class SnClientHandlerService
         _logger = logger;
         AppSettings appSettings = appSettingsOptions.Value;
         var remoteUri = appSettings.RemoteURL;
-        bool showHelp = appSettingsOptions.Value.Help.HasValue && appSettingsOptions.Value.Help.Value;
         if (string.IsNullOrWhiteSpace(remoteUri))
         {
-            if (!showHelp)
-                _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.RemoteURL), AppSettings.SHORTHAND_r);
+            _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.RemoteURL), AppSettings.SHORTHAND_r);
             BaseURL = EmptyURI;
             ClientCredentials = UserCredentials = null!;
             return;
@@ -299,8 +297,7 @@ public sealed class SnClientHandlerService
             if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
             {
                 BaseURL = EmptyURI;
-                if (!showHelp)
-                    _logger.LogInvalidRemoteInstanceUrl(uri);
+                _logger.LogInvalidRemoteInstanceUrl(uri);
                 ClientCredentials = UserCredentials = null!;
                 return;
             }
@@ -312,8 +309,7 @@ public sealed class SnClientHandlerService
                 clientId = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(clientId))
                 {
-                    if (!showHelp)
-                        _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientId));
+                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientId));
                     ClientCredentials = UserCredentials = null!;
                     return;
                 }
@@ -325,8 +321,7 @@ public sealed class SnClientHandlerService
                 clientSecret = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(clientSecret))
                 {
-                    if (!showHelp)
-                        _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientSecret));
+                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientSecret));
                     ClientCredentials = UserCredentials = null!;
                     return;
                 }
@@ -339,8 +334,7 @@ public sealed class SnClientHandlerService
                 userName = Console.ReadLine();
                 if (string.IsNullOrEmpty(userName))
                 {
-                    if (!showHelp)
-                        _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.UserName), AppSettings.SHORTHAND_u);
+                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.UserName), AppSettings.SHORTHAND_u);
                     UserCredentials = null!;
                     return;
                 }
@@ -352,8 +346,7 @@ public sealed class SnClientHandlerService
                 password = Console.ReadLine();
                 if (string.IsNullOrEmpty(password))
                 {
-                    if (!showHelp)
-                        _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.Password), AppSettings.SHORTHAND_p);
+                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.Password), AppSettings.SHORTHAND_p);
                     UserCredentials = null!;
                     return;
                 }
@@ -363,8 +356,7 @@ public sealed class SnClientHandlerService
         else
         {
             BaseURL = EmptyURI;
-            if (!showHelp)
-                _logger.LogInvalidRemoteInstanceUrl(Uri.TryCreate(remoteUri, UriKind.Relative, out uri) ? uri : new Uri(Uri.EscapeDataString(remoteUri), UriKind.Relative));
+            _logger.LogInvalidRemoteInstanceUrl(Uri.TryCreate(remoteUri, UriKind.Relative, out uri) ? uri : new Uri(Uri.EscapeDataString(remoteUri), UriKind.Relative));
             ClientCredentials = UserCredentials = null!;
         }
     }

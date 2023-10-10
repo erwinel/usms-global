@@ -51,9 +51,11 @@ If this option is not present, then this will use the `SnTsTypeGenerator:Output`
 Force overwrite of the output file.
 If this option is not present, then this will use the `SnTsTypeGenerator:Force` setting in `appsettings.json`, if set to true; otherwise, it will write the output to a file named `types.d.ts` in the current working directory.
 
-`-?=true`
+`-?`
   or
-`-h=true`
+`-h`
+  or
+`--help`
 Displays this help information.
 If this option is used, then all other options are ignored.
 
