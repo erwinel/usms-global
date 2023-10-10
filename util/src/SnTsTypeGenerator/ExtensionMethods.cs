@@ -409,7 +409,7 @@ public static class ExtensionMethods
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
-            if (field.TryCoercePropertyAsString(JSON_KEY_VALUE, out value))
+            if (field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out value))
             {
                 display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
                 return true;
@@ -432,7 +432,7 @@ public static class ExtensionMethods
     public static bool TryGetFieldAsNonEmpty(this JsonObject source, string propertyName, [NotNullWhen(true)] out string? value)
     {
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
-            return field.TryCoercePropertyAsString(JSON_KEY_VALUE, out value);
+            return field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out value);
         value = null;
         return false;
     }
@@ -455,7 +455,7 @@ public static class ExtensionMethods
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
             display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
-            if (field.TryCoercePropertyAsString(JSON_KEY_VALUE, out string? value))
+            if (field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out string? value))
                 return value;
         }
         else
@@ -467,7 +467,7 @@ public static class ExtensionMethods
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsStringOrNull(JSON_KEY_VALUE) : null;
 
     public static string? GetFieldAsNonEmptyOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsStringOrNull(JSON_KEY_VALUE) : null;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsNonEmptyOrNull(JSON_KEY_VALUE) : null;
 
     public static string GetFieldAsString(this JsonObject source, string propertyName, string defaultValue, out string? display_value)
     {
@@ -487,7 +487,7 @@ public static class ExtensionMethods
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
             display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
-            if (field.TryCoercePropertyAsString(JSON_KEY_VALUE, out string? value))
+            if (field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out string? value))
                 return value;
         }
         else
@@ -513,7 +513,7 @@ public static class ExtensionMethods
         if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field)
         {
             display_value = field.TryCoercePropertyAsString(JSON_KEY_DISPLAY_VALUE, out string? s) ? s : null;
-            if (field.TryCoercePropertyAsString(JSON_KEY_VALUE, out string? value))
+            if (field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out string? value))
                 return value;
         }
         else
@@ -525,7 +525,7 @@ public static class ExtensionMethods
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.GetFieldAsString(JSON_KEY_VALUE, defaultValue) : defaultValue;
 
     public static string GetFieldAsNonEmpty(this JsonObject source, string propertyName, string defaultValue = "") =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.GetFieldAsString(JSON_KEY_VALUE, defaultValue) : defaultValue;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.GetFieldAsNonEmpty(JSON_KEY_VALUE, defaultValue) : defaultValue;
 
     public static bool TryGetFieldAsInt(this JsonObject source, string propertyName, [NotNullWhen(true)] out int value, out string? display_value)
     {
