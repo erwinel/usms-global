@@ -198,9 +198,9 @@ public static class ExtensionMethods
     public static IEnumerable<ElementInfo> GetNonBaseRecordElements(this IEnumerable<ElementInfo> source) => source.Where(e => e.Name switch
     {
         JSON_KEY_SYS_ID => e.TypeName != TYPE_NAME_GUID && e.IsPrimary,
-        JSON_KEY_SYS_CREATED_BY or JSON_KEY_SYS_UPDATED_BY => e.TypeName != TYPE_NAME_STRING,
-        JSON_KEY_SYS_CREATED_ON or JSON_KEY_SYS_UPDATED_ON => e.TypeName != TYPE_NAME_GLIDE_DATE_TIME,
-        JSON_KEY_SYS_MOD_COUNT => e.TypeName != TYPE_NAME_INTEGER,
+        JSON_KEY_SYS_CREATED_BY or JSON_KEY_SYS_UPDATED_BY => e.TypeName != TYPE_NAME_string,
+        JSON_KEY_SYS_CREATED_ON or JSON_KEY_SYS_UPDATED_ON => e.TypeName != TYPE_NAME_glide_date_time,
+        JSON_KEY_SYS_MOD_COUNT => e.TypeName != TYPE_NAME_integer,
         _ => true,
     });
 
@@ -211,11 +211,11 @@ public static class ExtensionMethods
     /// <returns><see langword="true" /> if all fields implemented by the IBaseRecord type are present; otherwise <see langword="false" />.</returns>
     public static bool ExtendsBaseRecord(this IEnumerable<ElementInfo>? elements) => elements is not null &&
         elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.TypeName == TYPE_NAME_GUID && e.IsPrimary) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.TypeName == TYPE_NAME_STRING) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.TypeName == TYPE_NAME_GLIDE_DATE_TIME) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_INTEGER) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_STRING) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_GLIDE_DATE_TIME);
+        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.TypeName == TYPE_NAME_string) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.TypeName == TYPE_NAME_glide_date_time) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
 
     /// <summary>
     /// Surrounds a string with quotes if it contains spaces or specific symbols.

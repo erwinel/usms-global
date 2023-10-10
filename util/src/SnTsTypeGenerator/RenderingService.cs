@@ -178,30 +178,30 @@ public class RenderingService
 
     private static string GetScopedElementName(string typeName) => typeName switch
     {
-        "journal" or "glide_list" or "glide_action_list" or "user_input" or "journal_input" or "journal_list" => "JournalGlideElement",
-        "glide_date_time" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or "calendar_date_time" => "GlideDateTimeElement",
-        "reference" or "currency2" or "domain_id" or "document_id" or "source_id" => "GlideElementReference",
-        _ => "GlideElement",
+        TYPE_NAME_journal or TYPE_NAME_glide_list or TYPE_NAME_glide_action_list or TYPE_NAME_user_input or TYPE_NAME_journal_input or TYPE_NAME_journal_list => "JournalGlideElement",
+        TYPE_NAME_glide_date_time or TYPE_NAME_glide_date or TYPE_NAME_glide_time or TYPE_NAME_timer or TYPE_NAME_glide_duration or TYPE_NAME_glide_utc_time or TYPE_NAME_due_date or TYPE_NAME_glide_precise_time or TYPE_NAME_calendar_date_time => "GlideDateTimeElement",
+        TYPE_NAME_reference or TYPE_NAME_currency2 or TYPE_NAME_domain_id or TYPE_NAME_document_id or TYPE_NAME_source_id => TS_NAME_GlideElementReference,
+        _ => TS_NAME_GlideElement,
     };
 
     private static bool IsExplicitScalarTypeScoped(string typeName) => typeName switch
     {
-        "glide_list" or "glide_action_list" or "user_input" or "journal_input" or "journal_list" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or
-            "glide_precise_time" or "calendar_date_time" or "currency2" or "domain_id" or "document_id" or "source_id" => true,
+        TYPE_NAME_glide_list or TYPE_NAME_glide_action_list or TYPE_NAME_user_input or TYPE_NAME_journal_input or TYPE_NAME_journal_list or TYPE_NAME_glide_date or TYPE_NAME_glide_time or TYPE_NAME_timer or TYPE_NAME_glide_duration or TYPE_NAME_glide_utc_time or TYPE_NAME_due_date or
+            TYPE_NAME_glide_precise_time or TYPE_NAME_calendar_date_time or TYPE_NAME_currency2 or TYPE_NAME_domain_id or TYPE_NAME_document_id or TYPE_NAME_source_id => true,
         _ => false,
     };
 
     private static string GetGlobalElementName(string typeName) => typeName switch
     {
         "boolean" => "GlideElementBoolean",
-        "integer" or "decimal" or "float" or "percent_complete" or "order_index" or "longint" => "GlideElementNumeric",
+        TYPE_NAME_integer or TYPE_NAME_decimal or TYPE_NAME_float or TYPE_NAME_percent_complete or TYPE_NAME_order_index or TYPE_NAME_longint => "GlideElementNumeric",
         "sys_class_name" => "GlideElementSysClassName",
-        "document_id" => "GlideElementDocumentId",
-        "domain_id" => "GlideElementDomainId",
+        TYPE_NAME_document_id => "GlideElementDocumentId",
+        TYPE_NAME_domain_id => "GlideElementDomainId",
         "related_tags" => "GlideElementRelatedTags",
         "translated_field" => "GlideElementTranslatedField",
         "documentation_field" => "GlideElementDocumentation",
-        "script" or "script_plain" or "xml" => "GlideElementScript",
+        "script" or TYPE_NAME_script_plain or TYPE_NAME_xml => "GlideElementScript",
         "conditions" => "GlideElementConditions",
         "variables" => "GlideElementVariables",
         "password" => "GlideElementPassword",
@@ -229,21 +229,23 @@ public class RenderingService
         "source_name" => "GlideElementSourceName",
         "source_table" => "GlideElementSourceTable",
         "password2" => "GlideElementPassword2",
-        "reference" => "GlideElementReference",
+        TYPE_NAME_reference => TS_NAME_GlideElementReference,
         "wiki_text" => "GlideElementWikiText",
         "workflow" => "GlideElementWorkflow",
-        "glide_date_time" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or "calendar_date_time" or "user_input" or "journal_input" or "journal_list" or
-            "html" or "glide_list" or "journal" or "glide_action_list" or "date" or "day_of_week" or "month_of_year" or "week_of_month" => "GlideElementGlideObject",
-        "phone_number" or "caller_phone_number" or "phone_number_e164" => "GlideElementPhoneNumber",
+        TYPE_NAME_glide_date_time or TYPE_NAME_glide_date or TYPE_NAME_glide_time or TYPE_NAME_timer or TYPE_NAME_glide_duration or TYPE_NAME_glide_utc_time or TYPE_NAME_due_date or
+            TYPE_NAME_glide_precise_time or TYPE_NAME_calendar_date_time or TYPE_NAME_user_input or TYPE_NAME_journal_input or TYPE_NAME_journal_list or TYPE_NAME_html or TYPE_NAME_glide_list or
+            TYPE_NAME_journal or TYPE_NAME_glide_action_list or TYPE_NAME_date or TYPE_NAME_day_of_week or TYPE_NAME_month_of_year or TYPE_NAME_week_of_month => "GlideElementGlideObject",
+        "phone_number" or TYPE_NAME_caller_phone_number or TYPE_NAME_phone_number_e164 => "GlideElementPhoneNumber",
         "ip_addr" => "GlideElementIPAddress",
-        _ => "GlideElement",
+        _ => TS_NAME_GlideElement,
     };
 
     private static bool IsExplicitScalarTypeGlobal(string typeName) => typeName switch
     {
-        "decimal" or "float" or "percent_complete" or "order_index" or "longint" or "script_plain" or "xml" or "glide_date" or "glide_time" or "timer" or "glide_duration" or "glide_utc_time" or "due_date" or "glide_precise_time" or
-            "calendar_date_time" or "user_input" or "journal_input" or "journal_list" or "html" or "glide_list" or "journal" or "glide_action_list" or "date" or "day_of_week" or "month_of_year" or "week_of_month" or
-            "caller_phone_number" or "phone_number_e164" => true,
+        TYPE_NAME_decimal or TYPE_NAME_float or TYPE_NAME_percent_complete or TYPE_NAME_order_index or TYPE_NAME_longint or TYPE_NAME_script_plain or TYPE_NAME_xml or TYPE_NAME_glide_date or
+            TYPE_NAME_glide_time or TYPE_NAME_timer or TYPE_NAME_glide_duration or TYPE_NAME_glide_utc_time or TYPE_NAME_due_date or TYPE_NAME_glide_precise_time or TYPE_NAME_calendar_date_time or
+            TYPE_NAME_user_input or TYPE_NAME_journal_input or TYPE_NAME_journal_list or TYPE_NAME_html or TYPE_NAME_glide_list or TYPE_NAME_journal or TYPE_NAME_glide_action_list or TYPE_NAME_date or
+            TYPE_NAME_day_of_week or TYPE_NAME_month_of_year or TYPE_NAME_week_of_month or TYPE_NAME_caller_phone_number or TYPE_NAME_phone_number_e164 => true,
         _ => false,
     };
 

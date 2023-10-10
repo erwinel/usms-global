@@ -291,17 +291,51 @@ internal static class SnApiConstants
     /// <summary>
     /// "String" type name.
     /// </summary>
-    internal const string TYPE_NAME_STRING = "string";
+    internal const string TYPE_NAME_string = "string";
 
     /// <summary>
     /// "GlideDateTime" type name.
     /// </summary>
-    internal const string TYPE_NAME_GLIDE_DATE_TIME = "glide_date_time";
+    internal const string TYPE_NAME_glide_date_time = "glide_date_time";
 
     /// <summary>
     /// "Integer" type name.
     /// </summary>
-    internal const string TYPE_NAME_INTEGER = "integer";
+    internal const string TYPE_NAME_integer = "integer";
+
+    internal const string TYPE_NAME_decimal = "decimal";
+    internal const string TYPE_NAME_float = "float";
+    internal const string TYPE_NAME_percent_complete = "percent_complete";
+    internal const string TYPE_NAME_order_index = "order_index";
+    internal const string TYPE_NAME_longint = "longint";
+    internal const string TYPE_NAME_script_plain = "script_plain";
+    internal const string TYPE_NAME_xml = "xml";
+    internal const string TYPE_NAME_glide_date = "glide_date";
+    internal const string TYPE_NAME_glide_time = "glide_time";
+    internal const string TYPE_NAME_timer = "timer";
+    internal const string TYPE_NAME_glide_duration = "glide_duration";
+    internal const string TYPE_NAME_glide_utc_time = "glide_utc_time";
+    internal const string TYPE_NAME_due_date = "due_date";
+    internal const string TYPE_NAME_glide_precise_time = "glide_precise_time";
+    internal const string TYPE_NAME_calendar_date_time = "calendar_date_time";
+    internal const string TYPE_NAME_user_input = "user_input";
+    internal const string TYPE_NAME_journal_input = "journal_input";
+    internal const string TYPE_NAME_journal_list = "journal_list";
+    internal const string TYPE_NAME_html = "html";
+    internal const string TYPE_NAME_glide_list = "glide_list";
+    internal const string TYPE_NAME_journal = "journal";
+    internal const string TYPE_NAME_glide_action_list = "glide_action_list";
+    internal const string TYPE_NAME_date = "date";
+    internal const string TYPE_NAME_day_of_week = "day_of_week";
+    internal const string TYPE_NAME_month_of_year = "month_of_year";
+    internal const string TYPE_NAME_week_of_month = "week_of_month";
+    internal const string TYPE_NAME_caller_phone_number = "caller_phone_number";
+    internal const string TYPE_NAME_phone_number_e164 = "phone_number_e164";
+    internal const string TYPE_NAME_reference = "reference";
+    internal const string TYPE_NAME_currency2 = "currency2";
+    internal const string TYPE_NAME_domain_id = "domain_id";
+    internal const string TYPE_NAME_document_id = "document_id";
+    internal const string TYPE_NAME_source_id = "source_id";
 
     /// <summary>
     /// Namespace for global GlideRecord types.
@@ -342,4 +376,6 @@ internal static class SnApiConstants
     /// GlideElement TypeScript class name.
     /// </summary>
     internal const string TS_NAME_GlideElement = "GlideElement";
+    
+    internal const string TS_NAME_GlideElementReference = "GlideElementReference";
 }

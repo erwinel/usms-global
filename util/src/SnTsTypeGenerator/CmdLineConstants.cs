@@ -40,72 +40,72 @@ public static class CmdLineConstants
     internal const string SLASH__3F_ = "/?";
     
     /// <summary>
-    /// Gets the command line option for the <c><see cref="Dbfile" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.Dbfile" /></c> setting.
     /// </summary>
     public const char SHORTHAND_d = 'd';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="Table" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.Table" /></c> setting.
     /// </summary>
     public const char SHORTHAND_t = 't';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="UserName" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.UserName" /></c> setting.
     /// </summary>
     public const char SHORTHAND_u = 'u';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="Password" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.Password" /></c> setting.
     /// </summary>
     public const char SHORTHAND_p = 'p';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="ClientId" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.ClientId" /></c> setting.
     /// </summary>
     public const char SHORTHAND_i = 'i';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="ClientSecret" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.ClientSecret" /></c> setting.
     /// </summary>
     public const char SHORTHAND_x = 'x';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="RemoteURL" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.RemoteURL" /></c> setting.
     /// </summary>
     public const char SHORTHAND_r = 'r';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="Output" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.Output" /></c> setting.
     /// </summary>
     public const char SHORTHAND_o = 'o';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="Force" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.Force" /></c> setting.
     /// </summary>
     public const char SHORTHAND_f = 'f';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="Mode" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.Mode" /></c> setting.
     /// </summary>
     public const char SHORTHAND_m = 'm';
 
     /// <summary>
-    /// Gets the command line option value equivalent to <c><see cref="MODE_SCOPED" /></c>.
+    /// Gets the <see cref="AppSettings.Mode"/> equivalent to <c><see cref="MODE_SCOPED" /></c>.
     /// </summary>
     public const string MODE_SCOPED_ABBR = "s";
 
     /// <summary>
-    /// Gets the command line option value equivalent to <c><see cref="MODE_GLOBAL" /></c>.
+    /// Gets the <see cref="AppSettings.Mode"/> equivalent to <c><see cref="MODE_GLOBAL" /></c>.
     /// </summary>
     public const string MODE_GLOBAL_ABBR = "g";
 
     /// <summary>
-    /// Value of <see cref="Mode"/> when the render mode is for global-scoped scripts.
+    /// Value of <see cref="AppSettings.Mode"/> when the render mode is for global-scoped scripts.
     /// </summary>
     public const string MODE_GLOBAL = "global";
     
     /// <summary>
-    /// Value of <see cref="Mode"/> when the render mode is for scoped app scripts.
+    /// Value of <see cref="AppSettings.Mode"/> when the render mode is for scoped app scripts.
     /// </summary>
     public const string MODE_SCOPED = "scoped";
 }
