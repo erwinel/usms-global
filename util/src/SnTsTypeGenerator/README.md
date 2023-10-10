@@ -61,7 +61,7 @@ If this option is used, then all other options are ignored.
 
 1. If the element `Project/PropertyGroup/UserSecretsId` does not exist in [SnTsTypeGenerator.csproj](./SnTsTypeGenerator.csproj), run the following command from the project directory: `dotnet user-secrets init`.
 2. Create Application Registry in target ServiceNow instance:
-   1. Navigate to *System OAuth* => *Application Registries*.
+   1. Navigate to *System OAuth* => *Application Registry*.
    2. Click the *New* button.
    3. Click the *Create an OAuth API endpoint for external clients* link.
    4. Fill in the following fields and submit the form:
