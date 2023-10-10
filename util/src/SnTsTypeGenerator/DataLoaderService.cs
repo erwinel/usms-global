@@ -67,7 +67,7 @@ public sealed class DataLoaderService
             scope.Value = scope.SysID;
         else
         {
-            value = scope.Value;
+            value = (scope = retrieved).Value;
             if ((retrieved = await _dbContext.Scopes.FirstOrDefaultAsync(t => t.Value == value, cancellationToken)) is not null)
             {
                 _scopeIdMap.Add(scope.SysID, value);
