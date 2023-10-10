@@ -25,7 +25,7 @@ public sealed class TableAPIService
             SourceFqdn = (_handler ?? throw new InvalidOperationException()).BaseURL.Host
         } : null;
 
-    private SysScope? GetScope(JsonObject resultObj) => resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value, out string? display_value) ? new()
+    private SysScope? GetScope(JsonObject resultObj) => resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_SCOPE, out string? value, out string? display_value) ? new()
     {
         SysID = value,
         Name = display_value ?? value,
