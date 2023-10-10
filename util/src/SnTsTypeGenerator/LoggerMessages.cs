@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using static SnTsTypeGenerator.Constants;
+using static SnTsTypeGenerator.CmdLineConstants;
 
 namespace SnTsTypeGenerator;
 
@@ -237,14 +238,14 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="isScoped">Indicates whether the mode is for scoped scripts.</param>
-    public static void LogRenderModeSettingValue(this ILogger logger, bool isScoped) => _renderMode1(logger, nameof(AppSettings.Mode), AppSettings.SHORTHAND_m, isScoped ? AppSettings.MODE_SCOPED : AppSettings.MODE_GLOBAL, null);
+    public static void LogRenderModeSettingValue(this ILogger logger, bool isScoped) => _renderMode1(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
 
     /// <summary>
     /// Logs an RenderMode event with event code 0x0006.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="isScoped">Indicates whether the default mode is for scoped scripts.</param>
-    public static void LogDefaultRenderMode(this ILogger logger, bool isScoped) => _renderMode2(logger, nameof(AppSettings.Mode), AppSettings.SHORTHAND_m, isScoped ? AppSettings.MODE_SCOPED : AppSettings.MODE_GLOBAL, null);
+    public static void LogDefaultRenderMode(this ILogger logger, bool isScoped) => _renderMode2(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
 
     #endregion
 
@@ -286,10 +287,10 @@ public static class LoggerMessages
     public static readonly EventId InvalidRemoteInstanceUrl = new(EVENT_ID_InvalidRemoteInstanceUrl, nameof(InvalidRemoteInstanceUrl));
 
     private static readonly Action<ILogger, string, Exception?> _invalidRemoteInstanceUrl1 = LoggerMessage.Define<string>(LogLevel.Critical, InvalidRemoteInstanceUrl,
-        $"The {nameof(AppSettings.RemoteURL)} setting ({AppSettings.SHORTHAND_r}) contains an invalid URL: {{URI}} does not use the http or https scheme.");
+        $"The {nameof(AppSettings.RemoteURL)} setting ({SHORTHAND_r}) contains an invalid URL: {{URI}} does not use the http or https scheme.");
 
     private static readonly Action<ILogger, string, Exception?> _invalidRemoteInstanceUrl2 = LoggerMessage.Define<string>(LogLevel.Critical, InvalidRemoteInstanceUrl,
-        $"The {nameof(AppSettings.RemoteURL)} setting ({AppSettings.SHORTHAND_r}) contains an invalid URL: {{URI}} is not an absolute URI.");
+        $"The {nameof(AppSettings.RemoteURL)} setting ({SHORTHAND_r}) contains an invalid URL: {{URI}} is not an absolute URI.");
 
     /// <summary>
     /// Logs an invalid remote URL event (InvalidRemoteInstanceUrl) with event code 0x0008.
@@ -343,7 +344,7 @@ public static class LoggerMessages
     public static readonly EventId InvalidModeOption = new(EVENT_ID_InvalidModeOption, nameof(InvalidModeOption));
     
     private static readonly Action<ILogger, string, Exception?> _invalidModeOption = LoggerMessage.Define<string>(LogLevel.Critical, InvalidModeOption,
-        $"The {nameof(AppSettings.Mode)} ({AppSettings.SHORTHAND_m}) option contains unknown mode value \"{{Mode}}\". Mode must be {AppSettings.MODE_SCOPED}, {AppSettings.MODE_SCOPED_ABBR}, {AppSettings.MODE_GLOBAL}, or {AppSettings.MODE_GLOBAL_ABBR}.");
+        $"The {nameof(AppSettings.Mode)} ({SHORTHAND_m}) option contains unknown mode value \"{{Mode}}\". Mode must be {MODE_SCOPED}, {MODE_SCOPED_ABBR}, {MODE_GLOBAL}, or {MODE_GLOBAL_ABBR}.");
     
     /// <summary>
     /// Logs an InvalidModeOption event with event code 0x000a.

@@ -7,6 +7,7 @@ using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static SnTsTypeGenerator.Constants;
+using static SnTsTypeGenerator.CmdLineConstants;
 
 namespace SnTsTypeGenerator;
 
@@ -287,7 +288,7 @@ public sealed class SnClientHandlerService
         var remoteUri = appSettings.RemoteURL;
         if (string.IsNullOrWhiteSpace(remoteUri))
         {
-            _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.RemoteURL), AppSettings.SHORTHAND_r);
+            _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.RemoteURL), SHORTHAND_r);
             BaseURL = EmptyURI;
             ClientCredentials = UserCredentials = null!;
             return;
@@ -334,7 +335,7 @@ public sealed class SnClientHandlerService
                 userName = Console.ReadLine();
                 if (string.IsNullOrEmpty(userName))
                 {
-                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.UserName), AppSettings.SHORTHAND_u);
+                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.UserName), SHORTHAND_u);
                     UserCredentials = null!;
                     return;
                 }
@@ -346,7 +347,7 @@ public sealed class SnClientHandlerService
                 password = Console.ReadLine();
                 if (string.IsNullOrEmpty(password))
                 {
-                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.Password), AppSettings.SHORTHAND_p);
+                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.Password), SHORTHAND_p);
                     UserCredentials = null!;
                     return;
                 }
