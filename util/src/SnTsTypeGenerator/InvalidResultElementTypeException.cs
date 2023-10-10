@@ -6,7 +6,7 @@ using static SnTsTypeGenerator.SnApiConstants;
 namespace SnTsTypeGenerator;
 
 [Serializable]
-internal class InvalidResultElementType : Exception, ILogTrackable
+internal class InvalidResultElementTypeException : Exception, ILogTrackable
 {
     public Uri RequestUri { get; }
 
@@ -24,21 +24,21 @@ internal class InvalidResultElementType : Exception, ILogTrackable
         IsLogged = true;
     }
 
-    public InvalidResultElementType() => (RequestUri, Element, Index) = (EmptyURI, new JsonObject(), -1);
+    public InvalidResultElementTypeException() => (RequestUri, Element, Index) = (EmptyURI, new JsonObject(), -1);
 
-    public InvalidResultElementType(string? message) : base(message) => (RequestUri, Element, Index) = (EmptyURI, new JsonObject(), -1);
+    public InvalidResultElementTypeException(string? message) : base(message) => (RequestUri, Element, Index) = (EmptyURI, new JsonObject(), -1);
 
-    public InvalidResultElementType(string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Element, Index) = (EmptyURI, new JsonObject(), -1);
+    public InvalidResultElementTypeException(string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Element, Index) = (EmptyURI, new JsonObject(), -1);
 
-    public InvalidResultElementType(Uri requestUri, JsonObject element, int index) => (RequestUri, Element, Index) = (requestUri, element, index);
+    public InvalidResultElementTypeException(Uri requestUri, JsonObject element, int index) => (RequestUri, Element, Index) = (requestUri, element, index);
 
-    public InvalidResultElementType(Uri requestUri, JsonObject element, int index, string? message) : base(message) => (RequestUri, Element, Index) = (requestUri, element, index);
+    public InvalidResultElementTypeException(Uri requestUri, JsonObject element, int index, string? message) : base(message) => (RequestUri, Element, Index) = (requestUri, element, index);
 
-    public InvalidResultElementType(Uri requestUri, JsonObject element, int index, Exception? innerException) : this(requestUri, element, index, null, innerException) { }
+    public InvalidResultElementTypeException(Uri requestUri, JsonObject element, int index, Exception? innerException) : this(requestUri, element, index, null, innerException) { }
 
-    public InvalidResultElementType(Uri requestUri, JsonObject element, int index, string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Element, Index) = (requestUri, element, index);
+    public InvalidResultElementTypeException(Uri requestUri, JsonObject element, int index, string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Element, Index) = (requestUri, element, index);
 
-    protected InvalidResultElementType(SerializationInfo info, StreamingContext context) : base(info, context)
+    protected InvalidResultElementTypeException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
         IsLogged = info.GetBoolean(nameof(IsLogged));
         string? value = info.GetString(nameof(Element));

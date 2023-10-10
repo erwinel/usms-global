@@ -59,7 +59,7 @@ public sealed class TableAPIService
                 _logger.LogMultipleResponseItems(requestUri, length - 1, resultObj);
 
             if ((jsonNode = arr[0]) is not JsonObject)
-                throw new InvalidResultElementType(requestUri, resultObj, 0);
+                throw new InvalidResultElementTypeException(requestUri, resultObj, 0);
             resultObj = (JsonObject)jsonNode;
         }
         else if (jsonNode is JsonObject)
@@ -270,7 +270,7 @@ public sealed class TableAPIService
             _logger.LogMultipleResponseItems(requestUri, length - 1, resultObj);
 
         if ((jsonNode = arr[0]) is not JsonObject)
-            throw new InvalidResultElementType(requestUri, resultObj, 0);
+            throw new InvalidResultElementTypeException(requestUri, resultObj, 0);
         resultObj = (JsonObject)jsonNode;
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
