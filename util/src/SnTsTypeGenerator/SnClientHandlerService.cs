@@ -52,17 +52,7 @@ public sealed class SnClientHandlerService
         cancellationToken.ThrowIfCancellationRequested();
         if (string.IsNullOrWhiteSpace(responseBody)) { throw new InvalidHttpResponseException(requestUri, responseBody); }
         JsonNode? result;
-        try
-        {
-            using JsonDocument doc = JsonDocument.Parse(responseBody);
-            result = doc.RootElement.ValueKind switch
-            {
-                JsonValueKind.Undefined or JsonValueKind.Null => null,
-                JsonValueKind.Array => JsonArray.Create(doc.RootElement),
-                JsonValueKind.Object => JsonObject.Create(doc.RootElement),
-                _ => JsonValue.Create(doc.RootElement),
-            };
-        }
+        try { result = JsonNode.Parse(responseBody); }
         catch (JsonException exception) { throw new ResponseParsingException(requestUri, responseBody, exception); }
         _logger.LogAPIRequestCompleted(requestUri, result);
         return result;
