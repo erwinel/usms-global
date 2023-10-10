@@ -52,7 +52,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(SourceInfo.LastAccessed)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     CONSTRAINT ""PK_{nameof(SourceInfo)}"" PRIMARY KEY(""{nameof(SourceInfo.FQDN)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(SourceInfo)}_{nameof(SourceInfo.IsPersonalDev)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(SourceInfo.IsPersonalDev)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(SourceInfo)}_{nameof(SourceInfo.IsPersonalDev)}\" ON \"{nameof(SourceInfo)}\" (\"{nameof(SourceInfo.IsPersonalDev)}\")";
     }
 
     private static IEnumerable<string> GetSysPackageDbInitCommands()
