@@ -8,7 +8,7 @@ namespace SnTsTypeGenerator;
 /// <summary>
 /// Represents an item from the "Application" (<see cref="SnApiConstants.TABLE_NAME_SYS_SCOPE" />) table.
 /// </summary>
-[Table(nameof(SysScope))]
+[Table(nameof(TypingsDbContext.Scopes))]
 public class SysScope
 {
     private readonly object _syncRoot = new();

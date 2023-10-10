@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,7 @@ namespace SnTsTypeGenerator;
 /// <summary>
 /// Represents an item from the "Package" (sys_package) table.
 /// </summary>
+[Table(nameof(TypingsDbContext.Packages))]
 public class SysPackage
 {
     private readonly object _syncRoot = new();

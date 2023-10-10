@@ -35,7 +35,7 @@ public partial class TypingsDbContext : DbContext
 
     private static IEnumerable<string> GetOutputFileDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(OutputFile)}"" (
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(OutputFiles)}"" (
     ""{nameof(OutputFile.Id)}"" UNIQUEIDENTIFIER NOt NULL COLLATE NOCASE,
     ""{nameof(OutputFile.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(OutputFile.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
@@ -45,46 +45,47 @@ public partial class TypingsDbContext : DbContext
 
     private static IEnumerable<string> GetSourceInfoDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SourceInfo)}"" (
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Sources)}"" (
     ""{nameof(SourceInfo.FQDN)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(SourceInfo.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(SourceInfo.IsPersonalDev)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(SourceInfo.LastAccessed)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     CONSTRAINT ""PK_{nameof(SourceInfo)}"" PRIMARY KEY(""{nameof(SourceInfo.FQDN)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(SourceInfo)}_{nameof(SourceInfo.IsPersonalDev)}\" ON \"{nameof(SourceInfo)}\" (\"{nameof(SourceInfo.IsPersonalDev)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(SourceInfo)}_{nameof(SourceInfo.IsPersonalDev)}\" ON \"{nameof(Sources)}\" (\"{nameof(SourceInfo.IsPersonalDev)}\")";
     }
 
     private static IEnumerable<string> GetSysPackageDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysPackage)}"" (
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Packages)}"" (
     ""{nameof(SysPackage.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SysPackage.SysId)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(SysPackage.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(SysPackage.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(SysPackage.OutputId)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(OutputFile)}"" REFERENCES ""{nameof(OutputFile)}""(""{nameof(OutputFile.Id)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(SysPackage.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(SysPackage.OutputId)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(OutputFile)}"" REFERENCES ""{nameof(OutputFiles)}""(""{nameof(OutputFile.Id)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(SysPackage.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(SysPackage)}"" PRIMARY KEY(""{nameof(SysPackage.Name)}"")
 )";
     }
 
     private static IEnumerable<string> GetSysScopeDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SysScope)}"" (
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Scopes)}"" (
     ""{nameof(SysScope.Value)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(SysScope.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(SysScope.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(SysScope.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(SysScope.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(SysScope.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysScope)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(SysScope.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysScope)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(SysScope)}"" PRIMARY KEY(""{nameof(SysScope.Value)}""),
     CONSTRAINT ""UK_{nameof(SysScope)}_{nameof(SysScope.SysID)}"" UNIQUE(""{nameof(SysScope.SysID)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(SysScope)}_{nameof(SysScope.SysID)}\" ON \"{nameof(SysScope)}\" (\"{nameof(SysScope.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(SysScope)}_{nameof(SysScope.SysID)}\" ON \"{nameof(Scopes)}\" (\"{nameof(SysScope.SysID)}\" COLLATE NOCASE)";
     }
 
     private static IEnumerable<string> GetGlideTypeDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(GlideType)}"" (
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Types)}"" (
     ""{nameof(GlideType.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(GlideType.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(GlideType.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
@@ -94,20 +95,20 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(GlideType.UseOriginalValue)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(GlideType.IsVisible)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(GlideType.LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(GlideType.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(GlideType.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysScope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(GlideType)}"" PRIMARY KEY(""{nameof(GlideType.Name)}""),
     CONSTRAINT ""UK_{nameof(GlideType)}_{nameof(GlideType.SysID)}"" UNIQUE(""{nameof(GlideType.SysID)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.SysID)}\" ON \"{nameof(GlideType)}\" (\"{nameof(GlideType.SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.UseOriginalValue)}\" ON \"{nameof(GlideType)}\" (\"{nameof(GlideType.UseOriginalValue)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.IsVisible)}\" ON \"{nameof(GlideType)}\" (\"{nameof(GlideType.IsVisible)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.SysID)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.UseOriginalValue)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.UseOriginalValue)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.IsVisible)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.IsVisible)}\")";
     }
 
     private static IEnumerable<string> GetTableInfoDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(TableInfo)}"" (
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Tables)}"" (
     ""{nameof(TableInfo.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(TableInfo.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(TableInfo.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
@@ -116,20 +117,20 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(TableInfo.ExtensionModel)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(TableInfo.IsExtendable)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(TableInfo.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(TableInfo.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(TableInfo.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(TableInfo.SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(TableInfo.SuperClass)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(TableInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(TableInfo.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(TableInfo.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(TableInfo.SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(TableInfo.SuperClass)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(TableInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(TableInfo)}"" PRIMARY KEY(""{nameof(TableInfo.Name)}""),
     CONSTRAINT ""UK_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}"" UNIQUE(""{nameof(TableInfo.SysID)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(TableInfo.SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.IsExtendable)}\" ON \"{nameof(TableInfo)}\" (\"{nameof(TableInfo.IsExtendable)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.IsExtendable)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.IsExtendable)}\")";
     }
 
     private static IEnumerable<string> GetElementInfoDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(ElementInfo)}"" (
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Elements)}"" (
     ""{nameof(ElementInfo.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(ElementInfo.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(ElementInfo.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
@@ -146,19 +147,19 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(ElementInfo.IsCalculated)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(ElementInfo.IsUnique)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(ElementInfo.LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(ElementInfo.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(SysPackage)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ElementInfo.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(SysScope)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ElementInfo.TableName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(ElementInfo.Table)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(ElementInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ElementInfo.TypeName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(GlideType)}"" REFERENCES ""{nameof(GlideType)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ElementInfo.RefTableName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(TableInfo)}"" REFERENCES ""{nameof(TableInfo)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ElementInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(SourceInfo)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.TableName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(ElementInfo.Table)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.TypeName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(GlideType)}"" REFERENCES ""{nameof(Types)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.RefTableName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(TableInfo)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(ElementInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(ElementInfo)}"" PRIMARY KEY(""{nameof(ElementInfo.Name)}""),
     CONSTRAINT ""UK_{nameof(ElementInfo)}_{nameof(ElementInfo.SysID)}"" UNIQUE(""{nameof(ElementInfo.SysID)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.SysID)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsActive)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.IsActive)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsDisplay)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.IsDisplay)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsPrimary)}\" ON \"{nameof(ElementInfo)}\" (\"{nameof(ElementInfo.IsPrimary)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.SysID)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsActive)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.IsActive)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsDisplay)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.IsDisplay)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsPrimary)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.IsPrimary)}\")";
     }
 
     public TypingsDbContext(DbContextOptions<TypingsDbContext> options) : base(options)

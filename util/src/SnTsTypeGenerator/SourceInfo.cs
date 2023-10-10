@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SnTsTypeGenerator;
 
+[Table(nameof(TypingsDbContext.Sources))]
 public class SourceInfo
 {
     private string _fqdn = string.Empty;

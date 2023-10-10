@@ -8,7 +8,7 @@ namespace SnTsTypeGenerator;
 /// <summary>
 /// Represents an item from the "Field class" (<see cref="SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" />) table.
 /// </summary>
-[Table(nameof(GlideType))]
+[Table(nameof(TypingsDbContext.Types))]
 public class GlideType
 {
     private readonly object _syncRoot = new();

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -8,6 +9,7 @@ namespace SnTsTypeGenerator;
 /// <summary>
 /// This defines an explicit output file base name.
 /// </summary>
+[Table(nameof(TypingsDbContext.OutputFiles))]
 public class OutputFile : IValidatableObject
 {
     /// <summary>
