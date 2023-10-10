@@ -121,20 +121,21 @@ public sealed class MainWorkerService : BackgroundService
                 $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Global)} setting in appsettings.json, if it is set to true.",
                 $"This is the default behaviour if neither this option, the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Global)} setting, the -{AppSettings.SHORTHAND_s}=true option, nor the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Scoped)} is present.");
 
-            writeSwitch(AppSettings.SHORTHAND_o, "subdirectory",
-                "The output file name.",
-                "This path is relative to the current working directory.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Output)} setting in appsettings.json, if present; otherwise, it will write to a file named {DEFAULT_OUTPUT_FILENAME} in the current working directory.");
-
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine();
-            Console.Write($"-{AppSettings.SHORTHAND_f}=");
+            Console.Write($"-{AppSettings.SHORTHAND_o}=");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("filename");
-            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(".d.ts");
-            Console.WriteLine("Force overwrite of the output file.");
-            Console.WriteLine($"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Force)} setting in appsettings.json, if set to true; otherwise, an error message will be displayed if the output file already exists.");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("The output file name.");
+            Console.WriteLine("This path is relative to the current working directory.");
+            Console.WriteLine($"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Output)} setting in appsettings.json, if present; otherwise, it will write to a file named {DEFAULT_OUTPUT_FILENAME} in the current working directory.");
+
+            writeBoolSwitch(AppSettings.SHORTHAND_f,
+                "Force overwrite of the output file.",
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Force)} setting in appsettings.json, if set to true; otherwise, an error message will be displayed if the output file already exists.");
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write($"-{AppSettings.SHORTHAND__3F_}=true");
