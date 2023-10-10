@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using static SnTsTypeGenerator.Constants;
 
@@ -158,7 +159,11 @@ public partial class TypingsDbContext : DbContext
         SqliteConnectionStringBuilder csb;
         string connectionString = Database.GetConnectionString()!;
         FileInfo dbFile;
-        try { dbFile = new((csb = new(connectionString)).DataSource); }
+        try
+        {
+            string path = (csb = new(connectionString)).DataSource;
+            dbFile = new(Path.IsPathFullyQualified(path) ? path : Path.Combine(Program.Host.Services.GetRequiredService<IHostEnvironment>().ContentRootPath, path));
+        }
         catch (Exception exception)
         {
             _logger.LogDbfileValidationError(connectionString, exception);
