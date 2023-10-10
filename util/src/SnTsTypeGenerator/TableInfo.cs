@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace SnTsTypeGenerator;
 
 /// <summary>
-/// Represents an item from the "Table" (<see cref="Constants.TABLE_NAME_SYS_DB_OBJECT" />) table.
+/// Represents an item from the "Table" (<see cref="SnApiConstants.TABLE_NAME_SYS_DB_OBJECT" />) table.
 /// </summary>
 [Table(nameof(TableInfo))]
 public class TableInfo
@@ -16,7 +16,7 @@ public class TableInfo
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the "Sys ID" (<see cref="Constants.JSON_KEY_SYS_ID" />) column.
+    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]
@@ -29,7 +29,7 @@ public class TableInfo
     private string _name = string.Empty;
 
     /// <summary>
-    /// Value of the "Name" (<see cref="Constants.JSON_KEY_NAME" />) column.
+    /// Value of the "Name" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_name))]
@@ -42,7 +42,7 @@ public class TableInfo
     private string _label = string.Empty;
 
     /// <summary>
-    /// Value of the "Label" (<see cref="Constants.JSON_KEY_LABEL" />) column.
+    /// Value of the "Label" (<see cref="SnApiConstants.JSON_KEY_LABEL" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_label))]
@@ -53,14 +53,14 @@ public class TableInfo
     }
 
     /// <summary>
-    /// Value of the "Extensible" (<see cref="Constants.JSON_KEY_NAME" />) column.
+    /// Value of the "Extensible" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     public bool IsExtendable { get; set; }
 
     private string _accessibleFrom = string.Empty;
 
     /// <summary>
-    /// Value of the "Accessible from" (<see cref="Constants.JSON_KEY_ACCESS" />) column.
+    /// Value of the "Accessible from" (<see cref="SnApiConstants.JSON_KEY_ACCESS" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_accessibleFrom))]
@@ -71,12 +71,12 @@ public class TableInfo
     }
 
     /// <summary>
-    /// Value of the "Extension model" (<see cref="Constants.JSON_KEY_EXTENSION_MODEL" />) column.
+    /// Value of the "Extension model" (<see cref="SnApiConstants.JSON_KEY_EXTENSION_MODEL" />) column.
     /// </summary>
     public string? ExtensionModel { get; set; }
 
     /// <summary>
-    /// Associated value of the "Auto number" (<see cref="Constants.JSON_KEY_NUMBER_REF" />) column.
+    /// Associated value of the "Auto number" (<see cref="SnApiConstants.JSON_KEY_NUMBER_REF" />) column.
     /// </summary>
     public string? NumberPrefix { get; set; }
 
@@ -86,7 +86,7 @@ public class TableInfo
     public DateTime LastUpdated { get; set; }
 
     /// <summary>
-    /// Name of the associated record for the "Package" (<see cref="Constants.JSON_KEY_SYS_PACKAGE" />) column.
+    /// Name of the associated record for the "Package" (<see cref="SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
     private string? _packageName;
 
@@ -143,7 +143,7 @@ public class TableInfo
     private string? _scopeValue;
 
     /// <summary>
-    /// Value of the associated record for the "Application" (<see cref="Constants.JSON_KEY_SYS_SCOPE" />) column.
+    /// Value of the associated record for the "Application" (<see cref="SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
     /// </summary>
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue
@@ -198,7 +198,7 @@ public class TableInfo
     private string? _superClassName;
 
     /// <summary>
-    /// Table name associated with the "Extends table" (<see cref="Constants.JSON_KEY_SUPER_CLASS" />) column.
+    /// Table name associated with the "Extends table" (<see cref="SnApiConstants.JSON_KEY_SUPER_CLASS" />) column.
     /// </summary>
     [BackingField(nameof(_superClassName))]
     public string? SuperClassName

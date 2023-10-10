@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
-using static SnTsTypeGenerator.Constants;
+using static SnTsTypeGenerator.SnApiConstants;
 
 namespace SnTsTypeGenerator;
 

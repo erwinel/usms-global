@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using static SnTsTypeGenerator.Constants;
 
 namespace SnTsTypeGenerator;
 
@@ -14,6 +13,16 @@ namespace SnTsTypeGenerator;
 /// </summary>
 public partial class TypingsDbContext : DbContext
 {
+    /// <summary>
+    /// The Sqlite collation for case-insensitive matching.
+    /// </summary>
+    internal const string COLLATION_NOCASE = "NOCASE";
+
+    /// <summary>
+    /// The Sqlite code for the current date and time.
+    /// </summary>
+    internal const string DEFAULT_SQL_NOW = "(datetime('now','localtime'))";
+    
     private readonly ILogger<TypingsDbContext> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 

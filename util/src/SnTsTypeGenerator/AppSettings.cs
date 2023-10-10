@@ -1,6 +1,5 @@
 
 using Microsoft.Extensions.Configuration;
-using static SnTsTypeGenerator.Constants;
 using static SnTsTypeGenerator.CmdLineConstants;
 
 namespace SnTsTypeGenerator;

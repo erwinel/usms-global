@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace SnTsTypeGenerator;
 
 /// <summary>
-/// Represents an item from the "Field class" (<see cref="Constants.TABLE_NAME_SYS_GLIDE_OBJECT" />) table.
+/// Represents an item from the "Field class" (<see cref="SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" />) table.
 /// </summary>
 [Table(nameof(GlideType))]
 public class GlideType
@@ -16,7 +16,7 @@ public class GlideType
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the "Sys ID" (<see cref="Constants.JSON_KEY_SYS_ID" />) column.
+    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]
@@ -29,7 +29,7 @@ public class GlideType
     private string _name = string.Empty;
 
     /// <summary>
-    /// Value of the "Name" (<see cref="Constants.JSON_KEY_NAME" />) column.
+    /// Value of the "Name" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_name))]
@@ -42,7 +42,7 @@ public class GlideType
     private string _label = string.Empty;
 
     /// <summary>
-    /// Value of the "Label" (<see cref="Constants.JSON_KEY_LABEL" />) column.
+    /// Value of the "Label" (<see cref="SnApiConstants.JSON_KEY_LABEL" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_label))]
@@ -53,27 +53,27 @@ public class GlideType
     }
 
     /// <summary>
-    /// Value of the "Extends" (<see cref="Constants.JSON_KEY_SCALAR_TYPE" />) column.
+    /// Value of the "Extends" (<see cref="SnApiConstants.JSON_KEY_SCALAR_TYPE" />) column.
     /// </summary>
     public string? ScalarType { get; set; }
 
     /// <summary>
-    /// Value of the "Length" (<see cref="Constants.JSON_KEY_SCALAR_LENGTH" />) column.
+    /// Value of the "Length" (<see cref="SnApiConstants.JSON_KEY_SCALAR_LENGTH" />) column.
     /// </summary>
     public int? ScalarLength { get; set; }
 
     /// <summary>
-    /// Value of the "Class name" (<see cref="Constants.JSON_KEY_CLASS_NAME" />) column.
+    /// Value of the "Class name" (<see cref="SnApiConstants.JSON_KEY_CLASS_NAME" />) column.
     /// </summary>
     public string? ClassName { get; set; }
 
     /// <summary>
-    /// Value of the "Use original value" (<see cref="Constants.JSON_KEY_USE_ORIGINAL_VALUE" />) column.
+    /// Value of the "Use original value" (<see cref="SnApiConstants.JSON_KEY_USE_ORIGINAL_VALUE" />) column.
     /// </summary>
     public bool UseOriginalValue { get; set; }
 
     /// <summary>
-    /// Value of the "Visible" (<see cref="Constants.JSON_KEY_VISIBLE" />) column.
+    /// Value of the "Visible" (<see cref="SnApiConstants.JSON_KEY_VISIBLE" />) column.
     /// </summary>
     public bool IsVisible { get; set; }
 
@@ -83,7 +83,7 @@ public class GlideType
     public DateTime LastUpdated { get; set; }
 
     /// <summary>
-    /// Name of the associated record for the "Package" (<see cref="Constants.JSON_KEY_SYS_PACKAGE" />) column.
+    /// Name of the associated record for the "Package" (<see cref="SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
     private string? _packageName;
 
@@ -140,7 +140,7 @@ public class GlideType
     private string? _scopeValue;
 
     /// <summary>
-    /// Value of the associated record for the "Application" (<see cref="Constants.JSON_KEY_SYS_SCOPE" />) column.
+    /// Value of the associated record for the "Application" (<see cref="SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
     /// </summary>
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue

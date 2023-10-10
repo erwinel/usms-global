@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
-using static SnTsTypeGenerator.Constants;
+using static SnTsTypeGenerator.SnApiConstants;
 
 namespace SnTsTypeGenerator;
 

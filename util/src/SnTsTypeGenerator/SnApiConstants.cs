@@ -1,27 +1,10 @@
 namespace SnTsTypeGenerator;
 
-internal static class Constants
+internal static class SnApiConstants
 {
-    /// <summary>
-    /// The Sqlite collation for case-insensitive matching.
-    /// </summary>
-    internal const string COLLATION_NOCASE = "NOCASE";
-
-    /// <summary>
-    /// The Sqlite code for the current date and time.
-    /// </summary>
-    internal const string DEFAULT_SQL_NOW = "(datetime('now','localtime'))";
+    internal static readonly Uri EmptyURI = new(string.Empty, UriKind.Relative);
 
     internal const string DEFAULT_NAMESPACE = "global";
-
-    /// <summary>
-    /// Default name of database file.
-    /// </summary>
-    public const string DEFAULT_DbFile = $"Typings.db";
-
-    internal const string DEFAULT_OUTPUT_FILENAME = "types.d.ts";
-
-    internal static readonly Uri EmptyURI = new(string.Empty, UriKind.Relative);
 
     internal const string URI_PARAM_QUERY = "sysparm_query";
 

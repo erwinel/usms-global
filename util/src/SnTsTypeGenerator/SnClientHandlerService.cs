@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static SnTsTypeGenerator.Constants;
+using static SnTsTypeGenerator.SnApiConstants;
 using static SnTsTypeGenerator.CmdLineConstants;
 
 namespace SnTsTypeGenerator;

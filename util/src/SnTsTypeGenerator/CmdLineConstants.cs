@@ -3,6 +3,13 @@ namespace SnTsTypeGenerator;
 public static class CmdLineConstants
 {
     /// <summary>
+    /// Default name of database file.
+    /// </summary>
+    public const string DEFAULT_DbFile = $"Typings.db";
+
+    internal const string DEFAULT_OUTPUT_FILENAME = "types.d.ts";
+
+    /// <summary>
     /// Command line switch for showing help.
     /// </summary>
     internal const string DASH_help = "--help";

@@ -4,7 +4,7 @@ using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
-using static SnTsTypeGenerator.Constants;
+using static SnTsTypeGenerator.SnApiConstants;
 using static SnTsTypeGenerator.CmdLineConstants;
 
 namespace SnTsTypeGenerator;

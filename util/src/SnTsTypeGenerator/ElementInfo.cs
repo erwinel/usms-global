@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace SnTsTypeGenerator;
 
 /// <summary>
-/// Represents an item from the "Dictionary Entry" (<see cref="Constants.TABLE_NAME_SYS_DICTIONARY" />) table.
+/// Represents an item from the "Dictionary Entry" (<see cref="SnApiConstants.TABLE_NAME_SYS_DICTIONARY" />) table.
 /// </summary>
 [Table(nameof(ElementInfo))]
 public class ElementInfo
@@ -16,7 +16,7 @@ public class ElementInfo
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the "Sys ID" (<see cref="Constants.JSON_KEY_SYS_ID" />) column.
+    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]
@@ -29,7 +29,7 @@ public class ElementInfo
     private string _name = string.Empty;
 
     /// <summary>
-    /// Value of the "Column name" (<see cref="Constants.JSON_KEY_ELEMENT" />) column.
+    /// Value of the "Column name" (<see cref="SnApiConstants.JSON_KEY_ELEMENT" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_name))]
@@ -42,7 +42,7 @@ public class ElementInfo
     private string _label = string.Empty;
 
     /// <summary>
-    /// Value of the "Column label" (<see cref="Constants.JSON_KEY_COLUMN_LABEL" />) column.
+    /// Value of the "Column label" (<see cref="SnApiConstants.JSON_KEY_COLUMN_LABEL" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_label))]
@@ -53,62 +53,62 @@ public class ElementInfo
     }
 
     /// <summary>
-    /// Value of the "Active" (<see cref="Constants.JSON_KEY_ACTIVE" />) column.
+    /// Value of the "Active" (<see cref="SnApiConstants.JSON_KEY_ACTIVE" />) column.
     /// </summary>
     public bool IsActive { get; set; }
 
     /// <summary>
-    /// Value of the "Array" (<see cref="Constants.JSON_KEY_ARRAY" />) column.
+    /// Value of the "Array" (<see cref="SnApiConstants.JSON_KEY_ARRAY" />) column.
     /// </summary>
     public bool IsArray { get; set; }
 
     /// <summary>
-    /// Value of the "Max length" (<see cref="Constants.JSON_KEY_MAX_LENGTH" />) column.
+    /// Value of the "Max length" (<see cref="SnApiConstants.JSON_KEY_MAX_LENGTH" />) column.
     /// </summary>
     public int? MaxLength { get; set; }
 
     /// <summary>
-    /// Value of the "Comments" (<see cref="Constants.JSON_KEY_COMMENTS" />) column.
+    /// Value of the "Comments" (<see cref="SnApiConstants.JSON_KEY_COMMENTS" />) column.
     /// </summary>
     public string? Comments { get; set; }
 
     /// <summary>
-    /// Value of the "Default value" (<see cref="Constants.JSON_KEY_DEFAULT_VALUE" />) column.
+    /// Value of the "Default value" (<see cref="SnApiConstants.JSON_KEY_DEFAULT_VALUE" />) column.
     /// </summary>
     public string? DefaultValue { get; set; }
 
     /// <summary>
-    /// Value of the "Display" (<see cref="Constants.JSON_KEY_DISPLAY" />) column.
+    /// Value of the "Display" (<see cref="SnApiConstants.JSON_KEY_DISPLAY" />) column.
     /// </summary>
     public bool IsDisplay { get; set; }
 
     /// <summary>
-    /// Value of the "Sizeclass" (<see cref="Constants.JSON_KEY_SIZECLASS" />) column.
+    /// Value of the "Sizeclass" (<see cref="SnApiConstants.JSON_KEY_SIZECLASS" />) column.
     /// </summary>
     public int? SizeClass { get; set; }
 
     /// <summary>
-    /// Value of the "Mandatory" (<see cref="Constants.JSON_KEY_MANDATORY" />) column.
+    /// Value of the "Mandatory" (<see cref="SnApiConstants.JSON_KEY_MANDATORY" />) column.
     /// </summary>
     public bool IsMandatory { get; set; }
 
     /// <summary>
-    /// Value of the "Primary" (<see cref="Constants.JSON_KEY_PRIMARY" />) column.
+    /// Value of the "Primary" (<see cref="SnApiConstants.JSON_KEY_PRIMARY" />) column.
     /// </summary>
     public bool IsPrimary { get; set; }
 
     /// <summary>
-    /// Value of the "Read only" (<see cref="Constants.JSON_KEY_READ_ONLY" />) column.
+    /// Value of the "Read only" (<see cref="SnApiConstants.JSON_KEY_READ_ONLY" />) column.
     /// </summary>
     public bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Value of the "Calculated" (<see cref="Constants.JSON_KEY_VIRTUAL" />) column.
+    /// Value of the "Calculated" (<see cref="SnApiConstants.JSON_KEY_VIRTUAL" />) column.
     /// </summary>
     public bool IsCalculated { get; set; }
 
     /// <summary>
-    /// Value of the "Unique" (<see cref="Constants.JSON_KEY_UNIQUE" />) column.
+    /// Value of the "Unique" (<see cref="SnApiConstants.JSON_KEY_UNIQUE" />) column.
     /// </summary>
     public bool IsUnique { get; set; }
 
@@ -120,7 +120,7 @@ public class ElementInfo
     private string? _packageName;
 
     /// <summary>
-    /// Name of the associated record for the "Package" (<see cref="Constants.JSON_KEY_SYS_PACKAGE" />) column.
+    /// Name of the associated record for the "Package" (<see cref="SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
     [BackingField(nameof(_packageName))]
     public string? PackageName
@@ -175,7 +175,7 @@ public class ElementInfo
     private string? _scopeValue;
 
     /// <summary>
-    /// Value of the associated record for the "Application" (<see cref="Constants.JSON_KEY_SYS_SCOPE" />) column.
+    /// Value of the associated record for the "Application" (<see cref="SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
     /// </summary>
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue
@@ -230,7 +230,7 @@ public class ElementInfo
     private string _tableName = string.Empty;
 
     /// <summary>
-    /// Value of the "Table" (<see cref="Constants.JSON_KEY_NAME" />) column.
+    /// Value of the "Table" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [BackingField(nameof(_tableName))]
     public string TableName
@@ -283,7 +283,7 @@ public class ElementInfo
     private string _typeName = string.Empty;
 
     /// <summary>
-    /// Name of the related value for the "Type" (<see cref="Constants.JSON_KEY_INTERNAL_TYPE" />) column.
+    /// Name of the related value for the "Type" (<see cref="SnApiConstants.JSON_KEY_INTERNAL_TYPE" />) column.
     /// </summary>
     [BackingField(nameof(_typeName))]
     public string TypeName
@@ -336,7 +336,7 @@ public class ElementInfo
     private string? _refTableName;
 
     /// <summary>
-    /// The value of the associated name for the "Reference" (<see cref="Constants.JSON_KEY_REFERENCE" />) column.
+    /// The value of the associated name for the "Reference" (<see cref="SnApiConstants.JSON_KEY_REFERENCE" />) column.
     /// </summary>
     [BackingField(nameof(_refTableName))]
     public string? RefTableName

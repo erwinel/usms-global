@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static SnTsTypeGenerator.Constants;
+using static SnTsTypeGenerator.SnApiConstants;
+using static SnTsTypeGenerator.CmdLineConstants;
 
 namespace SnTsTypeGenerator;
 
@@ -452,12 +453,12 @@ public class RenderingService
         {
             switch (appSettings.Mode.Trim().ToLower())
             {
-                case AppSettings.MODE_SCOPED:
-                case AppSettings.MODE_SCOPED_ABBR:
+                case MODE_SCOPED:
+                case MODE_SCOPED_ABBR:
                     _isScoped = true;
                     break;
-                case AppSettings.MODE_GLOBAL:
-                case AppSettings.MODE_GLOBAL_ABBR:
+                case MODE_GLOBAL:
+                case MODE_GLOBAL_ABBR:
                     _isScoped = false;
                     break;
                 default:

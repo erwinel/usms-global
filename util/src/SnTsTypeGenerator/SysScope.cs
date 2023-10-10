@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace SnTsTypeGenerator;
 
 /// <summary>
-/// Represents an item from the "Application" (<see cref="Constants.TABLE_NAME_SYS_SCOPE" />) table.
+/// Represents an item from the "Application" (<see cref="SnApiConstants.TABLE_NAME_SYS_SCOPE" />) table.
 /// </summary>
 [Table(nameof(SysScope))]
 public class SysScope
@@ -26,7 +26,7 @@ public class SysScope
     private string _name = string.Empty;
 
     /// <summary>
-    /// Value of the "Name" (<see cref="Constants.JSON_KEY_NAME" />) column.
+    /// Value of the "Name" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_name))]
@@ -41,7 +41,7 @@ public class SysScope
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the "Sys ID" (<see cref="Constants.JSON_KEY_SYS_ID" />) column.
+    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]
