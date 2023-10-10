@@ -28,7 +28,7 @@ internal class InvalidResponseTypeException : Exception, ILogTrackable
 
     public InvalidResponseTypeException(string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Result) = (EmptyURI, null);
 
-    public InvalidResponseTypeException(Uri requestUri, JsonNode?result) => (RequestUri, Result) = (requestUri, result);
+    public InvalidResponseTypeException(Uri requestUri, JsonNode? result) => (RequestUri, Result) = (requestUri, result);
 
     public InvalidResponseTypeException(Uri requestUri, JsonNode? result, string? message) : base(message) => (RequestUri, Result) = (requestUri, result);
 

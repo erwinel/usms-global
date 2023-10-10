@@ -771,7 +771,7 @@ public static class ExtensionMethods
         HttpStatusCode.NetworkAuthenticationRequired => "Authentication required for network access.",
         _ => null,
     };
-    
+
     public static string GetNamespace(this TableInfo tableInfo) => string.IsNullOrWhiteSpace(tableInfo.ScopeValue) ? DEFAULT_NAMESPACE : tableInfo.ScopeValue;
 
     public static string GetShortName(this TableInfo tableInfo)

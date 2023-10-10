@@ -33,20 +33,20 @@ public static class LoggerMessages
 
     #endregion
     #region Critical UnexpectedServiceException Error (0xffff)
-    
+
     /// <summary>
     // Numerical event code for UnexpectedServiceException.
     /// </summary>
     public const int EVENT_ID_UnexpectedServiceException = 0xffff;
-    
+
     /// <summary>
     // Event ID for UnexpectedServiceException.
     /// </summary>
     public static readonly EventId UnexpectedServiceException = new(EVENT_ID_UnexpectedServiceException, nameof(UnexpectedServiceException));
-    
+
     private static readonly Action<ILogger, string, Exception?> _unexpectedServiceException = LoggerMessage.Define<string>(LogLevel.Critical, UnexpectedServiceException,
         "Unexpected error executing service {TypeName}");
-    
+
     /// <summary>
     /// Logs an UnexpectedServiceException event with event code 0xffff.
     /// </summary>
@@ -54,7 +54,7 @@ public static class LoggerMessages
     /// <param name="type">The service type that failed.</param>
     /// <param name="error">The exception that caused the event.</param>
     public static void LogUnexpectedServiceException(this ILogger logger, Type type, Exception? error) => _unexpectedServiceException(logger, type.FullName ?? type.Name, error);
-    
+
     /// <summary>
     /// Logs an UnexpectedServiceException event with event code 0xffff.
     /// </summary>
@@ -62,7 +62,7 @@ public static class LoggerMessages
     /// <param name="error">The exception that caused the event.</param>
     /// <typeparam name="T">The service type that failed.</typeparam>
     public static void LogUnexpectedServiceException<T>(this ILogger logger, Exception error) => LogUnexpectedServiceException(logger, typeof(T), error);
-    
+
     #endregion
 
     #region Critical DbfileValidation Error (0x0001)
@@ -180,23 +180,23 @@ public static class LoggerMessages
     #endregion
 
     #region Critical CriticalSettingValueNotProvided Error (0x0005)
-    
+
     /// <summary>
     // Numerical event code for CriticalSettingValueNotProvided.
     /// </summary>
     public const int EVENT_ID_CriticalSettingValueNotProvided = 0x0005;
-    
+
     /// <summary>
     // Event ID for CriticalSettingValueNotProvided.
     /// </summary>
     public static readonly EventId CriticalSettingValueNotProvided = new(EVENT_ID_CriticalSettingValueNotProvided, nameof(CriticalSettingValueNotProvided));
-    
-    private static readonly Action<ILogger, string, Exception?> _criticalSettingValueNotProvided1= LoggerMessage.Define<string>(LogLevel.Critical, CriticalSettingValueNotProvided,
+
+    private static readonly Action<ILogger, string, Exception?> _criticalSettingValueNotProvided1 = LoggerMessage.Define<string>(LogLevel.Critical, CriticalSettingValueNotProvided,
         "The {SettingName} setting is empty or was not provided.");
-    
+
     private static readonly Action<ILogger, string, char, Exception?> _criticalSettingValueNotProvided2 = LoggerMessage.Define<string, char>(LogLevel.Critical, CriticalSettingValueNotProvided,
         "The {SettingName} setting ({CmdLineSwitch}) is empty or was not not provided.");
-    
+
     /// <summary>
     /// Logs an CriticalSettingValueNotProvided event with event code 0x0005.
     /// </summary>
@@ -211,27 +211,27 @@ public static class LoggerMessages
         else
             _criticalSettingValueNotProvided1(logger, settingName, null);
     }
-    
+
     #endregion
 
     #region RenderMode Trace (0x0006)
-    
+
     /// <summary>
     // Numerical event code for RenderMode.
     /// </summary>
     public const int EVENT_ID_RenderMode = 0x0006;
-    
+
     /// <summary>
     // Event ID for RenderMode.
     /// </summary>
     public static readonly EventId RenderMode = new(EVENT_ID_RenderMode, nameof(RenderMode));
-    
+
     private static readonly Action<ILogger, string, char, bool, Exception?> _renderMode1 = LoggerMessage.Define<string, char, bool>(LogLevel.Trace, RenderMode,
         "Setting {Setting} (-{Switch}) is {Value}.");
-    
+
     private static readonly Action<ILogger, string, char, bool, Exception?> _renderMode2 = LoggerMessage.Define<string, char, bool>(LogLevel.Trace, RenderMode,
         "Setting {Setting} (-{Switch}) defaulted to {Value}.");
-    
+
 
     /// <summary>
     /// Logs an RenderMode event with event code 0x0006.
@@ -239,9 +239,9 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="value">Indicates value of <see cref="AppSettings.Scoped"/> setting.</param>
     public static void LogScopedSettingValue(this ILogger logger, bool value) => _renderMode1(logger, nameof(AppSettings.Scoped), AppSettings.SHORTHAND_s, value, null);
-    
+
     public static void LogGlobalSettingValue(this ILogger logger, bool value) => _renderMode1(logger, nameof(AppSettings.Global), AppSettings.SHORTHAND_g, value, null);
-    
+
     public static void LogDefaultRenderMode(this ILogger logger, bool isGlobal)
     {
         if (isGlobal)
@@ -249,24 +249,24 @@ public static class LoggerMessages
         else
             _renderMode2(logger, nameof(AppSettings.Scoped), AppSettings.SHORTHAND_s, true, null);
     }
-    
+
     #endregion
 
     #region UsingOutputFile Trace (0x0007)
-    
+
     /// <summary>
     // Numerical event code for UsingOutputFile.
     /// </summary>
     public const int EVENT_ID_UsingOutputFile = 0x0007;
-    
+
     /// <summary>
     // Event ID for UsingOutputFile.
     /// </summary>
     public static readonly EventId UsingOutputFile = new(EVENT_ID_UsingOutputFile, nameof(UsingOutputFile));
-    
+
     private static readonly Action<ILogger, string, bool, Exception?> _usingOutputFile = LoggerMessage.Define<string, bool>(LogLevel.Trace, UsingOutputFile,
         "Message {Path} {OverWrite}");
-    
+
     /// <summary>
     /// Logs an UsingOutputFile event with event code 0x0007.
     /// </summary>
@@ -274,7 +274,7 @@ public static class LoggerMessages
     /// <param name="path">The output file path.</param>
     /// <param name="overWrite">The value of the <see cref="AppSettings.Force"/> setting.</param>
     public static void LogUsingOutputFile(this ILogger logger, string path, bool overWrite) => _usingOutputFile(logger, path, overWrite, null);
-    
+
     #endregion
 
     #region Critical InvalidRemoteInstanceUrl Error (0x0008)

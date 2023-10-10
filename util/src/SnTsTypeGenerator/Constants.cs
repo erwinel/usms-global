@@ -299,7 +299,7 @@ internal static class Constants
     internal const string JSON_KEY_ACCESS_TOKEN = "access_token";
 
     internal const string JSON_KEY_REFRESH_TOKEN = "refresh_token";
-    
+
     /// <summary>
     /// "GUID" type name.
     /// </summary>

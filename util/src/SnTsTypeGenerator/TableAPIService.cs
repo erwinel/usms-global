@@ -26,18 +26,18 @@ public sealed class TableAPIService
         } : null;
 
     private SysScope? GetScope(JsonObject resultObj) => resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value, out string? display_value) ? new()
-        {
-            SysID = value,
-            Name = display_value ?? value,
-            SourceFqdn = (_handler ?? throw new InvalidOperationException()).BaseURL.Host
-        } : null;
+    {
+        SysID = value,
+        Name = display_value ?? value,
+        SourceFqdn = (_handler ?? throw new InvalidOperationException()).BaseURL.Host
+    } : null;
 
     private TableInfo? GetTable(JsonObject resultObj, string propertyName) => resultObj.TryGetFieldAsNonEmpty(propertyName, out string? super_class, out string? label) ? new()
-        {
-            SysID = super_class,
-            Label = label ?? super_class,
-            SourceFqdn = (_handler ?? throw new InvalidOperationException()).BaseURL.Host
-        } : null;
+    {
+        SysID = super_class,
+        Label = label ?? super_class,
+        SourceFqdn = (_handler ?? throw new InvalidOperationException()).BaseURL.Host
+    } : null;
 
     private TableInfo? GetTableFromResponse(Uri requestUri, JsonNode? jsonNode, bool expectArray)
     {
@@ -183,11 +183,11 @@ public sealed class TableAPIService
                     Package = GetPackage(sysDictionary),
                     Scope = GetScope(sysDictionary),
                     Type = sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new GlideType()
-                        {
-                            Name = type,
-                            Label = displayValue ?? type,
-                            SourceFqdn = requestUri.Host
-                        } : null,
+                    {
+                        Name = type,
+                        Label = displayValue ?? type,
+                        SourceFqdn = requestUri.Host
+                    } : null,
                     SourceFqdn = requestUri.Host
                 };
             return null!;

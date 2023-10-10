@@ -22,7 +22,7 @@ public sealed class SnClientHandlerService
     internal Uri BaseURL { get; }
 
     public NetworkCredential ClientCredentials { get; }
-    
+
     public NetworkCredential UserCredentials { get; }
 
     /// <summary>
@@ -66,7 +66,7 @@ public sealed class SnClientHandlerService
         _logger.LogAPIRequestCompleted(requestUri, result);
         return result;
     }
-    
+
     /// <summary>
     /// Gets a ServiceNow access token.
     /// </summary>
@@ -211,7 +211,7 @@ public sealed class SnClientHandlerService
         Uri requestUri = new UriBuilder(BaseURL) { Path = path, Query = query }.Uri;
         return (requestUri, await GetJsonAsync(handler, requestUri, configureHeaders, cancellationToken));
     }
-    
+
     internal async Task<(Uri RequestUri, JsonNode? Response)> PostJsonAsync(string path, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -246,7 +246,7 @@ public sealed class SnClientHandlerService
         return (requestUri, await PostJsonAsync(handler, requestUri, content, null, cancellationToken));
     }
 
-    internal async Task<(Uri RequestUri, JsonNode? Response)> PostJsonAsync(string path,Action<HttpRequestHeaders> configureHeaders, CancellationToken cancellationToken)
+    internal async Task<(Uri RequestUri, JsonNode? Response)> PostJsonAsync(string path, Action<HttpRequestHeaders> configureHeaders, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using HttpClientHandler handler = CreateHttpClientHandler();

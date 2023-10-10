@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -34,7 +33,7 @@ public sealed class MainWorkerService : BackgroundService
             }
             _logger.LogNoTableNamesSpecifiedWarning();
         }
-        
+
         _tableNames = ImmutableArray.Create<string>();
     }
 

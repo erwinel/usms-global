@@ -210,7 +210,7 @@ public sealed class DataLoaderService
         await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogNewTableSaveCompleteTrace(tableInfo.Name);
     }
-    
+
     private async Task<TableInfo> GetTableAsync(TableInfo table, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
