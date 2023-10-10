@@ -443,31 +443,28 @@ public class RenderingService
         _services = services;
         // _dbContext = dbContext;
         AppSettings appSettings = appSettingsOptions.Value;
-        if (appSettings.Scoped.HasValue)
+        if (string.IsNullOrWhiteSpace(appSettings.Mode))
         {
-            if (appSettings.Global.HasValue)
-            {
-                if (appSettings.Scoped.Value && appSettings.Global.Value)
-                {
-                    _logger.LogGlobalAndScopedSwitchesBothSet();
-                    return;
-                }
-                _logger.LogGlobalSettingValue(appSettings.Global.Value);
-            }
-            _isScoped = appSettings.Scoped.Value;
-            _logger.LogScopedSettingValue(_isScoped);
-        }
-        else if (appSettings.Global.HasValue)
-        {
-            _logger.LogGlobalSettingValue(appSettings.Global.Value);
-            _isScoped = !appSettings.Global.Value;
-            if (_isScoped)
-                _logger.LogDefaultRenderMode(false);
+            _isScoped = false;
+            _logger.LogDefaultRenderMode(_isScoped);
         }
         else
         {
-            _isScoped = false;
-            _logger.LogDefaultRenderMode(true);
+            switch (appSettings.Mode.Trim().ToLower())
+            {
+                case AppSettings.MODE_SCOPED:
+                case AppSettings.MODE_SCOPED_ABBR:
+                    _isScoped = true;
+                    break;
+                case AppSettings.MODE_GLOBAL:
+                case AppSettings.MODE_GLOBAL_ABBR:
+                    _isScoped = false;
+                    break;
+                default:
+                    _logger.LogInvalidModeOption(appSettings.Mode);
+                    return;
+            }
+            _logger.LogRenderModeSettingValue(_isScoped);
         }
 
         _forceOverwrite = appSettings.Force ?? false;

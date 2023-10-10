@@ -226,29 +226,25 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId RenderMode = new(EVENT_ID_RenderMode, nameof(RenderMode));
 
-    private static readonly Action<ILogger, string, char, bool, Exception?> _renderMode1 = LoggerMessage.Define<string, char, bool>(LogLevel.Trace, RenderMode,
+    private static readonly Action<ILogger, string, char, string, Exception?> _renderMode1 = LoggerMessage.Define<string, char, string>(LogLevel.Trace, RenderMode,
         "Setting {Setting} (-{Switch}) is {Value}.");
 
-    private static readonly Action<ILogger, string, char, bool, Exception?> _renderMode2 = LoggerMessage.Define<string, char, bool>(LogLevel.Trace, RenderMode,
+    private static readonly Action<ILogger, string, char, string, Exception?> _renderMode2 = LoggerMessage.Define<string, char, string>(LogLevel.Trace, RenderMode,
         "Setting {Setting} (-{Switch}) defaulted to {Value}.");
-
 
     /// <summary>
     /// Logs an RenderMode event with event code 0x0006.
     /// </summary>
     /// <param name="logger">The current logger.</param>
-    /// <param name="value">Indicates value of <see cref="AppSettings.Scoped"/> setting.</param>
-    public static void LogScopedSettingValue(this ILogger logger, bool value) => _renderMode1(logger, nameof(AppSettings.Scoped), AppSettings.SHORTHAND_s, value, null);
+    /// <param name="isScoped">Indicates whether the mode is for scoped scripts.</param>
+    public static void LogRenderModeSettingValue(this ILogger logger, bool isScoped) => _renderMode1(logger, nameof(AppSettings.Mode), AppSettings.SHORTHAND_m, isScoped ? AppSettings.MODE_SCOPED : AppSettings.MODE_GLOBAL, null);
 
-    public static void LogGlobalSettingValue(this ILogger logger, bool value) => _renderMode1(logger, nameof(AppSettings.Global), AppSettings.SHORTHAND_g, value, null);
-
-    public static void LogDefaultRenderMode(this ILogger logger, bool isGlobal)
-    {
-        if (isGlobal)
-            _renderMode2(logger, nameof(AppSettings.Global), AppSettings.SHORTHAND_g, true, null);
-        else
-            _renderMode2(logger, nameof(AppSettings.Scoped), AppSettings.SHORTHAND_s, true, null);
-    }
+    /// <summary>
+    /// Logs an RenderMode event with event code 0x0006.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="isScoped">Indicates whether the default mode is for scoped scripts.</param>
+    public static void LogDefaultRenderMode(this ILogger logger, bool isScoped) => _renderMode2(logger, nameof(AppSettings.Mode), AppSettings.SHORTHAND_m, isScoped ? AppSettings.MODE_SCOPED : AppSettings.MODE_GLOBAL, null);
 
     #endregion
 
@@ -334,29 +330,28 @@ public static class LoggerMessages
 
     #endregion
 
-    #region Critical GlobalAndScopedSwitchesBothSet Error (0x000a)
-
+    #region Critical InvalidModeOption Error (0x000a)
+    
     /// <summary>
-    /// Numerical event code for scope switch syntax error.
+    // Numerical event code for InvalidModeOption.
     /// </summary>
-    public const int EVENT_ID_GlobalAndScopedSwitchesBothSet = 0x000a;
-
+    public const int EVENT_ID_InvalidModeOption = 0x000a;
+    
     /// <summary>
-    /// Event ID for scope switch syntax error.
+    // Event ID for InvalidModeOption.
     /// </summary>
-    public static readonly EventId GlobalAndScopedSwitchesBothSet = new(EVENT_ID_GlobalAndScopedSwitchesBothSet, nameof(GlobalAndScopedSwitchesBothSet));
-
-    private static readonly Action<ILogger, Exception?> _globalAndScopedSwitchesBothSet = LoggerMessage.Define(LogLevel.Critical, GlobalAndScopedSwitchesBothSet,
-        $"The {nameof(AppSettings.Global)} ({AppSettings.SHORTHAND_g}) and {nameof(AppSettings.Scoped)} ({AppSettings.SHORTHAND_s}) options cannot be specified at the same time.");
-
-
+    public static readonly EventId InvalidModeOption = new(EVENT_ID_InvalidModeOption, nameof(InvalidModeOption));
+    
+    private static readonly Action<ILogger, string, Exception?> _invalidModeOption = LoggerMessage.Define<string>(LogLevel.Critical, InvalidModeOption,
+        $"The {nameof(AppSettings.Mode)} ({AppSettings.SHORTHAND_m}) option contains unknown mode value \"{{Mode}}\". Mode must be {AppSettings.MODE_SCOPED}, {AppSettings.MODE_SCOPED_ABBR}, {AppSettings.MODE_GLOBAL}, or {AppSettings.MODE_GLOBAL_ABBR}.");
+    
     /// <summary>
-    /// Logs a scope switch syntax error event (GlobalAndScopedSwitchesBothSet) with event code 0x000a.
+    /// Logs an InvalidModeOption event with event code 0x000a.
     /// </summary>
     /// <param name="logger">The current logger.</param>
-    /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogGlobalAndScopedSwitchesBothSet(this ILogger logger) => _globalAndScopedSwitchesBothSet(logger, null);
-
+    /// <param name="mode">The invalid mode value.</param>
+    public static void LogInvalidModeOption(this ILogger logger, string mode) => _invalidModeOption(logger, mode, null);
+    
     #endregion
 
     #region Critical OutputFileAlreadyExists Error (0x000b)

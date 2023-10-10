@@ -94,32 +94,27 @@ public sealed class MainWorkerService : BackgroundService
                 "The base URL of the remote ServiceNow instance.",
                 $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.RemoteURL)} setting in appsettings.json, if defined; otherwise, an error message will be displayed.");
 
-            writeSwitch(AppSettings.SHORTHAND_s, "url",
-                "Generate typings for use with scoped apps.",
-                $"This cannot be used with the -{AppSettings.SHORTHAND_g}=true option.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Scoped)} setting in appsettings.json, if it is set to true.");
-
-            void writeBoolSwitch(char switchChar, string desription, params string[] additionalDesc)
-            {
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine();
-                Console.Write($"-{switchChar}=true");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(desription);
-                foreach (string d in additionalDesc)
-                    Console.WriteLine(d);
-            }
-
-            writeBoolSwitch(AppSettings.SHORTHAND_s,
-                "Generate typings for use with scoped apps.",
-                $"This cannot be used with the -{AppSettings.SHORTHAND_g}=true option.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Scoped)} setting in appsettings.json, if it is set to true.");
-
-            writeBoolSwitch(AppSettings.SHORTHAND_g,
-                "Generate typings for use with scoped apps.",
-                $"This cannot be used with the -{AppSettings.SHORTHAND_s}=true option.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Global)} setting in appsettings.json, if it is set to true.",
-                $"This is the default behaviour if neither this option, the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Global)} setting, the -{AppSettings.SHORTHAND_s}=true option, nor the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Scoped)} is present.");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine();
+            Console.Write($"-{AppSettings.SHORTHAND_m}=");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(AppSettings.MODE_SCOPED);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("|");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(AppSettings.MODE_SCOPED_ABBR);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("|");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(AppSettings.MODE_GLOBAL);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("|");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(AppSettings.MODE_GLOBAL_ABBR);
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Specifies output mode.",
+                $"'{AppSettings.MODE_SCOPED}' or '{AppSettings.MODE_SCOPED_ABBR}' generates typings for use in scoped apps, and '{AppSettings.MODE_SCOPED}' or '{AppSettings.MODE_GLOBAL_ABBR}' generates typings for use in global scripts.",
+                "The default behavior is to generate typings for use in global scripts.");
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine();
@@ -133,9 +128,12 @@ public sealed class MainWorkerService : BackgroundService
             Console.WriteLine("This path is relative to the current working directory.");
             Console.WriteLine($"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Output)} setting in appsettings.json, if present; otherwise, it will write to a file named {DEFAULT_OUTPUT_FILENAME} in the current working directory.");
 
-            writeBoolSwitch(AppSettings.SHORTHAND_f,
-                "Force overwrite of the output file.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Force)} setting in appsettings.json, if set to true; otherwise, an error message will be displayed if the output file already exists.");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine();
+            Console.Write($"-{AppSettings.SHORTHAND_f}=true");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Force overwrite of the output file.");
+            Console.WriteLine($"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Force)} setting in appsettings.json, if set to true; otherwise, an error message will be displayed if the output file already exists.");
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write($"-{AppSettings.SHORTHAND__3F_}=true");

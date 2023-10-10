@@ -104,25 +104,37 @@ public class AppSettings
     public bool? Force { get; set; }
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="Scoped" /></c> setting.
+    /// Gets the command line option for the <c><see cref="Mode" /></c> setting.
     /// </summary>
-    public const char SHORTHAND_s = 's';
+    public const char SHORTHAND_m = 'm';
 
     /// <summary>
-    /// Generate typings for use in scoped applications.
+    /// The output mode.
+    /// Should be <see cref="MODE_SCOPED"/>, <see cref="MODE_SCOPED_ABBR"/>, <see cref="MODE_GLOBAL"/>, or <see cref="MODE_GLOBAL_ABBR"/>.
     /// </summary>
-    public bool? Scoped { get; set; }
+    /// <remarks>The default behavior is <see cref="MODE_GLOBAL"/>.</remarks>
+    public string? Mode { get; set; }
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="Global" /></c> setting.
+    /// Gets the command line option value equivalent to <c><see cref="MODE_SCOPED" /></c>.
     /// </summary>
-    public const char SHORTHAND_g = 'g';
+    public const string MODE_SCOPED_ABBR = "s";
 
     /// <summary>
-    /// Generate typings for use in global applications.
+    /// Gets the command line option value equivalent to <c><see cref="MODE_GLOBAL" /></c>.
     /// </summary>
-    public bool? Global { get; set; }
+    public const string MODE_GLOBAL_ABBR = "g";
 
+    /// <summary>
+    /// Value of <see cref="Mode"/> when the render mode is for global-scoped scripts.
+    /// </summary>
+    public const string MODE_GLOBAL = "global";
+    
+    /// <summary>
+    /// Value of <see cref="Mode"/> when the render mode is for scoped app scripts.
+    /// </summary>
+    public const string MODE_SCOPED = "scoped";
+    
     /// <summary>
     /// Gets the command line option for the <c><see cref="Help" /></c> setting.
     /// </summary>
@@ -146,8 +158,7 @@ public class AppSettings
         { $"-{SHORTHAND_u}", $"{nameof(SnTsTypeGenerator)}:{nameof(UserName)}" },
         { $"-{SHORTHAND_p}", $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
         { $"-{SHORTHAND_r}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
-        { $"-{SHORTHAND_g}", $"{nameof(SnTsTypeGenerator)}:{nameof(Global)}" },
-        { $"-{SHORTHAND_s}", $"{nameof(SnTsTypeGenerator)}:{nameof(Scoped)}" },
+        { $"-{SHORTHAND_m}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" },
         { $"-{SHORTHAND_h}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
         { $"-{SHORTHAND__3F_}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" }
     };
