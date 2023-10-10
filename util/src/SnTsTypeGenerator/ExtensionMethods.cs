@@ -522,10 +522,10 @@ public static class ExtensionMethods
     }
 
     public static string GetFieldAsString(this JsonObject source, string propertyName, string defaultValue = "") =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.GetFieldAsString(JSON_KEY_VALUE, defaultValue) : defaultValue;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsString(JSON_KEY_VALUE, out string? value)) ? value : defaultValue;
 
     public static string GetFieldAsNonEmpty(this JsonObject source, string propertyName, string defaultValue = "") =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.GetFieldAsNonEmpty(JSON_KEY_VALUE, defaultValue) : defaultValue;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out string? value)) ? value : defaultValue;
 
     public static bool TryGetFieldAsInt(this JsonObject source, string propertyName, [NotNullWhen(true)] out int value, out string? display_value)
     {
