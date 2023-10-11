@@ -94,13 +94,13 @@ public class RenderingService
     }
 #pragma warning restore CS1998
 
-    private async Task RenderFieldsAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync,
+    private async Task RenderFieldsAsync(EntityEntry<TableInfo> entry, int indentLevel, IndentedTextWriter writer, TypingsDbContext dbContext, Func<ElementInfo, string, Task> renderPropertyAsync,
         Func<ElementInfo, string, Task> renderJsDocAsync, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        var tableInfo = entry.Entity;
         string @namespace = tableInfo.GetNamespace();
         var tableName = tableInfo.Name;
-        EntityEntry<TableInfo> entry = dbContext.Tables.Entry(tableInfo);
         var elements = (await entry.GetRelatedCollectionAsync(e => e.Elements, cancellationToken)).ToArray();
         TableInfo? superClass = await entry.GetReferencedEntityAsync(e => e.SuperClass, cancellationToken);
         string extends;
@@ -136,6 +136,7 @@ public class RenderingService
         }
         tableName = tableInfo.GetShortName();
         await writer.WriteLineAsync();
+        writer.Indent = indentLevel;
         await writer.WriteLinesAsync(cancellationToken,
             "/**",
             (tableName == tableInfo.Name) ?
@@ -149,7 +150,7 @@ public class RenderingService
         if (elements.Length > 0 || jsDocElements.Length > 0)
         {
             await writer.WriteAsync($"export interface {tableName} {extends}");
-            var indent = writer.Indent + 1;
+            var indent = indentLevel + 1;
             foreach (ElementInfo e in jsDocElements)
             {
                 writer.Indent = indent;
@@ -160,20 +161,12 @@ public class RenderingService
                 writer.Indent = indent;
                 await renderPropertyAsync(e, @namespace);
             }
-            writer.Indent = indent - 1;
+            writer.Indent = indentLevel;
             await writer.WriteLineAsync("}");
         }
         else
             await writer.WriteLineAsync($"export interface {tableName} {extends} }}");
     }
-
-    private async Task RenderFieldsGlobalAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
-        await RenderFieldsAsync(tableInfo, writer, dbContext, async (e, ns) => await RenderPropertyGlobalAsync(e, writer, ns, dbContext, cancellationToken),
-            async (e, ns) => await RenderJsDocGlobalAsync(e, writer, ns, dbContext, cancellationToken), cancellationToken);
-
-    private async Task RenderFieldsScopedAsync(TableInfo tableInfo, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken) =>
-        await RenderFieldsAsync(tableInfo, writer, dbContext, async (e, ns) => await RenderPropertyScopedAsync(e, writer, ns, dbContext, cancellationToken),
-            async (e, ns) => await RenderJsDocScopedAsync(e, writer, ns, dbContext, cancellationToken), cancellationToken);
 
     private static string GetScopedElementName(string typeName) => typeName switch
     {
@@ -326,71 +319,8 @@ public class RenderingService
                 var gns = nsGrouped.FirstOrDefault(n => n.Key == DEFAULT_NAMESPACE);
                 if (gns is not null)
                 {
-                    await writer.WriteAsync($"declare namespace {NS_NAME_GlideRecord} {{");
-                    writer.Indent = 1;
-                    foreach (TableInfo table in gns.OrderBy(g => g.Name))
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                            return;
-                        await writer.WriteLineAsync();
-                        await writer.WriteLinesAsync(cancellationToken,
-                            "/**",
-                            $" * {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record."
-                        );
-                        if (!string.IsNullOrWhiteSpace(table.NumberPrefix))
-                            await writer.WriteLineAsync($" * Auto-number Prefix: {table.NumberPrefix}");
-                        if (table.IsExtendable)
-                            await writer.WriteLineAsync(" * IsExtendable: true");
-                        await writer.WriteLineAsync(" */");
-                        await writer.WriteAsync($"export type {table.Name} = {table.GetInterfaceTypeString(DEFAULT_NAMESPACE)}");
-                        if (table.SuperClass is null)
-                            await writer.WriteLineAsync($" & {TS_NAME_GlideRecord};");
-                        else
-                            await writer.WriteLineAsync($" & {table.SuperClass.GetGlideRecordTypeString(DEFAULT_NAMESPACE)};");
-                    }
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
-                    await writer.WriteLineAsync();
-                    await writer.WriteAsync($"declare namespace {NS_NAME_GlideElement} {{");
-                    writer.Indent = 1;
-                    foreach (TableInfo table in gns.OrderBy(g => g.Name))
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                            return;
-                        await writer.WriteLineAsync();
-                        await writer.WriteLinesAsync(cancellationToken,
-                            "/**",
-                            $" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.",
-                            " */",
-                            $"export type Reference<{table.GetInterfaceTypeString(DEFAULT_NAMESPACE)}, {table.GetGlideRecordTypeString(DEFAULT_NAMESPACE)}>;"
-                        );
-                    }
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
-                    await writer.WriteLineAsync();
-                    await writer.WriteAsync($"declare namespace {NS_NAME_tableFields} {{");
-                    writer.Indent = 1;
-                    if (_isScoped)
-                    {
-                        foreach (TableInfo table in gns.OrderBy(g => g.Name))
-                        {
-                            if (cancellationToken.IsCancellationRequested)
-                                return;
-                            await RenderFieldsScopedAsync(table, writer, dbContext, cancellationToken);
-                        }
-                    }
-                    else
-                    {
-                        foreach (TableInfo table in gns.OrderBy(g => g.Name))
-                        {
-                            if (cancellationToken.IsCancellationRequested)
-                                return;
-                            await RenderFieldsGlobalAsync(table, writer, dbContext, cancellationToken);
-                        }
-                    }
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
-                    if ((nsGrouped = nsGrouped.Where(n => n.Key == DEFAULT_NAMESPACE).ToArray()).Length > 0)
+                    await new GlobalTypingsRenderer(writer, dbContext).WriteAsync(gns.OrderBy(t => t.Name).Select(t => dbContext.Tables.Entry(t)).ToArray(), cancellationToken);
+                    if ((nsGrouped = nsGrouped.Where(n => n.Key != DEFAULT_NAMESPACE).ToArray()).Length > 0)
                         await writer.WriteLineAsync();
                 }
 
@@ -398,78 +328,7 @@ public class RenderingService
                 {
                     if (cancellationToken.IsCancellationRequested)
                         return;
-                    var scope = nsg.First().Scope!;
-                    await writer.WriteLinesAsync(cancellationToken,
-                        "/**",
-                        $" * {((string.IsNullOrWhiteSpace(scope.Name) || scope.Name == scope.Value) ? scope.Value : scope.Name.SmartQuoteJson())} scope.",
-                        " */"
-                    );
-                    await writer.WriteAsync($"declare namespace {nsg.Key} {{");
-                    writer.Indent = 1;
-                    await writer.WriteAsync($"export namespace {NS_NAME_record} {{");
-                    writer.Indent = 2;
-                    foreach (TableInfo table in nsg.OrderBy(g => g.Name))
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                            return;
-                        await writer.WriteLineAsync();
-                        await writer.WriteLineAsync("/**");
-                        await writer.WriteLineAsync($" * {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.");
-                        if (!string.IsNullOrWhiteSpace(table.NumberPrefix))
-                            await writer.WriteLineAsync($" * Auto-number Prefix: {table.NumberPrefix}");
-                        if (table.IsExtendable)
-                            await writer.WriteLineAsync(" * IsExtendable: true");
-                        await writer.WriteLineAsync(" */");
-                        await writer.WriteAsync($"export type {table.Name} = {table.GetInterfaceTypeString(nsg.Key)}");
-                        if (table.SuperClass is null)
-                            await writer.WriteLineAsync($" & {TS_NAME_GlideRecord};");
-                        else
-                            await writer.WriteLineAsync($" & {table.SuperClass.GetGlideRecordTypeString(nsg.Key)};");
-                    }
-                    writer.Indent = 1;
-                    await writer.WriteLineAsync("}");
-                    await writer.WriteLineAsync();
-                    await writer.WriteAsync($"export namespace {NS_NAME_element} {{");
-                    writer.Indent = 2;
-                    foreach (TableInfo table in nsg.OrderBy(g => g.Name))
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                            return;
-                        await writer.WriteLineAsync();
-                        await writer.WriteLinesAsync(cancellationToken,
-                            "/**",
-                            $" * Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.",
-                            " */",
-                            $"export type Reference<{table.GetInterfaceTypeString(nsg.Key)}, {table.GetGlideRecordTypeString(nsg.Key)}>;"
-                        );
-                    }
-                    writer.Indent = 1;
-                    await writer.WriteLineAsync("}");
-                    await writer.WriteLineAsync();
-                    await writer.WriteAsync($"export namespace {NS_NAME_fields} {{");
-                    writer.Indent = 2;
-                    if (_isScoped)
-                    {
-                        foreach (TableInfo table in nsg.OrderBy(g => g.Name))
-                        {
-                            if (cancellationToken.IsCancellationRequested)
-                                return;
-                            await RenderFieldsScopedAsync(table, writer, dbContext, cancellationToken);
-                        }
-                    }
-                    else
-                    {
-                        foreach (TableInfo table in nsg.OrderBy(g => g.Name))
-                        {
-                            if (cancellationToken.IsCancellationRequested)
-                                return;
-                            await RenderFieldsGlobalAsync(table, writer, dbContext, cancellationToken);
-                        }
-                    }
-                    writer.Indent = 1;
-                    await writer.WriteLineAsync("}");
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
+                    await new ScopedTypingsRenderer(nsg.Key, writer, dbContext).WriteAsync(nsg.OrderBy(t => t.Name).Select(t => dbContext.Tables.Entry(t)).ToArray(), cancellationToken);
                 }
                 try
                 {
@@ -479,11 +338,86 @@ public class RenderingService
                 catch (Exception exception)
                 {
                     _logger.LogOutputFileAccessError(_outputFile.FullName, exception);
-                    return;
                 }
             }
         }
         catch (Exception error) { _logger.LogUnexpecteException(error); }
+    }
+
+    private static IEnumerable<string> GetGlideRecordJsDocLines(TableInfo table, SysPackage? package)
+    {
+        yield return $"{((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.";
+        if (!string.IsNullOrWhiteSpace(table.NumberPrefix))
+            yield return $"Auto-number Prefix: {table.NumberPrefix}";
+        if (table.IsExtendable)
+            yield return "IsExtendable: true";
+        if (package is not null)
+        {
+            if (string.IsNullOrWhiteSpace(package.ShortDescription) || package.ShortDescription == package.Name)
+                yield return $"Package: {package.Name.SmartQuoteJson()}";
+            else
+                yield return $"Package: {package.ShortDescription.SmartQuoteJson()} ({package.Name.SmartQuoteJson()})";
+        }
+    }
+
+    record NsDefinition(int Indent, string Declaration, string GlideRecordNamespace, string ReferenceNamespace, string FieldsNamespace);
+
+    private async Task RenderTypeDefinitions(IndentedTextWriter writer, NsDefinition nsDefinition, string currentScope, EntityEntry<TableInfo>[] entries, TypingsDbContext dbContext, CancellationToken cancellationToken)
+    {
+        int indentLevel = (writer.Indent = nsDefinition.Indent) + 1;
+        await writer.WriteAsync($"{nsDefinition.Declaration} namespace {nsDefinition.GlideRecordNamespace} {{");
+        foreach (EntityEntry<TableInfo> entry in entries)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                return;
+            TableInfo table = entry.Entity;
+            SysPackage? package = string.IsNullOrEmpty(table.PackageName) ? null : await entry.GetReferencedEntityAsync(t => t.Package, cancellationToken);
+            TableInfo? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
+            await writer.WriteLineAsync();
+            writer.Indent = indentLevel;
+            await writer.WriteJsDocAsync(GetGlideRecordJsDocLines(table, package), cancellationToken);
+            await writer.WriteAsync($"export type {table.Name} = {table.GetInterfaceTypeString(currentScope)}");
+            if (superClass is null)
+                await writer.WriteLineAsync($" & {TS_NAME_GlideRecord};");
+            else
+                await writer.WriteLineAsync($" & {superClass.GetGlideRecordTypeString(currentScope)};");
+        }
+        writer.Indent = nsDefinition.Indent;
+        await writer.WriteLineAsync("}");
+        await writer.WriteLineAsync();
+        await writer.WriteAsync($"{nsDefinition.Declaration} namespace {nsDefinition.ReferenceNamespace} {{");
+        foreach (EntityEntry<TableInfo> entry in entries)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                return;
+            writer.Indent = indentLevel;
+            TableInfo table = entry.Entity;
+            await writer.WriteLineAsync();
+            await writer.WriteLinesWithJsDoc($"Element that refers to a {((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.",
+                cancellationToken, $"export type Reference<{table.GetInterfaceTypeString(currentScope)}, {table.GetGlideRecordTypeString(currentScope)}>;");
+        }
+        writer.Indent = nsDefinition.Indent;
+        await writer.WriteLineAsync("}");
+        await writer.WriteLineAsync();
+        await writer.WriteAsync($"{nsDefinition.Declaration} namespace {nsDefinition.FieldsNamespace} {{");
+        if (_isScoped)
+            foreach (EntityEntry<TableInfo> entry in entries)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+                await RenderFieldsAsync(entry, indentLevel, writer, dbContext, async (e, ns) => await RenderPropertyScopedAsync(e, writer, ns, dbContext, cancellationToken),
+                    async (e, ns) => await RenderJsDocScopedAsync(e, writer, ns, dbContext, cancellationToken), cancellationToken);
+            }
+        else
+            foreach (EntityEntry<TableInfo> entry in entries)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+                await RenderFieldsAsync(entry, indentLevel, writer, dbContext, async (e, ns) => await RenderPropertyGlobalAsync(e, writer, ns, dbContext, cancellationToken),
+                    async (e, ns) => await RenderJsDocGlobalAsync(e, writer, ns, dbContext, cancellationToken), cancellationToken);
+            }
+        writer.Indent = nsDefinition.Indent;
+        await writer.WriteLineAsync("}");
     }
 
     public RenderingService(ILogger<RenderingService> logger, IServiceProvider services, IOptions<AppSettings> appSettingsOptions)

@@ -1,7 +1,9 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -822,4 +824,34 @@ public static class ExtensionMethods
     }
 
     public static async Task WriteLinesAsync(this TextWriter writer, CancellationToken cancellationToken, params string[] lines) => await writer.WriteLinesAsync(lines, cancellationToken);
+    
+    private static readonly ImmutableArray<string> JSDOC_START = new string[]{ "/**" }.ToImmutableArray();
+    
+    private static readonly ImmutableArray<string> JSDOC_END = new string[]{ " */" }.ToImmutableArray();
+    
+    public static readonly Regex AbnormalWsRegex = new(@" \s+|(?! )\s+", RegexOptions.Compiled);
+
+    public static string AsWhitespaceNormalized(this string? text) => (text is null || (text = text.Trim()).Length == 0) ? string.Empty : AbnormalWsRegex.Replace(text, " ");
+
+    public static readonly Regex LineBreakRegex = new(@"\r\n?|\n", RegexOptions.Compiled);
+
+    public static string[] SplitLines(this string? lines) => string.IsNullOrEmpty(lines) ? new string[] { "" } : LineBreakRegex.Split(lines);
+
+    public static IEnumerable<string> SplitLines(this IEnumerable<string>? lines) => (lines is null) ? Enumerable.Empty<string>() : lines.SelectMany(SplitLines);
+
+    public static IEnumerable<string> ToJsDocLines(this IEnumerable<string> lines) => JSDOC_START.Concat(lines.Select(l => string.IsNullOrWhiteSpace(l) ? " *" : $" * {l}")).Concat(JSDOC_END);
+
+    public static IEnumerable<string> AsSingleEnumerable(string line) { yield return line; }
+
+    public static async Task WriteLinesWithJsDoc(this TextWriter writer, string jsDoc, IEnumerable<string> lines, CancellationToken cancellationToken) => await writer.WriteLinesAsync((lines is null) ? AsSingleEnumerable(jsDoc) : AsSingleEnumerable(jsDoc).Concat(lines), cancellationToken);
+
+    public static async Task WriteLinesWithJsDoc(this TextWriter writer, IEnumerable<string> jsDoc, IEnumerable<string> lines, CancellationToken cancellationToken) => await writer.WriteLinesAsync((lines is null) ? jsDoc.ToJsDocLines() : jsDoc.ToJsDocLines().Concat(lines), cancellationToken);
+
+    public static async Task WriteLinesWithJsDoc(this TextWriter writer, string jsDoc, CancellationToken cancellationToken, params string[] lines) => await writer.WriteLinesWithJsDoc(jsDoc, lines, cancellationToken);
+    
+    public static async Task WriteLinesWithJsDoc(this TextWriter writer, IEnumerable<string> jsDoc, CancellationToken cancellationToken, params string[] lines) => await writer.WriteLinesWithJsDoc(jsDoc, lines, cancellationToken);
+    
+    public static async Task WriteJsDocAsync(this TextWriter writer, IEnumerable<string> lines, CancellationToken cancellationToken) => await writer.WriteLinesAsync(lines.ToJsDocLines(), cancellationToken);
+
+    public static async Task WriteJsDocAsync(this TextWriter writer, CancellationToken cancellationToken, params string[] lines) => await writer.WriteJsDocAsync(lines, cancellationToken);
 }
