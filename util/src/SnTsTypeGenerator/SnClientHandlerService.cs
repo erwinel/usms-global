@@ -22,20 +22,20 @@ public sealed class SnClientHandlerService
     /// </summary>
     internal Uri BaseURL { get; }
 
-    public NetworkCredential ClientCredentials { get; }
+    public NetworkCredential? ClientCredentials { get; }
 
     public NetworkCredential UserCredentials { get; }
 
     /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
-    internal bool InitSuccessful => BaseURL.IsAbsoluteUri && ClientCredentials is not null && UserCredentials is not null;
+    internal bool InitSuccessful => BaseURL.IsAbsoluteUri && UserCredentials is not null;
 
     internal HttpClientHandler CreateHttpClientHandler()
     {
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        return new() { Credentials = UserCredentials };
+        return (ClientCredentials is null) ? new() : new() { Credentials = UserCredentials };
     }
 
     private async Task<JsonNode?> GetJsonResponseAsync(HttpClientHandler handler, HttpRequestMessage message, Uri requestUri, CancellationToken cancellationToken)
@@ -67,7 +67,7 @@ public sealed class SnClientHandlerService
     internal async Task<SnAccessToken> GetAccessTokenAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!InitSuccessful)
+        if (!InitSuccessful || ClientCredentials is null)
             throw new InvalidOperationException();
         SnAccessToken? token = _token;
         JsonNode? jsonNode;
@@ -79,31 +79,39 @@ public sealed class SnClientHandlerService
             using HttpClientHandler handler = CreateHttpClientHandler();
             using HttpClient httpClient = new(handler);
             requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
-            HttpRequestMessage message = new(HttpMethod.Post, requestUri);
-            // BUG: The content-type of the OAuth API should be application/x-www-form-urlencoded.
-            message.Headers.Add(HEADER_KEY_GRANT_TYPE, HEADER_KEY_PASSWORD);
-            message.Headers.Add(HEADER_KEY_CLIENT_ID, ClientCredentials.UserName);
-            message.Headers.Add(HEADER_KEY_CLIENT_SECRET, ClientCredentials.Password);
-            message.Headers.Add(HEADER_KEY_USERNAME, UserCredentials.UserName);
-            message.Headers.Add(HEADER_KEY_PASSWORD, UserCredentials.Password);
+            using HttpRequestMessage message = new(HttpMethod.Post, requestUri)
+            {
+                Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
+                {
+                    new(HEADER_KEY_GRANT_TYPE, HEADER_KEY_PASSWORD),
+                    new(HEADER_KEY_CLIENT_ID, ClientCredentials.UserName),
+                    new(HEADER_KEY_CLIENT_SECRET, ClientCredentials.Password),
+                    new(HEADER_KEY_USERNAME, UserCredentials.UserName),
+                    new(HEADER_KEY_PASSWORD, UserCredentials.Password)
+                })
+            };
             message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
             jsonNode = await GetJsonResponseAsync(handler, message, requestUri, cancellationToken);
         }
         else
         {
-            if (token.ExpiresOn < DateTime.Now)
+            if (token.ExpiresOn > DateTime.Now)
                 return token;
             createdOn = DateTime.Now;
             using HttpClientHandler handler = CreateHttpClientHandler();
             using HttpClient httpClient = new(handler);
             requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
-            HttpRequestMessage message = new(HttpMethod.Post, requestUri);
-            // BUG: The content-type of the OAuth API should be application/x-www-form-urlencoded.
+            using HttpRequestMessage message = new(HttpMethod.Post, requestUri)
+            {
+                Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
+                {
+                    new(HEADER_KEY_GRANT_TYPE, HEADER_KEY_REFRESH_TOKEN),
+                    new(HEADER_KEY_CLIENT_ID, ClientCredentials.UserName),
+                    new(HEADER_KEY_CLIENT_SECRET, ClientCredentials.Password),
+                    new(HEADER_KEY_REFRESH_TOKEN, token.RefreshToken)
+                })
+            };
             message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-            message.Headers.Add(HEADER_KEY_CLIENT_ID, ClientCredentials.UserName);
-            message.Headers.Add(HEADER_KEY_CLIENT_SECRET, ClientCredentials.Password);
-            message.Headers.Add(HEADER_KEY_GRANT_TYPE, HEADER_KEY_REFRESH_TOKEN);
-            message.Headers.Add(HEADER_KEY_REFRESH_TOKEN, token.RefreshToken);
             jsonNode = await GetJsonResponseAsync(handler, message, requestUri, cancellationToken);
         }
         if (jsonNode is not JsonObject resultObj)
@@ -118,23 +126,21 @@ public sealed class SnClientHandlerService
 
     private async Task<JsonNode?> GetJsonAsync(HttpClientHandler handler, Uri requestUri, Action<HttpRequestHeaders>? configureHeaders, CancellationToken cancellationToken)
     {
-        // TODO: Add access token
-        // SnAccessToken accessToken = await GetAccessTokenAsync(cancellationToken);
-        HttpRequestMessage message = new(HttpMethod.Get, requestUri);
+        using HttpRequestMessage message = new(HttpMethod.Get, requestUri);
         message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-        // message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, accessToken.AccessToken);
+        if (ClientCredentials is not null)
+            message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, (await GetAccessTokenAsync(cancellationToken)).AccessToken);
         configureHeaders?.Invoke(message.Headers);
         return await GetJsonResponseAsync(handler, message, requestUri, cancellationToken);
     }
 
     private async Task<JsonNode?> PostJsonAsync(HttpClientHandler handler, Uri requestUri, JsonNode? content, Action<HttpRequestHeaders>? configureHeaders, CancellationToken cancellationToken)
     {
-        // TODO: Add access token
-        // SnAccessToken accessToken = await GetAccessTokenAsync(cancellationToken);
         using HttpClient httpClient = new(handler);
         HttpRequestMessage message = new(HttpMethod.Post, requestUri);
         message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-        // message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, accessToken.AccessToken);
+        if (ClientCredentials is not null)
+            message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, (await GetAccessTokenAsync(cancellationToken)).AccessToken);
         configureHeaders?.Invoke(message.Headers);
         if (content is not null)
             message.Content = JsonContent.Create(content, new MediaTypeHeaderValue(MediaTypeNames.Application.Json));
@@ -300,30 +306,37 @@ public sealed class SnClientHandlerService
             }
             BaseURL = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
             string? clientId = appSettings.ClientId;
+            string? clientSecret = appSettings.ClientSecret;
             if (string.IsNullOrWhiteSpace(clientId))
             {
-                Console.Write("Client ID: ");
-                clientId = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(clientId))
+                if (!string.IsNullOrWhiteSpace(clientSecret))
                 {
-                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientId));
-                    ClientCredentials = UserCredentials = null!;
-                    return;
+                    Console.Write("Client ID: ");
+                    clientId = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(clientId))
+                    {
+                        _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientId));
+                        ClientCredentials = UserCredentials = null!;
+                        return;
+                    }
+                    ClientCredentials = new(clientId, clientSecret);
                 }
             }
-            string? clientSecret = appSettings.ClientSecret;
-            if (string.IsNullOrWhiteSpace(clientSecret))
+            else
             {
-                Console.Write("Client Secret: ");
-                clientSecret = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(clientSecret))
                 {
-                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientSecret));
-                    ClientCredentials = UserCredentials = null!;
-                    return;
+                    Console.Write("Client Secret: ");
+                    clientSecret = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(clientSecret))
+                    {
+                        _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientSecret));
+                        ClientCredentials = UserCredentials = null!;
+                        return;
+                    }
                 }
+                ClientCredentials = new(clientId, clientSecret);
             }
-            ClientCredentials = new(clientId, clientSecret);
             string? userName = appSettings.UserName;
             if (string.IsNullOrWhiteSpace(userName))
             {

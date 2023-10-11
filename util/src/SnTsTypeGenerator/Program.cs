@@ -58,11 +58,13 @@ internal class Program
 
             writeSwitch(SHORTHAND_i, "id",
                 "Specifies client ID in the remote ServiceNow instance's Application Registry.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientId)} setting in appsettings.json, if defined; otherwise, you will be prompted for the client ID.");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientId)} setting in appsettings.json, if defined;",
+                $"otherwise, you will be prompted for the client ID if there is a client secret (-{SHORTHAND_x} command line option or {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientSecret)} setting) specified.");
 
             writeSwitch(SHORTHAND_x, "secret",
                 "The the client secret in the remote ServiceNow instance's Application Registry.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientSecret)} setting in appsettings.json, if defined; otherwise, you will be prompted for the client secret.");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientSecret)} setting in appsettings.json, if defined;",
+                $"otherwise, you will be prompted for the client secret. if there is a client ID (-{SHORTHAND_i} command line option or {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientId)} setting) specified");
 
             writeSwitch(SHORTHAND_r, "url",
                 "The base URL of the remote ServiceNow instance.",

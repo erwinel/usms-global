@@ -22,11 +22,11 @@ If this option is not present, then this will use the `SnTsTypeGenerator:Passwor
 
 `-i=`*id*
 Specifies client ID in the remote ServiceNow instance's Application Registry.
-If this option is not present, then this will use the `SnTsTypeGenerator:ClientId` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the client ID.
+If this option is not present, then this will use the `SnTsTypeGenerator:ClientId` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the client ID if there is a client secret (`-x` command line option or `SnTsTypeGenerator:ClientSecret` setting) specified.
 
 `-x=`*secret*
 The the client secret in the remote ServiceNow instance's Application Registry.
-If this option is not present, then this will use the `SnTsTypeGenerator:ClientSecret` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the client secret.
+If this option is not present, then this will use the `SnTsTypeGenerator:ClientSecret` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the client secret if there is a client ID (`-i` command line option or `SnTsTypeGenerator:ClientId` setting) specified.
 
 `-r=`*url*
 The base URL of the remote ServiceNow instance.
