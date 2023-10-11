@@ -11,8 +11,7 @@ namespace SnTsTypeGenerator;
 public class RenderingService
 {
     private ILogger<RenderingService> _logger;
-    private readonly IServiceProvider _services;
-    // private TypingsDbContext _dbContext;
+    private readonly IServiceScope _scope;
     private readonly FileInfo? _outputFile;
     private readonly bool _forceOverwrite;
     private readonly bool _isScoped;
@@ -302,7 +301,7 @@ public class RenderingService
         cancellationToken.ThrowIfCancellationRequested();
         if (_outputFile is null)
             return;
-        using var dbContext = _services.GetRequiredService<TypingsDbContext>();
+        using var dbContext = _scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
         StreamWriter streamWriter;
         try
         {
@@ -490,7 +489,7 @@ public class RenderingService
     public RenderingService(ILogger<RenderingService> logger, IServiceProvider services, IOptions<AppSettings> appSettingsOptions)
     {
         _logger = logger;
-        _services = services;
+        _scope = services.CreateScope();
         // _dbContext = dbContext;
         AppSettings appSettings = appSettingsOptions.Value;
         if (string.IsNullOrWhiteSpace(appSettings.Mode))
