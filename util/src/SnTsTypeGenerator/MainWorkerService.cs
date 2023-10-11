@@ -14,22 +14,6 @@ public sealed class MainWorkerService : BackgroundService
     private readonly IHostApplicationLifetime _applicationLifetime;
     private readonly ImmutableArray<string> _tableNames;
 
-    public MainWorkerService(ILogger<MainWorkerService> logger, IServiceProvider services, IOptions<AppSettings> appSettings, IHostApplicationLifetime applicationLifetime)
-    {
-        _logger = logger;
-        _scope = services.CreateScope();
-        _applicationLifetime = applicationLifetime;
-        AppSettings _appSettings = appSettings.Value;
-        var tableNames = _appSettings.Table?.Split(',').Where(t => !string.IsNullOrEmpty(t));
-        if ((tableNames is not null && tableNames.Any()) || ((tableNames = _appSettings.Tables?.Where(t => !string.IsNullOrEmpty(t))) is not null))
-        {
-            _tableNames = tableNames.Select(n => n.Trim().ToLower()).Distinct().ToImmutableArray();
-            return;
-        }
-        _logger.LogNoTableNamesSpecifiedWarning();
-        _tableNames = ImmutableArray.Create<string>();
-    }
-
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
@@ -81,5 +65,21 @@ public sealed class MainWorkerService : BackgroundService
             if (!stoppingToken.IsCancellationRequested)
                 _applicationLifetime.StopApplication();
         }
+    }
+
+    public MainWorkerService(ILogger<MainWorkerService> logger, IServiceProvider services, IOptions<AppSettings> appSettings, IHostApplicationLifetime applicationLifetime)
+    {
+        _logger = logger;
+        _scope = services.CreateScope();
+        _applicationLifetime = applicationLifetime;
+        AppSettings _appSettings = appSettings.Value;
+        var tableNames = _appSettings.Table?.Split(',').Where(t => !string.IsNullOrEmpty(t));
+        if ((tableNames is not null && tableNames.Any()) || ((tableNames = _appSettings.Tables?.Where(t => !string.IsNullOrEmpty(t))) is not null))
+        {
+            _tableNames = tableNames.Select(n => n.Trim().ToLower()).Distinct().ToImmutableArray();
+            return;
+        }
+        _logger.LogNoTableNamesSpecifiedWarning();
+        _tableNames = ImmutableArray.Create<string>();
     }
 }
