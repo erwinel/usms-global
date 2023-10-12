@@ -134,5 +134,3 @@ public static partial class StringExtensionMethods
 
     public static IEnumerable<string> ToJsDocLines(this IEnumerable<string> lines) => JSDOC_START.Concat(lines.Select(l => string.IsNullOrWhiteSpace(l) ? " *" : $" * {l}")).Concat(JSDOC_END);
 }
-
-record ElementInheritance(ElementInfo Element, ElementInfo? Super);
