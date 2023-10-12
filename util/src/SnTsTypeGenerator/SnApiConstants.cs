@@ -2,6 +2,8 @@ namespace SnTsTypeGenerator;
 
 internal static class SnApiConstants
 {
+    internal static readonly StringComparer NameComparer = StringComparer.InvariantCultureIgnoreCase;
+
     internal static readonly Uri EmptyURI = new(string.Empty, UriKind.Relative);
 
     internal const string DEFAULT_NAMESPACE = "global";
@@ -401,6 +403,11 @@ internal static class SnApiConstants
     /// </summary>
     internal const string NS_NAME_fields = "$$fields";
 
+    /// <summary>
+    /// IBaseRecord TypeScript class name.
+    /// </summary>
+    internal const string TS_NAME_BASERECORD = "IBaseRecord";
+    
     /// <summary>
     /// GlideRecord TypeScript class name.
     /// </summary>

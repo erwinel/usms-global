@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Net;
@@ -11,7 +13,7 @@ using static SnTsTypeGenerator.SnApiConstants;
 
 namespace SnTsTypeGenerator;
 
-public static class ExtensionMethods
+public static partial class ExtensionMethods
 {
     /// <summary>
     /// Indicates whether the entry exists in the target database.
@@ -156,28 +158,12 @@ public static class ExtensionMethods
         if (entity is null)
             return null;
         TProperty? result = propertyAccessor(entity);
-        return (result is null) ? (await dbSet.Entry(entity).GetReferencedEntryAsync(Expression.Lambda<Func<TEntity, TProperty?>>(Expression.Call(propertyAccessor.Method)), cancellationToken))?.Entity : result;
+        return result is null ? (await dbSet.Entry(entity).GetReferencedEntryAsync(Expression.Lambda<Func<TEntity, TProperty?>>(Expression.Call(propertyAccessor.Method)), cancellationToken))?.Entity : result;
     }
 
-    /// <summary>
-    /// Gets elements that inherit from a super class with different properties.
-    /// </summary>
-    /// <param name="source">The elements of the inheriting class.</param>
-    /// <param name="inherited">The elements of the inherited class.</param>
-    /// <returns>The elements from <paramref name="source"/> where <paramref name="inherited"/> matches an element with the <see cref="ElementInfo.Name"/> and <see cref="ElementInfo.TypeName"/>,
-    /// but has at least one other property that differs.</returns>
-    public static IEnumerable<ElementInfo> OverriddenElements(this IEnumerable<ElementInfo> source, IEnumerable<ElementInfo>? inherited) => (inherited is null) ? Enumerable.Empty<ElementInfo>() : source.Where(e =>
-    {
-        string n = e.Name;
-        string t = e.TypeName;
-        ElementInfo? ie = inherited.FirstOrDefault(i => i.Name == n && i.TypeName == t);
-        return ie is not null && (ie.Comments != e.Comments || ie.DefaultValue != e.DefaultValue || ie.IsActive != ie.IsActive || ie.IsDisplay != ie.IsDisplay ||
-            ie.IsReadOnly != ie.IsReadOnly || ie.IsUnique != ie.IsUnique || ie.Label != ie.Label || ie.MaxLength != ie.MaxLength || ie.IsArray != ie.IsArray);
-    });
 
     public static IEnumerable<(ElementInfo Inherited, ElementInfo? Base, bool IsTypeOverride)> GetBaseElements(this IEnumerable<ElementInfo> inheritedElements, IEnumerable<ElementInfo> baseElements)
     {
-        StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
         return inheritedElements.Select<ElementInfo, (ElementInfo Inherited, ElementInfo? Base, bool IsTypeOverride)>(e =>
         {
             string name = e.Name;
@@ -187,38 +173,98 @@ public static class ExtensionMethods
             string tn = e.TypeName;
             string? r = e.RefTableName;
             if (r is null)
-                return (e, b, b.RefTableName is not null || !comparer.Equals(b.TypeName, tn));
-            return (e, b, b.RefTableName is null || !(comparer.Equals(b.TypeName, tn) && comparer.Equals(b.RefTableName, r)));
+                return (e, b, b.RefTableName is not null || !NameComparer.Equals(b.TypeName, tn));
+            return (e, b, b.RefTableName is null || !(NameComparer.Equals(b.TypeName, tn) && NameComparer.Equals(b.RefTableName, r)));
         });
     }
 
-    /// <summary>
-    /// Gets the properties that aren't implemented by the IBaseRecord type.
-    /// </summary>
-    /// <param name="source">The source elements.</param>
-    /// <returns>Elements representing properties that aren't implemented by the IBaseRecord type.</returns>
-    public static IEnumerable<ElementInfo> GetNonBaseRecordElements(this IEnumerable<ElementInfo> source) => source.Where(e => e.Name switch
+    private static readonly GlideType _stringType = new() { Name = TYPE_NAME_string, Label = "String" };
+    private static readonly GlideType _dateTimeType = new() { Name = TYPE_NAME_glide_date_time, Label = "Date/Time" };
+
+    internal static async Task<IEnumerable<ElementInfo>> GetAllElementsAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
     {
-        JSON_KEY_SYS_ID => e.TypeName != TYPE_NAME_GUID && e.IsPrimary,
-        JSON_KEY_SYS_CREATED_BY or JSON_KEY_SYS_UPDATED_BY => e.TypeName != TYPE_NAME_string,
-        JSON_KEY_SYS_CREATED_ON or JSON_KEY_SYS_UPDATED_ON => e.TypeName != TYPE_NAME_glide_date_time,
-        JSON_KEY_SYS_MOD_COUNT => e.TypeName != TYPE_NAME_integer,
-        _ => true,
-    });
+        var elements = await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken);
+        EntityEntry<TableInfo>? superClass = await entity.GetReferencedEntryAsync(t => t.SuperClass, cancellationToken);
+        if (superClass is null)
+            return elements;
+        var superElements = (await superClass.GetAllElementsAsync(cancellationToken)).ToArray();
+        if (superElements.Length == 0)
+            return elements;
+        return elements.Concat(superElements.Where(e => !elements.Any(b => NameComparer.Equals(b.Name, e.Name) && NameComparer.Equals(b.TypeName, e.TypeName))));
+    }
 
-    /// <summary>
-    /// Tests whether all fields implemented by the IBaseRecord type are present.
-    /// </summary>
-    /// <param name="source">The source elements.</param>
-    /// <returns><see langword="true" /> if all fields implemented by the IBaseRecord type are present; otherwise <see langword="false" />.</returns>
-    public static bool ExtendsBaseRecord(this IEnumerable<ElementInfo>? elements) => elements is not null &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.TypeName == TYPE_NAME_GUID && e.IsPrimary) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.TypeName == TYPE_NAME_string) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.TypeName == TYPE_NAME_glide_date_time) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
+    internal static bool NoCaseEquals(this string? x, string? y) => string.IsNullOrWhiteSpace(x) ? string.IsNullOrWhiteSpace(y) : NameComparer.Equals(x, y);
 
+    internal static bool Overrides(this ElementInfo element, ElementInfo superElement, out bool isNew)
+    {
+        if (!NameComparer.Equals(element.Name, superElement.Name))
+        {
+            isNew = false;
+            return false;
+        }
+        isNew = !NameComparer.Equals(element.TypeName, superElement.TypeName);
+        return element.IsActive != superElement.IsActive || element.IsArray != superElement.IsArray || element.IsDisplay != superElement.IsDisplay || element.IsMandatory != superElement.IsMandatory ||
+            element.IsPrimary != superElement.IsPrimary || element.IsReadOnly != superElement.IsReadOnly || element.IsCalculated != superElement.IsCalculated || element.IsUnique != superElement.IsUnique ||
+            element.MaxLength.HasValue ? superElement.MaxLength.HasValue && element.MaxLength!.Value == superElement.MaxLength.Value : !superElement.MaxLength.HasValue ||
+            element.SizeClass.HasValue ? superElement.SizeClass.HasValue && element.SizeClass!.Value == superElement.SizeClass.Value : !superElement.SizeClass.HasValue ||
+            !(element.Comments.NoCaseEquals(superElement.Comments) && element.DefaultValue.NoCaseEquals(superElement.DefaultValue) && element.PackageName.NoCaseEquals(superElement.PackageName) &&
+                element.RefTableName.NoCaseEquals(superElement.RefTableName) && NameComparer.Equals(element.Label, superElement.Label));
+    }
+
+    internal static async Task<(IEnumerable<ElementInheritance> Inheritances, bool ExtendsBaseRecord)> GetElementInheritancesAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
+    {
+        var elements = await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken);
+        TableInfo table = entity.Entity;
+        EntityEntry<TableInfo>? superClass = await entity.GetReferencedEntryAsync(t => t.SuperClass, cancellationToken);
+        if (superClass is null)
+        {
+            ElementInfo? sys_id = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_ID && e.TypeName == TYPE_NAME_GUID);
+            if (sys_id is not null)
+            {
+                ElementInfo? created_by = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.TypeName == TYPE_NAME_string);
+                if (created_by is not null)
+                {
+                    ElementInfo? created_on = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
+                    if (created_on is not null)
+                    {
+                        ElementInfo? mod_count = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer);
+                        if (mod_count is not null)
+                        {
+                            ElementInfo? updated_by = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string);
+                            if (updated_by is not null)
+                            {
+                                ElementInfo? updated_on = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
+                                if (updated_on is not null)
+                                    return (new ElementInheritance[]
+                                    {
+                                        new(sys_id, new() { IsActive = true, IsPrimary = true, Label = "Sys ID", MaxLength = 32, Name = JSON_KEY_SYS_ID, ScopeValue = DEFAULT_NAMESPACE, SysID = sys_id.SysID,
+                                            TypeName = TYPE_NAME_GUID, TableName = TS_NAME_BASERECORD, SourceFqdn = sys_id.SourceFqdn }),
+                                        new(created_by, new() { IsActive = true, Label = "Created by", MaxLength = 40, Name = JSON_KEY_SYS_CREATED_BY, ScopeValue = DEFAULT_NAMESPACE, SysID = created_by.SysID,
+                                            TypeName = TYPE_NAME_string, TableName = TS_NAME_BASERECORD, SourceFqdn = created_by.SourceFqdn }),
+                                        new(created_on, new() { IsActive = true, Label = "Created", MaxLength = 40, Name = JSON_KEY_SYS_CREATED_ON, ScopeValue = DEFAULT_NAMESPACE, SysID = created_on.SysID,
+                                            TypeName = TYPE_NAME_glide_date_time, TableName = TS_NAME_BASERECORD, SourceFqdn = created_on.SourceFqdn }),
+                                        new(mod_count, new() { IsActive = true, Label = "Updates", MaxLength = 40, Name = JSON_KEY_SYS_MOD_COUNT, ScopeValue = DEFAULT_NAMESPACE, SysID = mod_count.SysID,
+                                            TypeName = TYPE_NAME_integer, TableName = TS_NAME_BASERECORD, SourceFqdn = mod_count.SourceFqdn }),
+                                        new(updated_by, new() { IsActive = true, Label = "Updated by", MaxLength = 40, Name = JSON_KEY_SYS_UPDATED_BY, ScopeValue = DEFAULT_NAMESPACE, SysID = updated_by.SysID,
+                                            TypeName = TYPE_NAME_string, TableName = TS_NAME_BASERECORD, SourceFqdn = updated_by.SourceFqdn }),
+                                        new(updated_on, new() { IsActive = true, Label = "Updated", MaxLength = 40, Name = JSON_KEY_SYS_UPDATED_ON, ScopeValue = DEFAULT_NAMESPACE, SysID = updated_on.SysID,
+                                            TypeName = TYPE_NAME_glide_date_time, TableName = TS_NAME_BASERECORD, SourceFqdn = updated_on.SourceFqdn })
+                                    }, true);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            var superElements = (await superClass.GetAllElementsAsync(cancellationToken)).ToArray();
+            if (superElements.Length > 0)
+                return (elements.Select(e => new ElementInheritance(e, superElements.FirstOrDefault(b => NameComparer.Equals(b.Name, e.Name)))), false);
+        }
+        return (elements.Select(e => new ElementInheritance(e, null)), false);
+    }
+    
     /// <summary>
     /// Surrounds a string with quotes if it contains spaces or specific symbols.
     /// </summary>
@@ -231,7 +277,7 @@ public static class ExtensionMethods
         if (value.Length == 0)
             return "\"\"";
         string result = JsonValue.Create(value)!.ToJsonString();
-        return (!value.Any(c => char.IsWhiteSpace(c)) && value.Length == result.Length - 2) ? value : result;
+        return !value.Any(c => char.IsWhiteSpace(c)) && value.Length == result.Length - 2 ? value : result;
     }
 
     public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string id, CancellationToken cancellationToken)
@@ -244,30 +290,6 @@ public static class ExtensionMethods
         value = Uri.EscapeDataString($"{element}={value}");
         return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName}", $"{URI_PARAM_QUERY}={value}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
     }
-
-    // public static async Task<string?> GetJsonResponseAsync(this HttpClientHandler? clientHandler, Uri requestUri, ILogger logger, CancellationToken cancellationToken)
-    // {
-    //     if (clientHandler is null)
-    //         return null;
-    //     using HttpClient httpClient = new(clientHandler);
-    //     HttpRequestMessage message = new(HttpMethod.Get, requestUri);
-    //     message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-    //     using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
-    //     if (cancellationToken.IsCancellationRequested)
-    //         return null;
-    //     try { response.EnsureSuccessStatusCode(); }
-    //     catch (HttpRequestException exception)
-    //     {
-    //         logger.LogHttpRequestFailed(requestUri, exception);
-    //         return null;
-    //     }
-    //     try { return await response.Content.ReadAsStringAsync(cancellationToken); }
-    //     catch (Exception exception)
-    //     {
-    //         logger.LogGetResponseContentFailed(requestUri, exception);
-    //         return null;
-    //     }
-    // }
 
     public static bool TryGetPropertyValue(this JsonObject source, string propertyName, string innerPropertyName, out JsonNode? jsonNode) =>
         source.TryGetPropertyValue(propertyName, out jsonNode) && jsonNode is JsonObject obj && obj.TryGetPropertyValue(innerPropertyName, out jsonNode);
@@ -289,10 +311,10 @@ public static class ExtensionMethods
     }
 
     public static string? GetPropertyAsString(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result)) ? result : null;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result) ? result : null;
 
     public static string GetPropertyAsNonEmpty(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result) && !string.IsNullOrWhiteSpace(result)) ? result : string.Empty;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result) && !string.IsNullOrWhiteSpace(result) ? result : string.Empty;
 
     public static bool TryCoercePropertyAsString(this JsonObject source, string propertyName, [NotNullWhen(true)] out string? result)
     {
@@ -319,7 +341,7 @@ public static class ExtensionMethods
     }
 
     public static string? CoercePropertyAsStringOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out string? result) ? result : jsonValue.ToString()) : null;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out string? result) ? result : jsonValue.ToString() : null;
 
     public static string? CoercePropertyAsNonEmptyOrNull(this JsonObject source, string propertyName)
     {
@@ -334,7 +356,7 @@ public static class ExtensionMethods
     }
 
     public static string CoercePropertyAsString(this JsonObject source, string propertyName, string defaultValue = "") =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out string? result) ? result : jsonValue.ToString()) : defaultValue;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out string? result) ? result : jsonValue.ToString() : defaultValue;
 
     public static string CoercePropertyAsNonEmpty(this JsonObject source, string propertyName, string defaultValue = "")
     {
@@ -360,12 +382,12 @@ public static class ExtensionMethods
         return false;
     }
     public static int? CoercePropertyAsIntOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out int? result) ? result :
-            (jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i)) ? i : null) : null;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out int? result) ? result :
+            jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i) ? i : null : null;
 
     public static int CoercePropertyAsInt(this JsonObject source, string propertyName, int defaultValue = 0) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out int? result) ? result.Value :
-            (jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i)) ? i : defaultValue) : defaultValue;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out int? result) ? result.Value :
+            jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i) ? i : defaultValue : defaultValue;
 
     public static bool TryCoercePropertyAsBoolean(this JsonObject source, string propertyName, out bool result)
     {
@@ -384,12 +406,12 @@ public static class ExtensionMethods
     }
 
     public static bool? CoercePropertyAsBooleanOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out bool? result) ? result :
-            (jsonValue.TryGetValue(out string? s) && bool.TryParse(s, out bool b)) ? b : null) : null;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out bool? result) ? result :
+            jsonValue.TryGetValue(out string? s) && bool.TryParse(s, out bool b) ? b : null : null;
 
     public static bool CoercePropertyAsBoolean(this JsonObject source, string propertyName, bool defaultValue = false) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? (jsonValue.TryGetValue(out bool? result) ? result.Value :
-            (jsonValue.TryGetValue(out string? s) && bool.TryParse(s, out bool b)) ? b : defaultValue) : defaultValue;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out bool? result) ? result.Value :
+            jsonValue.TryGetValue(out string? s) && bool.TryParse(s, out bool b) ? b : defaultValue : defaultValue;
 
     public static bool TryGetFieldAsString(this JsonObject source, string propertyName, [NotNullWhen(true)] out string? value, out string? display_value)
     {
@@ -466,10 +488,10 @@ public static class ExtensionMethods
     }
 
     public static string? GetFieldAsStringOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsStringOrNull(JSON_KEY_VALUE) : null;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.CoercePropertyAsStringOrNull(JSON_KEY_VALUE) : null;
 
     public static string? GetFieldAsNonEmptyOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsNonEmptyOrNull(JSON_KEY_VALUE) : null;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.CoercePropertyAsNonEmptyOrNull(JSON_KEY_VALUE) : null;
 
     public static string GetFieldAsString(this JsonObject source, string propertyName, string defaultValue, out string? display_value)
     {
@@ -524,10 +546,10 @@ public static class ExtensionMethods
     }
 
     public static string GetFieldAsString(this JsonObject source, string propertyName, string defaultValue = "") =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsString(JSON_KEY_VALUE, out string? value)) ? value : defaultValue;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsString(JSON_KEY_VALUE, out string? value) ? value : defaultValue;
 
     public static string GetFieldAsNonEmpty(this JsonObject source, string propertyName, string defaultValue = "") =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out string? value)) ? value : defaultValue;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out string? value) ? value : defaultValue;
 
     public static bool TryGetFieldAsInt(this JsonObject source, string propertyName, [NotNullWhen(true)] out int value, out string? display_value)
     {
@@ -567,7 +589,7 @@ public static class ExtensionMethods
     }
 
     public static int? GetFieldAsIntOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsIntOrNull(JSON_KEY_VALUE) : null;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.CoercePropertyAsIntOrNull(JSON_KEY_VALUE) : null;
 
     public static int GetFieldAsInt(this JsonObject source, string propertyName, int defaultValue, out string? display_value)
     {
@@ -596,7 +618,7 @@ public static class ExtensionMethods
     }
 
     public static int GetFieldAsInt(this JsonObject source, string propertyName, int defaultValue = 0) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.GetFieldAsInt(JSON_KEY_VALUE, defaultValue) : defaultValue;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.GetFieldAsInt(JSON_KEY_VALUE, defaultValue) : defaultValue;
 
     public static bool TryGetFieldAsBoolean(this JsonObject source, string propertyName, [NotNullWhen(true)] out bool value, out string? display_value)
     {
@@ -636,7 +658,7 @@ public static class ExtensionMethods
     }
 
     public static bool? GetFieldAsBooleanOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsBooleanOrNull(JSON_KEY_VALUE) : null;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.CoercePropertyAsBooleanOrNull(JSON_KEY_VALUE) : null;
 
     public static bool GetFieldAsBoolean(this JsonObject source, string propertyName, bool defaultValue, out string? display_value)
     {
@@ -665,7 +687,7 @@ public static class ExtensionMethods
     }
 
     public static bool GetFieldAsBoolean(this JsonObject source, string propertyName, bool defaultValue = false) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool value)) ? value : defaultValue;
+        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool value) ? value : defaultValue;
 
     public static string ToDisplayName(this HttpStatusCode statusCode) => statusCode switch
     {
@@ -823,35 +845,27 @@ public static class ExtensionMethods
         }
     }
 
-    public static async Task WriteLinesAsync(this TextWriter writer, CancellationToken cancellationToken, params string[] lines) => await writer.WriteLinesAsync(lines, cancellationToken);
-    
     private static readonly ImmutableArray<string> JSDOC_START = new string[]{ "/**" }.ToImmutableArray();
     
     private static readonly ImmutableArray<string> JSDOC_END = new string[]{ " */" }.ToImmutableArray();
     
-    public static readonly Regex AbnormalWsRegex = new(@" \s+|(?! )\s+", RegexOptions.Compiled);
+    [GeneratedRegex(@" \s+|(?! )\s+", RegexOptions.Compiled)]
+    private static partial Regex GetAbnormalWsRegexRegex();
+    public static readonly Regex AbnormalWsRegex = GetAbnormalWsRegexRegex();
 
-    public static string AsWhitespaceNormalized(this string? text) => (text is null || (text = text.Trim()).Length == 0) ? string.Empty : AbnormalWsRegex.Replace(text, " ");
+    public static string AsWhitespaceNormalized(this string? text) => text is null || (text = text.Trim()).Length == 0 ? string.Empty : AbnormalWsRegex.Replace(text, " ");
 
-    public static readonly Regex LineBreakRegex = new(@"\r\n?|\n", RegexOptions.Compiled);
+    [GeneratedRegex(@"\r\n?|\n", RegexOptions.Compiled)]
+    private static partial Regex GetLineBreakRegex();
+    public static readonly Regex LineBreakRegex = GetLineBreakRegex();
 
     public static string[] SplitLines(this string? lines) => string.IsNullOrEmpty(lines) ? new string[] { "" } : LineBreakRegex.Split(lines);
 
-    public static IEnumerable<string> SplitLines(this IEnumerable<string>? lines) => (lines is null) ? Enumerable.Empty<string>() : lines.SelectMany(SplitLines);
-
     public static IEnumerable<string> ToJsDocLines(this IEnumerable<string> lines) => JSDOC_START.Concat(lines.Select(l => string.IsNullOrWhiteSpace(l) ? " *" : $" * {l}")).Concat(JSDOC_END);
 
-    public static IEnumerable<string> AsSingleEnumerable(string line) { yield return line; }
-
-    public static async Task WriteLinesWithJsDoc(this TextWriter writer, string jsDoc, IEnumerable<string> lines, CancellationToken cancellationToken) => await writer.WriteLinesAsync((lines is null) ? AsSingleEnumerable(jsDoc) : AsSingleEnumerable(jsDoc).Concat(lines), cancellationToken);
-
-    public static async Task WriteLinesWithJsDoc(this TextWriter writer, IEnumerable<string> jsDoc, IEnumerable<string> lines, CancellationToken cancellationToken) => await writer.WriteLinesAsync((lines is null) ? jsDoc.ToJsDocLines() : jsDoc.ToJsDocLines().Concat(lines), cancellationToken);
-
-    public static async Task WriteLinesWithJsDoc(this TextWriter writer, string jsDoc, CancellationToken cancellationToken, params string[] lines) => await writer.WriteLinesWithJsDoc(jsDoc, lines, cancellationToken);
-    
-    public static async Task WriteLinesWithJsDoc(this TextWriter writer, IEnumerable<string> jsDoc, CancellationToken cancellationToken, params string[] lines) => await writer.WriteLinesWithJsDoc(jsDoc, lines, cancellationToken);
-    
     public static async Task WriteJsDocAsync(this TextWriter writer, IEnumerable<string> lines, CancellationToken cancellationToken) => await writer.WriteLinesAsync(lines.ToJsDocLines(), cancellationToken);
 
     public static async Task WriteJsDocAsync(this TextWriter writer, CancellationToken cancellationToken, params string[] lines) => await writer.WriteJsDocAsync(lines, cancellationToken);
 }
+
+record ElementInheritance(ElementInfo Element, ElementInfo? Super);
