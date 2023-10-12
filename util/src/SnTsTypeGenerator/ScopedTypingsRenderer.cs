@@ -9,6 +9,12 @@ public sealed class ScopedTypingsRenderer : TypingsRenderer
     private string _currentScope;
     protected override string CurrentScope => _currentScope;
 
+    protected override string GlideRecordNamespace => NS_NAME_record;
+
+    protected override string GlideElementNamespace => NS_NAME_element;
+
+    protected override string TableFieldsNamespace => NS_NAME_fields;
+
     public ScopedTypingsRenderer(string currentScope, IndentedTextWriter writer, TypingsDbContext dbContext) : base(writer, dbContext) => _currentScope = currentScope;
 
     public async override Task WriteAsync(EntityEntry<TableInfo>[] toRender, CancellationToken cancellationToken)
@@ -44,4 +50,24 @@ public sealed class ScopedTypingsRenderer : TypingsRenderer
     protected override Task WriteStartElementsNamespace() => Writer.WriteLineAsync($"export namespace {NS_NAME_element} {{");
 
     protected override Task WriteStartFieldsNamespace() => Writer.WriteLineAsync($"export namespace {NS_NAME_fields} {{");
+
+    protected override string GetElementName(string typeName) => typeName switch
+    {
+        TYPE_NAME_journal or TYPE_NAME_glide_list or TYPE_NAME_glide_action_list or TYPE_NAME_user_input or TYPE_NAME_journal_input or TYPE_NAME_journal_list => "JournalGlideElement",
+
+        TYPE_NAME_glide_date_time or TYPE_NAME_glide_date or TYPE_NAME_glide_time or TYPE_NAME_timer or TYPE_NAME_glide_duration or TYPE_NAME_glide_utc_time or TYPE_NAME_due_date or
+            TYPE_NAME_glide_precise_time or TYPE_NAME_calendar_date_time => "GlideDateTimeElement",
+
+        TYPE_NAME_reference or TYPE_NAME_currency2 or TYPE_NAME_domain_id or TYPE_NAME_document_id or TYPE_NAME_source_id => TS_NAME_GlideElementReference,
+        _ => TS_NAME_GlideElement,
+    };
+
+    protected override bool IsExplicitScalarType(string typeName) => typeName switch
+    {
+        TYPE_NAME_glide_list or TYPE_NAME_glide_action_list or TYPE_NAME_user_input or TYPE_NAME_journal_input or TYPE_NAME_journal_list or TYPE_NAME_glide_date or TYPE_NAME_glide_time or TYPE_NAME_timer or
+            TYPE_NAME_glide_duration or TYPE_NAME_glide_utc_time or TYPE_NAME_due_date or TYPE_NAME_glide_precise_time or TYPE_NAME_calendar_date_time or TYPE_NAME_currency2 or TYPE_NAME_domain_id or
+            TYPE_NAME_document_id or TYPE_NAME_source_id => true,
+
+        _ => false,
+    };
 }
