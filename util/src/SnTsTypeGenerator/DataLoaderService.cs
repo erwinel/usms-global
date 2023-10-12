@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SnTsTypeGenerator.Models;
 
 namespace SnTsTypeGenerator;
 

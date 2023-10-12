@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
+using SnTsTypeGenerator.Models;
 using static SnTsTypeGenerator.SnApiConstants;
 
 namespace SnTsTypeGenerator;

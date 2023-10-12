@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Models;
 
 /// <summary>
 /// This defines an explicit output file base name.

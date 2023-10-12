@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Models;
 
 [Table(nameof(TypingsDbContext.Sources))]
 public class SourceInfo

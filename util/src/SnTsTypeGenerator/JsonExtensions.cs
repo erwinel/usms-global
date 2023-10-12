@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
+using SnTsTypeGenerator.Models;
 using static SnTsTypeGenerator.SnApiConstants;
 
 namespace SnTsTypeGenerator;

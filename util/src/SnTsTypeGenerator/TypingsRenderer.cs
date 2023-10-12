@@ -1,10 +1,8 @@
 using System.CodeDom.Compiler;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using static SnTsTypeGenerator.SnApiConstants;
-using static SnTsTypeGenerator.CmdLineConstants;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
-using Microsoft.Extensions.Logging;
+using SnTsTypeGenerator.Models;
+using static SnTsTypeGenerator.SnApiConstants;
 
 namespace SnTsTypeGenerator;
 
