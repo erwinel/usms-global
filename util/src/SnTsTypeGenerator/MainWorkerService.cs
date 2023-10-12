@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SnTsTypeGenerator.Models;
+using SnTsTypeGenerator.Rendering;
 
 namespace SnTsTypeGenerator;
 

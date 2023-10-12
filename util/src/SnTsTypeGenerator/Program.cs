@@ -189,7 +189,7 @@ internal class Program
             .AddTransient<SnTsTypeGenerator.SnClientHandlerService>()
             .AddTransient<SnTsTypeGenerator.TableAPIService>()
             .AddTransient<SnTsTypeGenerator.DataLoaderService>()
-            .AddSingleton<SnTsTypeGenerator.RenderingService>();
+            .AddSingleton<SnTsTypeGenerator.Rendering.RenderingService>();
         Host = builder.Build();
         Host.Run();
     }

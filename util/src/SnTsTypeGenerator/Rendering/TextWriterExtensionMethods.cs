@@ -1,4 +1,4 @@
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Rendering;
 
 public static class TextWriterExtensionMethods
 {

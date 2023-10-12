@@ -1,8 +1,9 @@
 using System.CodeDom.Compiler;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using SnTsTypeGenerator.Models;
 using static SnTsTypeGenerator.SnApiConstants;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Rendering;
 
 public sealed class ScopedTypingsRenderer : TypingsRenderer
 {

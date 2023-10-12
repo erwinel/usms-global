@@ -3,10 +3,11 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SnTsTypeGenerator.Models;
 using static SnTsTypeGenerator.SnApiConstants;
 using static SnTsTypeGenerator.CmdLineConstants;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Rendering;
 
 public class RenderingService
 {

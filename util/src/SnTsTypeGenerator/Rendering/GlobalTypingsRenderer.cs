@@ -1,7 +1,7 @@
 using System.CodeDom.Compiler;
 using static SnTsTypeGenerator.SnApiConstants;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Rendering;
 
 public sealed class GlobalTypingsRenderer : TypingsRenderer
 {
