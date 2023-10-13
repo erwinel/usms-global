@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using SnTsTypeGenerator.Models;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 public static class EntityFrameworkExtensions
 {
