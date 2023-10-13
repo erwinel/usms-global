@@ -1,4 +1,4 @@
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 internal static class SnApiConstants
 {

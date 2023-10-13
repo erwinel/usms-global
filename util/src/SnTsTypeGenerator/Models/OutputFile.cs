@@ -9,7 +9,7 @@ namespace SnTsTypeGenerator.Models;
 /// <summary>
 /// This defines an explicit output file base name.
 /// </summary>
-[Table(nameof(TypingsDbContext.OutputFiles))]
+[Table(nameof(Services.TypingsDbContext.OutputFiles))]
 public class OutputFile : IValidatableObject
 {
     /// <summary>

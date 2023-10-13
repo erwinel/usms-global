@@ -7,7 +7,7 @@ namespace SnTsTypeGenerator.Models;
 /// <summary>
 /// Represents an item from the "Package" (sys_package) table.
 /// </summary>
-[Table(nameof(TypingsDbContext.Packages))]
+[Table(nameof(Services.TypingsDbContext.Packages))]
 public class SysPackage
 {
     private readonly object _syncRoot = new();

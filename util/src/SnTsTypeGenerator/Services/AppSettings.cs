@@ -1,8 +1,8 @@
 
 using Microsoft.Extensions.Configuration;
-using static SnTsTypeGenerator.CmdLineConstants;
+using static SnTsTypeGenerator.Services.CmdLineConstants;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 public class AppSettings
 {

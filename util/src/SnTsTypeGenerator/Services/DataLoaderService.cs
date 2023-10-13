@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SnTsTypeGenerator.Models;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 /// <summary>
 /// Loads data from the database and from the remote ServiceNow instance.

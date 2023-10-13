@@ -8,7 +8,7 @@ namespace SnTsTypeGenerator.Models;
 /// <summary>
 /// Represents an item from the "Dictionary Entry" (<see cref="SnApiConstants.TABLE_NAME_SYS_DICTIONARY" />) table.
 /// </summary>
-[Table(nameof(TypingsDbContext.Elements))]
+[Table(nameof(Services.TypingsDbContext.Elements))]
 public class ElementInfo
 {
     private readonly object _syncRoot = new();

@@ -2,7 +2,8 @@ using System.CodeDom.Compiler;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.ObjectModel;
 using SnTsTypeGenerator.Models;
-using static SnTsTypeGenerator.SnApiConstants;
+using SnTsTypeGenerator.Services;
+using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Rendering;
 

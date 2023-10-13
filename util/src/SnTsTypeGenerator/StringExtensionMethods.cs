@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using System.Net;
 using System.Text.RegularExpressions;
-using static SnTsTypeGenerator.SnApiConstants;
+using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator;
 

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SnTsTypeGenerator.Models;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 /// <summary>
 /// The type definitions database context.
@@ -27,7 +27,7 @@ public partial class TypingsDbContext : DbContext
     private readonly ILogger<TypingsDbContext> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 
-    private bool _pathValidated;
+    private readonly bool _pathValidated;
 
     /// <summary>
     /// Indicates whether service initialization was successful.

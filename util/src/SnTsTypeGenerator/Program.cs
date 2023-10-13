@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using static SnTsTypeGenerator.CmdLineConstants;
+using static SnTsTypeGenerator.Services.CmdLineConstants;
 
 internal class Program
 {
@@ -42,33 +42,33 @@ internal class Program
             writeSwitch(SHORTHAND_d, "fileName",
                 "The Path to the typings database.",
                 "This path is relative to the subdirectory containing the executable.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.DbFile)} setting in appsettings.json, if defined; otherwise it will use a database named {DEFAULT_DbFile} in the same subdirectory as the executable.");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.DbFile)} setting in appsettings.json, if defined; otherwise it will use a database named {DEFAULT_DbFile} in the same subdirectory as the executable.");
 
             writeSwitch(SHORTHAND_t, "name",
                 "The names of the table to generate typings for.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.Table)} setting in appsettings.json, if defined.");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.Table)} setting in appsettings.json, if defined.");
 
             writeSwitch(SHORTHAND_u, "name",
                 "The user name credentials to use when connecting to the remote instance.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.UserName)} setting in appsettings.json, if defined; otherwise, you will be prompted for the user name.");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.UserName)} setting in appsettings.json, if defined; otherwise, you will be prompted for the user name.");
 
             writeSwitch(SHORTHAND_p, "password",
                 "The password credentials to use when connecting to the remote instance.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.Password)} setting in appsettings.json, if defined; otherwise, you will be prompted for the password.");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.Password)} setting in appsettings.json, if defined; otherwise, you will be prompted for the password.");
 
             writeSwitch(SHORTHAND_i, "id",
                 "Specifies client ID in the remote ServiceNow instance's Application Registry.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientId)} setting in appsettings.json, if defined;",
-                $"otherwise, you will be prompted for the client ID if there is a client secret (-{SHORTHAND_x} command line option or {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientSecret)} setting) specified.");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.ClientId)} setting in appsettings.json, if defined;",
+                $"otherwise, you will be prompted for the client ID if there is a client secret (-{SHORTHAND_x} command line option or {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.ClientSecret)} setting) specified.");
 
             writeSwitch(SHORTHAND_x, "secret",
                 "The the client secret in the remote ServiceNow instance's Application Registry.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientSecret)} setting in appsettings.json, if defined;",
-                $"otherwise, you will be prompted for the client secret. if there is a client ID (-{SHORTHAND_i} command line option or {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.ClientId)} setting) specified");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.ClientSecret)} setting in appsettings.json, if defined;",
+                $"otherwise, you will be prompted for the client secret. if there is a client ID (-{SHORTHAND_i} command line option or {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.ClientId)} setting) specified");
 
             writeSwitch(SHORTHAND_r, "url",
                 "The base URL of the remote ServiceNow instance.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.RemoteURL)} setting in appsettings.json, if defined; otherwise, an error message will be displayed.");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.RemoteURL)} setting in appsettings.json, if defined; otherwise, an error message will be displayed.");
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine();
@@ -102,14 +102,14 @@ internal class Program
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("The output file name.");
             Console.WriteLine("This path is relative to the current working directory.");
-            Console.WriteLine($"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.Output)} setting in appsettings.json, if present; otherwise, it will write to a file named {DEFAULT_OUTPUT_FILENAME} in the current working directory.");
+            Console.WriteLine($"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.Output)} setting in appsettings.json, if present; otherwise, it will write to a file named {DEFAULT_OUTPUT_FILENAME} in the current working directory.");
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine();
             Console.WriteLine($"-{SHORTHAND_f}=true");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Force overwrite of the output file.");
-            Console.WriteLine($"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.AppSettings.Force)} setting in appsettings.json, if set to true; otherwise, an error message will be displayed if the output file already exists.");
+            Console.WriteLine($"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(SnTsTypeGenerator.Services.AppSettings.Force)} setting in appsettings.json, if set to true; otherwise, an error message will be displayed if the output file already exists.");
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(SHORTHAND__3F_);
@@ -167,11 +167,11 @@ internal class Program
         if (builder.Environment.IsDevelopment())
             builder.Configuration.AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly(), true);
         builder.Logging.AddConsole();
-        builder.Services.Configure<SnTsTypeGenerator.AppSettings>(builder.Configuration.GetSection(nameof(SnTsTypeGenerator)));
-        SnTsTypeGenerator.AppSettings.Configure(args, builder.Configuration);
-        builder.Services.AddDbContextPool<SnTsTypeGenerator.TypingsDbContext>(options =>
+        builder.Services.Configure<SnTsTypeGenerator.Services.AppSettings>(builder.Configuration.GetSection(nameof(SnTsTypeGenerator)));
+        SnTsTypeGenerator.Services.AppSettings.Configure(args, builder.Configuration);
+        builder.Services.AddDbContextPool<SnTsTypeGenerator.Services.TypingsDbContext>(options =>
             {
-                var dbFile = builder.Configuration.GetSection(nameof(SnTsTypeGenerator)).Get<SnTsTypeGenerator.AppSettings>()?.DbFile;
+                var dbFile = builder.Configuration.GetSection(nameof(SnTsTypeGenerator)).Get<SnTsTypeGenerator.Services.AppSettings>()?.DbFile;
                 try
                 {
                     dbFile = Path.GetFullPath(string.IsNullOrEmpty(dbFile) ? Path.Combine(builder.Environment.ContentRootPath, DEFAULT_DbFile) :
@@ -185,11 +185,11 @@ internal class Program
                     Mode = SqliteOpenMode.ReadWrite
                 }.ConnectionString);
             })
-            .AddHostedService<SnTsTypeGenerator.MainWorkerService>()
-            .AddTransient<SnTsTypeGenerator.SnClientHandlerService>()
-            .AddTransient<SnTsTypeGenerator.TableAPIService>()
-            .AddTransient<SnTsTypeGenerator.DataLoaderService>()
-            .AddSingleton<SnTsTypeGenerator.Rendering.RenderingService>();
+            .AddHostedService<SnTsTypeGenerator.Services.MainWorkerService>()
+            .AddTransient<SnTsTypeGenerator.Services.SnClientHandlerService>()
+            .AddTransient<SnTsTypeGenerator.Services.TableAPIService>()
+            .AddTransient<SnTsTypeGenerator.Services.DataLoaderService>()
+            .AddSingleton<SnTsTypeGenerator.Services.RenderingService>();
         Host = builder.Build();
         Host.Run();
     }

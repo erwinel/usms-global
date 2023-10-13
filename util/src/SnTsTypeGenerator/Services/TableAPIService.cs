@@ -1,9 +1,9 @@
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using SnTsTypeGenerator.Models;
-using static SnTsTypeGenerator.SnApiConstants;
+using static SnTsTypeGenerator.Services.SnApiConstants;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 /// <summary>
 /// Gets table information from a remote ServiceNow instance.
@@ -11,7 +11,7 @@ namespace SnTsTypeGenerator;
 public sealed class TableAPIService
 {
     private readonly ILogger<TableAPIService> _logger;
-    private SnClientHandlerService? _handler;
+    private readonly SnClientHandlerService? _handler;
 
     /// <summary>
     /// Indicates whether service initialization was successful.

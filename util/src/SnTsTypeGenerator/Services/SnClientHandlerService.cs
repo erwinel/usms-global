@@ -6,10 +6,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static SnTsTypeGenerator.SnApiConstants;
-using static SnTsTypeGenerator.CmdLineConstants;
+using static SnTsTypeGenerator.Services.SnApiConstants;
+using static SnTsTypeGenerator.Services.CmdLineConstants;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 public sealed class SnClientHandlerService
 {

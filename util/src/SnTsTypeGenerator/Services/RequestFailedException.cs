@@ -1,9 +1,9 @@
 using System.Net;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
-using static SnTsTypeGenerator.SnApiConstants;
+using static SnTsTypeGenerator.Services.SnApiConstants;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 [Serializable]
 internal class RequestFailedException : Exception, ILogTrackable

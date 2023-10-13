@@ -1,7 +1,7 @@
 using System.CodeDom.Compiler;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SnTsTypeGenerator.Models;
-using static SnTsTypeGenerator.SnApiConstants;
+using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Rendering;
 
@@ -16,7 +16,7 @@ public sealed class ScopedTypingsRenderer : TypingsRenderer
 
     protected override string TableFieldsNamespace => NS_NAME_fields;
 
-    public ScopedTypingsRenderer(string currentScope, IndentedTextWriter writer, TypingsDbContext dbContext) : base(writer, dbContext) => _currentScope = currentScope;
+    public ScopedTypingsRenderer(string currentScope, IndentedTextWriter writer, Services.TypingsDbContext dbContext) : base(writer, dbContext) => _currentScope = currentScope;
 
     public async override Task WriteAsync(EntityEntry<TableInfo>[] toRender, CancellationToken cancellationToken)
     {

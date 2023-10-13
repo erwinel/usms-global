@@ -4,10 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SnTsTypeGenerator.Models;
-using static SnTsTypeGenerator.SnApiConstants;
-using static SnTsTypeGenerator.CmdLineConstants;
+using SnTsTypeGenerator.Rendering;
+using static SnTsTypeGenerator.Services.SnApiConstants;
+using static SnTsTypeGenerator.Services.CmdLineConstants;
 
-namespace SnTsTypeGenerator.Rendering;
+namespace SnTsTypeGenerator.Services;
 
 public class RenderingService
 {

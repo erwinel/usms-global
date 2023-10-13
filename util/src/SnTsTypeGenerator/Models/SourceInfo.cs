@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SnTsTypeGenerator.Models;
 
-[Table(nameof(TypingsDbContext.Sources))]
+[Table(nameof(Services.TypingsDbContext.Sources))]
 public class SourceInfo
 {
     private string _fqdn = string.Empty;

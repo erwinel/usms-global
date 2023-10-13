@@ -8,7 +8,7 @@ namespace SnTsTypeGenerator.Models;
 /// <summary>
 /// Represents an item from the "Table" (<see cref="SnApiConstants.TABLE_NAME_SYS_DB_OBJECT" />) table.
 /// </summary>
-[Table(nameof(TypingsDbContext.Tables))]
+[Table(nameof(Services.TypingsDbContext.Tables))]
 public class TableInfo
 {
     private readonly object _syncRoot = new();

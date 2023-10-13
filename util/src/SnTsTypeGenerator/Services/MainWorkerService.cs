@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using SnTsTypeGenerator.Models;
 using SnTsTypeGenerator.Rendering;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 public sealed class MainWorkerService : BackgroundService
 {

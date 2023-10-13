@@ -1,5 +1,6 @@
 using System.CodeDom.Compiler;
-using static SnTsTypeGenerator.SnApiConstants;
+using SnTsTypeGenerator.Services;
+using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Rendering;
 

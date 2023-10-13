@@ -1,9 +1,9 @@
 using System.Runtime.Serialization;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using static SnTsTypeGenerator.SnApiConstants;
+using static SnTsTypeGenerator.Services.SnApiConstants;
 
-namespace SnTsTypeGenerator;
+namespace SnTsTypeGenerator.Services;
 
 [Serializable]
 internal class ResponseParsingException : Exception, ILogTrackable
