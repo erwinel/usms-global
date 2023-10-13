@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Logging.Abstractions;
 using SnTsTypeGenerator.Models;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 

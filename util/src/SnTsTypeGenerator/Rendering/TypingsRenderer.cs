@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using SnTsTypeGenerator.Models;
 using SnTsTypeGenerator.Services;
 using static SnTsTypeGenerator.Services.SnApiConstants;
-using System.Collections.Immutable;
 
 namespace SnTsTypeGenerator.Rendering;
 
