@@ -9,9 +9,6 @@ namespace SnTsTypeGenerator.Services;
 
 public static class EntityFrameworkExtensions
 {
-    private static readonly GlideType _stringType = new() { Name = TYPE_NAME_string, Label = "String" };
-    private static readonly GlideType _dateTimeType = new() { Name = TYPE_NAME_glide_date_time, Label = "Date/Time" };
-
     /// <summary>
     /// Indicates whether the entry exists in the target database.
     /// </summary>
