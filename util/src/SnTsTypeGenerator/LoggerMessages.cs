@@ -37,12 +37,12 @@ public static class LoggerMessages
     #region Critical UnexpectedServiceException Error (0xffff)
 
     /// <summary>
-    // Numerical event code for UnexpectedServiceException.
+    /// Numerical event code for UnexpectedServiceException.
     /// </summary>
     public const int EVENT_ID_UnexpectedServiceException = 0xffff;
 
     /// <summary>
-    // Event ID for UnexpectedServiceException.
+    /// Event ID for UnexpectedServiceException.
     /// </summary>
     public static readonly EventId UnexpectedServiceException = new(EVENT_ID_UnexpectedServiceException, nameof(UnexpectedServiceException));
 
@@ -95,12 +95,12 @@ public static class LoggerMessages
     #region Critical DbFileDirectoryNotFOund Error (0x0002)
 
     /// <summary>
-    // Numerical event code for DbFileDirectoryNotFOund.
+    /// Numerical event code for DbFileDirectoryNotFOund.
     /// </summary>
     public const int EVENT_ID_DbFileDirectoryNotFound = 0x0002;
 
     /// <summary>
-    // Event ID for DbFileDirectoryNotFOund.
+    /// Event ID for DbFileDirectoryNotFOund.
     /// </summary>
     public static readonly EventId DbFileDirectoryNotFound = new(EVENT_ID_DbFileDirectoryNotFound, nameof(DbFileDirectoryNotFound));
 
@@ -184,12 +184,12 @@ public static class LoggerMessages
     #region Critical CriticalSettingValueNotProvided Error (0x0005)
 
     /// <summary>
-    // Numerical event code for CriticalSettingValueNotProvided.
+    /// Numerical event code for CriticalSettingValueNotProvided.
     /// </summary>
     public const int EVENT_ID_CriticalSettingValueNotProvided = 0x0005;
 
     /// <summary>
-    // Event ID for CriticalSettingValueNotProvided.
+    /// Event ID for CriticalSettingValueNotProvided.
     /// </summary>
     public static readonly EventId CriticalSettingValueNotProvided = new(EVENT_ID_CriticalSettingValueNotProvided, nameof(CriticalSettingValueNotProvided));
 
@@ -219,12 +219,12 @@ public static class LoggerMessages
     #region RenderMode Trace (0x0006)
 
     /// <summary>
-    // Numerical event code for RenderMode.
+    /// Numerical event code for RenderMode.
     /// </summary>
     public const int EVENT_ID_RenderMode = 0x0006;
 
     /// <summary>
-    // Event ID for RenderMode.
+    /// Event ID for RenderMode.
     /// </summary>
     public static readonly EventId RenderMode = new(EVENT_ID_RenderMode, nameof(RenderMode));
 
@@ -253,12 +253,12 @@ public static class LoggerMessages
     #region UsingOutputFile Trace (0x0007)
 
     /// <summary>
-    // Numerical event code for UsingOutputFile.
+    /// Numerical event code for UsingOutputFile.
     /// </summary>
     public const int EVENT_ID_UsingOutputFile = 0x0007;
 
     /// <summary>
-    // Event ID for UsingOutputFile.
+    /// Event ID for UsingOutputFile.
     /// </summary>
     public static readonly EventId UsingOutputFile = new(EVENT_ID_UsingOutputFile, nameof(UsingOutputFile));
 
@@ -335,12 +335,12 @@ public static class LoggerMessages
     #region Critical InvalidModeOption Error (0x000a)
     
     /// <summary>
-    // Numerical event code for InvalidModeOption.
+    /// Numerical event code for InvalidModeOption.
     /// </summary>
     public const int EVENT_ID_InvalidModeOption = 0x000a;
     
     /// <summary>
-    // Event ID for InvalidModeOption.
+    /// Event ID for InvalidModeOption.
     /// </summary>
     public static readonly EventId InvalidModeOption = new(EVENT_ID_InvalidModeOption, nameof(InvalidModeOption));
     
@@ -571,12 +571,12 @@ public static class LoggerMessages
     #region ValidatingEntity Trace (0x0011)
 
     /// <summary>
-    // Numerical event code for ValidatingEntity.
+    /// Numerical event code for ValidatingEntity.
     /// </summary>
     public const int EVENT_ID_ValidatingEntity = 0x0011;
 
     /// <summary>
-    // Event ID for ValidatingEntity.
+    /// Event ID for ValidatingEntity.
     /// </summary>
     public static readonly EventId ValidatingEntity = new(EVENT_ID_ValidatingEntity, nameof(ValidatingEntity));
 
@@ -607,12 +607,12 @@ public static class LoggerMessages
     #region EntityValidationFailure Error (0x0012)
 
     /// <summary>
-    // Numerical event code for EntityValidationFailure.
+    /// Numerical event code for EntityValidationFailure.
     /// </summary>
     public const int EVENT_ID_EntityValidationFailure = 0x0012;
 
     /// <summary>
-    // Event ID for EntityValidationFailure.
+    /// Event ID for EntityValidationFailure.
     /// </summary>
     public static readonly EventId EntityValidationFailure = new(EVENT_ID_EntityValidationFailure, nameof(EntityValidationFailure));
 
@@ -653,12 +653,12 @@ public static class LoggerMessages
     #region ValidationCompleted Trace (0x0013)
 
     /// <summary>
-    // Numerical event code for ValidationCompleted.
+    /// Numerical event code for ValidationCompleted.
     /// </summary>
     public const int EVENT_ID_ValidationCompleted = 0x0013;
 
     /// <summary>
-    // Event ID for ValidationCompleted.
+    /// Event ID for ValidationCompleted.
     /// </summary>
     public static readonly EventId ValidationCompleted = new(EVENT_ID_ValidationCompleted, nameof(ValidationCompleted));
 
@@ -689,12 +689,12 @@ public static class LoggerMessages
     #region DbSaveChangesCompleted Trace (0x0014)
 
     /// <summary>
-    // Numerical event code for DbSaveChangesCompleted.
+    /// Numerical event code for DbSaveChangesCompleted.
     /// </summary>
     public const int EVENT_ID_DbSaveChangesCompletedTrace = 0x0014;
 
     /// <summary>
-    // Event ID for DbSaveChangesCompleted.
+    /// Event ID for DbSaveChangesCompleted.
     /// </summary>
     public static readonly EventId DbSaveChangesCompletedTrace = new(EVENT_ID_DbSaveChangesCompletedTrace, nameof(DbSaveChangesCompletedTrace));
 
@@ -716,12 +716,12 @@ public static class LoggerMessages
     #region InvalidResponseType Error (0x0015)
 
     /// <summary>
-    // Numerical event code for InvalidResponseType.
+    /// Numerical event code for InvalidResponseType.
     /// </summary>
     public const int EVENT_ID_InvalidResponseType = 0x0015;
 
     /// <summary>
-    // Event ID for InvalidResponseType.
+    /// Event ID for InvalidResponseType.
     /// </summary>
     public static readonly EventId InvalidResponseType = new(EVENT_ID_InvalidResponseType, nameof(InvalidResponseType));
 
@@ -751,12 +751,12 @@ public static class LoggerMessages
     #region ResponseResultPropertyNotFound Error (0x0016)
 
     /// <summary>
-    // Numerical event code for ResponseResultPropertyNotFound.
+    /// Numerical event code for ResponseResultPropertyNotFound.
     /// </summary>
     public const int EVENT_ID_ResponseResultPropertyNotFound = 0x0016;
 
     /// <summary>
-    // Event ID for ResponseResultPropertyNotFound.
+    /// Event ID for ResponseResultPropertyNotFound.
     /// </summary>
     public static readonly EventId ResponseResultPropertyNotFound = new(EVENT_ID_ResponseResultPropertyNotFound, nameof(ResponseResultPropertyNotFound));
 
@@ -776,12 +776,12 @@ public static class LoggerMessages
     #region NoResultsFromQuery Error (0x0017)
 
     /// <summary>
-    // Numerical event code for NoResultsFromQuery.
+    /// Numerical event code for NoResultsFromQuery.
     /// </summary>
     public const int EVENT_ID_NoResultsFromQuery = 0x0017;
 
     /// <summary>
-    // Event ID for NoResultsFromQuery.
+    /// Event ID for NoResultsFromQuery.
     /// </summary>
     public static readonly EventId NoResultsFromQuery = new(EVENT_ID_NoResultsFromQuery, nameof(NoResultsFromQuery));
 
@@ -801,12 +801,12 @@ public static class LoggerMessages
     #region MultipleResponseItems Warning (0x0018)
 
     /// <summary>
-    // Numerical event code for MultipleResponseItems.
+    /// Numerical event code for MultipleResponseItems.
     /// </summary>
     public const int EVENT_ID_MultipleResponseItems = 0x0018;
 
     /// <summary>
-    // Event ID for MultipleResponseItems.
+    /// Event ID for MultipleResponseItems.
     /// </summary>
     public static readonly EventId MultipleResponseItems = new(EVENT_ID_MultipleResponseItems, nameof(MultipleResponseItems));
 
@@ -827,12 +827,12 @@ public static class LoggerMessages
     #region InvalidResultElementType Error (0x0019)
 
     /// <summary>
-    // Numerical event code for InvalidResultElementType.
+    /// Numerical event code for InvalidResultElementType.
     /// </summary>
     public const int EVENT_ID_InvalidResultElementType = 0x0019;
 
     /// <summary>
-    // Event ID for InvalidResultElementType.
+    /// Event ID for InvalidResultElementType.
     /// </summary>
     public static readonly EventId InvalidResultElementType = new(EVENT_ID_InvalidResultElementType, nameof(InvalidResultElementType));
 
@@ -860,12 +860,12 @@ public static class LoggerMessages
     #region ExpectedPropertyNotFound Error (0x001a)
 
     /// <summary>
-    // Numerical event code for ExpectedPropertyNotFound.
+    /// Numerical event code for ExpectedPropertyNotFound.
     /// </summary>
     public const int EVENT_ID_ExpectedPropertyNotFound = 0x001a;
 
     /// <summary>
-    // Event ID for ExpectedPropertyNotFound.
+    /// Event ID for ExpectedPropertyNotFound.
     /// </summary>
     public static readonly EventId ExpectedPropertyNotFound = new(EVENT_ID_ExpectedPropertyNotFound, nameof(ExpectedPropertyNotFound));
 
@@ -901,12 +901,12 @@ public static class LoggerMessages
     #region APIRequestStart Trace (0x001b)
 
     /// <summary>
-    // Numerical event code for APIRequestStart.
+    /// Numerical event code for APIRequestStart.
     /// </summary>
     public const int EVENT_ID_APIRequestStart = 0x001b;
 
     /// <summary>
-    // Event ID for APIRequestStart.
+    /// Event ID for APIRequestStart.
     /// </summary>
     public static readonly EventId APIRequestStart = new(EVENT_ID_APIRequestStart, nameof(APIRequestStart));
 
@@ -925,12 +925,12 @@ public static class LoggerMessages
     #region APIRequestCompleted Trace (0x001c)
 
     /// <summary>
-    // Numerical event code for APIRequestCompleted.
+    /// Numerical event code for APIRequestCompleted.
     /// </summary>
     public const int EVENT_ID_APIRequestCompleted = 0x001c;
 
     /// <summary>
-    // Event ID for APIRequestCompleted.
+    /// Event ID for APIRequestCompleted.
     /// </summary>
     public static readonly EventId APIRequestCompleted = new(EVENT_ID_APIRequestCompleted, nameof(APIRequestCompleted));
 
@@ -950,12 +950,12 @@ public static class LoggerMessages
     #region GettingTableByNameFromRemote Trace (0x001d)
 
     /// <summary>
-    // Numerical event code for GettingTableByNameFromRemote.
+    /// Numerical event code for GettingTableByNameFromRemote.
     /// </summary>
     public const int EVENT_ID_GettingTableByNameFromRemote = 0x001d;
 
     /// <summary>
-    // Event ID for GettingTableByNameFromRemote.
+    /// Event ID for GettingTableByNameFromRemote.
     /// </summary>
     public static readonly EventId GettingTableByNameFromRemote = new(EVENT_ID_GettingTableByNameFromRemote, nameof(GettingTableByNameFromRemote));
 
@@ -974,12 +974,12 @@ public static class LoggerMessages
     #region GettingTableBySysIdFromRemote Trace (0x001e)
 
     /// <summary>
-    // Numerical event code for GettingTableBySysIdFromRemote.
+    /// Numerical event code for GettingTableBySysIdFromRemote.
     /// </summary>
     public const int EVENT_ID_GettingTableBySysIdFromRemot = 0x001e;
 
     /// <summary>
-    // Event ID for GettingTableBySysIdFromRemote.
+    /// Event ID for GettingTableBySysIdFromRemote.
     /// </summary>
     public static readonly EventId GettingTableBySysIdFromRemote = new(EVENT_ID_GettingTableBySysIdFromRemot, nameof(GettingTableBySysIdFromRemote));
 
@@ -998,12 +998,12 @@ public static class LoggerMessages
     #region GettingElementsByTableNameFromRemote Trace (0x001f)
 
     /// <summary>
-    // Numerical event code for GettingElementsByTableNameFromRemote.
+    /// Numerical event code for GettingElementsByTableNameFromRemote.
     /// </summary>
     public const int EVENT_ID_GettingElementsByTableNameFromRemote = 0x001f;
 
     /// <summary>
-    // Event ID for GettingElementsByTableNameFromRemote.
+    /// Event ID for GettingElementsByTableNameFromRemote.
     /// </summary>
     public static readonly EventId GettingElementsByTableNameFromRemote = new(EVENT_ID_GettingElementsByTableNameFromRemote, nameof(GettingElementsByTableNameFromRemote));
 
@@ -1022,12 +1022,12 @@ public static class LoggerMessages
     #region GettingScopeByIdentifierFromRemote Trace (0x0020)
 
     /// <summary>
-    // Numerical event code for GettingScopeByIdentifierFromRemote.
+    /// Numerical event code for GettingScopeByIdentifierFromRemote.
     /// </summary>
     public const int EVENT_ID_GettingScopeByIdentifierFromRemote = 0x0020;
 
     /// <summary>
-    // Event ID for GettingScopeByIdentifierFromRemote.
+    /// Event ID for GettingScopeByIdentifierFromRemote.
     /// </summary>
     public static readonly EventId GettingScopeByIdentifierFromRemote = new(EVENT_ID_GettingScopeByIdentifierFromRemote, nameof(GettingScopeByIdentifierFromRemote));
 
@@ -1046,12 +1046,12 @@ public static class LoggerMessages
     #region GettingTypeByNameFromRemote Trace (0x0021)
 
     /// <summary>
-    // Numerical event code for GettingTypeByNameFromRemote.
+    /// Numerical event code for GettingTypeByNameFromRemote.
     /// </summary>
     public const int EVENT_ID_GettingTypeByNameFromRemoteTrace = 0x0021;
 
     /// <summary>
-    // Event ID for GettingTypeByNameFromRemote.
+    /// Event ID for GettingTypeByNameFromRemote.
     /// </summary>
     public static readonly EventId GettingTypeByNameFromRemoteTrace = new(EVENT_ID_GettingTypeByNameFromRemoteTrace, nameof(GettingTypeByNameFromRemoteTrace));
 
@@ -1070,12 +1070,12 @@ public static class LoggerMessages
     #region AddingTableToDb Trace (0x0022)
 
     /// <summary>
-    // Numerical event code for AddingTableToDb.
+    /// Numerical event code for AddingTableToDb.
     /// </summary>
     public const int EVENT_ID_AddingTableToDb = 0x0022;
 
     /// <summary>
-    // Event ID for AddingTableToDb.
+    /// Event ID for AddingTableToDb.
     /// </summary>
     public static readonly EventId AddingTableToDb = new(EVENT_ID_AddingTableToDb, nameof(AddingTableToDb));
 
@@ -1094,12 +1094,12 @@ public static class LoggerMessages
     #region AddingElementsToDatabase Trace (0x0023)
 
     /// <summary>
-    // Numerical event code for AddingElementsToDatabase.
+    /// Numerical event code for AddingElementsToDatabase.
     /// </summary>
     public const int EVENT_ID_AddingElementsToDatabase = 0x0023;
 
     /// <summary>
-    // Event ID for AddingElementsToDatabase.
+    /// Event ID for AddingElementsToDatabase.
     /// </summary>
     public static readonly EventId AddingElementsToDatabase = new(EVENT_ID_AddingElementsToDatabase, nameof(AddingElementsToDatabase));
 
@@ -1118,12 +1118,12 @@ public static class LoggerMessages
     #region NewTableSaveComplete Trace (0x0024)
 
     /// <summary>
-    // Numerical event code for NewTableSaveComplete.
+    /// Numerical event code for NewTableSaveComplete.
     /// </summary>
     public const int EVENT_ID_NewTableSaveCompleteTrace = 0x0024;
 
     /// <summary>
-    // Event ID for NewTableSaveComplete.
+    /// Event ID for NewTableSaveComplete.
     /// </summary>
     public static readonly EventId NewTableSaveCompleteTrace = new(EVENT_ID_NewTableSaveCompleteTrace, nameof(NewTableSaveCompleteTrace));
 
@@ -1142,12 +1142,12 @@ public static class LoggerMessages
     #region Critical UnexpecteException Error (0x00ff)
 
     /// <summary>
-    // Numerical event code for UnexpecteException.
+    /// Numerical event code for UnexpecteException.
     /// </summary>
     public const int EVENT_ID_UnexpecteException = 0x00ff;
 
     /// <summary>
-    // Event ID for UnexpecteException.
+    /// Event ID for UnexpecteException.
     /// </summary>
     public static readonly EventId UnexpecteException = new(EVENT_ID_UnexpecteException, nameof(UnexpecteException));
 
