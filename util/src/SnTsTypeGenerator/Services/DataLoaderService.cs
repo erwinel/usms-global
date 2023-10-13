@@ -135,7 +135,7 @@ public sealed class DataLoaderService : IDisposable
         _tableIdMap.Add(tableInfo.SysID, tableInfo.Name);
         await _dbContext!.SaveChangesAsync(cancellationToken);
 
-        if (superClass is not null && (tableInfo.SuperClass = await GetTableAsync(superClass, cancellationToken)) is not null)
+        if (superClass is not null && (tableInfo.SuperClass = superClass = await GetTableAsync(superClass, cancellationToken)) is not null)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _dbContext!.SaveChangesAsync(cancellationToken);
@@ -149,32 +149,37 @@ public sealed class DataLoaderService : IDisposable
             return;
         }
 
-        if (tableInfo.SuperClass is not null)
+        if (superClass is null && elements.ExtendsBaseRecord())
+            tableInfo.SuperClass = superClass = await GetBaseRecordTypeAsync(cancellationToken);
+        
+        if (superClass is not null)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
-            elements = elements.GetBaseElements(await tableInfo.SuperClass.GetRelatedCollectionAsync(_dbContext!.Tables, t => t.Elements, cancellationToken)).Where(a =>
+
+            var super = await _dbContext.Tables.Entry(superClass).GetAllElementsAsync(cancellationToken);
+            if ((elements = elements.Where(e =>
             {
-                (ElementInfo e, ElementInfo? b, bool isTypeOverride) = a;
-                return isTypeOverride || b is null || e.IsActive != b.IsActive || e.IsArray != b.IsArray || e.MaxLength != b.MaxLength || e.IsDisplay != b.IsDisplay || e.SizeClass != b.SizeClass ||
-                    e.IsMandatory != b.IsMandatory || e.IsPrimary != b.IsPrimary || e.IsReadOnly != b.IsReadOnly || e.IsCalculated != b.IsCalculated || e.IsUnique != b.IsUnique ||
-                    !comparer.Equals(e.Label, b.Label) || ((e.Comments is null) ? b.Comments is not null : b.Comments is null || !comparer.Equals(e.Comments, b.Comments)) ||
-                    ((e.DefaultValue is null) ? b.DefaultValue is not null : b.DefaultValue is null || !comparer.Equals(e.Comments, b.DefaultValue)) ||
-                    ((e.PackageName is null) ? b.PackageName is not null : b.PackageName is null || !comparer.Equals(e.Comments, b.PackageName)) ||
-                    ((e.ScopeValue is null) ? b.ScopeValue is not null : b.ScopeValue is null || !comparer.Equals(e.Comments, b.ScopeValue));
-            }).Select(a => a.Inherited).ToArray();
-            if (elements.Length == 0)
+                var n = e.Name;
+                var se = super.FirstOrDefault(s => s.Name == n);
+                if (se is null || !e.IsIdenticalTo(se))
+                {
+                    e.Table = tableInfo;
+                    e.Source = source;
+                    return true;
+                }
+                return false;
+            }).ToArray()).Length == 0)
             {
                 _logger.LogNewTableSaveCompleteTrace(tableInfo.Name);
                 return;
             }
         }
-
-        foreach (ElementInfo e in elements)
-        {
-            e.Table = tableInfo;
-            e.Source = source;
-        }
+        else
+            foreach (ElementInfo e in elements)
+            {
+                e.Table = tableInfo;
+                e.Source = source;
+            }
 
         foreach (var g in elements.Where(e => e.Package is not null).GroupBy(e => e.Package!.SysId))
         {

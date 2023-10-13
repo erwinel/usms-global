@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using SnTsTypeGenerator.Models;
 using SnTsTypeGenerator.Services;
 using static SnTsTypeGenerator.Services.SnApiConstants;
+using System.Collections.Immutable;
 
 namespace SnTsTypeGenerator.Rendering;
 
@@ -272,32 +273,23 @@ public abstract class TypingsRenderer
             $"{table.Label.SmartQuoteJson()} glide record fields.",
             $"@see {{@link {GlideRecordNamespace}.{table.Name}}}",
             $"@see {{@link {GlideElementNamespace}.{table.Name}}}");
-        ElementInfo[] elements = (await entry.GetRelatedCollectionAsync(t => t.Elements, cancellationToken)).ToArray();
-        
-        (IEnumerable<ElementInheritance> inheritances, bool extendsBaseRecord) = await entry.GetElementInheritancesAsync(cancellationToken);
+
+        IEnumerable<ElementInheritance> inheritances = await entry.GetElementsAsync(cancellationToken);
         Collection<ElementInfo> commentOnlyElements = new();
         Collection<(ElementInfo Element, bool IsNew)> toRender = new();
         foreach (ElementInheritance i in inheritances)
         {
             if (i.Super is null)
                 toRender.Add((i.Element, false));
-            else if (i.Element.Overrides(i.Super, out bool isNew))
-            {
-                if (isNew)
-                    toRender.Add((i.Element, true));
-                else
-                    commentOnlyElements.Add(i.Element);
-            }
+            else if (NameComparer.Equals(i.Element.TypeName, i.Super.TypeName))
+                toRender.Add((i.Element, true));
+            else
+                commentOnlyElements.Add(i.Element);
         }
         TableInfo? superClass = table.SuperClass;
         await Writer.WriteAsync("export interface ");
         await Writer.WriteAsync(table.Name);
-        if (extendsBaseRecord)
-        {
-            await Writer.WriteAsync(" extends ");
-            await Writer.WriteAsync(TS_NAME_BASERECORD);
-        }
-        else if (superClass is not null)
+        if (superClass is not null)
         {
             await Writer.WriteAsync(" extends ");
             await Writer.WriteAsync(superClass.GetInterfaceTypeString(CurrentScope));
@@ -329,31 +321,15 @@ public abstract class TypingsRenderer
         }
         else if (toRender.Count > 0)
         {
-            var ie = toRender[0];
-            await RenderElementAsync(ie.Element, ie.IsNew, indentLevel, cancellationToken);
-            foreach ((ElementInfo element, bool isNew) in toRender.Skip(1))
+            var (element, isNew) = toRender[0];
+            await RenderElementAsync(element, isNew, indentLevel, cancellationToken);
+            foreach ((ElementInfo e, bool n) in toRender.Skip(1))
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
                 await Writer.WriteLineAsync();
-                await RenderElementAsync(element, isNew, indentLevel, cancellationToken);
+                await RenderElementAsync(e, n, indentLevel, cancellationToken);
             }
-        }
-        foreach (ElementInfo element in elements)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                break;
-            EntityEntry<ElementInfo> ee = DbContext.Elements.Entry(element);
-            TableInfo? reference = string.IsNullOrEmpty(element.RefTableName) ? null : await ee.GetReferencedEntityAsync(t => t.Reference, cancellationToken);
-            await Writer.WriteJsDocAsync(GetElementJsDoc(element, await ee.GetReferencedEntityAsync(t => t.Type, cancellationToken), reference,
-                string.IsNullOrEmpty(table.PackageName) ? null : await ee.GetReferencedEntityAsync(t => t.Package, cancellationToken)), cancellationToken);
-            await Writer.WriteAsync(element.Name);
-            await Writer.WriteAsync(": ");
-            if (reference is null)
-                await Writer.WriteAsync(GetElementName(element.TypeName));
-            else
-                await Writer.WriteAsync(reference.GetGlideElementTypeString(CurrentScope));
-            await Writer.WriteLineAsync(";");
         }
         Writer.Indent = indentLevel - 1;
         await Writer.WriteLineAsync("}");
