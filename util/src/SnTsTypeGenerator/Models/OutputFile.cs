@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -10,7 +11,7 @@ namespace SnTsTypeGenerator.Models;
 /// This defines an explicit output file base name.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.OutputFiles))]
-public class OutputFile : IValidatableObject
+public class OutputFile : IValidatableObject, IEquatable<OutputFile>
 {
     /// <summary>
     /// Gets or sets the unique identifier for the output file.
@@ -73,4 +74,17 @@ public class OutputFile : IValidatableObject
     [NotNull]
     [BackingField(nameof(_packages))]
     public virtual HashSet<SysPackage> Packages { get => _packages; set => _packages = value ?? new(); }
+
+    public bool Equals(OutputFile? other) => other is not null && (ReferenceEquals(this, other) || Id.Equals(other.Id));
+
+    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+
+    public override int GetHashCode() => Id.GetHashCode();
+
+    public override string ToString() => nameof(OutputFile) + new JsonObject()
+    {
+        { nameof(Id), JsonValue.Create(Id) },
+        { nameof(Name), JsonValue.Create(_name) },
+        { nameof(Label), JsonValue.Create(_label) }
+    }.ToJsonString();
 }

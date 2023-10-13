@@ -2,11 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 
 namespace SnTsTypeGenerator.Models;
 
 [Table(nameof(Services.TypingsDbContext.Sources))]
-public class SourceInfo
+public class SourceInfo : IEquatable<SourceInfo>
 {
     private string _fqdn = string.Empty;
 
@@ -73,4 +74,18 @@ public class SourceInfo
     [NotNull]
     [BackingField(nameof(_packages))]
     public virtual HashSet<SysPackage> Packages { get => _packages; set => _packages = value ?? new(); }
+
+    public bool Equals(SourceInfo? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_fqdn, other._fqdn));
+
+    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+
+    public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_fqdn);
+
+    public override string ToString() => nameof(SourceInfo) + new JsonObject()
+    {
+        { nameof(FQDN), JsonValue.Create(_fqdn) },
+        { nameof(Label), JsonValue.Create(_label) },
+        { nameof(IsPersonalDev), JsonValue.Create(IsPersonalDev) },
+        { nameof(LastAccessed), JsonValue.Create(LastAccessed) }
+    }.ToJsonString();
 }

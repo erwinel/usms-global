@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 
 namespace SnTsTypeGenerator.Models;
 
@@ -9,22 +10,9 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Dictionary Entry" (<see cref="SnApiConstants.TABLE_NAME_SYS_DICTIONARY" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Elements))]
-public class ElementInfo
+public class ElementInfo : IEquatable<ElementInfo>
 {
     private readonly object _syncRoot = new();
-
-    private string _sysID = string.Empty;
-
-    /// <summary>
-    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
-    /// </summary>
-    [NotNull]
-    [BackingField(nameof(_sysID))]
-    public string SysID
-    {
-        get => _sysID;
-        set => _sysID = value ?? string.Empty;
-    }
 
     private string _name = string.Empty;
 
@@ -441,4 +429,56 @@ public class ElementInfo
             }
         }
     }
+
+    private string _sysID = string.Empty;
+
+    /// <summary>
+    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_sysID))]
+    public string SysID
+    {
+        get => _sysID;
+        set => _sysID = value ?? string.Empty;
+    }
+
+    public bool Equals(ElementInfo? other) => other is not null && (ReferenceEquals(this, other) ||
+        (Services.SnApiConstants.NameComparer.Equals(_name, other._name) && Services.SnApiConstants.NameComparer.Equals(_tableName, other._tableName)));
+
+    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            return (21 + Services.SnApiConstants.NameComparer.GetHashCode(_name)) * 7 + (_table?.GetHashCode() ?? Services.SnApiConstants.NameComparer.GetHashCode(_tableName));
+        }
+    }
+
+    public override string ToString() => nameof(ElementInfo) + new JsonObject()
+    {
+        { nameof(Name), JsonValue.Create(_name) },
+        { nameof(Label), JsonValue.Create(_label) },
+        { nameof(IsActive), JsonValue.Create(IsActive) },
+        { nameof(IsArray), JsonValue.Create(IsArray) },
+        { nameof(MaxLength), JsonValue.Create(MaxLength) },
+        { nameof(Comments), JsonValue.Create(Comments) },
+        { nameof(DefaultValue), JsonValue.Create(DefaultValue) },
+        { nameof(IsDisplay), JsonValue.Create(IsDisplay) },
+        { nameof(SizeClass), JsonValue.Create(SizeClass) },
+        { nameof(IsMandatory), JsonValue.Create(IsMandatory) },
+        { nameof(IsPrimary), JsonValue.Create(IsPrimary) },
+        { nameof(IsReadOnly), JsonValue.Create(IsReadOnly) },
+        { nameof(IsCalculated), JsonValue.Create(IsCalculated) },
+        { nameof(IsUnique), JsonValue.Create(IsUnique) },
+        { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
+        { nameof(Package), JsonValue.Create(_packageName) },
+        { nameof(Scope), JsonValue.Create(_scopeValue) },
+        { nameof(Table), JsonValue.Create(_tableName) },
+        { nameof(Type), JsonValue.Create(_typeName) },
+        { nameof(Reference), JsonValue.Create(_refTableName) },
+        { nameof(Source), JsonValue.Create(_sourceFqdn) },
+        { nameof(SysID), JsonValue.Create(_sysID) }
+    }.ToJsonString();
 }
