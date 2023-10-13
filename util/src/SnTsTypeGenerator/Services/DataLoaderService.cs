@@ -190,15 +190,6 @@ public sealed class DataLoaderService : IDisposable
                 e.Package = p;
         }
 
-        foreach (var g in elements.Where(e => e.Scope is not null).GroupBy(e => e.Scope!.Value))
-        {
-            ElementInfo[] arr = g.ToArray();
-            cancellationToken.ThrowIfCancellationRequested();
-            SysScope s = await GetScopeAsync(arr[0].Scope!, cancellationToken);
-            foreach (ElementInfo e in arr)
-                e.Scope = s;
-        }
-
         foreach (var g in elements.Where(e => e.Type is not null).GroupBy(e => e.Type!.Name))
         {
             ElementInfo[] arr = g.ToArray();
@@ -271,7 +262,6 @@ public sealed class DataLoaderService : IDisposable
                 Label = "Sys ID",
                 MaxLength = 32,
                 Name = JSON_KEY_SYS_ID,
-                ScopeValue = DEFAULT_NAMESPACE,
                 SysID = "00000000000000000000000000000000",
                 TypeName = TYPE_NAME_GUID,
                 Table = tableInfo,
@@ -284,7 +274,6 @@ public sealed class DataLoaderService : IDisposable
                 Label = "Created by",
                 MaxLength = 40,
                 Name = JSON_KEY_SYS_CREATED_BY,
-                ScopeValue = DEFAULT_NAMESPACE,
                 SysID = "9be67479a3b34cf395f500f3c165a9af",
                 TypeName = TYPE_NAME_string,
                 Table = tableInfo,
@@ -297,7 +286,6 @@ public sealed class DataLoaderService : IDisposable
                 Label = "Created",
                 MaxLength = 40,
                 Name = JSON_KEY_SYS_CREATED_ON,
-                ScopeValue = DEFAULT_NAMESPACE,
                 SysID = "6bd533127c67405d998d3cb50f44419a",
                 TypeName = TYPE_NAME_glide_date_time,
                 Table = tableInfo,
@@ -310,7 +298,6 @@ public sealed class DataLoaderService : IDisposable
                 Label = "Updates",
                 MaxLength = 40,
                 Name = JSON_KEY_SYS_MOD_COUNT,
-                ScopeValue = DEFAULT_NAMESPACE,
                 SysID = "75a55d94320c4041a7e4a1e14813de27",
                 TypeName = TYPE_NAME_integer,
                 Table = tableInfo,
@@ -323,7 +310,6 @@ public sealed class DataLoaderService : IDisposable
                 Label = "Updated by",
                 MaxLength = 40,
                 Name = JSON_KEY_SYS_UPDATED_BY,
-                ScopeValue = DEFAULT_NAMESPACE,
                 SysID = "ef0b4750753d4f6c82499a605b490af4",
                 TypeName = TYPE_NAME_string,
                 Table = tableInfo,
@@ -336,7 +322,6 @@ public sealed class DataLoaderService : IDisposable
                 Label = "Updated",
                 MaxLength = 40,
                 Name = JSON_KEY_SYS_UPDATED_ON,
-                ScopeValue = DEFAULT_NAMESPACE,
                 SysID = "3f68a52adc8a4c5a960ec2a9a2bd9fd6",
                 TypeName = TYPE_NAME_glide_date_time,
                 Table = tableInfo,

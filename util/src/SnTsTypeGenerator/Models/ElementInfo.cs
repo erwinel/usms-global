@@ -160,61 +160,6 @@ public class ElementInfo : IEquatable<ElementInfo>
         }
     }
 
-    private string? _scopeValue;
-
-    /// <summary>
-    /// Value of the associated record for the "Application" (<see cref="SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
-    /// </summary>
-    [BackingField(nameof(_scopeValue))]
-    public string? ScopeValue
-    {
-        get => _scope?.Value ?? _scopeValue;
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_scopeValue is not null)
-                    {
-                        _scopeValue = null;
-                        _scope = null;
-                    }
-                }
-                else if (_scopeValue is null || !value.Equals(_scopeValue, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    if (_scope is null)
-                        _scopeValue = value;
-                    else if (value.Equals(_scope.Value, StringComparison.InvariantCultureIgnoreCase))
-                        _scopeValue = null;
-                    else
-                        _scope = null;
-                }
-            }
-        }
-    }
-
-    private SysScope? _scope;
-
-    /// <summary>
-    /// The scope for the element.
-    /// </summary>
-    public SysScope? Scope
-    {
-        get => _scope;
-        set
-        {
-            lock (_syncRoot)
-            {
-                if ((value is null) ? _scope is null : _scope is not null && ReferenceEquals(_scope, value))
-                    return;
-
-                _scope = value;
-                _scopeValue = null;
-            }
-        }
-    }
-
     private string _tableName = string.Empty;
 
     /// <summary>
@@ -474,7 +419,6 @@ public class ElementInfo : IEquatable<ElementInfo>
         { nameof(IsUnique), JsonValue.Create(IsUnique) },
         { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
         { nameof(Package), JsonValue.Create(_packageName) },
-        { nameof(Scope), JsonValue.Create(_scopeValue) },
         { nameof(Table), JsonValue.Create(_tableName) },
         { nameof(Type), JsonValue.Create(_typeName) },
         { nameof(Reference), JsonValue.Create(_refTableName) },

@@ -187,7 +187,6 @@ public sealed class TableAPIService
                     SizeClass = sysDictionary.GetFieldAsIntOrNull(JSON_KEY_SIZECLASS),
                     Reference = GetTable(sysDictionary, JSON_KEY_REFERENCE),
                     Package = GetPackage(sysDictionary),
-                    Scope = GetScope(sysDictionary),
                     Type = sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new GlideType()
                     {
                         Name = type,

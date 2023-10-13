@@ -122,12 +122,6 @@ public class SysScope : IEquatable<SysScope>
     [BackingField(nameof(_tables))]
     public virtual HashSet<TableInfo> Tables { get => _tables; set => _tables = value ?? new(); }
 
-    private HashSet<ElementInfo> _elements = new();
-
-    [NotNull]
-    [BackingField(nameof(_elements))]
-    public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
-
     public bool Equals(SysScope? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_value, other._value));
 
     public override bool Equals(object? obj) => Equals(obj as ElementInfo);
