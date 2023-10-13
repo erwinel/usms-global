@@ -71,10 +71,6 @@ public abstract class TypingsRenderer
 
     private static IEnumerable<string> GetGlideRecordJsDocLines(TableInfo table, SysPackage? package)
     {
-        // /**
-        //  * "Guided Setup Content" glide record.
-        //  * Scope: "Guided Setup - Legacy" (sn_guided_setup)
-        //  */
         yield return $"{((string.IsNullOrWhiteSpace(table.Label) || table.Label == table.Name) ? table.Name : table.Label.SmartQuoteJson())} glide record.";
         if (!string.IsNullOrWhiteSpace(table.NumberPrefix))
             yield return $"Auto-number Prefix: {table.NumberPrefix}";
