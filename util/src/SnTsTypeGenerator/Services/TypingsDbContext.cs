@@ -118,6 +118,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(TableInfo.ExtensionModel)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(TableInfo.IsExtendable)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(TableInfo.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    ""{nameof(TableInfo.IsInterface)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(TableInfo.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(TableInfo.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(TableInfo.SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(TableInfo.SuperClass)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
@@ -127,6 +128,7 @@ public partial class TypingsDbContext : DbContext
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.SysID)}\" COLLATE NOCASE)";
         yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.IsExtendable)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.IsExtendable)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.IsInterface)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.IsInterface)}\")";
     }
 
     private static IEnumerable<string> GetElementInfoDbInitCommands()
@@ -371,6 +373,7 @@ public partial class TypingsDbContext : DbContext
                 _ = builder.HasKey(t => t.Name);
                 _ = builder.HasIndex(t => t.SysID).IsUnique();
                 _ = builder.HasIndex(t => t.IsExtendable);
+                _ = builder.HasIndex(t => t.IsInterface);
                 _ = builder.Property(nameof(TableInfo.Name)).UseCollation(COLLATION_NOCASE);
                 _ = builder.Property(nameof(TableInfo.Label)).UseCollation(COLLATION_NOCASE);
                 _ = builder.Property(nameof(TableInfo.SysID)).UseCollation(COLLATION_NOCASE);

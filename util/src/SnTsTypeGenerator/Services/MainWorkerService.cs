@@ -29,6 +29,7 @@ public sealed class MainWorkerService : BackgroundService
             if (!(_dataLoader.InitSuccessful && _renderer.InitSuccessful))
                 return;
 
+            _ = await _dataLoader.GetBaseRecordTypeAsync(stoppingToken);
             Collection<TableInfo> toRender = new();
             foreach (string name in _tableNames)
             {

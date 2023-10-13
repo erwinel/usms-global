@@ -24,6 +24,11 @@ public class AppSettings
     public List<string>? Tables { get; set; }
 
     /// <summary>
+    /// Emits typings for base types.
+    /// </summary>
+    public bool? EmitBaseTypes { get; set; }
+
+    /// <summary>
     /// Login user name.
     /// </summary>
     public string? UserName { get; set; }
@@ -69,6 +74,7 @@ public class AppSettings
     {
         { $"-{SHORTHAND_d}", $"{nameof(SnTsTypeGenerator)}:{nameof(DbFile)}" },
         { $"-{SHORTHAND_t}", $"{nameof(SnTsTypeGenerator)}:{nameof(Table)}" },
+        { $"-{SHORTHAND_b}", $"{nameof(SnTsTypeGenerator)}:{nameof(EmitBaseTypes)}" },
         { $"-{SHORTHAND_u}", $"{nameof(SnTsTypeGenerator)}:{nameof(UserName)}" },
         { $"-{SHORTHAND_p}", $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
         { $"-{SHORTHAND_r}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },

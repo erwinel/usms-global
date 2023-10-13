@@ -50,6 +50,11 @@ public static class CmdLineConstants
     public const char SHORTHAND_t = 't';
 
     /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.EmitBaseTypes" /></c> setting.
+    /// </summary>
+    public const char SHORTHAND_b = 'b';
+
+    /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.UserName" /></c> setting.
     /// </summary>
     public const char SHORTHAND_u = 'u';

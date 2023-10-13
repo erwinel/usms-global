@@ -14,6 +14,11 @@ public sealed class TableAPIService
     private readonly SnClientHandlerService? _handler;
 
     /// <summary>
+    /// Gets the base URL of the remote ServiceNow instance.
+    /// </summary>
+    internal string SourceFqdn => (_handler ?? throw new InvalidOperationException()).BaseURL.Host;
+
+    /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
     internal bool InitSuccessful => _handler?.InitSuccessful ?? false;

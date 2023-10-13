@@ -86,6 +86,11 @@ public class TableInfo
     public DateTime LastUpdated { get; set; }
 
     /// <summary>
+    /// Indicates whether the table is a TypeScript interface rather than a GlideRecord type.
+    /// </summary>
+    public bool IsInterface { get; set; }
+
+    /// <summary>
     /// Name of the associated record for the "Package" (<see cref="SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
     private string? _packageName;

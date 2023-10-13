@@ -202,6 +202,15 @@ public static class EntityFrameworkExtensions
                 element.RefTableName.NoCaseEquals(superElement.RefTableName) && NameComparer.Equals(element.Label, superElement.Label));
     }
 
+    public static bool ExtendsBaseRecord(this IEnumerable<ElementInfo> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.TypeName == TYPE_NAME_GUID) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.TypeName == TYPE_NAME_string) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.TypeName == TYPE_NAME_glide_date_time) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
+
+    public static async Task<bool> ExtendsBaseRecordAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken) => entity is not null &&
+        (await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken)).ExtendsBaseRecord();
+
+    // BUG: Database now contains a record for IBaseRecord
     internal static async Task<(IEnumerable<ElementInheritance> Inheritances, bool ExtendsBaseRecord)> GetElementInheritancesAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
     {
         var elements = await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken);

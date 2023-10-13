@@ -273,6 +273,7 @@ public abstract class TypingsRenderer
             $"@see {{@link {GlideRecordNamespace}.{table.Name}}}",
             $"@see {{@link {GlideElementNamespace}.{table.Name}}}");
         ElementInfo[] elements = (await entry.GetRelatedCollectionAsync(t => t.Elements, cancellationToken)).ToArray();
+        
         (IEnumerable<ElementInheritance> inheritances, bool extendsBaseRecord) = await entry.GetElementInheritancesAsync(cancellationToken);
         Collection<ElementInfo> commentOnlyElements = new();
         Collection<(ElementInfo Element, bool IsNew)> toRender = new();

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SnTsTypeGenerator.Models;
+using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Services;
 
@@ -236,6 +237,110 @@ public sealed class DataLoaderService : IDisposable
             await SaveTableAsync(table, cancellationToken);
         }
         return table;
+    }
+
+    internal async Task<TableInfo> GetBaseRecordTypeAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_dbContext is null)
+            throw new ObjectDisposedException(nameof(DataLoaderService));
+        TableInfo? tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == TS_NAME_BASERECORD && t.IsInterface, cancellationToken);
+        if (tableInfo is null)
+        {
+            string sourceFqdn = _tableAPIService.SourceFqdn;
+            tableInfo = new()
+            {
+                SysID = "00000000000000000000000000000000",
+                IsInterface = true,
+                Label = "",
+                LastUpdated = DateTime.Now,
+                Name = TS_NAME_BASERECORD,
+                SourceFqdn = sourceFqdn
+            };
+            await _dbContext.Tables.AddAsync(tableInfo, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.Elements.AddAsync(new ElementInfo()
+            {
+                IsActive = true,
+                IsPrimary = true,
+                Label = "Sys ID",
+                MaxLength = 32,
+                Name = JSON_KEY_SYS_ID,
+                ScopeValue = DEFAULT_NAMESPACE,
+                SysID = "00000000000000000000000000000000",
+                TypeName = TYPE_NAME_GUID,
+                Table = tableInfo,
+                SourceFqdn = sourceFqdn,
+                LastUpdated = DateTime.Now
+            }, cancellationToken);
+            await _dbContext.Elements.AddAsync(new ElementInfo()
+            {
+                IsActive = true,
+                Label = "Created by",
+                MaxLength = 40,
+                Name = JSON_KEY_SYS_CREATED_BY,
+                ScopeValue = DEFAULT_NAMESPACE,
+                SysID = "9be67479a3b34cf395f500f3c165a9af",
+                TypeName = TYPE_NAME_string,
+                Table = tableInfo,
+                SourceFqdn = sourceFqdn,
+                LastUpdated = DateTime.Now
+            }, cancellationToken);
+            await _dbContext.Elements.AddAsync(new ElementInfo()
+            {
+                IsActive = true,
+                Label = "Created",
+                MaxLength = 40,
+                Name = JSON_KEY_SYS_CREATED_ON,
+                ScopeValue = DEFAULT_NAMESPACE,
+                SysID = "6bd533127c67405d998d3cb50f44419a",
+                TypeName = TYPE_NAME_glide_date_time,
+                Table = tableInfo,
+                SourceFqdn = sourceFqdn,
+                LastUpdated = DateTime.Now
+            }, cancellationToken);
+            await _dbContext.Elements.AddAsync(new ElementInfo()
+            {
+                IsActive = true,
+                Label = "Updates",
+                MaxLength = 40,
+                Name = JSON_KEY_SYS_MOD_COUNT,
+                ScopeValue = DEFAULT_NAMESPACE,
+                SysID = "75a55d94320c4041a7e4a1e14813de27",
+                TypeName = TYPE_NAME_integer,
+                Table = tableInfo,
+                SourceFqdn = sourceFqdn,
+                LastUpdated = DateTime.Now
+            }, cancellationToken);
+            await _dbContext.Elements.AddAsync(new ElementInfo()
+            {
+                IsActive = true,
+                Label = "Updated by",
+                MaxLength = 40,
+                Name = JSON_KEY_SYS_UPDATED_BY,
+                ScopeValue = DEFAULT_NAMESPACE,
+                SysID = "ef0b4750753d4f6c82499a605b490af4",
+                TypeName = TYPE_NAME_string,
+                Table = tableInfo,
+                SourceFqdn = sourceFqdn,
+                LastUpdated = DateTime.Now
+            }, cancellationToken);
+            await _dbContext.Elements.AddAsync(new ElementInfo()
+            {
+                IsActive = true,
+                Label = "Updated",
+                MaxLength = 40,
+                Name = JSON_KEY_SYS_UPDATED_ON,
+                ScopeValue = DEFAULT_NAMESPACE,
+                SysID = "3f68a52adc8a4c5a960ec2a9a2bd9fd6",
+                TypeName = TYPE_NAME_glide_date_time,
+                Table = tableInfo,
+                SourceFqdn = sourceFqdn,
+                LastUpdated = DateTime.Now
+            }, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        return tableInfo;
     }
 
     /// <summary>
