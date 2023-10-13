@@ -100,17 +100,36 @@ public abstract class TypingsRenderer
         else
             await Writer.WriteJsDocAsync(GetGlideRecordJsDocLines(table, await entry.GetReferencedEntityAsync(t => t.Package, cancellationToken)), cancellationToken);
         TableInfo? superClass = string.IsNullOrEmpty(table.SuperClassName) ? null : await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
+        await Writer.WriteAsync("export type ");
+        await Writer.WriteAsync(table.Name);
+        await Writer.WriteAsync(" = ");
+        await Writer.WriteAsync(TableFieldsNamespace);
+        await Writer.WriteAsync(".");
+        await Writer.WriteAsync(table.Name);
+        await Writer.WriteAsync(" & ");
+        await Writer.WriteAsync(table.Name);
         if (superClass is null)
-            Writer.WriteLine($"export type {table.Name} = {TableFieldsNamespace}.{table.Name} & {TS_NAME_GlideRecord};");
+            await Writer.WriteAsync(TS_NAME_GlideRecord);
         else
-            Writer.WriteLine($"export type {table.Name} = {TableFieldsNamespace}.{table.Name} & {superClass.GetInterfaceTypeString(CurrentScope)};");
+            await Writer.WriteAsync(superClass.GetInterfaceTypeString(CurrentScope));
+        await Writer.WriteLineAsync(";");
     }
 
     private async Task RenderElementTypeAsync(TableInfo table, int indentLevel, CancellationToken cancellationToken)
     {
         Writer.Indent = indentLevel;
         await Writer.WriteJsDocAsync(cancellationToken, $"Element that refers to a {table.Label.SmartQuoteJson()} glide record.");
-        await Writer.WriteLineAsync($"export type {table.Name} = Reference<{TableFieldsNamespace}.{table.Name}, {GlideRecordNamespace}.{table.Name}>;");
+        await Writer.WriteAsync("export type ");
+        await Writer.WriteAsync(table.Name);
+        await Writer.WriteAsync(" = Reference<");
+        await Writer.WriteAsync(TableFieldsNamespace);
+        await Writer.WriteAsync(".");
+        await Writer.WriteAsync(table.Name);
+        await Writer.WriteAsync(", ");
+        await Writer.WriteAsync(GlideRecordNamespace);
+        await Writer.WriteAsync(".");
+        await Writer.WriteAsync(table.Name);
+        await Writer.WriteLineAsync(">;");
     }
 
     private static IEnumerable<string> GetFlags(ElementInfo elementInfo)
@@ -274,42 +293,34 @@ public abstract class TypingsRenderer
             }
         }
         TableInfo? superClass = table.SuperClass;
+        await Writer.WriteAsync("export interface ");
+        await Writer.WriteAsync(table.Name);
         if (extendsBaseRecord)
         {
-            if (toRender.Count > 0 || commentOnlyElements.Count > 0)
-                await Writer.WriteLineAsync($"export interface {table.Name} extends {TS_NAME_BASERECORD} {{");
-            else
-            {
-                await Writer.WriteLineAsync($"export interface {table.Name} extends {TS_NAME_BASERECORD} {{ }}");
-                return;
-            }
+            await Writer.WriteAsync(" extends ");
+            await Writer.WriteAsync(TS_NAME_BASERECORD);
         }
-        else if (superClass is null)
+        else if (superClass is not null)
         {
-            if (toRender.Count > 0)
-                await Writer.WriteLineAsync($"export interface {table.Name} {{");
-            else
-            {
-                await Writer.WriteLineAsync($"export interface {table.Name} {{ }}");
-                return;
-            }
+            await Writer.WriteAsync(" extends ");
+            await Writer.WriteAsync(superClass.GetInterfaceTypeString(CurrentScope));
+
         }
-        else if (toRender.Count > 0 || commentOnlyElements.Count > 0)
-            await Writer.WriteLineAsync($"export interface {table.Name} extends {superClass.GetInterfaceTypeString(CurrentScope)} {{");
-        else
+        if (toRender.Count == 0 && commentOnlyElements.Count == 0)
         {
-            await Writer.WriteLineAsync($"export interface {table.Name} extends {superClass.GetInterfaceTypeString(CurrentScope)} {{ }}");
+            await Writer.WriteLineAsync(" { }");
             return;
         }
+        await Writer.WriteLineAsync(" {");
         if (commentOnlyElements.Count > 0)
         {
-            // TODO: Render JSDoc comments for commentOnlyElements[0];
+            await RenderJsDocOnlyElementAsync(commentOnlyElements[0], indentLevel, cancellationToken);
             foreach (ElementInfo element in commentOnlyElements.Skip(1))
             {
                 if (cancellationToken.IsCancellationRequested)
                     break;
                 await Writer.WriteLineAsync();
-                // TODO: Render JSDoc comments
+                await RenderJsDocOnlyElementAsync(element, indentLevel, cancellationToken);
             }
             foreach ((ElementInfo element, bool isNew) in toRender)
             {
@@ -339,13 +350,46 @@ public abstract class TypingsRenderer
             TableInfo? reference = string.IsNullOrEmpty(element.RefTableName) ? null : await ee.GetReferencedEntityAsync(t => t.Reference, cancellationToken);
             await Writer.WriteJsDocAsync(GetElementJsDoc(element, await ee.GetReferencedEntityAsync(t => t.Type, cancellationToken), reference,
                 string.IsNullOrEmpty(table.PackageName) ? null : await ee.GetReferencedEntityAsync(t => t.Package, cancellationToken)), cancellationToken);
+            await Writer.WriteAsync(element.Name);
+            await Writer.WriteAsync(": ");
             if (reference is null)
-                await Writer.WriteAsync($"{element.Name}: {GetElementName(element.TypeName)};");
+                await Writer.WriteAsync(GetElementName(element.TypeName));
             else
-                await Writer.WriteLineAsync($"{element.Name}: {reference.GetGlideElementTypeString(CurrentScope)};");
+                await Writer.WriteAsync(reference.GetGlideElementTypeString(CurrentScope));
+            await Writer.WriteLineAsync(";");
         }
         Writer.Indent = indentLevel - 1;
         await Writer.WriteLineAsync("}");
+    }
+
+    private IEnumerable<string> GetFullElementJsDoc(ElementInfo element, GlideType? type, TableInfo? reference, SysPackage? package)
+    {
+        string[] description = GetElementJsDoc(element, type, reference, package).ToArray();
+        string code = $"@property {{{GetElementName(element.TypeName)}}} {element.Name}";
+        if (description.Length == 0)
+            yield return code;
+        else
+        {
+            yield return $"{code} - {description[0]}";
+            if (description.Length > 1)
+            {
+                string typeString = GetElementName(element.TypeName);
+                string indent = new(' ', typeString.Length + element.Name.Length + 16);
+                foreach (string d in description.Skip(1))
+                    yield return indent + d;
+            }
+        }
+    }
+
+    private async Task RenderJsDocOnlyElementAsync(ElementInfo element, int indentLevel, CancellationToken cancellationToken)
+    {
+        Writer.Indent = indentLevel;
+        if (cancellationToken.IsCancellationRequested)
+            return;
+        EntityEntry<ElementInfo> ee = DbContext.Elements.Entry(element);
+        TableInfo? reference = string.IsNullOrEmpty(element.RefTableName) ? null : await ee.GetReferencedEntityAsync(t => t.Reference, cancellationToken);
+        await Writer.WriteJsDocAsync(GetFullElementJsDoc(element, await ee.GetReferencedEntityAsync(t => t.Type, cancellationToken), reference,
+            string.IsNullOrEmpty(element.PackageName) ? null : await ee.GetReferencedEntityAsync(t => t.Package, cancellationToken)), cancellationToken);
     }
 
     private async Task RenderElementAsync(ElementInfo element, bool isNew, int indentLevel, CancellationToken cancellationToken)
@@ -358,15 +402,13 @@ public abstract class TypingsRenderer
         await Writer.WriteJsDocAsync(GetElementJsDoc(element, await ee.GetReferencedEntityAsync(t => t.Type, cancellationToken), reference,
             string.IsNullOrEmpty(element.PackageName) ? null : await ee.GetReferencedEntityAsync(t => t.Package, cancellationToken)), cancellationToken);
         if (isNew)
-        {
-            if (reference is null)
-                await Writer.WriteAsync($"new {element.Name}: {GetElementName(element.TypeName)};");
-            else
-                await Writer.WriteLineAsync($"new {element.Name}: {reference.GetGlideElementTypeString(CurrentScope)};");
-        }
-        else if (reference is null)
-            await Writer.WriteAsync($"{element.Name}: {GetElementName(element.TypeName)};");
+            Writer.Write("new ");
+        await Writer.WriteAsync(element.Name);
+        await Writer.WriteAsync(": ");
+        if (reference is null)
+            await Writer.WriteAsync(GetElementName(element.TypeName));
         else
-            await Writer.WriteLineAsync($"{element.Name}: {reference.GetGlideElementTypeString(CurrentScope)};");
+            await Writer.WriteAsync(reference.GetGlideElementTypeString(CurrentScope));
+        await Writer.WriteAsync(";");
     }
 }
