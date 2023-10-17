@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -9,9 +10,6 @@ namespace SnTsTypeGenerator.Services;
 
 public static class EntityFrameworkExtensions
 {
-    private static readonly GlideType _stringType = new() { Name = TYPE_NAME_string, Label = "String" };
-    private static readonly GlideType _dateTimeType = new() { Name = TYPE_NAME_glide_date_time, Label = "Date/Time" };
-
     /// <summary>
     /// Indicates whether the entry exists in the target database.
     /// </summary>
@@ -158,20 +156,32 @@ public static class EntityFrameworkExtensions
         return result is null ? (await dbSet.Entry(entity).GetReferencedEntryAsync(Expression.Lambda<Func<TEntity, TProperty?>>(Expression.Call(propertyAccessor.Method)), cancellationToken))?.Entity : result;
     }
 
-    public static IEnumerable<(ElementInfo Inherited, ElementInfo? Base, bool IsTypeOverride)> GetBaseElements(this IEnumerable<ElementInfo> inheritedElements, IEnumerable<ElementInfo> baseElements)
+    public static bool IsIdenticalTo(this ElementInfo x, ElementInfo y)
     {
-        return inheritedElements.Select<ElementInfo, (ElementInfo Inherited, ElementInfo? Base, bool IsTypeOverride)>(e =>
+        if (ReferenceEquals(x, y))
+            return true;
+        return ReferenceEquals(x, y) || (x.IsActive == y.IsActive && x.IsArray == y.IsArray && x.IsCalculated == y.IsCalculated && x.IsDisplay == y.IsDisplay && x.IsMandatory == y.IsMandatory &&
+            x.IsPrimary == y.IsPrimary && x.IsReadOnly == y.IsReadOnly && x.IsUnique == y.IsUnique && (x.MaxLength.HasValue ? y.MaxLength.HasValue && x.MaxLength.Value == y.MaxLength.Value : !y.MaxLength.HasValue) &&
+            (x.SizeClass.HasValue ? y.SizeClass.HasValue && x.SizeClass.Value == y.SizeClass.Value : !y.MaxLength.HasValue) && NameComparer.Equals(x.SysID, y.SysID) && NameComparer.Equals(x.Name, y.Name) &&
+            NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && x.PackageName.NoCaseEquals(y.PackageName));
+    }
+    
+    internal static async Task<IEnumerable<ElementInheritance>> GetAllElementInheritancesAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
+    {
+        var elements = await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken);
+        EntityEntry<TableInfo>? superClass = await entity.GetReferencedEntryAsync(t => t.SuperClass, cancellationToken);
+        if (superClass is null)
+            return elements.Select(e => new ElementInheritance(e, null));
+        var super = await GetAllElementInheritancesAsync(superClass, cancellationToken);
+        return elements.Select(e =>
         {
-            string name = e.Name;
-            ElementInfo? b = baseElements.FirstOrDefault(o => o.Name == name);
-            if (b is null)
-                return (e, null, false);
-            string tn = e.TypeName;
-            string? r = e.RefTableName;
-            if (r is null)
-                return (e, b, b.RefTableName is not null || !NameComparer.Equals(b.TypeName, tn));
-            return (e, b, b.RefTableName is null || !(NameComparer.Equals(b.TypeName, tn) && NameComparer.Equals(b.RefTableName, r)));
-        });
+            var n = e.Name;
+            return new ElementInheritance(e, super.FirstOrDefault(s => NameComparer.Equals(s.Element.Name, n))?.Element);
+        }).Concat(super.Where(s =>
+        {
+            var n = s.Element.Name;
+            return !elements.Any(e => NameComparer.Equals(e.Name, n));
+        })).OrderBy(i => i.Element.Name, NameComparer);
     }
 
     internal static async Task<IEnumerable<ElementInfo>> GetAllElementsAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
@@ -180,26 +190,30 @@ public static class EntityFrameworkExtensions
         EntityEntry<TableInfo>? superClass = await entity.GetReferencedEntryAsync(t => t.SuperClass, cancellationToken);
         if (superClass is null)
             return elements;
-        var superElements = (await superClass.GetAllElementsAsync(cancellationToken)).ToArray();
-        if (superElements.Length == 0)
-            return elements;
-        return elements.Concat(superElements.Where(e => !elements.Any(b => NameComparer.Equals(b.Name, e.Name) && NameComparer.Equals(b.TypeName, e.TypeName))));
+        var super = await GetAllElementsAsync(superClass, cancellationToken);
+        return elements.Concat(super.Where(s =>
+        {
+            var n = s.Name;
+            return !elements.Any(e => NameComparer.Equals(e.Name, n));
+        })).OrderBy(e => e.Name, NameComparer);
     }
 
-    internal static bool Overrides(this ElementInfo element, ElementInfo superElement, out bool isNew)
+    internal static async Task<IEnumerable<ElementInheritance>> GetElementsAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
     {
-        if (!NameComparer.Equals(element.Name, superElement.Name))
+        var elements = await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken);
+        EntityEntry<TableInfo>? superClass = await entity.GetReferencedEntryAsync(t => t.SuperClass, cancellationToken);
+        if (superClass is null)
+            return elements.Select(e => new ElementInheritance(e, null));
+        var super = await GetAllElementInheritancesAsync(superClass, cancellationToken);
+        return elements.Select(e =>
         {
-            isNew = false;
-            return false;
-        }
-        isNew = !NameComparer.Equals(element.TypeName, superElement.TypeName);
-        return element.IsActive != superElement.IsActive || element.IsArray != superElement.IsArray || element.IsDisplay != superElement.IsDisplay || element.IsMandatory != superElement.IsMandatory ||
-            element.IsPrimary != superElement.IsPrimary || element.IsReadOnly != superElement.IsReadOnly || element.IsCalculated != superElement.IsCalculated || element.IsUnique != superElement.IsUnique ||
-            element.MaxLength.HasValue ? superElement.MaxLength.HasValue && element.MaxLength!.Value == superElement.MaxLength.Value : !superElement.MaxLength.HasValue ||
-            element.SizeClass.HasValue ? superElement.SizeClass.HasValue && element.SizeClass!.Value == superElement.SizeClass.Value : !superElement.SizeClass.HasValue ||
-            !(element.Comments.NoCaseEquals(superElement.Comments) && element.DefaultValue.NoCaseEquals(superElement.DefaultValue) && element.PackageName.NoCaseEquals(superElement.PackageName) &&
-                element.RefTableName.NoCaseEquals(superElement.RefTableName) && NameComparer.Equals(element.Label, superElement.Label));
+            var n = e.Name;
+            return new ElementInheritance(e, super.FirstOrDefault(s => NameComparer.Equals(s.Element.Name, n))?.Element);
+        }).Where(i =>
+        {
+            var s = i.Super;
+            return s is null || !i.Element.IsIdenticalTo(s);
+        }).OrderBy(i => i.Element.Name, NameComparer);
     }
 
     public static bool ExtendsBaseRecord(this IEnumerable<ElementInfo> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.TypeName == TYPE_NAME_GUID) &&
@@ -207,61 +221,17 @@ public static class EntityFrameworkExtensions
         elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
 
-    public static async Task<bool> ExtendsBaseRecordAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken) => entity is not null &&
-        (await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken)).ExtendsBaseRecord();
+    public static bool IsGlobalScope(this TableInfo table) => string.IsNullOrWhiteSpace(table.ScopeValue) || NameComparer.Equals(table.ScopeValue, GLOBAL_NAMESPACE);
+    public static string GetGlideRecordTypeName(this TableInfo table, string currentNamespace) => table.IsGlobalScope() ? $"{NS_NAME_GlideRecord}.{table.Name}" :
+        NameComparer.Equals(table.ScopeValue, currentNamespace) ? $"{NS_NAME_record}.{table.Name}" : $"{table.ScopeValue}.{NS_NAME_record}.{table.Name}";
 
-    // BUG: Database now contains a record for IBaseRecord
-    internal static async Task<(IEnumerable<ElementInheritance> Inheritances, bool ExtendsBaseRecord)> GetElementInheritancesAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
-    {
-        var elements = await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken);
-        TableInfo table = entity.Entity;
-        EntityEntry<TableInfo>? superClass = await entity.GetReferencedEntryAsync(t => t.SuperClass, cancellationToken);
-        if (superClass is null)
-        {
-            ElementInfo? sys_id = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_ID && e.TypeName == TYPE_NAME_GUID);
-            if (sys_id is not null)
-            {
-                ElementInfo? created_by = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.TypeName == TYPE_NAME_string);
-                if (created_by is not null)
-                {
-                    ElementInfo? created_on = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
-                    if (created_on is not null)
-                    {
-                        ElementInfo? mod_count = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer);
-                        if (mod_count is not null)
-                        {
-                            ElementInfo? updated_by = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string);
-                            if (updated_by is not null)
-                            {
-                                ElementInfo? updated_on = elements.FirstOrDefault(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
-                                if (updated_on is not null)
-                                    return (new ElementInheritance[]
-                                    {
-                                        new(sys_id, new() { IsActive = true, IsPrimary = true, Label = "Sys ID", MaxLength = 32, Name = JSON_KEY_SYS_ID, ScopeValue = DEFAULT_NAMESPACE, SysID = sys_id.SysID,
-                                            TypeName = TYPE_NAME_GUID, TableName = TS_NAME_BASERECORD, SourceFqdn = sys_id.SourceFqdn }),
-                                        new(created_by, new() { IsActive = true, Label = "Created by", MaxLength = 40, Name = JSON_KEY_SYS_CREATED_BY, ScopeValue = DEFAULT_NAMESPACE, SysID = created_by.SysID,
-                                            TypeName = TYPE_NAME_string, TableName = TS_NAME_BASERECORD, SourceFqdn = created_by.SourceFqdn }),
-                                        new(created_on, new() { IsActive = true, Label = "Created", MaxLength = 40, Name = JSON_KEY_SYS_CREATED_ON, ScopeValue = DEFAULT_NAMESPACE, SysID = created_on.SysID,
-                                            TypeName = TYPE_NAME_glide_date_time, TableName = TS_NAME_BASERECORD, SourceFqdn = created_on.SourceFqdn }),
-                                        new(mod_count, new() { IsActive = true, Label = "Updates", MaxLength = 40, Name = JSON_KEY_SYS_MOD_COUNT, ScopeValue = DEFAULT_NAMESPACE, SysID = mod_count.SysID,
-                                            TypeName = TYPE_NAME_integer, TableName = TS_NAME_BASERECORD, SourceFqdn = mod_count.SourceFqdn }),
-                                        new(updated_by, new() { IsActive = true, Label = "Updated by", MaxLength = 40, Name = JSON_KEY_SYS_UPDATED_BY, ScopeValue = DEFAULT_NAMESPACE, SysID = updated_by.SysID,
-                                            TypeName = TYPE_NAME_string, TableName = TS_NAME_BASERECORD, SourceFqdn = updated_by.SourceFqdn }),
-                                        new(updated_on, new() { IsActive = true, Label = "Updated", MaxLength = 40, Name = JSON_KEY_SYS_UPDATED_ON, ScopeValue = DEFAULT_NAMESPACE, SysID = updated_on.SysID,
-                                            TypeName = TYPE_NAME_glide_date_time, TableName = TS_NAME_BASERECORD, SourceFqdn = updated_on.SourceFqdn })
-                                    }, true);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            var superElements = (await superClass.GetAllElementsAsync(cancellationToken)).ToArray();
-            if (superElements.Length > 0)
-                return (elements.Select(e => new ElementInheritance(e, superElements.FirstOrDefault(b => NameComparer.Equals(b.Name, e.Name)))), false);
-        }
-        return (elements.Select(e => new ElementInheritance(e, null)), false);
-    }
+    public static string GetGlideElementTypeName(this TableInfo table, string currentNamespace) => table.IsGlobalScope() ? $"{NS_NAME_GlideElement}.{table.Name}" :
+        NameComparer.Equals(table.ScopeValue, currentNamespace) ? $"{NS_NAME_element}.{table.Name}" : $"{table.ScopeValue}.{NS_NAME_element}.{table.Name}";
+
+    public static string GetFieldsTypeName(this TableInfo table, string currentNamespace) => table.IsGlobalScope() ? $"{NS_NAME_tableFields}.{table.Name}" :
+        NameComparer.Equals(table.ScopeValue, currentNamespace) ? $"{NS_NAME_fields}.{table.Name}" : $"{table.ScopeValue}.{NS_NAME_fields}.{table.Name}";
+
+    public static string GetNamespace(this TableInfo table) => string.IsNullOrWhiteSpace(table.ScopeValue) ? GLOBAL_NAMESPACE : table.ScopeValue;
+
+    public static string GetGlideTableName(this TableInfo table) => table.IsGlobalScope() ? table.Name : $"{table.ScopeValue}_{table.Name}";
 }

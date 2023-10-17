@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 
 namespace SnTsTypeGenerator.Models;
@@ -8,7 +9,7 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Package" (sys_package) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Packages))]
-public class SysPackage
+public class SysPackage : IEquatable<SysPackage>
 {
     private readonly object _syncRoot = new();
 
@@ -23,19 +24,6 @@ public class SysPackage
     {
         get => _name;
         set => _name = value ?? string.Empty;
-    }
-
-    private string _sysId = string.Empty;
-
-    /// <summary>
-    /// Value of the package reference.
-    /// </summary>
-    [NotNull]
-    [BackingField(nameof(_sysId))]
-    public string SysId
-    {
-        get => _sysId;
-        set => _sysId = value ?? string.Empty;
     }
 
     public string? ShortDescription { get; set; }
@@ -96,6 +84,19 @@ public class SysPackage
                 }
             }
         }
+    }
+
+    private string _sysId = string.Empty;
+
+    /// <summary>
+    /// Value of the package reference.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_sysId))]
+    public string SysId
+    {
+        get => _sysId;
+        set => _sysId = value ?? string.Empty;
     }
 
     private Guid? _outputId;
@@ -170,4 +171,20 @@ public class SysPackage
     [NotNull]
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
+
+    public bool Equals(SysPackage? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
+
+    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+
+    public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_name);
+
+    public override string ToString() => nameof(SysPackage) + new JsonObject()
+    {
+        { nameof(Name), JsonValue.Create(_name) },
+        { nameof(ShortDescription), JsonValue.Create(ShortDescription) },
+        { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
+        { nameof(Source), JsonValue.Create(_sourceFqdn) },
+        { nameof(SysId), JsonValue.Create(_sysId) },
+        { nameof(Output), JsonValue.Create(_outputId) }
+    }.ToJsonString();
 }

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 
 namespace SnTsTypeGenerator.Models;
 
@@ -9,22 +10,9 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Table" (<see cref="SnApiConstants.TABLE_NAME_SYS_DB_OBJECT" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Tables))]
-public class TableInfo
+public class TableInfo : IEquatable<TableInfo>
 {
     private readonly object _syncRoot = new();
-
-    private string _sysID = string.Empty;
-
-    /// <summary>
-    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
-    /// </summary>
-    [NotNull]
-    [BackingField(nameof(_sysID))]
-    public string SysID
-    {
-        get => _sysID;
-        set => _sysID = value ?? string.Empty;
-    }
 
     private string _name = string.Empty;
 
@@ -309,6 +297,19 @@ public class TableInfo
         }
     }
 
+    private string _sysID = string.Empty;
+
+    /// <summary>
+    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_sysID))]
+    public string SysID
+    {
+        get => _sysID;
+        set => _sysID = value ?? string.Empty;
+    }
+
     private HashSet<TableInfo> _derived = new();
 
     [NotNull]
@@ -326,4 +327,35 @@ public class TableInfo
     [NotNull]
     [BackingField(nameof(_referredBy))]
     public virtual HashSet<ElementInfo> ReferredBy { get => _referredBy; set => _referredBy = value ?? new(); }
+
+    public bool Equals(TableInfo? other) => other is not null && (ReferenceEquals(this, other) ||
+        (Services.SnApiConstants.NameComparer.Equals(_name, other._name) && _scopeValue.NoCaseEquals(other._scopeValue)));
+
+    public override bool Equals(object? obj) => Equals(obj as TableInfo);
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            return (21 + Services.SnApiConstants.NameComparer.GetHashCode(_scopeValue ?? "")) * 7 + Services.SnApiConstants.NameComparer.GetHashCode(_name);
+        }
+    }
+
+    public override string ToString() => nameof(TableInfo) + new JsonObject()
+    {
+        { nameof(Name), JsonValue.Create(_name) },
+        { nameof(Label), JsonValue.Create(_label) },
+        { nameof(IsExtendable), JsonValue.Create(IsExtendable) },
+        { nameof(AccessibleFrom), JsonValue.Create(_accessibleFrom) },
+        { nameof(ExtensionModel), JsonValue.Create(ExtensionModel) },
+        { nameof(NumberPrefix), JsonValue.Create(NumberPrefix) },
+        { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
+        { nameof(IsInterface), JsonValue.Create(IsInterface) },
+        { nameof(Package), JsonValue.Create(_packageName) },
+        { nameof(Scope), JsonValue.Create(_scopeValue) },
+        { nameof(SuperClass), JsonValue.Create(_superClassName) },
+        { nameof(Source), JsonValue.Create(_sourceFqdn) },
+        { nameof(SysID), JsonValue.Create(_sysID) }
+    }.ToJsonString();
+
 }

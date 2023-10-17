@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 
 namespace SnTsTypeGenerator.Models;
 
@@ -9,7 +10,7 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Application" (<see cref="SnApiConstants.TABLE_NAME_SYS_SCOPE" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Scopes))]
-public class SysScope
+public class SysScope : IEquatable<SysScope>
 {
     private readonly object _syncRoot = new();
 
@@ -37,19 +38,6 @@ public class SysScope
     }
 
     public string? ShortDescription { get; set; }
-
-    private string _sysID = string.Empty;
-
-    /// <summary>
-    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
-    /// </summary>
-    [NotNull]
-    [BackingField(nameof(_sysID))]
-    public string SysID
-    {
-        get => _sysID;
-        set => _sysID = value ?? string.Empty;
-    }
 
     /// <summary>
     /// Date and time that this record was last updated.
@@ -109,6 +97,19 @@ public class SysScope
         }
     }
 
+    private string _sysID = string.Empty;
+
+    /// <summary>
+    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_sysID))]
+    public string SysID
+    {
+        get => _sysID;
+        set => _sysID = value ?? string.Empty;
+    }
+
     private HashSet<GlideType> _types = new();
 
     [NotNull]
@@ -121,9 +122,19 @@ public class SysScope
     [BackingField(nameof(_tables))]
     public virtual HashSet<TableInfo> Tables { get => _tables; set => _tables = value ?? new(); }
 
-    private HashSet<ElementInfo> _elements = new();
+    public bool Equals(SysScope? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_value, other._value));
 
-    [NotNull]
-    [BackingField(nameof(_elements))]
-    public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
+    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+
+    public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_value);
+
+    public override string ToString() => nameof(SysScope) + new JsonObject()
+    {
+        { nameof(Value), JsonValue.Create(_value) },
+        { nameof(Name), JsonValue.Create(_name) },
+        { nameof(ShortDescription), JsonValue.Create(ShortDescription) },
+        { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
+        { nameof(Source), JsonValue.Create(_sourceFqdn) },
+        { nameof(SysID), JsonValue.Create(_sysID) }
+    }.ToJsonString();
 }

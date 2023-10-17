@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 
 namespace SnTsTypeGenerator.Models;
 
@@ -9,22 +10,9 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Field class" (<see cref="SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Types))]
-public class GlideType
+public class GlideType : IEquatable<GlideType>
 {
     private readonly object _syncRoot = new();
-
-    private string _sysID = string.Empty;
-
-    /// <summary>
-    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
-    /// </summary>
-    [NotNull]
-    [BackingField(nameof(_sysID))]
-    public string SysID
-    {
-        get => _sysID;
-        set => _sysID = value ?? string.Empty;
-    }
 
     private string _name = string.Empty;
 
@@ -245,9 +233,44 @@ public class GlideType
         }
     }
 
+    private string _sysID = string.Empty;
+
+    /// <summary>
+    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_sysID))]
+    public string SysID
+    {
+        get => _sysID;
+        set => _sysID = value ?? string.Empty;
+    }
+
     private HashSet<ElementInfo> _elements = new();
 
     [NotNull]
     [BackingField(nameof(_elements))]
     public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
+
+    public bool Equals(GlideType? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
+
+    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+
+    public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_name);
+
+    public override string ToString() => nameof(GlideType) + new JsonObject()
+    {
+        { nameof(Name), JsonValue.Create(_name) },
+        { nameof(Label), JsonValue.Create(_label) },
+        { nameof(ScalarType), JsonValue.Create(ScalarType) },
+        { nameof(ScalarLength), JsonValue.Create(ScalarLength) },
+        { nameof(ClassName), JsonValue.Create(ClassName) },
+        { nameof(UseOriginalValue), JsonValue.Create(UseOriginalValue) },
+        { nameof(IsVisible), JsonValue.Create(IsVisible) },
+        { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
+        { nameof(Package), JsonValue.Create(_packageName) },
+        { nameof(Scope), JsonValue.Create(_scopeValue) },
+        { nameof(Source), JsonValue.Create(_sourceFqdn) },
+        { nameof(SysID), JsonValue.Create(_sysID) }
+    }.ToJsonString();
 }
