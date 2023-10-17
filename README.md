@@ -2,6 +2,8 @@
 
 Global scripts for USMS ServiceNow instances
 
+[Click here for the current project](https://github.com/users/erwinel/projects/1)
+
 ## Dev Setup
 
 This is intended to be developed using VS Code. See [/.vscode/extensions.json](./.vscode/extensions.json) for a list of recommended extensions. Dependencies are mananged using [npm](https://www.npmjs.com/).
