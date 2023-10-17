@@ -99,61 +99,6 @@ public class SysPackage : IEquatable<SysPackage>
         set => _sysId = value ?? string.Empty;
     }
 
-    private Guid? _outputId;
-
-    /// <summary>
-    /// Foreign key associated with <see cref="Output"/> .
-    /// </summary>
-    [BackingField(nameof(_outputId))]
-    public Guid? OutputId
-    {
-        get => _output?.Id ?? _outputId;
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value.HasValue)
-                {
-                    if (!(_outputId.HasValue && value.Value.Equals(_outputId.Value)))
-                    {
-                        if (_output is null)
-                            _outputId = value;
-                        else if (value.Value.Equals(_output.Id))
-                            _outputId = null;
-                        else
-                            _output = null;
-                    }
-                }
-                else if (_outputId.HasValue)
-                {
-                    _outputId = null;
-                    _output = null;
-                }
-            }
-        }
-    }
-
-    private OutputFile? _output;
-
-    /// <summary>
-    /// Specifies an optional explicit output file.
-    /// </summary>
-    public OutputFile? Output
-    {
-        get => _output;
-        set
-        {
-            lock (_syncRoot)
-            {
-                if ((value is null) ? _output is null : _output is not null && ReferenceEquals(_output, value))
-                    return;
-
-                _output = value;
-                _outputId = null;
-            }
-        }
-    }
-
     private HashSet<GlideType> _types = new();
 
     [NotNull]
@@ -184,7 +129,6 @@ public class SysPackage : IEquatable<SysPackage>
         { nameof(ShortDescription), JsonValue.Create(ShortDescription) },
         { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
         { nameof(Source), JsonValue.Create(_sourceFqdn) },
-        { nameof(SysId), JsonValue.Create(_sysId) },
-        { nameof(Output), JsonValue.Create(_outputId) }
+        { nameof(SysId), JsonValue.Create(_sysId) }
     }.ToJsonString();
 }

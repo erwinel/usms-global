@@ -34,16 +34,6 @@ public partial class TypingsDbContext : DbContext
     /// </summary>
     internal bool InitSuccessful => _pathValidated && Database.CanConnect();
 
-    private static IEnumerable<string> GetOutputFileDbInitCommands()
-    {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(OutputFiles)}"" (
-    ""{nameof(OutputFile.Id)}"" UNIQUEIDENTIFIER NOt NULL COLLATE NOCASE,
-    ""{nameof(OutputFile.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(OutputFile.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(OutputFile)}"" PRIMARY KEY(""{nameof(OutputFile.Id)}"")
-)";
-    }
-
     private static IEnumerable<string> GetSourceInfoDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Sources)}"" (
@@ -63,7 +53,6 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(SysPackage.SysId)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(SysPackage.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(SysPackage.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(SysPackage.OutputId)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(OutputFile)}"" REFERENCES ""{nameof(OutputFiles)}""(""{nameof(OutputFile.Id)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(SysPackage.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(SysPackage)}"" PRIMARY KEY(""{nameof(SysPackage.Name)}"")
 )";
@@ -228,7 +217,7 @@ public partial class TypingsDbContext : DbContext
                     }
                     return false;
                 }
-                if (executeDbInitCommands<OutputFile>(GetOutputFileDbInitCommands()) || executeDbInitCommands<SourceInfo>(GetSourceInfoDbInitCommands()) || executeDbInitCommands<SysPackage>(GetSysPackageDbInitCommands()) ||
+                if (executeDbInitCommands<SourceInfo>(GetSourceInfoDbInitCommands()) || executeDbInitCommands<SysPackage>(GetSysPackageDbInitCommands()) ||
                     executeDbInitCommands<SysScope>(GetSysScopeDbInitCommands()) || executeDbInitCommands<GlideType>(GetGlideTypeDbInitCommands()) || executeDbInitCommands<TableInfo>(GetTableInfoDbInitCommands()) ||
                     executeDbInitCommands<ElementInfo>(GetElementInfoDbInitCommands()))
                 {
@@ -316,14 +305,7 @@ public partial class TypingsDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        _ = modelBuilder.Entity<OutputFile>(builder =>
-            {
-                _ = builder.HasKey(s => s.Id);
-                _ = builder.HasIndex(s => s.Name).IsUnique();
-                _ = builder.Property(nameof(OutputFile.Label)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(OutputFile.Name)).UseCollation(COLLATION_NOCASE);
-            })
-            .Entity<SourceInfo>(builder =>
+        _ = modelBuilder.Entity<SourceInfo>(builder =>
             {
                 _ = builder.HasKey(s => s.FQDN);
                 _ = builder.HasIndex(t => t.IsPersonalDev);
@@ -338,7 +320,6 @@ public partial class TypingsDbContext : DbContext
                 _ = builder.Property(nameof(SysPackage.ShortDescription)).UseCollation(COLLATION_NOCASE);
                 _ = builder.Property(nameof(SysPackage.SourceFqdn)).UseCollation(COLLATION_NOCASE);
                 _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.Output).WithMany(s => s.Packages).HasForeignKey(t => t.OutputId).IsRequired().OnDelete(DeleteBehavior.Restrict);
             })
             .Entity<SysScope>(builder =>
             {
@@ -410,11 +391,6 @@ public partial class TypingsDbContext : DbContext
                 _ = builder.HasOne(t => t.Reference).WithMany(s => s.ReferredBy).HasForeignKey(t => t.RefTableName).OnDelete(DeleteBehavior.Restrict);
             });
     }
-
-    /// <summary>
-    /// Gets the explicit output file definitions.
-    /// </summary>
-    public virtual DbSet<OutputFile> OutputFiles { get; set; } = null!;
 
     /// <summary>
     /// Gets the source ServiceNow instance information records.
