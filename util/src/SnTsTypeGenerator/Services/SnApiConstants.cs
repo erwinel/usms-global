@@ -407,7 +407,7 @@ internal static class SnApiConstants
     /// IBaseRecord TypeScript class name.
     /// </summary>
     internal const string TS_NAME_BASERECORD = "IBaseRecord";
-    
+
     /// <summary>
     /// GlideRecord TypeScript class name.
     /// </summary>

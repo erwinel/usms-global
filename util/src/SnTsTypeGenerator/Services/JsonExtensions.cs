@@ -122,7 +122,7 @@ public static class JsonExtensions
             result = default;
         return false;
     }
-    
+
     public static int? CoercePropertyAsIntOrNull(this JsonObject source, string propertyName) =>
         source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out int? result) ? result :
             jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i) ? i : null : null;

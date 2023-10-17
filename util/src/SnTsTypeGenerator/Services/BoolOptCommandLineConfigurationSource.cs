@@ -7,7 +7,7 @@ namespace SnTsTypeGenerator.Services;
 public class BoolOptCommandLineConfigurationSource : IConfigurationSource
 {
     public IDictionary<string, string>? ValueSwitchMappings { get; set; }
-    
+
     public IDictionary<string, string> BooleanSwitchMappings { get; set; }
 
     public ImmutableArray<string> Args { get; set; }

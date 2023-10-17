@@ -100,7 +100,7 @@ public partial class RenderingService
                     writer.Indent = 0;
                     await writer.WriteLineAsync("}");
                     await writer.WriteLineAsync();
-                    
+
                     await writer.WriteDeclareNamespace(NS_NAME_GlideElement);
                     if (_emitBaseTypes)
                     {
@@ -125,7 +125,7 @@ public partial class RenderingService
                     writer.Indent = 0;
                     await writer.WriteLineAsync("}");
                     await writer.WriteLineAsync();
-                    
+
                     await writer.WriteDeclareNamespace(NS_NAME_tableFields);
                     if (_emitBaseTypes)
                     {
@@ -184,7 +184,7 @@ public partial class RenderingService
                     writer.Indent = 1;
                     await writer.WriteLineAsync("}");
                     await writer.WriteLineAsync();
-                    
+
                     await writer.WriteExportNamespace(NS_NAME_element);
                     await RenderScopedGlideElementAsync(entries.First().Entity, writer);
                     foreach (var e in entries.Skip(1))
@@ -196,7 +196,7 @@ public partial class RenderingService
                     writer.Indent = 1;
                     await writer.WriteLineAsync("}");
                     await writer.WriteLineAsync();
-                    
+
                     await writer.WriteExportNamespace(NS_NAME_fields);
                     await RenderScopedTableFieldsAsync(entries.First(), writer, dbContext, cancellationToken);
                     foreach (var e in entries.Skip(1))
@@ -244,6 +244,15 @@ public partial class RenderingService
         await writer.WriteLineAsync("}");
     }
 
+    // /**
+    //  * Reference
+    //  * Type: reference; Scalar Type: GUID
+    //  * @template TFields - The type that defines the fields of the referenced record.
+    //  * @template TRecord - The referenced record type.
+    //  */
+    // export type Reference<TFields = $$tableFields.IBaseRecord, TRecord extends GlideRecord & TFields = GlideRecord & TFields> = TFields & {
+    //     getRefRecord(): TRecord;
+    // } & GlideElementReference;
     private async Task RenderReferenceBaseTypeAsync(IndentedTextWriter writer)
     {
         await writer.WriteLineAsync(OPEN_JSDOC);
@@ -449,10 +458,10 @@ public partial class RenderingService
         await writer.WriteAsync(table.Name);
         await writer.WriteLineAsync("}");
         await writer.WriteLineAsync(" */");
-        
+
         await writer.WriteAsync("export interface ");
         await writer.WriteAsync(table.Name);
-        
+
         TableInfo? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
         if (superClass is not null)
         {
@@ -513,10 +522,10 @@ public partial class RenderingService
         await writer.WriteAsync(table.Name);
         await writer.WriteLineAsync("}");
         await writer.WriteLineAsync(CLOSE_JSDOC);
-        
+
         await writer.WriteAsync("export interface ");
         await writer.WriteAsync(table.Name);
-        
+
         TableInfo? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
         if (superClass is not null)
         {
@@ -790,7 +799,7 @@ public partial class RenderingService
         }
         await writer.WriteLineAsync(CLOSE_JSDOC);
     }
-    
+
     public RenderingService(ILogger<RenderingService> logger, IServiceProvider services, IOptions<AppSettings> appSettingsOptions)
     {
         _logger = logger;

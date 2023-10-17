@@ -151,7 +151,7 @@ public sealed class DataLoaderService : IDisposable
 
         if (superClass is null && elements.ExtendsBaseRecord())
             tableInfo.SuperClass = superClass = await GetBaseRecordTypeAsync(cancellationToken);
-        
+
         if (superClass is not null)
         {
             cancellationToken.ThrowIfCancellationRequested();

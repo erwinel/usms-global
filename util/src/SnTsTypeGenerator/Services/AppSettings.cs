@@ -1,8 +1,6 @@
 
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.CommandLine;
 using static SnTsTypeGenerator.Services.CmdLineConstants;
 
 namespace SnTsTypeGenerator.Services;
@@ -81,7 +79,7 @@ public class AppSettings
     public bool? Help { get; set; }
 
     public bool ShowHelp() => Help ?? false;
-    
+
     private static readonly Dictionary<string, string> _valueSwitchMappings = new()
     {
         { $"-{SHORTHAND_d}", $"{nameof(SnTsTypeGenerator)}:{nameof(DbFile)}" },

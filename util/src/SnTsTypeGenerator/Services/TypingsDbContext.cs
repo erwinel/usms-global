@@ -23,7 +23,7 @@ public partial class TypingsDbContext : DbContext
     /// The Sqlite code for the current date and time.
     /// </summary>
     internal const string DEFAULT_SQL_NOW = "(datetime('now','localtime'))";
-    
+
     private readonly ILogger<TypingsDbContext> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 

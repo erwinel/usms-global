@@ -88,7 +88,7 @@ public static class CmdLineConstants
     /// Value of <see cref="AppSettings.Mode"/> when the render mode is for global-scoped scripts.
     /// </summary>
     public const string MODE_GLOBAL = "global";
-    
+
     /// <summary>
     /// Value of <see cref="AppSettings.Mode"/> when the render mode is for scoped app scripts.
     /// </summary>
