@@ -22,6 +22,8 @@ public class RenderingService
     private readonly IServiceScope _scope;
     private readonly FileInfo? _outputFile;
     private readonly bool _forceOverwrite;
+    private readonly bool _includeReferenced;
+    private readonly bool _emitBaseTypes;
     private readonly bool _isScoped;
 
     /// <summary>
@@ -799,12 +801,18 @@ public class RenderingService
         //  */
         // activity_due: GlideElementGlideObject;
     }
-    // update 401k beneficiaries
+    
     public RenderingService(ILogger<RenderingService> logger, IServiceProvider services, IOptions<AppSettings> appSettingsOptions)
     {
         _logger = logger;
         _scope = services.CreateScope();
         AppSettings appSettings = appSettingsOptions.Value;
+        if (appSettings.ShowHelp())
+        {
+            _isScoped = _forceOverwrite = false;
+            _outputFile = null;
+            return;
+        }
         if (string.IsNullOrWhiteSpace(appSettings.Mode))
         {
             _isScoped = false;
@@ -830,6 +838,8 @@ public class RenderingService
         }
 
         _forceOverwrite = appSettings.Force ?? false;
+        _includeReferenced = appSettings.IncludeReferenced ?? false;
+        _emitBaseTypes = appSettings.EmitBaseTypes ?? false;
         string outputFileName = appSettings.Output!;
         if (string.IsNullOrEmpty(outputFileName))
             outputFileName = DEFAULT_OUTPUT_FILENAME;

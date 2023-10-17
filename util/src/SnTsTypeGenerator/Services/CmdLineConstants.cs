@@ -12,33 +12,13 @@ public static class CmdLineConstants
     /// <summary>
     /// Command line switch for showing help.
     /// </summary>
-    internal const string DASH_help = "--help";
+    internal const string SHORTHAND_h = "h";
 
     /// <summary>
     /// Command line switch for showing help.
     /// </summary>
-    internal const string SHORTHAND_h = "-h";
+    internal const string SHORTHAND__3F_ = "?";
 
-    /// <summary>
-    /// Command line switch for showing help.
-    /// </summary>
-    internal const string SHORTHAND__3F_ = "-?";
-
-    /// <summary>
-    /// Command line switch for showing help.
-    /// </summary>
-    internal const string SLASH_h = "/h";
-
-    /// <summary>
-    /// Command line switch for showing help.
-    /// </summary>
-    internal const string SLASH_help = "/help";
-
-    /// <summary>
-    /// Command line switch for showing help.
-    /// </summary>
-    internal const string SLASH__3F_ = "/?";
-    
     /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.Dbfile" /></c> setting.
     /// </summary>
@@ -55,6 +35,11 @@ public static class CmdLineConstants
     public const char SHORTHAND_b = 'b';
 
     /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.IncludeReferenced" /></c> setting.
+    /// </summary>
+    public const char SHORTHAND_i = 'i';
+
+    /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.UserName" /></c> setting.
     /// </summary>
     public const char SHORTHAND_u = 'u';
@@ -63,11 +48,6 @@ public static class CmdLineConstants
     /// Gets the command line option for the <c><see cref="AppSettings.Password" /></c> setting.
     /// </summary>
     public const char SHORTHAND_p = 'p';
-
-    /// <summary>
-    /// Gets the command line option for the <c><see cref="AppSettings.ClientId" /></c> setting.
-    /// </summary>
-    public const char SHORTHAND_i = 'i';
 
     /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.ClientSecret" /></c> setting.

@@ -1,5 +1,8 @@
 
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.CommandLine;
 using static SnTsTypeGenerator.Services.CmdLineConstants;
 
 namespace SnTsTypeGenerator.Services;
@@ -27,6 +30,11 @@ public class AppSettings
     /// Emits typings for base types.
     /// </summary>
     public bool? EmitBaseTypes { get; set; }
+
+    /// <summary>
+    /// Emits referenced types as well.
+    /// </summary>
+    public bool? IncludeReferenced { get; set; }
 
     /// <summary>
     /// Login user name.
@@ -70,19 +78,41 @@ public class AppSettings
     /// <remarks>The default behavior is <see cref="MODE_GLOBAL"/>.</remarks>
     public string? Mode { get; set; }
 
-    private static readonly Dictionary<string, string> _switchMappings = new()
+    public bool? Help { get; set; }
+
+    public bool ShowHelp() => Help ?? false;
+    
+    private static readonly Dictionary<string, string> _valueSwitchMappings = new()
     {
         { $"-{SHORTHAND_d}", $"{nameof(SnTsTypeGenerator)}:{nameof(DbFile)}" },
+        { $"--{nameof(DbFile)}", $"{nameof(SnTsTypeGenerator)}:{nameof(DbFile)}" },
         { $"-{SHORTHAND_t}", $"{nameof(SnTsTypeGenerator)}:{nameof(Table)}" },
-        { $"-{SHORTHAND_b}", $"{nameof(SnTsTypeGenerator)}:{nameof(EmitBaseTypes)}" },
+        { $"--{nameof(Table)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Table)}" },
         { $"-{SHORTHAND_u}", $"{nameof(SnTsTypeGenerator)}:{nameof(UserName)}" },
+        { $"--{nameof(UserName)}", $"{nameof(SnTsTypeGenerator)}:{nameof(UserName)}" },
         { $"-{SHORTHAND_p}", $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
+        { $"--{nameof(Password)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
         { $"-{SHORTHAND_r}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
-        { $"-{SHORTHAND_m}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" }
+        { $"--{nameof(RemoteURL)}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
+        { $"-{SHORTHAND_m}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" },
+        { $"--{nameof(Mode)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" }
+    };
+
+    private static readonly Dictionary<string, string> _booleanSwitchMappings = new()
+    {
+        { $"-{SHORTHAND_i}", $"{nameof(SnTsTypeGenerator)}:{nameof(IncludeReferenced)}" },
+        { $"--{nameof(IncludeReferenced)}", $"{nameof(SnTsTypeGenerator)}:{nameof(IncludeReferenced)}" },
+        { $"-{SHORTHAND_b}", $"{nameof(SnTsTypeGenerator)}:{nameof(EmitBaseTypes)}" },
+        { $"--{nameof(EmitBaseTypes)}", $"{nameof(SnTsTypeGenerator)}:{nameof(EmitBaseTypes)}" },
+        { $"-{SHORTHAND_f}", $"{nameof(SnTsTypeGenerator)}:{nameof(Force)}" },
+        { $"--{nameof(Force)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Force)}" },
+        { $"-{SHORTHAND_h}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
+        { $"-{SHORTHAND__3F_}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
+        { $"--{nameof(Help)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" }
     };
 
     internal static void Configure(string[] args, IConfigurationBuilder builder)
     {
-        builder.AddCommandLine(args, _switchMappings);
+        builder.Add(new BoolOptCommandLineConfigurationSource(args?.ToImmutableArray() ?? ImmutableArray<string>.Empty, _booleanSwitchMappings, _valueSwitchMappings));
     }
 }

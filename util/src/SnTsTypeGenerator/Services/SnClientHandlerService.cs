@@ -288,11 +288,17 @@ public sealed class SnClientHandlerService
         _logger = logger;
         AppSettings appSettings = appSettingsOptions.Value;
         var remoteUri = appSettings.RemoteURL;
+        if (appSettings.ShowHelp())
+        {
+            BaseURL = EmptyURI;
+            UserCredentials = null!;
+            return;
+        }
         if (string.IsNullOrWhiteSpace(remoteUri))
         {
             _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.RemoteURL), SHORTHAND_r);
             BaseURL = EmptyURI;
-            ClientCredentials = UserCredentials = null!;
+            UserCredentials = null!;
             return;
         }
         if (Uri.TryCreate(remoteUri, UriKind.Absolute, out Uri? uri))
@@ -301,7 +307,7 @@ public sealed class SnClientHandlerService
             {
                 BaseURL = EmptyURI;
                 _logger.LogInvalidRemoteInstanceUrl(uri);
-                ClientCredentials = UserCredentials = null!;
+                UserCredentials = null!;
                 return;
             }
             BaseURL = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
@@ -316,7 +322,7 @@ public sealed class SnClientHandlerService
                     if (string.IsNullOrWhiteSpace(clientId))
                     {
                         _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientId));
-                        ClientCredentials = UserCredentials = null!;
+                        UserCredentials = null!;
                         return;
                     }
                     ClientCredentials = new(clientId, clientSecret);
@@ -331,7 +337,7 @@ public sealed class SnClientHandlerService
                     if (string.IsNullOrWhiteSpace(clientSecret))
                     {
                         _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientSecret));
-                        ClientCredentials = UserCredentials = null!;
+                        UserCredentials = null!;
                         return;
                     }
                 }
@@ -367,7 +373,7 @@ public sealed class SnClientHandlerService
         {
             BaseURL = EmptyURI;
             _logger.LogInvalidRemoteInstanceUrl(Uri.TryCreate(remoteUri, UriKind.Relative, out uri) ? uri : new Uri(Uri.EscapeDataString(remoteUri), UriKind.Relative));
-            ClientCredentials = UserCredentials = null!;
+            UserCredentials = null!;
         }
     }
 }
