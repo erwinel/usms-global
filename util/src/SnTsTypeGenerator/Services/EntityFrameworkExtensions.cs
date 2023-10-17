@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -175,11 +176,11 @@ public static class EntityFrameworkExtensions
         return elements.Select(e =>
         {
             var n = e.Name;
-            return new ElementInheritance(e, super.FirstOrDefault(s => s.Element.Name == n)?.Element);
+            return new ElementInheritance(e, super.FirstOrDefault(s => NameComparer.Equals(s.Element.Name, n))?.Element);
         }).Concat(super.Where(s =>
         {
             var n = s.Element.Name;
-            return !elements.Any(e => e.Name == n);
+            return !elements.Any(e => NameComparer.Equals(e.Name, n));
         })).OrderBy(i => i.Element.Name, NameComparer);
     }
 
@@ -193,7 +194,7 @@ public static class EntityFrameworkExtensions
         return elements.Concat(super.Where(s =>
         {
             var n = s.Name;
-            return !elements.Any(e => e.Name == n);
+            return !elements.Any(e => NameComparer.Equals(e.Name, n));
         })).OrderBy(e => e.Name, NameComparer);
     }
 
@@ -207,7 +208,7 @@ public static class EntityFrameworkExtensions
         return elements.Select(e =>
         {
             var n = e.Name;
-            return new ElementInheritance(e, super.FirstOrDefault(s => s.Element.Name == n)?.Element);
+            return new ElementInheritance(e, super.FirstOrDefault(s => NameComparer.Equals(s.Element.Name, n))?.Element);
         }).Where(i =>
         {
             var s = i.Super;
@@ -220,42 +221,17 @@ public static class EntityFrameworkExtensions
         elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
 
-    public static string GetNamespace(this TableInfo tableInfo) => string.IsNullOrWhiteSpace(tableInfo.ScopeValue) ? DEFAULT_NAMESPACE : tableInfo.ScopeValue;
+    public static bool IsGlobalScope(this TableInfo table) => string.IsNullOrWhiteSpace(table.ScopeValue) || NameComparer.Equals(table.ScopeValue, GLOBAL_NAMESPACE);
+    public static string GetGlideRecordTypeName(this TableInfo table, string currentNamespace) => table.IsGlobalScope() ? $"{NS_NAME_GlideRecord}.{table.Name}" :
+        NameComparer.Equals(table.ScopeValue, currentNamespace) ? $"{NS_NAME_record}.{table.Name}" : $"{table.ScopeValue}.{NS_NAME_record}.{table.Name}";
 
-    public static string GetShortName(this TableInfo tableInfo)
-    {
-        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == DEFAULT_NAMESPACE || !tableInfo.Name.StartsWith(tableInfo.ScopeValue))
-            return tableInfo.Name;
-        int len = tableInfo.ScopeValue.Length + 1;
-        if (tableInfo.Name.Length <= len || tableInfo.Name[tableInfo.ScopeValue.Length] != '_')
-            return tableInfo.Name;
-        return tableInfo.Name[len..];
-    }
+    public static string GetGlideElementTypeName(this TableInfo table, string currentNamespace) => table.IsGlobalScope() ? $"{NS_NAME_GlideElement}.{table.Name}" :
+        NameComparer.Equals(table.ScopeValue, currentNamespace) ? $"{NS_NAME_element}.{table.Name}" : $"{table.ScopeValue}.{NS_NAME_element}.{table.Name}";
 
-    public static string GetGlideRecordTypeString(this TableInfo tableInfo, string targetNs)
-    {
-        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == DEFAULT_NAMESPACE)
-            return $"{NS_NAME_GlideRecord}.{tableInfo.Name}";
-        if (targetNs == tableInfo.ScopeValue)
-            return $"{NS_NAME_record}.{tableInfo.GetShortName()}";
-        return $"{tableInfo.ScopeValue}.{NS_NAME_record}.{tableInfo.GetShortName()}";
-    }
+    public static string GetFieldsTypeName(this TableInfo table, string currentNamespace) => table.IsGlobalScope() ? $"{NS_NAME_tableFields}.{table.Name}" :
+        NameComparer.Equals(table.ScopeValue, currentNamespace) ? $"{NS_NAME_fields}.{table.Name}" : $"{table.ScopeValue}.{NS_NAME_fields}.{table.Name}";
 
-    public static string GetGlideElementTypeString(this TableInfo tableInfo, string targetNs)
-    {
-        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == DEFAULT_NAMESPACE)
-            return $"{NS_NAME_GlideElement}.{tableInfo.Name}";
-        if (targetNs == tableInfo.ScopeValue)
-            return $"{NS_NAME_element}.{tableInfo.GetShortName()}";
-        return $"{tableInfo.ScopeValue}.{NS_NAME_element}.{tableInfo.GetShortName()}";
-    }
+    public static string GetNamespace(this TableInfo table) => string.IsNullOrWhiteSpace(table.ScopeValue) ? GLOBAL_NAMESPACE : table.ScopeValue;
 
-    public static string GetInterfaceTypeString(this TableInfo tableInfo, string targetNs)
-    {
-        if (string.IsNullOrWhiteSpace(tableInfo.ScopeValue) || tableInfo.ScopeValue == DEFAULT_NAMESPACE)
-            return $"{NS_NAME_tableFields}.{tableInfo.Name}";
-        if (targetNs == tableInfo.ScopeValue)
-            return $"{NS_NAME_fields}.{tableInfo.GetShortName()}";
-        return $"{tableInfo.ScopeValue}.{NS_NAME_fields}.{tableInfo.GetShortName()}";
-    }
+    public static string GetGlideTableName(this TableInfo table) => table.IsGlobalScope() ? table.Name : $"{table.ScopeValue}_{table.Name}";
 }

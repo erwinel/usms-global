@@ -107,7 +107,7 @@ public abstract class TypingsRenderer
         if (superClass is null)
             await Writer.WriteAsync(TS_NAME_GlideRecord);
         else
-            await Writer.WriteAsync(superClass.GetInterfaceTypeString(CurrentScope));
+            await Writer.WriteAsync(superClass.GetFieldsTypeName(CurrentScope));
         await Writer.WriteLineAsync(";");
     }
 
@@ -291,7 +291,7 @@ public abstract class TypingsRenderer
         if (superClass is not null)
         {
             await Writer.WriteAsync(" extends ");
-            await Writer.WriteAsync(superClass.GetInterfaceTypeString(CurrentScope));
+            await Writer.WriteAsync(superClass.GetFieldsTypeName(CurrentScope));
 
         }
         if (toRender.Count == 0 && commentOnlyElements.Count == 0)
@@ -380,7 +380,7 @@ public abstract class TypingsRenderer
         if (reference is null)
             await Writer.WriteAsync(GetElementName(element.TypeName));
         else
-            await Writer.WriteAsync(reference.GetGlideElementTypeString(CurrentScope));
+            await Writer.WriteAsync(reference.GetGlideElementTypeName(CurrentScope));
         await Writer.WriteAsync(";");
     }
 }

@@ -70,6 +70,6 @@ public sealed class ScopedTypingsRenderer : TypingsRenderer
             TYPE_NAME_glide_duration or TYPE_NAME_glide_utc_time or TYPE_NAME_due_date or TYPE_NAME_glide_precise_time or TYPE_NAME_calendar_date_time or TYPE_NAME_currency2 or TYPE_NAME_domain_id or
             TYPE_NAME_document_id or TYPE_NAME_source_id => true,
 
-        _ => false,
+        _ => false
     };
 }

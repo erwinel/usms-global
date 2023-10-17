@@ -6,7 +6,7 @@ internal static class SnApiConstants
 
     internal static readonly Uri EmptyURI = new(string.Empty, UriKind.Relative);
 
-    internal const string DEFAULT_NAMESPACE = "global";
+    internal const string GLOBAL_NAMESPACE = "global";
 
     internal const string URI_PARAM_QUERY = "sysparm_query";
 

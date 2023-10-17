@@ -6,7 +6,7 @@ namespace SnTsTypeGenerator.Rendering;
 
 public sealed class GlobalTypingsRenderer : TypingsRenderer
 {
-    protected override string CurrentScope => DEFAULT_NAMESPACE;
+    protected override string CurrentScope => GLOBAL_NAMESPACE;
 
     protected override string GlideRecordNamespace => NS_NAME_GlideRecord;
 
