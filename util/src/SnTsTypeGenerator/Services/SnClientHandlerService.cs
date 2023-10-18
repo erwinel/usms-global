@@ -320,24 +320,14 @@ public sealed class SnClientHandlerService
             BaseURL = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
             string? clientId = appSettings.ClientId;
             string? clientSecret = appSettings.ClientSecret;
-            if (string.IsNullOrWhiteSpace(clientId))
+            if (clientId is null)
             {
-                if (!string.IsNullOrWhiteSpace(clientSecret))
-                {
-                    Console.Write("Client ID: ");
-                    clientId = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(clientId))
-                    {
-                        _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientId));
-                        UserCredentials = null!;
-                        return;
-                    }
-                    ClientCredentials = new(clientId, clientSecret);
-                }
+                if (clientSecret is not null)
+                    throw new Exception("Client ID is required when ClientSecret is specified.");
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(clientSecret))
+                if (clientSecret is null)
                 {
                     Console.Write("Client Secret: ");
                     clientSecret = Console.ReadLine();
@@ -351,7 +341,7 @@ public sealed class SnClientHandlerService
                 ClientCredentials = new(clientId, clientSecret);
             }
             string? userName = appSettings.UserName;
-            if (string.IsNullOrWhiteSpace(userName))
+            if (userName is null)
             {
                 Console.Write("User Name: ");
                 userName = Console.ReadLine();
@@ -363,7 +353,7 @@ public sealed class SnClientHandlerService
                 }
             }
             string? password = appSettings.Password;
-            if (string.IsNullOrWhiteSpace(password))
+            if (password is null)
             {
                 Console.Write("Password: ");
                 password = Console.ReadLine();
