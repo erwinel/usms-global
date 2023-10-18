@@ -35,7 +35,8 @@ public sealed class SnClientHandlerService
     {
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        return (ClientCredentials is null) ? new() : new() { Credentials = UserCredentials };
+        // return (ClientCredentials is null) ? new() { Credentials = UserCredentials } : new();
+        return new() { Credentials = UserCredentials };
     }
 
     private async Task<JsonNode?> GetJsonResponseAsync(HttpClientHandler handler, HttpRequestMessage message, Uri requestUri, CancellationToken cancellationToken)
@@ -45,7 +46,13 @@ public sealed class SnClientHandlerService
         using HttpResponseMessage response = await httpClient.SendAsync(message, cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         try { response.EnsureSuccessStatusCode(); }
-        catch (HttpRequestException exception) { throw new RequestFailedException(requestUri, exception); }
+        catch (HttpRequestException exception)
+        {
+            string? text;
+            try { text = await response.Content.ReadAsStringAsync(cancellationToken); }
+            catch { text = null; }
+            throw new RequestFailedException(requestUri, exception, text);
+        }
         string responseBody;
         try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
         catch (Exception exception) { throw new GetResponseContentFailedException(requestUri, exception); }
@@ -367,7 +374,7 @@ public sealed class SnClientHandlerService
                     return;
                 }
             }
-            UserCredentials = new NetworkCredential(appSettings.UserName, password);
+            UserCredentials = new NetworkCredential(userName, password);
         }
         else
         {

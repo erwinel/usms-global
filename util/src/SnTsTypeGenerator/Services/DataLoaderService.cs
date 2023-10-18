@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SnTsTypeGenerator.Models;
+using SnTsTypeGenerator.Models.TableAPI;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Services;
@@ -73,17 +74,15 @@ public sealed class DataLoaderService : IDisposable
     {
         if (_scopeIdMap.TryGetValue(scope.SysID, out string? value))
             return await _dbContext!.Scopes.FirstAsync(t => t.Value == value, cancellationToken);
-        SysScope? retrieved = await _tableAPIService!.GetScopeByIDAsync(scope.SysID, cancellationToken);
+        var retrieved = await _tableAPIService!.GetScopeByIDAsync(scope.SysID, cancellationToken);
         if (retrieved is null)
             scope.Value = scope.SysID;
         else
         {
-            value = (scope = retrieved).Value;
-            if ((retrieved = await _dbContext!.Scopes.FirstOrDefaultAsync(t => t.Value == value, cancellationToken)) is not null)
-            {
-                _scopeIdMap.Add(scope.SysID, value);
-                return retrieved;
-            }
+            var existing = await retrieved.ToDbEntityAsync(_dbContext, _scopeIdMap, cancellationToken);
+            if (existing is not null)
+                return existing;
+            value = retrieved.Value;
         }
         scope.Source = await GetSourceAsync(scope.SourceFqdn, cancellationToken);
         scope.LastUpdated = DateTime.Now;
@@ -100,13 +99,10 @@ public sealed class DataLoaderService : IDisposable
         GlideType? result = await _dbContext!.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         if (result is not null)
             return result;
-        if ((result = await _tableAPIService!.GetGlideTypeByNameAsync(name, cancellationToken)) is not null)
+        var response = await _tableAPIService!.GetGlideTypeByNameAsync(name, cancellationToken);
+        if (response is not null)
         {
-            type = result;
-            if (type.Scope is not null)
-                type.Scope = await GetScopeAsync(type.Scope, cancellationToken);
-            if (type.Package is not null)
-                type.Package = await GetPackageAsync(type.Package, cancellationToken);
+            type = await response.ToDbEntityAsync(_dbContext, _scopeIdMap, _packageIdMap, cancellationToken);
         }
 
         type.Source = await GetSourceAsync(type.SourceFqdn, cancellationToken);
@@ -117,122 +113,40 @@ public sealed class DataLoaderService : IDisposable
         return type;
     }
 
-    private async Task SaveTableAsync(TableInfo tableInfo, CancellationToken cancellationToken)
+    private async Task SaveTableAsync(Table table, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (tableInfo.Scope is not null)
-            tableInfo.Scope = await GetScopeAsync(tableInfo.Scope, cancellationToken);
-        if (tableInfo.Package is not null)
-            tableInfo.Package = await GetPackageAsync(tableInfo.Package, cancellationToken);
-        SourceInfo source = await GetSourceAsync(tableInfo.SourceFqdn, cancellationToken);
-        tableInfo.Source = source;
-        tableInfo.LastUpdated = DateTime.Now;
-        TableInfo? superClass = tableInfo.SuperClass;
-        tableInfo.SuperClass = null;
-        cancellationToken.ThrowIfCancellationRequested();
-        _logger.LogAddingTableToDb(tableInfo.Name);
-        await _dbContext!.Tables.AddAsync(tableInfo, cancellationToken);
-        _tableIdMap.Add(tableInfo.SysID, tableInfo.Name);
-        await _dbContext!.SaveChangesAsync(cancellationToken);
+        
+        // _logger.LogAddingTableToDb(table.Name);
+        // if (elements.Length == 0)
+        // {
+        //     _logger.LogNewTableSaveCompleteTrace(table.Name);
+        //     return;
+        // }
 
-        if (superClass is not null && (tableInfo.SuperClass = superClass = await GetTableAsync(superClass, cancellationToken)) is not null)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            await _dbContext!.SaveChangesAsync(cancellationToken);
-        }
-        cancellationToken.ThrowIfCancellationRequested();
+        // if (superClass is not null)
+        // {
+        //     cancellationToken.ThrowIfCancellationRequested();
 
-        ElementInfo[] elements = await _tableAPIService!.GetElementsByTableNameAsync(tableInfo.Name, cancellationToken);
-        if (elements.Length == 0)
-        {
-            _logger.LogNewTableSaveCompleteTrace(tableInfo.Name);
-            return;
-        }
+        //     var super = await _dbContext.Tables.Entry(superClass).GetAllElementsAsync(cancellationToken);
+        //     if ((elements = elements.Where(e =>
+        //     {
+        //         var n = e.Name;
+        //         var se = super.FirstOrDefault(s => s.Name == n);
+        //         return se is null || !e.IsIdenticalTo(se);
+        //     }).ToArray()).Length == 0)
+        //     {
+        //         _logger.LogNewTableSaveCompleteTrace(table.Name);
+        //         return;
+        //     }
+        // }
 
-        if (superClass is null && elements.ExtendsBaseRecord())
-            tableInfo.SuperClass = superClass = await GetBaseRecordTypeAsync(cancellationToken);
-
-        if (superClass is not null)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var super = await _dbContext.Tables.Entry(superClass).GetAllElementsAsync(cancellationToken);
-            if ((elements = elements.Where(e =>
-            {
-                var n = e.Name;
-                var se = super.FirstOrDefault(s => s.Name == n);
-                if (se is null || !e.IsIdenticalTo(se))
-                {
-                    e.Table = tableInfo;
-                    e.Source = source;
-                    return true;
-                }
-                return false;
-            }).ToArray()).Length == 0)
-            {
-                _logger.LogNewTableSaveCompleteTrace(tableInfo.Name);
-                return;
-            }
-        }
-        else
-            foreach (ElementInfo e in elements)
-            {
-                e.Table = tableInfo;
-                e.Source = source;
-            }
-
-        foreach (var g in elements.Where(e => e.Package is not null).GroupBy(e => e.Package!.SysId))
-        {
-            ElementInfo[] arr = g.ToArray();
-            cancellationToken.ThrowIfCancellationRequested();
-            SysPackage p = await GetPackageAsync(arr[0].Package!, cancellationToken);
-            foreach (ElementInfo e in arr)
-                e.Package = p;
-        }
-
-        foreach (var g in elements.Where(e => e.Type is not null).GroupBy(e => e.Type!.Name))
-        {
-            ElementInfo[] arr = g.ToArray();
-            cancellationToken.ThrowIfCancellationRequested();
-            GlideType t = await GetGlideTypeAsync(arr[0].Type!, cancellationToken);
-            foreach (ElementInfo e in arr)
-                e.Type = t;
-        }
-
-        foreach (var g in elements.Where(e => e.Reference is not null).GroupBy(e => e.Reference!.SysID))
-        {
-            ElementInfo[] arr = g.ToArray();
-            cancellationToken.ThrowIfCancellationRequested();
-            TableInfo t = await GetTableAsync(arr[0].Reference!, cancellationToken);
-            foreach (ElementInfo e in arr)
-                e.Reference = t;
-        }
-
-        cancellationToken.ThrowIfCancellationRequested();
-        _logger.LogAddingElementsToDatabase(tableInfo.Name);
-        await _dbContext!.Elements.AddRangeAsync(elements, cancellationToken);
-        cancellationToken.ThrowIfCancellationRequested();
-        await _dbContext!.SaveChangesAsync(cancellationToken);
-        _logger.LogNewTableSaveCompleteTrace(tableInfo.Name);
-    }
-
-    private async Task<TableInfo> GetTableAsync(TableInfo table, CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        if (_tableIdMap.TryGetValue(table.SysID, out string? name))
-            return await _dbContext!.Tables.FirstAsync(t => t.Name == name, cancellationToken);
-        name = table.Name;
-        TableInfo? result = await _dbContext!.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        if (result is not null)
-            _tableIdMap.Add(table.SysID, name);
-        else
-        {
-            if ((result = await _tableAPIService!.GetTableByIdAsync(table.SysID, cancellationToken)) is not null)
-                table = result;
-            cancellationToken.ThrowIfCancellationRequested();
-            await SaveTableAsync(table, cancellationToken);
-        }
-        return table;
+        // cancellationToken.ThrowIfCancellationRequested();
+        // _logger.LogAddingElementsToDatabase(table.Name);
+        // await _dbContext!.Elements.AddRangeAsync(elements, cancellationToken);
+        // cancellationToken.ThrowIfCancellationRequested();
+        // await _dbContext!.SaveChangesAsync(cancellationToken);
+        // _logger.LogNewTableSaveCompleteTrace(table.Name);
     }
 
     internal async Task<TableInfo> GetBaseRecordTypeAsync(CancellationToken cancellationToken)
@@ -244,93 +158,32 @@ public sealed class DataLoaderService : IDisposable
         if (tableInfo is null)
         {
             string sourceFqdn = _tableAPIService.SourceFqdn;
-            tableInfo = new()
-            {
-                SysID = "00000000000000000000000000000000",
-                IsInterface = true,
-                Label = "",
-                LastUpdated = DateTime.Now,
-                Name = TS_NAME_BASERECORD,
-                SourceFqdn = sourceFqdn
-            };
-            await _dbContext.Tables.AddAsync(tableInfo, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            await _dbContext.Elements.AddAsync(new ElementInfo()
-            {
-                IsActive = true,
-                IsPrimary = true,
-                Label = "Sys ID",
-                MaxLength = 32,
-                Name = JSON_KEY_SYS_ID,
-                SysID = "00000000000000000000000000000000",
-                TypeName = TYPE_NAME_GUID,
-                Table = tableInfo,
-                SourceFqdn = sourceFqdn,
-                LastUpdated = DateTime.Now
-            }, cancellationToken);
-            await _dbContext.Elements.AddAsync(new ElementInfo()
-            {
-                IsActive = true,
-                Label = "Created by",
-                MaxLength = 40,
-                Name = JSON_KEY_SYS_CREATED_BY,
-                SysID = "9be67479a3b34cf395f500f3c165a9af",
-                TypeName = TYPE_NAME_string,
-                Table = tableInfo,
-                SourceFqdn = sourceFqdn,
-                LastUpdated = DateTime.Now
-            }, cancellationToken);
-            await _dbContext.Elements.AddAsync(new ElementInfo()
-            {
-                IsActive = true,
-                Label = "Created",
-                MaxLength = 40,
-                Name = JSON_KEY_SYS_CREATED_ON,
-                SysID = "6bd533127c67405d998d3cb50f44419a",
-                TypeName = TYPE_NAME_glide_date_time,
-                Table = tableInfo,
-                SourceFqdn = sourceFqdn,
-                LastUpdated = DateTime.Now
-            }, cancellationToken);
-            await _dbContext.Elements.AddAsync(new ElementInfo()
-            {
-                IsActive = true,
-                Label = "Updates",
-                MaxLength = 40,
-                Name = JSON_KEY_SYS_MOD_COUNT,
-                SysID = "75a55d94320c4041a7e4a1e14813de27",
-                TypeName = TYPE_NAME_integer,
-                Table = tableInfo,
-                SourceFqdn = sourceFqdn,
-                LastUpdated = DateTime.Now
-            }, cancellationToken);
-            await _dbContext.Elements.AddAsync(new ElementInfo()
-            {
-                IsActive = true,
-                Label = "Updated by",
-                MaxLength = 40,
-                Name = JSON_KEY_SYS_UPDATED_BY,
-                SysID = "ef0b4750753d4f6c82499a605b490af4",
-                TypeName = TYPE_NAME_string,
-                Table = tableInfo,
-                SourceFqdn = sourceFqdn,
-                LastUpdated = DateTime.Now
-            }, cancellationToken);
-            await _dbContext.Elements.AddAsync(new ElementInfo()
-            {
-                IsActive = true,
-                Label = "Updated",
-                MaxLength = 40,
-                Name = JSON_KEY_SYS_UPDATED_ON,
-                SysID = "3f68a52adc8a4c5a960ec2a9a2bd9fd6",
-                TypeName = TYPE_NAME_glide_date_time,
-                Table = tableInfo,
-                SourceFqdn = sourceFqdn,
-                LastUpdated = DateTime.Now
-            }, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            tableInfo = await AddTableAsync(new(TS_NAME_BASERECORD, TS_NAME_BASERECORD, Guid.Empty.ToString("N"), true, null, null, null, null, string.Empty, null, sourceFqdn), cancellationToken);
+            await AddElementsAsync(new Element[] {
+                new(JSON_KEY_SYS_ID, "Sys ID", Guid.Empty.ToString("N"), null, false, new GlideTypeRef(TYPE_NAME_GUID, "Sys ID (GUID)", sourceFqdn), 32, true, false, true, false, null, false, false, null, false, null, null, sourceFqdn),
+                new(JSON_KEY_SYS_CREATED_BY, "Created by", "9be67479a3b34cf395f500f3c165a9af", null, false, new GlideTypeRef(TYPE_NAME_string, "String", sourceFqdn), 40, true, false,
+                    false, false, null, false, false, null, false, null, null, sourceFqdn),
+                new(JSON_KEY_SYS_CREATED_ON, "Created", "6bd533127c67405d998d3cb50f44419a", null, false, new GlideTypeRef(TYPE_NAME_glide_date_time, "Date/Time", sourceFqdn), null, true,
+                    false, false, false, null, false, false, null, false, null, null, sourceFqdn),
+                new(JSON_KEY_SYS_MOD_COUNT, "Updates", "75a55d94320c4041a7e4a1e14813de27", null, false, new GlideTypeRef(TYPE_NAME_integer, "Integer", sourceFqdn), null, false, false,
+                    false, false, null, false, false, null, false, null, null, sourceFqdn),
+                new(JSON_KEY_SYS_CREATED_BY, "Updated by", "ef0b4750753d4f6c82499a605b490af4", null, false, new GlideTypeRef(TYPE_NAME_string, "String", sourceFqdn), 40, true, false,
+                    false, false, null, false, false, null, false, null, null, sourceFqdn),
+                new(JSON_KEY_SYS_CREATED_ON, "Updated", "3f68a52adc8a4c5a960ec2a9a2bd9fd6", null, false, new GlideTypeRef(TYPE_NAME_glide_date_time, "Date/Time", sourceFqdn), null, true,
+                    false, false, false, null, false, false, null, false, null, null, sourceFqdn)
+            }, tableInfo, cancellationToken);
         }
         return tableInfo;
+    }
+
+    private async Task<IEnumerable<ElementInfo>> AddElementsAsync(IEnumerable<Element> elements, TableInfo table, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task<TableInfo> AddTableAsync(Table table, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -345,8 +198,12 @@ public sealed class DataLoaderService : IDisposable
         if (_dbContext is null)
             throw new ObjectDisposedException(nameof(DataLoaderService));
         TableInfo? tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        if (tableInfo is null && (tableInfo = await _tableAPIService.GetTableByNameAsync(name, cancellationToken)) is not null)
-            await SaveTableAsync(tableInfo, cancellationToken);
+        if (tableInfo is null)
+        {
+            var response = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
+            if (response is not null)
+                tableInfo = await AddTableAsync(response, cancellationToken);
+        }
         return tableInfo;
     }
 

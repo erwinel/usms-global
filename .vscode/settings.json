@@ -76,5 +76,14 @@
     ],
     "githubPullRequests.ignoredPullRequestBranches": [
         "main"
-    ]
+    ],
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "Typings",
+            "database": "${workspaceFolder:usms-global}/util/src/SnTsTypeGenerator/Typings.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }
