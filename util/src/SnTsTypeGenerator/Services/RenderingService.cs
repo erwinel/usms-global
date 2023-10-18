@@ -790,7 +790,7 @@ public partial class RenderingService
         }
         if (string.IsNullOrWhiteSpace(appSettings.Mode))
         {
-            _isScoped = false;
+            _isScoped = true;
             _logger.LogDefaultRenderMode(_isScoped);
         }
         else
