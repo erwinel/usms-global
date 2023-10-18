@@ -69,7 +69,7 @@ Settings Example:
 
 ### ServiceNow Instance URL
 
-This is the base URL of the source ServiceNow instance, and not include any path, query or fragment. This can be specified using the `-r` command line switch or the `SnTsTypeGenerator/RemoteURL` setting. If this is not specified, you will be prompted for the URL.
+This is the base URL of the source ServiceNow instance, which should not include any path, query or fragment. This can be specified using the `-r` command line switch or the `SnTsTypeGenerator/RemoteURL` setting. If this is not specified, you will be prompted for the URL.
 
 Command Line Example:
 
@@ -169,9 +169,9 @@ Settings Example:
 
 ### Override Output File Path
 
-This defaults to a file named `types.d.ts` in the current working subdirectory.
+The file output path relative to the current working subdirectory. This defaults to a file named `types.d.ts`.
 
-You can override this using the  `-o` command line switch or the `SnTsTypeGenerator/Output` setting. The path for this setting is relative to the current working subdirectory. If the file extension is omitted, it will have the default extension of `.d.ts`.
+You can override this using the  `-o` command line switch or the `SnTsTypeGenerator/Output` setting. If the file extension is omitted, it will have the default extension of `.d.ts`.
 
 Command Line Example:
 
