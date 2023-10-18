@@ -1,76 +1,319 @@
 # ServiceNow Typings Generator
 
+- [ServiceNow Typings Generator](#servicenow-typings-generator)
+  - [Settings and Command Line Options](#settings-and-command-line-options)
+    - [Table Names](#table-names)
+    - [Output Mode](#output-mode)
+    - [ServiceNow Instance URL](#servicenow-instance-url)
+    - [Login User Name](#login-user-name)
+    - [Login Password](#login-password)
+    - [Client ID](#client-id)
+    - [Client Secret](#client-secret)
+    - [Override Output File Path](#override-output-file-path)
+      - [Force Overwrite](#force-overwrite)
+    - [Override Database File Path](#override-database-file-path)
+    - [Emitting Base Types](#emitting-base-types)
+    - [Including Referenced and Parent Types](#including-referenced-and-parent-types)
+    - [Show Help](#show-help)
+  - [Development Environment setup](#development-environment-setup)
+    - [Create Application Registry](#create-application-registry)
+    - [Store Client Secret and User Account Password](#store-client-secret-and-user-account-password)
+
 Creates `.d.ts` from ServiceNow tables, using the [ServiceNow Table REST API](https://developer.servicenow.com/dev.do#!/reference/api/utah/rest/c_TableAPI).
 
-## Command Line Options
+## Settings and Command Line Options
 
-`-d=`*filename*: The Path to the typings database.
-This path is relative to the subdirectory containing the executable.
-If this option is not present, then this will use the `SnTsTypeGenerator:DbFile` setting in `appsettings.json`, if defined; otherwise it will use a database named `Typings.db` in the same subdirectory as the executable.
+Options specified as command line switches will override those specified in the [Application settings](./appsettings.json) file.
 
-`-t=`*name,name,...*
-The names of the table to generate typings for.
-If this option is not present, then this will use the `SnTsTypeGenerator:Table` setting in `appsettings.json`, if defined.
+### Table Names
 
-`-u=`*login*
-The user name credentials to use when connecting to the remote instance.
-If this option is not present, then this will use the `SnTsTypeGenerator:UserName` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the user name.
+This specifies the names of the tables to render typings for. This is specified using the `-t` command line switch or the `SnTsTypeGenerator/Tables` setting. If specified on the command line, multiple table names are separated by commas with no spaces. Table names are individually specified within an array in the [Application settings](./appsettings.json) file.
 
-`-p=`*password*
-The password credentials to use when connecting to the remote instance.
-If this option is not present, then this will use the `SnTsTypeGenerator:Password` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the password.
+Command Line Example uses comma-delimited names (no spaces):
 
-`-i=`*id*
-Specifies client ID in the remote ServiceNow instance's Application Registry.
-If this option is not present, then this will use the `SnTsTypeGenerator:ClientId` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the client ID if there is a client secret (`-x` command line option or `SnTsTypeGenerator:ClientSecret` setting) specified.
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user
+```
 
-`-x=`*secret*
-The the client secret in the remote ServiceNow instance's Application Registry.
-If this option is not present, then this will use the `SnTsTypeGenerator:ClientSecret` setting in `appsettings.json`, if defined; otherwise, you will be prompted for the client secret if there is a client ID (`-i` command line option or `SnTsTypeGenerator:ClientId` setting) specified.
+Settings Example:
 
-`-r=`*url*
-The base URL of the remote ServiceNow instance.
-If this option is not present, then this will use the `SnTsTypeGenerator:RemoteURL` setting in `appsettings.json`, if defined; otherwise, an error message will be displayed.
+```json
+{
+    "SnTsTypeGenerator": {
+        "Tables": ["sys_metadata", "task", "sys_user"],
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
 
-`-m=`*scoped*`|`*s*`|`*global*`|`*g*
-The typing generation mode.
-The *scoped* (*s*) option generates typings for use with scoped apps, and *global* (*g*) generates typings for globally-scoped scripting.
-If this option is not present, then this will use the `SnTsTypeGenerator:Mode` setting in `appsettings.json`, if present; otherwise generates typings for globally-scoped scripting.
+### Output Mode
 
-`-o=`*filename*`.d.ts`
-The output file name.
-If this option is not present, then this will use the `SnTsTypeGenerator:Output` setting in `appsettings.json`, if present; otherwise, an error message will be displayed.
+This determines whether the typings file is generated for use with scoped applications or for globally-scoped scripting. This can be specified using the `-m` command line switch or the `SnTsTypeGenerator/Mode` setting. If this is not specified, you will be prompted for the URL. Valid values are `scoped` or `s` for targeting scoped applications, and `global`, or `g` for global-scope mode. If this is not specified, the default behavior is to generate typings for scoped applications.
 
-`-f=true`
-Force overwrite of the output file.
-If this option is not present, then this will use the `SnTsTypeGenerator:Force` setting in `appsettings.json`, if set to true; otherwise, it will write the output to a file named `types.d.ts` in the current working directory.
+Command Line Example:
 
-`-?`
-  or
-`-h`
-  or
-`--help`
-Displays this help information.
-If this option is used, then all other options are ignored.
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -m s
+```
 
-## Development setup
+Settings Example:
 
-1. If the element `Project/PropertyGroup/UserSecretsId` does not exist in [SnTsTypeGenerator.csproj](./SnTsTypeGenerator.csproj), run the following command from the project directory: `dotnet user-secrets init`.
-2. Create Application Registry in target ServiceNow instance:
-   1. Navigate to *System OAuth* => *Application Registry*.
-   2. Click the *New* button.
-   3. Click the *Create an OAuth API endpoint for external clients* link.
-   4. Fill in the following fields and submit the form:
-      - **Name**: SnTsTypeGenerator
-      - **DataSync**: Unchecked
-      - **Accessible from**: All application scopes
-      - **Active**: Checked
-      - Leave all other fields as-is.
-3. Edit [appsettings.Development.json](./appsettings.Development.json) and add/modify the following keys in the "SnTsTypeGenerator" section:
-   - **RemoteURL**: This is the base URL of the ServiceNow instance.
-   - **UserName**: The user account name to authenticate as.
-   - **ClientId**: This is the value of the *Client ID* field from the Application Registry previously created.
-4. Set the client secret from the 'Client Secret' field of the Application Registry previously created, using the following command: `dotnet user-secrets set "SnTsTypeGenerator:ClientSecret" "{client_secret}"`
-5. Set the ServiceNow user account password using the following command: `dotnet user-secrets set "SnTsTypeGenerator:Password" "{password}"`
+```json
+{
+    "SnTsTypeGenerator": {
+        "Mode": "scoped",
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### ServiceNow Instance URL
+
+This is the base URL of the source ServiceNow instance, and not include any path, query or fragment. This can be specified using the `-r` command line switch or the `SnTsTypeGenerator/RemoteURL` setting. If this is not specified, you will be prompted for the URL.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -r https://dev00000.service-now.com
+```
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### Login User Name
+
+The account name to use as account credentials on the source ServiceNow instance. This can be specified using the `-u` command line switch or the `SnTsTypeGenerator/UserName` setting. If this is not specified, you will be prompted for the user account login name.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -u my_login
+```
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "UserName": "my_login",
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### Login Password
+
+The password to use as account credentials on on the source ServiceNow instance. This can be specified using the `-o` command line switch or the `SnTsTypeGenerator/Password` setting. If this is not specified, you will be prompted for the user account password.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -u my_login -p "My*\$ecret!"
+```
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "UserName": "my_login",
+        "Password": "Ny*$ecret!",
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### Client ID
+
+This is the Client ID of the Application Registry entry in the target ServiceNow instance. This can be specified using the `SnTsTypeGenerator/ClientId` setting. If this setting is not specified, this will connect using only the account credentials and will not attempt to get an OAuth access token.
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "ClientId": "00000000000000000000000000000000",
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### Client Secret
+
+This is the Client Secrent from the Application Registry entry in the target ServiceNow instance. This can be specified using the `-x` command line switch or the `SnTsTypeGenerator/ClientSecret` setting. If the Client ID is specified, but the Client Secret is not, you will be prompted for the client secret.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -x "My*\$ecret!"
+```
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "ClientId": "00000000000000000000000000000000",
+        "ClientSecret": "My*$ecret!",
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### Override Output File Path
+
+This defaults to a file named `types.d.ts` in the current working subdirectory.
+
+You can override this using the  `-o` command line switch or the `SnTsTypeGenerator/Output` setting. The path for this setting is relative to the current working subdirectory. If the file extension is omitted, it will have the default extension of `.d.ts`.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -o=myTypes.d.ts
+```
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "Output": "myTypes.d.ts",
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+#### Force Overwrite
+
+To overwrite any existing output file, use the `-f` command line switch or set the `SnTsTypeGenerator/Force` setting to `true`; otherwise the type generation will fail if the output file already exists.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -o=myTypes.d.ts -f
+```
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "DbFile": "MyTypings.db",
+        "ForceOverwrite": true,
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### Override Database File Path
+
+This defaults to a file named `Typings.db` in the same subdirectory as the application executable.
+
+You can override this using the  `-d` command line switch or the `SnTsTypeGenerator/DbFile` setting. The path for this setting is relative to the current working subdirectory.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -d=MyTypings.db
+```
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "DbFile": "MyTypings.db",
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### Emitting Base Types
+
+To include the `$$GlideElement.Reference<TFields, TRecord>` type definition and the `$$tableFields.IBaseRecord` interface, use the `-b` command line switch or set the `SnTsTypeGenerator/DbFile` setting to `true`.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -b
+```
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "EmitBaseTypes": true,
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### Including Referenced and Parent Types
+
+To include the parent type definitions and type definitions referenced by elements, which are not explicitly included in the `-t` command line argument or `SnTsTypeGenerator/Tables` setting, use the `-i` command line switch or set the `SnTsTypeGenerator/IncludeReferenced` setting to `true`.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -i
+```
+
+Settings Example:
+
+```json
+{
+    "SnTsTypeGenerator": {
+        "IncludeReferenced": true,
+        "RemoteURL": "https://dev00000.service-now.com"
+    }
+}
+```
+
+### Show Help
+
+To display help text, use the `-?`, `-h` or `--help` command line switch. If this is specified, no typings will be generated.
+
+## Development Environment setup
+
+### Create Application Registry
+
+If you wish to use OAuth tokens, you will need to add and application registry in the target ServiceNow instance.
+
+Note: If the element `Project/PropertyGroup/UserSecretsId` does not exist in [SnTsTypeGenerator.csproj](./SnTsTypeGenerator.csproj), run `dotnet user-secrets init` from the project directory.
+
+In the target ServiceNow instance:
+
+1. Navigate to *System OAuth* => *Application Registry*.
+2. Click the *New* button.
+3. Click the *Create an OAuth API endpoint for external clients* link.
+4. Fill in the following fields and save changes:
+   - **Name**: SnTsTypeGenerator
+   - **DataSync**: Unchecked
+   - **Accessible from**: All application scopes
+   - **Active**: Checked
+   - *Leave all other fields as-is.*
+
+Add/modify the following keys in the "SnTsTypeGenerator" section of [appsettings.Development.json](./appsettings.Development.json):
+
+- **RemoteURL**: This is the base URL of the ServiceNow instance.
+- **UserName**: The user account name to authenticate as.
+- **ClientId**: This is the value of the *Client ID* field from the Application Registry previously created.
+
+### Store Client Secret and User Account Password
+
+Set Client Secret and user account password in user-secrets, where `"{client_secret}"` is the valid of the Client Secret field in the Application Registry, and `"{password}"` is the actual password for the account specified by the `UserName` setting.
+
+```sh
+dotnet user-secrets set "SnTsTypeGenerator:ClientSecret" "{client_secret}" --project util/src/SnTsTypeGenerator
+dotnet user-secrets set "SnTsTypeGenerator:Password" "{password}" --project util/src/SnTsTypeGenerator
+```
 
 - See [Safe storage of app secrets in development in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) for more information about user secrets.
