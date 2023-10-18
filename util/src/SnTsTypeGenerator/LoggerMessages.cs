@@ -12,29 +12,7 @@ namespace SnTsTypeGenerator;
 
 public static class LoggerMessages
 {
-    #region UnexpectedServiceError (0x0001)
-
-    public const int EVENT_ID_UnexpectedServiceError = 0x0001;
-    public static readonly EventId UnexpectedServiceError = new(EVENT_ID_UnexpectedServiceError, nameof(UnexpectedServiceError));
-    private static readonly Action<ILogger, string, Exception?> _unexpectedServiceError = LoggerMessage.Define<string>(LogLevel.Error,
-        UnexpectedServiceError, "Error executing {TypeFullName}.");
-    /// <summary>
-    /// Logs an UnexpectedServiceError event with event code 0x0001.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <param name="type">The type of service that threw the exception.</param>
-    /// <param name="error">The exception that caused the event.</param>
-    public static void LogUnexpectedServiceError(this ILogger logger, Type type, Exception error) => _unexpectedServiceError(logger, type.FullName ?? type.Name, error);
-    /// <summary>
-    /// Logs an UnexpectedServiceError event with event code 0x0001.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <param name="error">The exception that caused the event.</param>
-    /// <typeparam name="T">The type of service that threw the exception.</typeparam>
-    public static void LogUnexpectedServiceError<T>(this ILogger logger, Exception error) => LogUnexpectedServiceError(logger, typeof(T), error);
-
-    #endregion
-    #region Critical UnexpectedServiceException Error (0xffff)
+    #region Critical UnexpectedServiceException (0xffff)
 
     /// <summary>
     /// Numerical event code for UnexpectedServiceException.
