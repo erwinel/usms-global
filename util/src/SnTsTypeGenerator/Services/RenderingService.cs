@@ -812,7 +812,7 @@ public partial class RenderingService
             _logger.LogRenderModeSettingValue(_isScoped);
         }
 
-        _forceOverwrite = appSettings.Force ?? false;
+        _forceOverwrite = appSettings.ForceOverwrite ?? false;
         _includeReferenced = appSettings.IncludeReferenced ?? false;
         _emitBaseTypes = appSettings.EmitBaseTypes ?? false;
         string outputFileName = appSettings.Output!;

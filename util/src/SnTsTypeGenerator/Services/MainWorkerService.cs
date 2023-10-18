@@ -119,7 +119,7 @@ public sealed class MainWorkerService : BackgroundService
             Console.WriteLine($"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Output)} setting in appsettings.json, if present; otherwise, it will write to a file named {DEFAULT_OUTPUT_FILENAME} in the current working directory.");
 
             writeBooleanSwitch(SHORTHAND_f, "Force overwrite of the output file.",
-                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Force)} setting in appsettings.json, if defined; otherwise, you will be prompted for the user name.");
+                $"If this option is not present, then this will use the {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.ForceOverwrite)} setting in appsettings.json, if defined; otherwise, you will be prompted for the user name.");
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(SHORTHAND__3F_);

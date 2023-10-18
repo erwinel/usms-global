@@ -270,7 +270,7 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="path">The output file path.</param>
-    /// <param name="overWrite">The value of the <see cref="AppSettings.Force"/> setting.</param>
+    /// <param name="overWrite">The value of the <see cref="AppSettings.ForceOverwrite"/> setting.</param>
     public static void LogUsingOutputFile(this ILogger logger, string path, bool overWrite) => _usingOutputFile(logger, path, overWrite, null);
 
     #endregion

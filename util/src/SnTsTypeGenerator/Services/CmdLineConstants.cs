@@ -65,9 +65,14 @@ public static class CmdLineConstants
     public const char SHORTHAND_o = 'o';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="AppSettings.Force" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.ForceOverwrite" /></c> setting.
     /// </summary>
     public const char SHORTHAND_f = 'f';
+
+    /// <summary>
+    /// Gets the alternate command line option for the <c><see cref="AppSettings.ForceOverwrite" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_force = "Force";
 
     /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.Mode" /></c> setting.

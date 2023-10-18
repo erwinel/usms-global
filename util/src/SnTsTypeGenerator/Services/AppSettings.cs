@@ -67,7 +67,7 @@ public class AppSettings
     /// <summary>
     /// Force overwrite of output file.
     /// </summary>
-    public bool? Force { get; set; }
+    public bool? ForceOverwrite { get; set; }
 
     /// <summary>
     /// The output mode.
@@ -92,6 +92,8 @@ public class AppSettings
         { $"--{nameof(Password)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
         { $"-{SHORTHAND_r}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
         { $"--{nameof(RemoteURL)}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
+        { $"-{SHORTHAND_o}", $"{nameof(SnTsTypeGenerator)}:{nameof(Output)}" },
+        { $"--{nameof(Output)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Output)}" },
         { $"-{SHORTHAND_m}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" },
         { $"--{nameof(Mode)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" }
     };
@@ -102,8 +104,9 @@ public class AppSettings
         { $"--{nameof(IncludeReferenced)}", $"{nameof(SnTsTypeGenerator)}:{nameof(IncludeReferenced)}" },
         { $"-{SHORTHAND_b}", $"{nameof(SnTsTypeGenerator)}:{nameof(EmitBaseTypes)}" },
         { $"--{nameof(EmitBaseTypes)}", $"{nameof(SnTsTypeGenerator)}:{nameof(EmitBaseTypes)}" },
-        { $"-{SHORTHAND_f}", $"{nameof(SnTsTypeGenerator)}:{nameof(Force)}" },
-        { $"--{nameof(Force)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Force)}" },
+        { $"-{SHORTHAND_f}", $"{nameof(SnTsTypeGenerator)}:{nameof(ForceOverwrite)}" },
+        { $"--{SHORTHAND_force}", $"{nameof(SnTsTypeGenerator)}:{nameof(ForceOverwrite)}" },
+        { $"--{nameof(ForceOverwrite)}", $"{nameof(SnTsTypeGenerator)}:{nameof(ForceOverwrite)}" },
         { $"-{SHORTHAND_h}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
         { $"-{SHORTHAND__3F_}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
         { $"--{nameof(Help)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" }
