@@ -90,6 +90,8 @@ public class AppSettings
         { $"--{nameof(UserName)}", $"{nameof(SnTsTypeGenerator)}:{nameof(UserName)}" },
         { $"-{SHORTHAND_p}", $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
         { $"--{nameof(Password)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Password)}" },
+        { $"-{SHORTHAND_x}", $"{nameof(SnTsTypeGenerator)}:{nameof(ClientSecret)}" },
+        { $"--{nameof(ClientSecret)}", $"{nameof(SnTsTypeGenerator)}:{nameof(ClientSecret)}" },
         { $"-{SHORTHAND_r}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
         { $"--{nameof(RemoteURL)}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
         { $"-{SHORTHAND_o}", $"{nameof(SnTsTypeGenerator)}:{nameof(Output)}" },
