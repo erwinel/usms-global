@@ -27,12 +27,7 @@ internal class Program
         builder.Services.AddDbContextPool<SnTsTypeGenerator.Services.TypingsDbContext>(options =>
             {
                 var dbFile = builder.Configuration.GetSection(nameof(SnTsTypeGenerator)).Get<SnTsTypeGenerator.Services.AppSettings>()?.DbFile;
-                try
-                {
-                    dbFile = Path.GetFullPath(string.IsNullOrEmpty(dbFile) ? Path.Combine(builder.Environment.ContentRootPath, DEFAULT_DbFile) :
-                        Path.IsPathFullyQualified(dbFile) || Path.IsPathRooted(dbFile) ? dbFile : Path.Combine(builder.Environment.ContentRootPath, dbFile));
-                }
-                catch { }
+                try { dbFile = Path.GetFullPath(string.IsNullOrEmpty(dbFile) ? Path.Combine(builder.Environment.ContentRootPath, DEFAULT_DbFile) : dbFile); } catch { }
                 options.UseSqlite(new SqliteConnectionStringBuilder
                 {
                     DataSource = dbFile,
