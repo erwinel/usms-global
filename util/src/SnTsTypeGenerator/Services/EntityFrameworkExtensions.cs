@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
 using SnTsTypeGenerator.Models;
+using SnTsTypeGenerator.Models.TableAPI;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Services;
@@ -165,13 +167,25 @@ public static class EntityFrameworkExtensions
             NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && x.PackageName.NoCaseEquals(y.PackageName));
     }
 
+    public static bool IsIdenticalTo(this Element x, ElementInfo y)
+    {
+        if (ReferenceEquals(x, y))
+            return true;
+        return ReferenceEquals(x, y) || (x.IsActive == y.IsActive && x.IsArray == y.IsArray && x.IsCalculated == y.IsCalculated && x.IsDisplay == y.IsDisplay && x.IsMandatory == y.IsMandatory &&
+            x.IsPrimary == y.IsPrimary && x.IsReadOnly == y.IsReadOnly && x.IsUnique == y.IsUnique && (x.MaxLength.HasValue ? y.MaxLength.HasValue && x.MaxLength.Value == y.MaxLength.Value : !y.MaxLength.HasValue) &&
+            (x.SizeClass.HasValue ? y.SizeClass.HasValue && x.SizeClass.Value == y.SizeClass.Value : !y.MaxLength.HasValue) && NameComparer.Equals(x.SysID, y.SysID) && NameComparer.Equals(x.Name, y.Name) &&
+            NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && (x.Package?.Name).NoCaseEquals(y.PackageName));
+    }
+
     internal static async Task<IEnumerable<ElementInheritance>> GetAllElementInheritancesAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
     {
         var elements = await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken);
         EntityEntry<TableInfo>? superClass = await entity.GetReferencedEntryAsync(t => t.SuperClass, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         if (superClass is null)
             return elements.Select(e => new ElementInheritance(e, null));
         var super = await GetAllElementInheritancesAsync(superClass, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         return elements.Select(e =>
         {
             var n = e.Name;
@@ -187,9 +201,11 @@ public static class EntityFrameworkExtensions
     {
         var elements = await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken);
         EntityEntry<TableInfo>? superClass = await entity.GetReferencedEntryAsync(t => t.SuperClass, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         if (superClass is null)
             return elements;
         var super = await GetAllElementsAsync(superClass, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         return elements.Concat(super.Where(s =>
         {
             var n = s.Name;
@@ -197,13 +213,81 @@ public static class EntityFrameworkExtensions
         })).OrderBy(e => e.Name, NameComparer);
     }
 
+    internal static bool TryFindByName(this IEnumerable<TableInfo>? tables, string name, [NotNullWhen(true)] out TableInfo? result)
+    {
+        if (tables is not null)
+            foreach (TableInfo t in tables)
+                if (NameComparer.Equals(t.Name, name))
+                {
+                    result = t;
+                    return true;
+                }
+        result = null;
+        return false;
+    }
+    
+    internal static bool TryFindByName(this IEnumerable<ElementInfo>? elements, string name, [NotNullWhen(true)] out ElementInfo? result)
+    {
+        if (elements is not null)
+            foreach (ElementInfo e in elements)
+                if (NameComparer.Equals(e.Name, name))
+                {
+                    result = e;
+                    return true;
+                }
+        result = null;
+        return false;
+    }
+    
+    internal static TableInfo? FindByName(this IEnumerable<TableInfo>? tables, string name) => tables?.FirstOrDefault(t => NameComparer.Equals(t.Name, name));
+    
+    internal static bool HasTable(this IEnumerable<TableInfo>? tables, string name) => tables?.Any(t => NameComparer.Equals(t.Name, name)) ?? false;
+    
+    internal static ElementInfo? FindByName(this IEnumerable<ElementInfo>? elements, string name) => elements?.FirstOrDefault(e => NameComparer.Equals(e.Name, name));
+    
+    internal static bool HasElement(this IEnumerable<TableInfo>? elements, string name) => elements?.Any(e => NameComparer.Equals(e.Name, name)) ?? false;
+    
+    internal static async Task<IEnumerable<TableInfo>> LoadAllReferencedAsync(this TypingsDbContext dbContext, IEnumerable<TableInfo> tables, CancellationToken cancellationToken)
+    {
+        List<TableInfo> toValidate = tables.ToList();
+        int startCount = toValidate.Count;
+        for (int index = 0; index < toValidate.Count; index++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            TableInfo currentTable = toValidate[index];
+            var entry = dbContext.Tables.Entry(currentTable);
+            var name = currentTable.SuperClassName;
+            if (name is not null && !toValidate.HasTable(name))
+            {
+                var superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (superClass is not null)
+                    toValidate.Add(superClass);
+            }
+            foreach (ElementInfo element in await entry.GetRelatedCollectionAsync(t => t.Elements, cancellationToken))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if ((name = element.RefTableName) is not null && !toValidate.HasTable(name))
+                {
+                    var refTable = await element.GetReferencedEntityAsync(dbContext.Elements, e => e.Reference, cancellationToken);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (refTable is not null)
+                        toValidate.Add(refTable);
+                }
+            }
+        }
+        return (startCount > toValidate.Count) ? toValidate.OrderBy(t => t.Name, NameComparer) : tables;
+    }
+
     internal static async Task<IEnumerable<ElementInheritance>> GetElementsAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
     {
         var elements = await entity.GetRelatedCollectionAsync(t => t.Elements, cancellationToken);
         EntityEntry<TableInfo>? superClass = await entity.GetReferencedEntryAsync(t => t.SuperClass, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         if (superClass is null)
             return elements.Select(e => new ElementInheritance(e, null));
         var super = await GetAllElementInheritancesAsync(superClass, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         return elements.Select(e =>
         {
             var n = e.Name;
@@ -219,6 +303,11 @@ public static class EntityFrameworkExtensions
         elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.TypeName == TYPE_NAME_string) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.TypeName == TYPE_NAME_glide_date_time) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
+
+    public static bool ExtendsBaseRecord(this IEnumerable<Element> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.Type?.Name == TYPE_NAME_GUID) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.Type?.Name == TYPE_NAME_string) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.Type?.Name == TYPE_NAME_glide_date_time) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.Type?.Name == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.Type?.Name == TYPE_NAME_string) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.Type?.Name == TYPE_NAME_glide_date_time);
 
     public static bool IsGlobalScope(this TableInfo table) => string.IsNullOrWhiteSpace(table.ScopeValue) || NameComparer.Equals(table.ScopeValue, GLOBAL_NAMESPACE);
     public static string GetGlideRecordTypeName(this TableInfo table, string currentNamespace) => table.IsGlobalScope() ? $"{NS_NAME_GlideRecord}.{table.Name}" :

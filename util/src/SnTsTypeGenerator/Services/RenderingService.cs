@@ -16,7 +16,7 @@ public partial class RenderingService
     private const string START_INDENTED_JSDOC_LINE = " *    ";
     private const string OPEN_JSDOC = "/**";
     private const string CLOSE_JSDOC = " */";
-    private ILogger<RenderingService> _logger;
+    private readonly ILogger<RenderingService> _logger;
     private readonly IServiceScope _scope;
     private readonly FileInfo? _outputFile;
     private readonly bool _forceOverwrite;
@@ -31,37 +31,14 @@ public partial class RenderingService
 
     internal async Task RenderAsync(IEnumerable<TableInfo> toRender, CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
         if (_outputFile is null)
             return;
         using var dbContext = _scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
+        cancellationToken.ThrowIfCancellationRequested();
         if (_includeReferenced)
         {
-            List<TableInfo> toValidate = toRender.ToList();
-            for (int index = 0; index < toValidate.Count; index++)
-            {
-                var tbl = toValidate[index];
-                var e = dbContext.Tables.Entry(tbl);
-                var n = tbl.SuperClassName;
-                if (!string.IsNullOrEmpty(n) && !toValidate.Any(t => NameComparer.Equals(t.Name, n)))
-                {
-                    var sc = await e.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
-                    if (sc is not null)
-                        toValidate.Add(sc);
-                }
-
-                foreach (ElementInfo el in await e.GetRelatedCollectionAsync(t => t.Elements, cancellationToken))
-                {
-                    n = el.RefTableName;
-                    if (!string.IsNullOrEmpty(n) && !toValidate.Any(t => NameComparer.Equals(t.Name, n)))
-                    {
-                        var rt = await el.GetReferencedEntityAsync(dbContext.Elements, a => a.Reference, cancellationToken);
-                        if (rt is not null)
-                            toValidate.Add(rt);
-                    }
-                }
-            }
-            toRender = toValidate.OrderBy(t => t.Name, NameComparer);
+            toRender = await dbContext.LoadAllReferencedAsync(toRender, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
         }
         StreamWriter streamWriter;
         try
@@ -253,7 +230,7 @@ public partial class RenderingService
     // export type Reference<TFields = $$tableFields.IBaseRecord, TRecord extends GlideRecord & TFields = GlideRecord & TFields> = TFields & {
     //     getRefRecord(): TRecord;
     // } & GlideElementReference;
-    private async Task RenderReferenceBaseTypeAsync(IndentedTextWriter writer)
+    private static async Task RenderReferenceBaseTypeAsync(IndentedTextWriter writer)
     {
         await writer.WriteLineAsync(OPEN_JSDOC);
         await writer.WriteLineAsync(" * Reference Element");
@@ -402,7 +379,7 @@ public partial class RenderingService
         await writer.WriteLineAsync(">;");
     }
 
-    private async Task RenderScopedGlideElementAsync(TableInfo table, IndentedTextWriter writer)
+    private static async Task RenderScopedGlideElementAsync(TableInfo table, IndentedTextWriter writer)
     {
         writer.Indent = 2;
         await writer.WriteLineAsync(OPEN_JSDOC);
