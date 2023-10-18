@@ -211,7 +211,7 @@ public partial class TypingsDbContext : DbContext
                         try { _ = command.ExecuteNonQuery(); }
                         catch (Exception exception)
                         {
-                            _logger.LogCriticalDbInitializationFailure(query, typeof(T), dbFile, exception);
+                            _logger.LogDbInitializationFailure(query, typeof(T), dbFile, exception);
                             return true;
                         }
                     }
@@ -231,7 +231,7 @@ public partial class TypingsDbContext : DbContext
         }
         catch (Exception error)
         {
-            _logger.LogCriticalDbInitializationFailure(dbFile, error);
+            _logger.LogDbInitializationFailure(dbFile, error);
             _pathValidated = false;
         }
     }
@@ -272,7 +272,7 @@ public partial class TypingsDbContext : DbContext
         using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(SaveChanges));
         OnBeforeSave();
         int returnValue = base.SaveChanges();
-        _logger.LogDbSaveChangesCompletedTrace(false, null, returnValue);
+        _logger.LogDbSaveChangesCompleted(false, null, returnValue);
         return returnValue;
     }
 
@@ -281,7 +281,7 @@ public partial class TypingsDbContext : DbContext
         using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(SaveChanges), nameof(acceptAllChangesOnSuccess), acceptAllChangesOnSuccess);
         OnBeforeSave();
         int returnValue = base.SaveChanges(acceptAllChangesOnSuccess);
-        _logger.LogDbSaveChangesCompletedTrace(false, acceptAllChangesOnSuccess, returnValue);
+        _logger.LogDbSaveChangesCompleted(false, acceptAllChangesOnSuccess, returnValue);
         return returnValue;
     }
 
@@ -290,7 +290,7 @@ public partial class TypingsDbContext : DbContext
         using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(SaveChangesAsync), nameof(acceptAllChangesOnSuccess), acceptAllChangesOnSuccess);
         OnBeforeSave();
         int returnValue = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        _logger.LogDbSaveChangesCompletedTrace(true, acceptAllChangesOnSuccess, returnValue);
+        _logger.LogDbSaveChangesCompleted(true, acceptAllChangesOnSuccess, returnValue);
         return returnValue;
     }
 
@@ -299,7 +299,7 @@ public partial class TypingsDbContext : DbContext
         using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(SaveChangesAsync));
         OnBeforeSave();
         int returnValue = await base.SaveChangesAsync(cancellationToken);
-        _logger.LogDbSaveChangesCompletedTrace(true, null, returnValue);
+        _logger.LogDbSaveChangesCompleted(true, null, returnValue);
         return returnValue;
     }
 

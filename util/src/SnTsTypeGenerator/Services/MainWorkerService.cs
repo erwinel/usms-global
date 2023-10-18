@@ -211,7 +211,7 @@ public sealed class MainWorkerService : BackgroundService
             return;
         }
         if (!_showHelp)
-            _logger.LogNoTableNamesSpecifiedWarning();
+            _logger.LogNoTableNamesSpecified();
         _tableNames = ImmutableArray.Create<string>();
     }
 }

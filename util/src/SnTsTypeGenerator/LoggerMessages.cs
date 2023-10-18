@@ -12,21 +12,21 @@ namespace SnTsTypeGenerator;
 
 public static class LoggerMessages
 {
-    #region UnexpectedService Error (0x0001)
+    #region UnexpectedServiceError (0x0001)
 
     public const int EVENT_ID_UnexpectedServiceError = 0x0001;
     public static readonly EventId UnexpectedServiceError = new(EVENT_ID_UnexpectedServiceError, nameof(UnexpectedServiceError));
     private static readonly Action<ILogger, string, Exception?> _unexpectedServiceError = LoggerMessage.Define<string>(LogLevel.Error,
         UnexpectedServiceError, "Error executing {TypeFullName}.");
     /// <summary>
-    /// Logs an UnexpectedService event with event code 0x0001.
+    /// Logs an UnexpectedServiceError event with event code 0x0001.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="type">The type of service that threw the exception.</param>
     /// <param name="error">The exception that caused the event.</param>
     public static void LogUnexpectedServiceError(this ILogger logger, Type type, Exception error) => _unexpectedServiceError(logger, type.FullName ?? type.Name, error);
     /// <summary>
-    /// Logs an UnexpectedService event with event code 0x0001.
+    /// Logs an UnexpectedServiceError event with event code 0x0001.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="error">The exception that caused the event.</param>
@@ -67,7 +67,7 @@ public static class LoggerMessages
 
     #endregion
 
-    #region Critical DbfileValidation Error (0x0001)
+    #region Critical DbfileValidationError (0x0001)
 
     /// <summary>
     /// Numerical event code for database file validation error.
@@ -83,7 +83,7 @@ public static class LoggerMessages
         "Unexpected error validating DB file path \"{DbFile}\".");
 
     /// <summary>
-    /// Logs a database validation error event (DbfileValidation) with event code 0x0001.
+    /// Logs a database validation error event (DbfileValidationError) with event code 0x0001.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="dbFile">The path of the database file.</param>
@@ -92,15 +92,15 @@ public static class LoggerMessages
 
     #endregion
 
-    #region Critical DbFileDirectoryNotFOund Error (0x0002)
+    #region Critical DbFileDirectoryNotFound Error (0x0002)
 
     /// <summary>
-    /// Numerical event code for DbFileDirectoryNotFOund.
+    /// Numerical event code for DbFileDirectoryNotFound.
     /// </summary>
     public const int EVENT_ID_DbFileDirectoryNotFound = 0x0002;
 
     /// <summary>
-    /// Event ID for DbFileDirectoryNotFOund.
+    /// Event ID for DbFileDirectoryNotFound.
     /// </summary>
     public static readonly EventId DbFileDirectoryNotFound = new(EVENT_ID_DbFileDirectoryNotFound, nameof(DbFileDirectoryNotFound));
 
@@ -108,7 +108,7 @@ public static class LoggerMessages
         "Parent directory for database file {Path} does not exist.");
 
     /// <summary>
-    /// Logs an DbFileDirectoryNotFOund event with event code 0x0002.
+    /// Logs an DbFileDirectoryNotFound event with event code 0x0002.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="dbFile">The database file object.</param>
@@ -117,7 +117,7 @@ public static class LoggerMessages
 
     #endregion
 
-    #region Critical DbfileAccess Error (0x0003)
+    #region Critical DbfileAccessError (0x0003)
 
     /// <summary>
     /// Numerical event code for file access error.
@@ -133,7 +133,7 @@ public static class LoggerMessages
         "Unable to create DB file \"{Dbfile}\".");
 
     /// <summary>
-    /// Logs a database file access error event (DbfileAccess) with event code 0x0003.
+    /// Logs a database file access error event (DbfileAccessError) with event code 0x0003.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="dbFile">The path of the database file.</param>
@@ -142,22 +142,22 @@ public static class LoggerMessages
 
     #endregion
 
-    #region Critical DbInitializationFailure Error (0x0004)
+    #region Critical DbInitializationFailure (0x0004)
 
     /// <summary>
     /// Numerical event code for database initialization error.
     /// </summary>
-    public const int EVENT_ID_CriticalDbInitializationFailure = 0x0004;
+    public const int EVENT_ID_DbInitializationFailure = 0x0004;
 
     /// <summary>
     /// Event ID for database initialization error.
     /// </summary>
-    public static readonly EventId CriticalDbInitializationFailure = new(EVENT_ID_CriticalDbInitializationFailure, nameof(CriticalDbInitializationFailure));
+    public static readonly EventId DbInitializationFailure = new(EVENT_ID_DbInitializationFailure, nameof(DbInitializationFailure));
 
-    private static readonly Action<ILogger, string, Type, string, Exception> _criticalDbInitializationFailure1 = LoggerMessage.Define<string, Type, string>(LogLevel.Critical, CriticalDbInitializationFailure,
+    private static readonly Action<ILogger, string, Type, string, Exception> _dbInitializationFailure1 = LoggerMessage.Define<string, Type, string>(LogLevel.Critical, DbInitializationFailure,
         "Unexpected error while executing DB initialization query {QueryString} for {Type} in {DbPath}.");
 
-    private static readonly Action<ILogger, string, Exception> _criticalDbInitializationFailure2 = LoggerMessage.Define<string>(LogLevel.Critical, CriticalDbInitializationFailure,
+    private static readonly Action<ILogger, string, Exception> _dbInitializationFailure2 = LoggerMessage.Define<string>(LogLevel.Critical, DbInitializationFailure,
         "Unexpected error while executing DB initialization for {DbPath}.");
 
     /// <summary>
@@ -168,8 +168,8 @@ public static class LoggerMessages
     /// <param name="type">The DB entity object type.</param>
     /// <param name="dbFile">The database file.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogCriticalDbInitializationFailure(this ILogger logger, string querystring, Type type, FileInfo dbFile, Exception error) =>
-        _criticalDbInitializationFailure1(logger, querystring, type, dbFile.FullName, error);
+    public static void LogDbInitializationFailure(this ILogger logger, string querystring, Type type, FileInfo dbFile, Exception error) =>
+        _dbInitializationFailure1(logger, querystring, type, dbFile.FullName, error);
 
     /// <summary>
     /// Logs a database initialization error event (DbInitializationFailure) with event code 0x0004.
@@ -177,7 +177,7 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="dbFile">The database file.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogCriticalDbInitializationFailure(this ILogger logger, FileInfo dbFile, Exception error) => _criticalDbInitializationFailure2(logger, dbFile.FullName, error);
+    public static void LogDbInitializationFailure(this ILogger logger, FileInfo dbFile, Exception error) => _dbInitializationFailure2(logger, dbFile.FullName, error);
 
     #endregion
 
@@ -313,14 +313,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for no table names provided.
     /// </summary>
-    public const int EVENT_ID_NoTableNamesSpecifiedWarning = 0x0009;
+    public const int EVENT_ID_NoTableNamesSpecified = 0x0009;
 
     /// <summary>
     /// Event ID for no table names provided.
     /// </summary>
-    public static readonly EventId NoTableNamesSpecifiedWarning = new(EVENT_ID_NoTableNamesSpecifiedWarning, nameof(NoTableNamesSpecifiedWarning));
+    public static readonly EventId NoTableNamesSpecified = new(EVENT_ID_NoTableNamesSpecified, nameof(NoTableNamesSpecified));
 
-    private static readonly Action<ILogger, Exception?> _noTableNamesSpecifiedWarning = LoggerMessage.Define(LogLevel.Warning, NoTableNamesSpecifiedWarning,
+    private static readonly Action<ILogger, Exception?> _noTableNamesSpecified = LoggerMessage.Define(LogLevel.Warning, NoTableNamesSpecified,
         "No table names were specified; nothing to do.");
 
     /// <summary>
@@ -328,7 +328,7 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="exception">The optional exception that caused the event.</param>
-    public static void LogNoTableNamesSpecifiedWarning(this ILogger logger) => _noTableNamesSpecifiedWarning(logger, null);
+    public static void LogNoTableNamesSpecified(this ILogger logger) => _noTableNamesSpecified(logger, null);
 
     #endregion
 
@@ -691,14 +691,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for DbSaveChangesCompleted.
     /// </summary>
-    public const int EVENT_ID_DbSaveChangesCompletedTrace = 0x0014;
+    public const int EVENT_ID_DbSaveChangesCompleted = 0x0014;
 
     /// <summary>
     /// Event ID for DbSaveChangesCompleted.
     /// </summary>
-    public static readonly EventId DbSaveChangesCompletedTrace = new(EVENT_ID_DbSaveChangesCompletedTrace, nameof(DbSaveChangesCompletedTrace));
+    public static readonly EventId DbSaveChangesCompleted = new(EVENT_ID_DbSaveChangesCompleted, nameof(DbSaveChangesCompleted));
 
-    private static readonly Action<ILogger, string, int, Exception?> _dbSaveChangesCompletedTrace = LoggerMessage.Define<string, int>(LogLevel.Trace, DbSaveChangesCompletedTrace,
+    private static readonly Action<ILogger, string, int, Exception?> _dbSaveChangesCompleted = LoggerMessage.Define<string, int>(LogLevel.Trace, DbSaveChangesCompleted,
         "Message {MethodSignature} {ReturnValue}");
 
     /// <summary>
@@ -707,7 +707,7 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="methodSignature">The first event parameter.</param>
     /// <param name="returnValue">The second event parameter.</param>
-    public static void LogDbSaveChangesCompletedTrace(this ILogger logger, bool isAsync, bool? acceptAllChangesOnSuccess, int returnValue) => _dbSaveChangesCompletedTrace(logger, isAsync ?
+    public static void LogDbSaveChangesCompleted(this ILogger logger, bool isAsync, bool? acceptAllChangesOnSuccess, int returnValue) => _dbSaveChangesCompleted(logger, isAsync ?
         (acceptAllChangesOnSuccess.HasValue ? $"SaveChangesAsync({acceptAllChangesOnSuccess.Value})" : "SaveChangesAsync()") :
         acceptAllChangesOnSuccess.HasValue ? $"SaveChanges({acceptAllChangesOnSuccess.Value})" : "SaveChanges()", returnValue, null);
 
@@ -1120,14 +1120,14 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for NewTableSaveComplete.
     /// </summary>
-    public const int EVENT_ID_NewTableSaveCompleteTrace = 0x0024;
+    public const int EVENT_ID_NewTableSaveCompleted = 0x0024;
 
     /// <summary>
     /// Event ID for NewTableSaveComplete.
     /// </summary>
-    public static readonly EventId NewTableSaveCompleteTrace = new(EVENT_ID_NewTableSaveCompleteTrace, nameof(NewTableSaveCompleteTrace));
+    public static readonly EventId NewTableSaveCompleted = new(EVENT_ID_NewTableSaveCompleted, nameof(NewTableSaveCompleted));
 
-    private static readonly Action<ILogger, string, Exception?> _newTableSaveCompleteTrace = LoggerMessage.Define<string>(LogLevel.Trace, NewTableSaveCompleteTrace,
+    private static readonly Action<ILogger, string, Exception?> _newTableSaveCompleted = LoggerMessage.Define<string>(LogLevel.Trace, NewTableSaveCompleted,
         "Table named {TableName} and related entites saved to database.");
 
     /// <summary>
@@ -1135,7 +1135,7 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="tableName">The name of the table.</param>
-    public static void LogNewTableSaveCompleteTrace(this ILogger logger, string tableName) => _newTableSaveCompleteTrace(logger, tableName, null);
+    public static void LogNewTableSaveCompleted(this ILogger logger, string tableName) => _newTableSaveCompleted(logger, tableName, null);
 
     #endregion
 
