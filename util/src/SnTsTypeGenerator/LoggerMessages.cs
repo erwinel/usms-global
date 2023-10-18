@@ -311,27 +311,27 @@ public static class LoggerMessages
     #endregion
 
     #region Critical InvalidModeOption Error (0x000a)
-    
+
     /// <summary>
     /// Numerical event code for InvalidModeOption.
     /// </summary>
     public const int EVENT_ID_InvalidModeOption = 0x000a;
-    
+
     /// <summary>
     /// Event ID for InvalidModeOption.
     /// </summary>
     public static readonly EventId InvalidModeOption = new(EVENT_ID_InvalidModeOption, nameof(InvalidModeOption));
-    
+
     private static readonly Action<ILogger, string, Exception?> _invalidModeOption = LoggerMessage.Define<string>(LogLevel.Critical, InvalidModeOption,
         $"The {nameof(AppSettings.Mode)} ({SHORTHAND_m}) option contains unknown mode value \"{{Mode}}\". Mode must be {MODE_SCOPED}, {MODE_SCOPED_ABBR}, {MODE_GLOBAL}, or {MODE_GLOBAL_ABBR}.");
-    
+
     /// <summary>
     /// Logs an InvalidModeOption event with event code 0x000a.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="mode">The invalid mode value.</param>
     public static void LogInvalidModeOption(this ILogger logger, string mode) => _invalidModeOption(logger, mode, null);
-    
+
     #endregion
 
     #region Critical OutputFileAlreadyExists Error (0x000b)

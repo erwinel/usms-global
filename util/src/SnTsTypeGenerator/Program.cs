@@ -9,7 +9,6 @@ using static SnTsTypeGenerator.Services.CmdLineConstants;
 
 internal class Program
 {
-
     internal static IHost Host { get; private set; } = null!;
 
     private static void Main(string[] args)
@@ -18,22 +17,11 @@ internal class Program
         builder.Environment.ContentRootPath = Directory.GetCurrentDirectory();
         if (builder.Environment.IsDevelopment())
             builder.Configuration.AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly(), true);
-        // builder.Logging.AddConsole();
         builder.Logging.ClearProviders();
-        // builder.Logging.AddConsole();
-        // builder.Logging.AddDebug();
-        // string path = Path.Combine(builder.Environment.ContentRootPath, DEFAULT_LogDir);
-        // // if (File.Exists(path))
-        //     // TODO: Log fatal
-        // if (!Directory.Exists(path))
-        //     Directory.CreateDirectory(path);
         Log.Logger = new LoggerConfiguration()
-            // .ReadFrom.Configuration(builder.Configuration)
-            // .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug)
             .ReadFrom.Configuration(builder.Configuration)
             .CreateLogger();
         builder.Logging.AddSerilog();
-        // builder.Services.AddSingleton(Log.Logger);
         builder.Services.Configure<SnTsTypeGenerator.Services.AppSettings>(builder.Configuration.GetSection(nameof(SnTsTypeGenerator)));
         SnTsTypeGenerator.Services.AppSettings.Configure(args, builder.Configuration);
         builder.Services.AddDbContextPool<SnTsTypeGenerator.Services.TypingsDbContext>(options =>
