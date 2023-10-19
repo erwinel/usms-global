@@ -124,7 +124,7 @@ public class Scope : IEquatable<Scope>
 
     public bool Equals(Scope? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_value, other._value));
 
-    public override bool Equals(object? obj) => Equals(obj as Element);
+    public override bool Equals(object? obj) => obj is Scope other && Equals(other);
 
     public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_value);
 
