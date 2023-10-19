@@ -119,7 +119,7 @@ public class Package : IEquatable<Package>
 
     public bool Equals(Package? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
 
-    public override bool Equals(object? obj) => Equals(obj as Element);
+    public override bool Equals(object? obj) => obj is Package other && Equals(other);
 
     public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_name);
 
