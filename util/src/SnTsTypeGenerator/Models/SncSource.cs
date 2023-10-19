@@ -77,7 +77,7 @@ public class SncSource : IEquatable<SncSource>
 
     public bool Equals(SncSource? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_fqdn, other._fqdn));
 
-    public override bool Equals(object? obj) => Equals(obj as Element);
+    public override bool Equals(object? obj) => obj is SncSource other && Equals(other);
 
     public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_fqdn);
 
