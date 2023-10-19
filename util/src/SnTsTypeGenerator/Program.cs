@@ -26,6 +26,8 @@ internal class Program
         SnTsTypeGenerator.Services.AppSettings.Configure(args, builder.Configuration);
         builder.Services.AddDbContextPool<SnTsTypeGenerator.Services.TypingsDbContext>(options =>
             {
+                if (builder.Environment.IsDevelopment())
+                    options.EnableSensitiveDataLogging(true);
                 var dbFile = builder.Configuration.GetSection(nameof(SnTsTypeGenerator)).Get<SnTsTypeGenerator.Services.AppSettings>()?.DbFile;
                 try { dbFile = Path.GetFullPath(string.IsNullOrEmpty(dbFile) ? Path.Combine(builder.Environment.ContentRootPath, DEFAULT_DbFile) : dbFile); } catch { }
                 options.UseSqlite(new SqliteConnectionStringBuilder
