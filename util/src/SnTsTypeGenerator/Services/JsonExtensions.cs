@@ -21,10 +21,8 @@ public static class JsonExtensions
         return !value.Any(c => char.IsWhiteSpace(c)) && value.Length == result.Length - 2 ? value : result;
     }
 
-    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string id, CancellationToken cancellationToken)
-    {
-        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName}/{Uri.EscapeDataString(id)}", $"{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
-    }
+    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string id, CancellationToken cancellationToken) =>
+        await handler.GetJsonAsync($"{URI_PATH_API}/{tableName}/{Uri.EscapeDataString(id)}", $"{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
 
     public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string element, string value, CancellationToken cancellationToken)
     {
@@ -65,10 +63,10 @@ public static class JsonExtensions
     }
 
     public static string? GetPropertyAsString(this JsonObject source, string propertyName) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result) ? result : null;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result)) ? result : null;
 
     public static string GetPropertyAsNonEmpty(this JsonObject source, string propertyName) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result) && !string.IsNullOrWhiteSpace(result) ? result : string.Empty;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result) && !string.IsNullOrWhiteSpace(result)) ? result : string.Empty;
 
     public static bool TryCoercePropertyAsString(this JsonObject source, string propertyName, [NotNullWhen(true)] out string? result)
     {
@@ -95,7 +93,7 @@ public static class JsonExtensions
     }
 
     public static string? CoercePropertyAsStringOrNull(this JsonObject source, string propertyName) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out string? result) ? result : jsonValue.ToString() : null;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out string? result) ? result : jsonValue.ToString() : null;
 
     public static string? CoercePropertyAsNonEmptyOrNull(this JsonObject source, string propertyName)
     {
@@ -110,7 +108,7 @@ public static class JsonExtensions
     }
 
     public static string CoercePropertyAsString(this JsonObject source, string propertyName, string defaultValue = "") =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out string? result) ? result : jsonValue.ToString() : defaultValue;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out string? result) ? result : jsonValue.ToString() : defaultValue;
 
     public static string CoercePropertyAsNonEmpty(this JsonObject source, string propertyName, string defaultValue = "")
     {
@@ -137,11 +135,11 @@ public static class JsonExtensions
     }
 
     public static int? CoercePropertyAsIntOrNull(this JsonObject source, string propertyName) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out int? result) ? result :
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out int? result) ? result :
             jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i) ? i : null : null;
 
     public static int CoercePropertyAsInt(this JsonObject source, string propertyName, int defaultValue = 0) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out int? result) ? result.Value :
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out int? result) ? result.Value :
             jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i) ? i : defaultValue : defaultValue;
 
     public static bool TryCoercePropertyAsBoolean(this JsonObject source, string propertyName, out bool result)
@@ -161,11 +159,11 @@ public static class JsonExtensions
     }
 
     public static bool? CoercePropertyAsBooleanOrNull(this JsonObject source, string propertyName) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out bool? result) ? result :
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out bool? result) ? result :
             jsonValue.TryGetValue(out string? s) && bool.TryParse(s, out bool b) ? b : null : null;
 
     public static bool CoercePropertyAsBoolean(this JsonObject source, string propertyName, bool defaultValue = false) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue ? jsonValue.TryGetValue(out bool? result) ? result.Value :
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out bool? result) ? result.Value :
             jsonValue.TryGetValue(out string? s) && bool.TryParse(s, out bool b) ? b : defaultValue : defaultValue;
 
     public static bool TryGetFieldAsString(this JsonObject source, string propertyName, [NotNullWhen(true)] out string? value, out string? display_value)
@@ -243,10 +241,10 @@ public static class JsonExtensions
     }
 
     public static string? GetFieldAsStringOrNull(this JsonObject source, string propertyName) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.CoercePropertyAsStringOrNull(JSON_KEY_VALUE) : null;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsStringOrNull(JSON_KEY_VALUE) : null;
 
     public static string? GetFieldAsNonEmptyOrNull(this JsonObject source, string propertyName) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.CoercePropertyAsNonEmptyOrNull(JSON_KEY_VALUE) : null;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsNonEmptyOrNull(JSON_KEY_VALUE) : null;
 
     public static string GetFieldAsString(this JsonObject source, string propertyName, string defaultValue, out string? display_value)
     {
@@ -301,10 +299,10 @@ public static class JsonExtensions
     }
 
     public static string GetFieldAsString(this JsonObject source, string propertyName, string defaultValue = "") =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsString(JSON_KEY_VALUE, out string? value) ? value : defaultValue;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsString(JSON_KEY_VALUE, out string? value)) ? value : defaultValue;
 
     public static string GetFieldAsNonEmpty(this JsonObject source, string propertyName, string defaultValue = "") =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out string? value) ? value : defaultValue;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out string? value)) ? value : defaultValue;
 
     public static bool TryGetFieldAsInt(this JsonObject source, string propertyName, [NotNullWhen(true)] out int value, out string? display_value)
     {
@@ -344,7 +342,7 @@ public static class JsonExtensions
     }
 
     public static int? GetFieldAsIntOrNull(this JsonObject source, string propertyName) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.CoercePropertyAsIntOrNull(JSON_KEY_VALUE) : null;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsIntOrNull(JSON_KEY_VALUE) : null;
 
     public static int GetFieldAsInt(this JsonObject source, string propertyName, int defaultValue, out string? display_value)
     {
@@ -373,7 +371,7 @@ public static class JsonExtensions
     }
 
     public static int GetFieldAsInt(this JsonObject source, string propertyName, int defaultValue = 0) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.GetFieldAsInt(JSON_KEY_VALUE, defaultValue) : defaultValue;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.GetFieldAsInt(JSON_KEY_VALUE, defaultValue) : defaultValue;
 
     public static bool TryGetFieldAsBoolean(this JsonObject source, string propertyName, [NotNullWhen(true)] out bool value, out string? display_value)
     {
@@ -413,7 +411,7 @@ public static class JsonExtensions
     }
 
     public static bool? GetFieldAsBooleanOrNull(this JsonObject source, string propertyName) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field ? field.CoercePropertyAsBooleanOrNull(JSON_KEY_VALUE) : null;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsBooleanOrNull(JSON_KEY_VALUE) : null;
 
     public static bool GetFieldAsBoolean(this JsonObject source, string propertyName, bool defaultValue, out string? display_value)
     {
@@ -442,5 +440,5 @@ public static class JsonExtensions
     }
 
     public static bool GetFieldAsBoolean(this JsonObject source, string propertyName, bool defaultValue = false) =>
-        source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool value) ? value : defaultValue;
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsBoolean(JSON_KEY_VALUE, out bool value)) ? value : defaultValue;
 }
