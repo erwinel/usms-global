@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace SnTsTypeGenerator.Services;
 
-public class BoolOptCommandLineConfigurationSource : IConfigurationSource
+public class AltCommandLineConfigurationSource : IConfigurationSource
 {
     public IDictionary<string, string>? ValueSwitchMappings { get; set; }
 
@@ -12,8 +12,8 @@ public class BoolOptCommandLineConfigurationSource : IConfigurationSource
 
     public ImmutableArray<string> Args { get; set; }
 
-    public BoolOptCommandLineConfigurationSource(ImmutableArray<string> args, IDictionary<string, string> booleanwitchMappings, IDictionary<string, string>? valueSwitchMappings = null) =>
+    public AltCommandLineConfigurationSource(ImmutableArray<string> args, IDictionary<string, string> booleanwitchMappings, IDictionary<string, string>? valueSwitchMappings = null) =>
         (Args, BooleanSwitchMappings, ValueSwitchMappings) = (args, booleanwitchMappings, valueSwitchMappings);
 
-    public IConfigurationProvider Build(IConfigurationBuilder builder) => new BoolOptCommandLineConfigurationProvider(Args, BooleanSwitchMappings, ValueSwitchMappings);
+    public IConfigurationProvider Build(IConfigurationBuilder builder) => new AltCommandLineConfigurationProvider(Args, BooleanSwitchMappings, ValueSwitchMappings);
 }

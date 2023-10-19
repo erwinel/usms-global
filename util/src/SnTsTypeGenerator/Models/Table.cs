@@ -10,7 +10,7 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Table" (<see cref="SnApiConstants.TABLE_NAME_SYS_DB_OBJECT" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Tables))]
-public class TableInfo : IEquatable<TableInfo>
+public class Table : IEquatable<Table>
 {
     private readonly object _syncRoot = new();
 
@@ -112,12 +112,12 @@ public class TableInfo : IEquatable<TableInfo>
         }
     }
 
-    private SysPackage? _package;
+    private Package? _package;
 
     /// <summary>
     /// The source package of the table.
     /// </summary>
-    public SysPackage? Package
+    public Package? Package
     {
         get => _package;
         set
@@ -167,12 +167,12 @@ public class TableInfo : IEquatable<TableInfo>
         }
     }
 
-    private SysScope? _scope;
+    private Scope? _scope;
 
     /// <summary>
     /// The scope of the table.
     /// </summary>
-    public SysScope? Scope
+    public Scope? Scope
     {
         get => _scope;
         set
@@ -223,12 +223,12 @@ public class TableInfo : IEquatable<TableInfo>
         }
     }
 
-    private TableInfo? _superClass;
+    private Table? _superClass;
 
     /// <summary>
     /// The extended table.
     /// </summary>
-    public TableInfo? SuperClass
+    public Table? SuperClass
     {
         get => _superClass;
         set
@@ -268,12 +268,12 @@ public class TableInfo : IEquatable<TableInfo>
         }
     }
 
-    private SourceInfo? _source;
+    private SncSource? _source;
 
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
-    public SourceInfo? Source
+    public SncSource? Source
     {
         get => _source;
         set
@@ -310,28 +310,28 @@ public class TableInfo : IEquatable<TableInfo>
         set => _sysID = value ?? string.Empty;
     }
 
-    private HashSet<TableInfo> _derived = new();
+    private HashSet<Table> _derived = new();
 
     [NotNull]
     [BackingField(nameof(_derived))]
-    public virtual HashSet<TableInfo> Derived { get => _derived; set => _derived = value ?? new(); }
+    public virtual HashSet<Table> Derived { get => _derived; set => _derived = value ?? new(); }
 
-    private HashSet<ElementInfo> _elements = new();
+    private HashSet<Element> _elements = new();
 
     [NotNull]
     [BackingField(nameof(_elements))]
-    public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
+    public virtual HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
 
-    private HashSet<ElementInfo> _referredBy = new();
+    private HashSet<Element> _referredBy = new();
 
     [NotNull]
     [BackingField(nameof(_referredBy))]
-    public virtual HashSet<ElementInfo> ReferredBy { get => _referredBy; set => _referredBy = value ?? new(); }
+    public virtual HashSet<Element> ReferredBy { get => _referredBy; set => _referredBy = value ?? new(); }
 
-    public bool Equals(TableInfo? other) => other is not null && (ReferenceEquals(this, other) ||
+    public bool Equals(Table? other) => other is not null && (ReferenceEquals(this, other) ||
         (Services.SnApiConstants.NameComparer.Equals(_name, other._name) && _scopeValue.NoCaseEquals(other._scopeValue)));
 
-    public override bool Equals(object? obj) => Equals(obj as TableInfo);
+    public override bool Equals(object? obj) => Equals(obj as Table);
 
     public override int GetHashCode()
     {
@@ -341,7 +341,7 @@ public class TableInfo : IEquatable<TableInfo>
         }
     }
 
-    public override string ToString() => nameof(TableInfo) + new JsonObject()
+    public override string ToString() => nameof(Table) + new JsonObject()
     {
         { nameof(Name), JsonValue.Create(_name) },
         { nameof(Label), JsonValue.Create(_label) },

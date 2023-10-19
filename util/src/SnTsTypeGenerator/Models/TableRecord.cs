@@ -1,4 +1,4 @@
-namespace SnTsTypeGenerator.Models.TableAPI;
+namespace SnTsTypeGenerator.Models;
 
 /// <summary>
 /// Deserialized <c>sys_db_object</c> record from ServiceNow instance.
@@ -14,4 +14,4 @@ namespace SnTsTypeGenerator.Models.TableAPI;
 /// <param name="AccessibleFrom">The value of the <c>access.value</c> property.</param>
 /// <param name="ExtensionModel">The value of the <c>extension_model.value</c> property.</param>
 /// <param name="SourceFqdn">The FQDN of the source ServiceNow instance.</param>
-public record Table(string Name, string Label, string SysID, bool IsExtendable, string? NumberPrefix, RecordRef? Package, RecordRef? Scope, RecordRef? SuperClass, string AccessibleFrom, string? ExtensionModel, string SourceFqdn);
+public record TableRecord(string Name, string Label, string SysID, bool IsExtendable, string? NumberPrefix, RecordRef? Package, RecordRef? Scope, RecordRef? SuperClass, string AccessibleFrom, string? ExtensionModel, string SourceFqdn);

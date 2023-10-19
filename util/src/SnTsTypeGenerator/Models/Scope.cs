@@ -10,7 +10,7 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Application" (<see cref="SnApiConstants.TABLE_NAME_SYS_SCOPE" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Scopes))]
-public class SysScope : IEquatable<SysScope>
+public class Scope : IEquatable<Scope>
 {
     private readonly object _syncRoot = new();
 
@@ -68,12 +68,12 @@ public class SysScope : IEquatable<SysScope>
         }
     }
 
-    private SourceInfo? _source;
+    private SncSource? _source;
 
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
-    public SourceInfo? Source
+    public SncSource? Source
     {
         get => _source;
         set
@@ -116,19 +116,19 @@ public class SysScope : IEquatable<SysScope>
     [BackingField(nameof(_types))]
     public virtual HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
 
-    private HashSet<TableInfo> _tables = new();
+    private HashSet<Table> _tables = new();
 
     [NotNull]
     [BackingField(nameof(_tables))]
-    public virtual HashSet<TableInfo> Tables { get => _tables; set => _tables = value ?? new(); }
+    public virtual HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
 
-    public bool Equals(SysScope? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_value, other._value));
+    public bool Equals(Scope? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_value, other._value));
 
-    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+    public override bool Equals(object? obj) => Equals(obj as Element);
 
     public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_value);
 
-    public override string ToString() => nameof(SysScope) + new JsonObject()
+    public override string ToString() => nameof(Scope) + new JsonObject()
     {
         { nameof(Value), JsonValue.Create(_value) },
         { nameof(Name), JsonValue.Create(_name) },

@@ -116,6 +116,6 @@ public class AppSettings
 
     internal static void Configure(string[] args, IConfigurationBuilder builder)
     {
-        builder.Add(new BoolOptCommandLineConfigurationSource(args?.ToImmutableArray() ?? ImmutableArray<string>.Empty, _booleanSwitchMappings, _valueSwitchMappings));
+        builder.Add(new AltCommandLineConfigurationSource(args?.ToImmutableArray() ?? ImmutableArray<string>.Empty, _booleanSwitchMappings, _valueSwitchMappings));
     }
 }

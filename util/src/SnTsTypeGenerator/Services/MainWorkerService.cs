@@ -11,9 +11,12 @@ namespace SnTsTypeGenerator.Services;
 
 public sealed class MainWorkerService : BackgroundService
 {
+    private const string STAGE_NAME_LOAD = "Load";
+    private const string STAGE_NAME_RENDER = "Render";
     private readonly ILogger _logger;
     private readonly IServiceScope _scope;
     private readonly IHostApplicationLifetime _applicationLifetime;
+    private readonly bool _includeReferenced;
     private readonly ImmutableArray<string> _tableNames;
     private readonly bool _showHelp;
 
@@ -156,34 +159,42 @@ public sealed class MainWorkerService : BackgroundService
 
             if (!(_dataLoader.InitSuccessful && _renderer.InitSuccessful))
                 return;
+            IEnumerable<Table> toRender;
 
-            Collection<TableInfo> toRender = new();
-            foreach (string name in _tableNames)
+            using (var scope = _logger.BeginScope(STAGE_NAME_LOAD))
             {
-                if (stoppingToken.IsCancellationRequested)
-                    return;
-                try
-                {
-                    var tableInfo = await _dataLoader.GetTableByNameAsync(name, stoppingToken);
-                    if (tableInfo is not null)
-                        toRender.Add(tableInfo);
-                }
-                catch (Exception exception)
+                Collection<Table> tables = new();
+                foreach (string name in _tableNames)
                 {
                     if (stoppingToken.IsCancellationRequested)
                         return;
-                    if (exception is ILogTrackable logTrackable)
+                    try
                     {
-                        if (!logTrackable.IsLogged)
-                            logTrackable.Log(_logger);
+                        var tableInfo = await _dataLoader.GetTableByNameAsync(name, stoppingToken);
+                        if (tableInfo is not null)
+                            tables.Add(tableInfo);
                     }
-                    else
-                        _logger.LogUnexpecteException(exception);
-                    return;
+                    catch (Exception exception)
+                    {
+                        if (stoppingToken.IsCancellationRequested)
+                            return;
+                        if (exception is ILogTrackable logTrackable)
+                        {
+                            if (!logTrackable.IsLogged)
+                                logTrackable.Log(_logger);
+                        }
+                        else
+                            _logger.LogUnexpecteException(exception);
+                        return;
+                    }
                 }
+                toRender = (stoppingToken.IsCancellationRequested || !_includeReferenced) ? tables : await _dataLoader.LoadAllReferencedAsync(tables, stoppingToken);
             }
             if (!stoppingToken.IsCancellationRequested)
+            {
+                using var scope2 = _logger.BeginScope(STAGE_NAME_RENDER);
                 await _renderer.RenderAsync(toRender, stoppingToken);
+            }
         }
         catch (OperationCanceledException) { throw; }
         catch (Exception error)
@@ -203,6 +214,7 @@ public sealed class MainWorkerService : BackgroundService
         _scope = services.CreateScope();
         _applicationLifetime = applicationLifetime;
         AppSettings appSettings = settingsOption.Value;
+        _includeReferenced = appSettings.IncludeReferenced ?? false;
         _showHelp = appSettings.ShowHelp();
         var tableNames = appSettings.Table?.Split(',').Where(t => !string.IsNullOrEmpty(t));
         if ((tableNames is not null && tableNames.Any()) || ((tableNames = appSettings.Tables?.Where(t => !string.IsNullOrEmpty(t))) is not null))

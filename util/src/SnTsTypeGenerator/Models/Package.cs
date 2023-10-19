@@ -9,7 +9,7 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Package" (sys_package) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Packages))]
-public class SysPackage : IEquatable<SysPackage>
+public class Package : IEquatable<Package>
 {
     private readonly object _syncRoot = new();
 
@@ -57,12 +57,12 @@ public class SysPackage : IEquatable<SysPackage>
         }
     }
 
-    private SourceInfo? _source;
+    private SncSource? _source;
 
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
-    public SourceInfo? Source
+    public SncSource? Source
     {
         get => _source;
         set
@@ -105,25 +105,25 @@ public class SysPackage : IEquatable<SysPackage>
     [BackingField(nameof(_types))]
     public virtual HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
 
-    private HashSet<TableInfo> _tables = new();
+    private HashSet<Table> _tables = new();
 
     [NotNull]
     [BackingField(nameof(_tables))]
-    public virtual HashSet<TableInfo> Tables { get => _tables; set => _tables = value ?? new(); }
+    public virtual HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
 
-    private HashSet<ElementInfo> _elements = new();
+    private HashSet<Element> _elements = new();
 
     [NotNull]
     [BackingField(nameof(_elements))]
-    public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
+    public virtual HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
 
-    public bool Equals(SysPackage? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
+    public bool Equals(Package? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
 
-    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+    public override bool Equals(object? obj) => Equals(obj as Element);
 
     public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_name);
 
-    public override string ToString() => nameof(SysPackage) + new JsonObject()
+    public override string ToString() => nameof(Package) + new JsonObject()
     {
         { nameof(Name), JsonValue.Create(_name) },
         { nameof(ShortDescription), JsonValue.Create(ShortDescription) },

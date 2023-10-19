@@ -1,3 +1,3 @@
 namespace SnTsTypeGenerator.Models;
 
-record ElementInheritance(ElementInfo Element, ElementInfo? Super);
+record ElementInheritance(Element Element, Element? Super);

@@ -104,12 +104,12 @@ public class GlideType : IEquatable<GlideType>
         }
     }
 
-    private SysPackage? _package;
+    private Package? _package;
 
     /// <summary>
     /// The source package of the type.
     /// </summary>
-    public SysPackage? Package
+    public Package? Package
     {
         get => _package;
         set
@@ -159,12 +159,12 @@ public class GlideType : IEquatable<GlideType>
         }
     }
 
-    private SysScope? _scope;
+    private Scope? _scope;
 
     /// <summary>
     /// The scope for the type.
     /// </summary>
-    public SysScope? Scope
+    public Scope? Scope
     {
         get => _scope;
         set
@@ -204,12 +204,12 @@ public class GlideType : IEquatable<GlideType>
         }
     }
 
-    private SourceInfo? _source;
+    private SncSource? _source;
 
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
-    public SourceInfo? Source
+    public SncSource? Source
     {
         get => _source;
         set
@@ -246,15 +246,15 @@ public class GlideType : IEquatable<GlideType>
         set => _sysID = value ?? string.Empty;
     }
 
-    private HashSet<ElementInfo> _elements = new();
+    private HashSet<Element> _elements = new();
 
     [NotNull]
     [BackingField(nameof(_elements))]
-    public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
+    public virtual HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
 
     public bool Equals(GlideType? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
 
-    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+    public override bool Equals(object? obj) => Equals(obj as Element);
 
     public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_name);
 
