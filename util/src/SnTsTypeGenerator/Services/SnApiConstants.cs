@@ -307,6 +307,8 @@ internal static class SnApiConstants
     /// </summary>
     internal const string TYPE_NAME_integer = "integer";
 
+    internal const string TYPE_NAME_boolean = "boolean";
+
     internal const string TYPE_NAME_decimal = "decimal";
 
     internal const string TYPE_NAME_float = "float";
