@@ -225,7 +225,7 @@ public static class EntityFrameworkExtensions
         result = null;
         return false;
     }
-    
+
     internal static bool TryFindByName(this IEnumerable<ElementInfo>? elements, string name, [NotNullWhen(true)] out ElementInfo? result)
     {
         if (elements is not null)
@@ -238,15 +238,15 @@ public static class EntityFrameworkExtensions
         result = null;
         return false;
     }
-    
+
     internal static TableInfo? FindByName(this IEnumerable<TableInfo>? tables, string name) => tables?.FirstOrDefault(t => NameComparer.Equals(t.Name, name));
-    
+
     internal static bool HasTable(this IEnumerable<TableInfo>? tables, string name) => tables?.Any(t => NameComparer.Equals(t.Name, name)) ?? false;
-    
+
     internal static ElementInfo? FindByName(this IEnumerable<ElementInfo>? elements, string name) => elements?.FirstOrDefault(e => NameComparer.Equals(e.Name, name));
-    
+
     internal static bool HasElement(this IEnumerable<TableInfo>? elements, string name) => elements?.Any(e => NameComparer.Equals(e.Name, name)) ?? false;
-    
+
     internal static async Task<IEnumerable<TableInfo>> LoadAllReferencedAsync(this TypingsDbContext dbContext, IEnumerable<TableInfo> tables, CancellationToken cancellationToken)
     {
         List<TableInfo> toValidate = tables.ToList();
@@ -310,6 +310,7 @@ public static class EntityFrameworkExtensions
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.Type?.Name == TYPE_NAME_glide_date_time);
 
     public static bool IsGlobalScope(this TableInfo table) => string.IsNullOrWhiteSpace(table.ScopeValue) || NameComparer.Equals(table.ScopeValue, GLOBAL_NAMESPACE);
+
     public static string GetGlideRecordTypeName(this TableInfo table, string currentNamespace) => table.IsGlobalScope() ? $"{NS_NAME_GlideRecord}.{table.Name}" :
         NameComparer.Equals(table.ScopeValue, currentNamespace) ? $"{NS_NAME_record}.{table.Name}" : $"{table.ScopeValue}.{NS_NAME_record}.{table.Name}";
 
