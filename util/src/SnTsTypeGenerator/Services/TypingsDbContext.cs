@@ -67,8 +67,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(SysScope.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(SysScope.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     ""{nameof(SysScope.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysScope)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(SysScope)}"" PRIMARY KEY(""{nameof(SysScope.Value)}""),
-    CONSTRAINT ""UK_{nameof(SysScope)}_{nameof(SysScope.SysID)}"" UNIQUE(""{nameof(SysScope.SysID)}"")
+    CONSTRAINT ""PK_{nameof(SysScope)}"" PRIMARY KEY(""{nameof(SysScope.Value)}"")
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(SysScope)}_{nameof(SysScope.SysID)}\" ON \"{nameof(Scopes)}\" (\"{nameof(SysScope.SysID)}\" COLLATE NOCASE)";
     }
@@ -88,8 +87,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(GlideType.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysScope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(GlideType.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(GlideType)}"" PRIMARY KEY(""{nameof(GlideType.Name)}""),
-    CONSTRAINT ""UK_{nameof(GlideType)}_{nameof(GlideType.SysID)}"" UNIQUE(""{nameof(GlideType.SysID)}"")
+    CONSTRAINT ""PK_{nameof(GlideType)}"" PRIMARY KEY(""{nameof(GlideType.Name)}"")
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.SysID)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.SysID)}\" COLLATE NOCASE)";
         yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.UseOriginalValue)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.UseOriginalValue)}\")";
@@ -112,8 +110,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(TableInfo.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(TableInfo.SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(TableInfo.SuperClass)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(TableInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(TableInfo)}"" PRIMARY KEY(""{nameof(TableInfo.Name)}""),
-    CONSTRAINT ""UK_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}"" UNIQUE(""{nameof(TableInfo.SysID)}"")
+    CONSTRAINT ""PK_{nameof(TableInfo)}"" PRIMARY KEY(""{nameof(TableInfo.Name)}"")
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.SysID)}\" COLLATE NOCASE)";
         yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.IsExtendable)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.IsExtendable)}\")";
@@ -144,8 +141,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(ElementInfo.TypeName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(GlideType)}"" REFERENCES ""{nameof(Types)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(ElementInfo.RefTableName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(TableInfo)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(ElementInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(ElementInfo)}"" PRIMARY KEY(""{nameof(ElementInfo.Name)}""),
-    CONSTRAINT ""UK_{nameof(ElementInfo)}_{nameof(ElementInfo.SysID)}"" UNIQUE(""{nameof(ElementInfo.SysID)}"")
+    CONSTRAINT ""PK_{nameof(ElementInfo)}"" PRIMARY KEY(""{nameof(ElementInfo.Name)}"", ""{nameof(ElementInfo.TableName)}"")
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.SysID)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.SysID)}\" COLLATE NOCASE)";
         yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsActive)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.IsActive)}\")";
