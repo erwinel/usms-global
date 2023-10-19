@@ -142,11 +142,26 @@ public sealed class TableAPIService
                 if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
                     _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_SYS_ID, index, sysDictionary);
                 else
-                    return new ElementRecord(name, sysDictionary.GetFieldAsNonEmpty(JSON_KEY_COLUMN_LABEL, name), sys_id, RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_REFERENCE), sysDictionary.GetFieldAsBoolean(JSON_KEY_READ_ONLY),
-                        sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new RecordRef(type, displayValue ?? type) : null, sysDictionary.GetFieldAsIntOrNull(JSON_KEY_MAX_LENGTH),
-                        sysDictionary.GetFieldAsBoolean(JSON_KEY_ACTIVE), sysDictionary.GetFieldAsBoolean(JSON_KEY_UNIQUE), sysDictionary.GetFieldAsBoolean(JSON_KEY_PRIMARY), sysDictionary.GetFieldAsBoolean(JSON_KEY_VIRTUAL),
-                        sysDictionary.GetFieldAsIntOrNull(JSON_KEY_SIZECLASS), sysDictionary.GetFieldAsBoolean(JSON_KEY_MANDATORY), sysDictionary.GetFieldAsBoolean(JSON_KEY_ARRAY), sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_COMMENTS),
-                        sysDictionary.GetFieldAsBoolean(JSON_KEY_DISPLAY), sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_DEFAULT_VALUE), RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_SYS_PACKAGE), requestUri.Host);
+                    return new ElementRecord(
+                        Name: name,
+                        Label: sysDictionary.GetFieldAsNonEmpty(JSON_KEY_COLUMN_LABEL, name),
+                        SysID: sys_id,
+                        Reference: RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_REFERENCE),
+                        IsReadOnly: sysDictionary.GetFieldAsBoolean(JSON_KEY_READ_ONLY),
+                        Type: RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_INTERNAL_TYPE),
+                        MaxLength: sysDictionary.GetFieldAsIntOrNull(JSON_KEY_MAX_LENGTH),
+                        IsActive: sysDictionary.GetFieldAsBoolean(JSON_KEY_ACTIVE),
+                        IsUnique: sysDictionary.GetFieldAsBoolean(JSON_KEY_UNIQUE),
+                        IsPrimary: sysDictionary.GetFieldAsBoolean(JSON_KEY_PRIMARY),
+                        IsCalculated: sysDictionary.GetFieldAsBoolean(JSON_KEY_VIRTUAL),
+                        SizeClass: sysDictionary.GetFieldAsIntOrNull(JSON_KEY_SIZECLASS),
+                        IsMandatory: sysDictionary.GetFieldAsBoolean(JSON_KEY_MANDATORY),
+                        IsArray: sysDictionary.GetFieldAsBoolean(JSON_KEY_ARRAY),
+                        Comments: sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_COMMENTS),
+                        IsDisplay: sysDictionary.GetFieldAsBoolean(JSON_KEY_DISPLAY),
+                        DefaultValue: sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_DEFAULT_VALUE),
+                        Package: RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_SYS_PACKAGE),
+                        SourceFqdn: requestUri.Host);
             }
             return null!;
         }).Where(n => n is not null).ToArray();
