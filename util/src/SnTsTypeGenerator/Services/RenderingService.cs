@@ -29,7 +29,7 @@ public partial class RenderingService
     /// </summary>
     internal bool InitSuccessful => _outputFile is not null;
 
-    internal async Task RenderAsync(IEnumerable<TableInfo> toRender, CancellationToken cancellationToken)
+    internal async Task RenderAsync(IEnumerable<Table> toRender, CancellationToken cancellationToken)
     {
         if (_outputFile is null)
             return;
@@ -243,7 +243,7 @@ public partial class RenderingService
         await writer.WriteLineAsync($"}} & {TS_NAME_GlideElementReference};");
     }
 
-    private static async Task RenderGlideRecordJsDocAsync(TableInfo table, SysPackage? package, IndentedTextWriter writer)
+    private static async Task RenderGlideRecordJsDocAsync(Table table, Package? package, IndentedTextWriter writer)
     {
         await writer.WriteLineAsync(OPEN_JSDOC);
         await writer.WriteAsync(START_JSDOC_LINE);
@@ -289,10 +289,10 @@ public partial class RenderingService
         await writer.WriteLineAsync(" */");
     }
 
-    private static async Task RenderGlobalGlideRecordAsync(EntityEntry<TableInfo> entry, IndentedTextWriter writer, CancellationToken cancellationToken)
+    private static async Task RenderGlobalGlideRecordAsync(EntityEntry<Table> entry, IndentedTextWriter writer, CancellationToken cancellationToken)
     {
         writer.Indent = 1;
-        TableInfo table = entry.Entity;
+        Table table = entry.Entity;
         await RenderGlideRecordJsDocAsync(table, await entry.GetReferencedEntityAsync(t => t.Package, cancellationToken), writer);
         await writer.WriteAsync("export type ");
         await writer.WriteAsync(table.Name);
@@ -301,7 +301,7 @@ public partial class RenderingService
         await writer.WriteAsync(".");
         await writer.WriteAsync(table.Name);
         await writer.WriteAsync(" & ");
-        TableInfo? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
+        Table? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
         if (superClass is null)
             await writer.WriteAsync(TS_NAME_GlideRecord);
         else if (superClass.IsGlobalScope())
@@ -317,10 +317,10 @@ public partial class RenderingService
         await writer.WriteLineAsync(";");
     }
 
-    private static async Task RenderScopedGlideRecordAsync(EntityEntry<TableInfo> entry, IndentedTextWriter writer, CancellationToken cancellationToken)
+    private static async Task RenderScopedGlideRecordAsync(EntityEntry<Table> entry, IndentedTextWriter writer, CancellationToken cancellationToken)
     {
         writer.Indent = 2;
-        TableInfo table = entry.Entity;
+        Table table = entry.Entity;
         await RenderGlideRecordJsDocAsync(table, await entry.GetReferencedEntityAsync(t => t.Package, cancellationToken), writer);
         await writer.WriteAsync("export type ");
         await writer.WriteAsync(table.Name);
@@ -329,7 +329,7 @@ public partial class RenderingService
         await writer.WriteAsync(".");
         await writer.WriteAsync(table.Name);
         await writer.WriteAsync(" & ");
-        TableInfo? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
+        Table? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
         if (superClass is null)
             await writer.WriteAsync(TS_NAME_GlideRecord);
         else if (NameComparer.Equals(superClass.ScopeValue, table.ScopeValue))
@@ -351,7 +351,7 @@ public partial class RenderingService
         await writer.WriteLineAsync(";");
     }
 
-    private static async Task RenderGlobalGlideElementAsync(TableInfo table, IndentedTextWriter writer)
+    private static async Task RenderGlobalGlideElementAsync(Table table, IndentedTextWriter writer)
     {
         writer.Indent = 1;
         await writer.WriteLineAsync(OPEN_JSDOC);
@@ -379,7 +379,7 @@ public partial class RenderingService
         await writer.WriteLineAsync(">;");
     }
 
-    private static async Task RenderScopedGlideElementAsync(TableInfo table, IndentedTextWriter writer)
+    private static async Task RenderScopedGlideElementAsync(Table table, IndentedTextWriter writer)
     {
         writer.Indent = 2;
         await writer.WriteLineAsync(OPEN_JSDOC);
@@ -409,10 +409,10 @@ public partial class RenderingService
         await writer.WriteLineAsync(">;");
     }
 
-    private static async Task RenderGlobalTableFieldsAsync(EntityEntry<TableInfo> entry, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
+    private static async Task RenderGlobalTableFieldsAsync(EntityEntry<Table> entry, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
     {
         writer.Indent = 1;
-        TableInfo table = entry.Entity;
+        Table table = entry.Entity;
         await writer.WriteLineAsync(OPEN_JSDOC);
         await writer.WriteAsync(START_JSDOC_LINE);
         await writer.WriteAsync(table.Label.SmartQuoteJson());
@@ -439,7 +439,7 @@ public partial class RenderingService
         await writer.WriteAsync("export interface ");
         await writer.WriteAsync(table.Name);
 
-        TableInfo? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
+        Table? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
         if (superClass is not null)
         {
             await writer.WriteAsync(" extends ");
@@ -472,11 +472,11 @@ public partial class RenderingService
         await writer.WriteLineAsync("}");
     }
 
-    private static async Task RenderScopedTableFieldsAsync(EntityEntry<TableInfo> entry, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
+    private static async Task RenderScopedTableFieldsAsync(EntityEntry<Table> entry, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
     {
         writer.Indent = 2;
         await writer.WriteLineAsync(OPEN_JSDOC);
-        TableInfo table = entry.Entity;
+        Table table = entry.Entity;
         await writer.WriteLineAsync(OPEN_JSDOC);
         await writer.WriteAsync(START_JSDOC_LINE);
         await writer.WriteAsync(table.Label.SmartQuoteJson());
@@ -503,7 +503,7 @@ public partial class RenderingService
         await writer.WriteAsync("export interface ");
         await writer.WriteAsync(table.Name);
 
-        TableInfo? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
+        Table? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
         if (superClass is not null)
         {
             await writer.WriteAsync(" extends ");
@@ -541,31 +541,31 @@ public partial class RenderingService
         await writer.WriteLineAsync("}");
     }
 
-    private static IEnumerable<string> GetFlags(ElementInfo elementInfo)
+    private static IEnumerable<string> GetFlags(Element element)
     {
-        if (elementInfo.IsPrimary)
+        if (element.IsPrimary)
             yield return "Is Primary: true";
-        else if (elementInfo.IsMandatory)
+        else if (element.IsMandatory)
             yield return "Is Mandatory: true";
-        if (!elementInfo.IsActive)
+        if (!element.IsActive)
             yield return "Is Active: false";
-        if (elementInfo.IsArray)
+        if (element.IsArray)
             yield return "Is Array: true";
-        if (elementInfo.IsReadOnly)
+        if (element.IsReadOnly)
             yield return "Is Read-only: true";
-        if (elementInfo.IsDisplay)
+        if (element.IsDisplay)
             yield return "Is Display: true";
-        if (elementInfo.IsCalculated)
+        if (element.IsCalculated)
             yield return "Is Calculated: true";
-        if (elementInfo.IsUnique)
+        if (element.IsUnique)
             yield return "Is Unique: true";
     }
 
     private static async Task RenderElementAsync(ElementInheritance inheritance, IElementRenderingContext context, IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
     {
         writer.Indent = context.IndentLevel;
-        ElementInfo element = inheritance.Element;
-        EntityEntry<ElementInfo> entry = dbContext.Elements.Entry(element);
+        Element element = inheritance.Element;
+        EntityEntry<Element> entry = dbContext.Elements.Entry(element);
         await writer.WriteLineAsync(OPEN_JSDOC);
         await writer.WriteAsync(START_JSDOC_LINE);
         await writer.WriteAsync(element.Label.SmartQuoteJson());
@@ -596,7 +596,7 @@ public partial class RenderingService
         }
 
         GlideType? type = await entry.GetReferencedEntityAsync(e => e.Type, cancellationToken);
-        TableInfo? reference = await entry.GetReferencedEntityAsync(e => e.Reference, cancellationToken);
+        Table? reference = await entry.GetReferencedEntityAsync(e => e.Reference, cancellationToken);
         if (context.IsExplicitScalarType(element.TypeName))
         {
             if (appendLine)
@@ -739,7 +739,7 @@ public partial class RenderingService
                 await writer.WriteLineAsync(")");
             }
         }
-        SysPackage? package = await entry.GetReferencedEntityAsync(e => e.Package, cancellationToken);
+        Package? package = await entry.GetReferencedEntityAsync(e => e.Package, cancellationToken);
         if (package is not null && (context.Package is null || !NameComparer.Equals(package.Name, context.Package)))
         {
             if (appendLine)

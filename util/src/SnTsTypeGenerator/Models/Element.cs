@@ -10,7 +10,7 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Dictionary Entry" (<see cref="SnApiConstants.TABLE_NAME_SYS_DICTIONARY" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Elements))]
-public class ElementInfo : IEquatable<ElementInfo>
+public class Element : IEquatable<Element>
 {
     private readonly object _syncRoot = new();
 
@@ -139,12 +139,12 @@ public class ElementInfo : IEquatable<ElementInfo>
         }
     }
 
-    private SysPackage? _package;
+    private Package? _package;
 
     /// <summary>
     /// The source package for the element.
     /// </summary>
-    public SysPackage? Package
+    public Package? Package
     {
         get => _package;
         set
@@ -185,12 +185,12 @@ public class ElementInfo : IEquatable<ElementInfo>
         }
     }
 
-    private TableInfo? _table;
+    private Table? _table;
 
     /// <summary>
     /// The table that the current element belongs to.
     /// </summary>
-    public TableInfo? Table
+    public Table? Table
     {
         get => _table;
         set
@@ -302,12 +302,12 @@ public class ElementInfo : IEquatable<ElementInfo>
         }
     }
 
-    private TableInfo? _reference;
+    private Table? _reference;
 
     /// <summary>
     /// The table the current column refers to.
     /// </summary>
-    public TableInfo? Reference
+    public Table? Reference
     {
         get => _reference;
         set
@@ -347,12 +347,12 @@ public class ElementInfo : IEquatable<ElementInfo>
         }
     }
 
-    private SourceInfo? _source;
+    private SncSource? _source;
 
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
-    public SourceInfo? Source
+    public SncSource? Source
     {
         get => _source;
         set
@@ -389,10 +389,10 @@ public class ElementInfo : IEquatable<ElementInfo>
         set => _sysID = value ?? string.Empty;
     }
 
-    public bool Equals(ElementInfo? other) => other is not null && (ReferenceEquals(this, other) ||
+    public bool Equals(Element? other) => other is not null && (ReferenceEquals(this, other) ||
         (Services.SnApiConstants.NameComparer.Equals(_name, other._name) && Services.SnApiConstants.NameComparer.Equals(_tableName, other._tableName)));
 
-    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+    public override bool Equals(object? obj) => Equals(obj as Element);
 
     public override int GetHashCode()
     {
@@ -402,7 +402,7 @@ public class ElementInfo : IEquatable<ElementInfo>
         }
     }
 
-    public override string ToString() => nameof(ElementInfo) + new JsonObject()
+    public override string ToString() => nameof(Element) + new JsonObject()
     {
         { nameof(Name), JsonValue.Create(_name) },
         { nameof(Label), JsonValue.Create(_label) },

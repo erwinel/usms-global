@@ -34,42 +34,42 @@ public partial class TypingsDbContext : DbContext
     /// </summary>
     internal bool InitSuccessful => _pathValidated && Database.CanConnect();
 
-    private static IEnumerable<string> GetSourceInfoDbInitCommands()
+    private static IEnumerable<string> GetSncSourceDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Sources)}"" (
-    ""{nameof(SourceInfo.FQDN)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SourceInfo.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SourceInfo.IsPersonalDev)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(SourceInfo.LastAccessed)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    CONSTRAINT ""PK_{nameof(SourceInfo)}"" PRIMARY KEY(""{nameof(SourceInfo.FQDN)}"")
+    ""{nameof(SncSource.FQDN)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SncSource.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SncSource.IsPersonalDev)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(SncSource.LastAccessed)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    CONSTRAINT ""PK_{nameof(Sources)}"" PRIMARY KEY(""{nameof(SncSource.FQDN)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(SourceInfo)}_{nameof(SourceInfo.IsPersonalDev)}\" ON \"{nameof(Sources)}\" (\"{nameof(SourceInfo.IsPersonalDev)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(Sources)}_{nameof(SncSource.IsPersonalDev)}\" ON \"{nameof(Sources)}\" (\"{nameof(SncSource.IsPersonalDev)}\")";
     }
 
-    private static IEnumerable<string> GetSysPackageDbInitCommands()
+    private static IEnumerable<string> GetPackageDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Packages)}"" (
-    ""{nameof(SysPackage.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SysPackage.SysId)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SysPackage.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(SysPackage.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(SysPackage.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysPackage)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(SysPackage)}"" PRIMARY KEY(""{nameof(SysPackage.Name)}"")
+    ""{nameof(Package.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Package.SysId)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Package.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(Package.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    ""{nameof(Package.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Packages)}_{nameof(Package.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(Packages)}"" PRIMARY KEY(""{nameof(Package.Name)}"")
 )";
     }
 
-    private static IEnumerable<string> GetSysScopeDbInitCommands()
+    private static IEnumerable<string> GetScopeDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Scopes)}"" (
-    ""{nameof(SysScope.Value)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SysScope.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SysScope.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(SysScope.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SysScope.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(SysScope.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(SysScope)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(SysScope)}"" PRIMARY KEY(""{nameof(SysScope.Value)}"")
+    ""{nameof(Scope.Value)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Scope.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Scope.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(Scope.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Scope.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    ""{nameof(Scope.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Scopes)}_{nameof(Scope.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(Scopes)}"" PRIMARY KEY(""{nameof(Scope.Value)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(SysScope)}_{nameof(SysScope.SysID)}\" ON \"{nameof(Scopes)}\" (\"{nameof(SysScope.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(Scopes)}_{nameof(Scope.SysID)}\" ON \"{nameof(Scopes)}\" (\"{nameof(Scope.SysID)}\" COLLATE NOCASE)";
     }
 
     private static IEnumerable<string> GetGlideTypeDbInitCommands()
@@ -84,69 +84,69 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(GlideType.UseOriginalValue)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(GlideType.IsVisible)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(GlideType.LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(GlideType.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SysScope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(GlideType.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideType)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(GlideType)}"" PRIMARY KEY(""{nameof(GlideType.Name)}"")
+    ""{nameof(GlideType.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Scope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(Scope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(Types)}"" PRIMARY KEY(""{nameof(GlideType.Name)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.SysID)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.UseOriginalValue)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.UseOriginalValue)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(GlideType)}_{nameof(GlideType.IsVisible)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.IsVisible)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(Types)}_{nameof(GlideType.SysID)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(Types)}_{nameof(GlideType.UseOriginalValue)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.UseOriginalValue)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(Types)}_{nameof(GlideType.IsVisible)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.IsVisible)}\")";
     }
 
-    private static IEnumerable<string> GetTableInfoDbInitCommands()
+    private static IEnumerable<string> GetTableDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Tables)}"" (
-    ""{nameof(TableInfo.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(TableInfo.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(TableInfo.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(TableInfo.NumberPrefix)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(TableInfo.AccessibleFrom)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(TableInfo.ExtensionModel)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(TableInfo.IsExtendable)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(TableInfo.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(TableInfo.IsInterface)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(TableInfo.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(TableInfo.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SysScope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(SysScope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(TableInfo.SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(TableInfo.SuperClass)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(TableInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(TableInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(TableInfo)}"" PRIMARY KEY(""{nameof(TableInfo.Name)}"")
+    ""{nameof(Table.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Table.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Table.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Table.NumberPrefix)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(Table.AccessibleFrom)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Table.ExtensionModel)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(Table.IsExtendable)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(Table.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    ""{nameof(Table.IsInterface)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(Table.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Table.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Scope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(Scope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Table.SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.SuperClass)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(Table.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Table.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(Tables)}"" PRIMARY KEY(""{nameof(Table.Name)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.SysID)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.IsExtendable)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.IsExtendable)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(TableInfo)}_{nameof(TableInfo.IsInterface)}\" ON \"{nameof(Tables)}\" (\"{nameof(TableInfo.IsInterface)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(Tables)}_{nameof(Table.SysID)}\" ON \"{nameof(Tables)}\" (\"{nameof(Table.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(Tables)}_{nameof(Table.IsExtendable)}\" ON \"{nameof(Tables)}\" (\"{nameof(Table.IsExtendable)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(Tables)}_{nameof(Table.IsInterface)}\" ON \"{nameof(Tables)}\" (\"{nameof(Table.IsInterface)}\")";
     }
 
-    private static IEnumerable<string> GetElementInfoDbInitCommands()
+    private static IEnumerable<string> GetElementDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Elements)}"" (
-    ""{nameof(ElementInfo.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(ElementInfo.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(ElementInfo.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(ElementInfo.IsActive)}"" BIT NOT NULL DEFAULT 1,
-    ""{nameof(ElementInfo.IsArray)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(ElementInfo.MaxLength)}"" INT DEFAULT NULL,
-    ""{nameof(ElementInfo.SizeClass)}"" INT DEFAULT NULL,
-    ""{nameof(ElementInfo.Comments)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(ElementInfo.DefaultValue)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(ElementInfo.IsDisplay)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(ElementInfo.IsMandatory)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(ElementInfo.IsPrimary)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(ElementInfo.IsReadOnly)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(ElementInfo.IsCalculated)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(ElementInfo.IsUnique)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(ElementInfo.LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(ElementInfo.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SysPackage)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(SysPackage.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ElementInfo.TableName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(ElementInfo.Table)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ElementInfo.TypeName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(GlideType)}"" REFERENCES ""{nameof(Types)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ElementInfo.RefTableName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(TableInfo)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(TableInfo.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(ElementInfo.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(ElementInfo)}_{nameof(SourceInfo)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SourceInfo.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(ElementInfo)}"" PRIMARY KEY(""{nameof(ElementInfo.Name)}"", ""{nameof(ElementInfo.TableName)}"")
+    ""{nameof(Element.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Element.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Element.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Element.IsActive)}"" BIT NOT NULL DEFAULT 1,
+    ""{nameof(Element.IsArray)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(Element.MaxLength)}"" INT DEFAULT NULL,
+    ""{nameof(Element.SizeClass)}"" INT DEFAULT NULL,
+    ""{nameof(Element.Comments)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(Element.DefaultValue)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(Element.IsDisplay)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(Element.IsMandatory)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(Element.IsPrimary)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(Element.IsReadOnly)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(Element.IsCalculated)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(Element.IsUnique)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(Element.LastUpdated)}"" DATETIME NOT NULL,
+    ""{nameof(Element.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Element.TableName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Table)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(Table.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Element.TypeName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Type)}"" REFERENCES ""{nameof(Types)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Element.RefTableName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Reference)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(Table.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Element.SourceFqdn)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(Element)}"" PRIMARY KEY(""{nameof(Element.Name)}"", ""{nameof(Element.TableName)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.SysID)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsActive)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.IsActive)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsDisplay)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.IsDisplay)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(ElementInfo)}_{nameof(ElementInfo.IsPrimary)}\" ON \"{nameof(Elements)}\" (\"{nameof(ElementInfo.IsPrimary)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.SysID)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.IsActive)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.IsActive)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.IsDisplay)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.IsDisplay)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.IsPrimary)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.IsPrimary)}\")";
     }
 
     public TypingsDbContext(DbContextOptions<TypingsDbContext> options) : base(options)
@@ -213,9 +213,9 @@ public partial class TypingsDbContext : DbContext
                     }
                     return false;
                 }
-                if (executeDbInitCommands<SourceInfo>(GetSourceInfoDbInitCommands()) || executeDbInitCommands<SysPackage>(GetSysPackageDbInitCommands()) ||
-                    executeDbInitCommands<SysScope>(GetSysScopeDbInitCommands()) || executeDbInitCommands<GlideType>(GetGlideTypeDbInitCommands()) || executeDbInitCommands<TableInfo>(GetTableInfoDbInitCommands()) ||
-                    executeDbInitCommands<ElementInfo>(GetElementInfoDbInitCommands()))
+                if (executeDbInitCommands<SncSource>(GetSncSourceDbInitCommands()) || executeDbInitCommands<Package>(GetPackageDbInitCommands()) ||
+                    executeDbInitCommands<Scope>(GetScopeDbInitCommands()) || executeDbInitCommands<GlideType>(GetGlideTypeDbInitCommands()) || executeDbInitCommands<Table>(GetTableDbInitCommands()) ||
+                    executeDbInitCommands<Element>(GetElementDbInitCommands()))
                 {
                     transaction.Rollback();
                     _pathValidated = false;
@@ -301,31 +301,31 @@ public partial class TypingsDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        _ = modelBuilder.Entity<SourceInfo>(builder =>
+        _ = modelBuilder.Entity<SncSource>(builder =>
             {
                 _ = builder.HasKey(s => s.FQDN);
                 _ = builder.HasIndex(t => t.IsPersonalDev);
-                _ = builder.Property(nameof(SourceInfo.FQDN)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(SourceInfo.Label)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SncSource.FQDN)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(SncSource.Label)).UseCollation(COLLATION_NOCASE);
             })
-            .Entity<SysPackage>(builder =>
+            .Entity<Package>(builder =>
             {
                 _ = builder.HasKey(s => s.Name);
-                _ = builder.Property(nameof(SysPackage.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(SysPackage.SysId)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(SysPackage.ShortDescription)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(SysPackage.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Package.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Package.SysId)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Package.ShortDescription)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Package.SourceFqdn)).UseCollation(COLLATION_NOCASE);
                 _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
             })
-            .Entity<SysScope>(builder =>
+            .Entity<Scope>(builder =>
             {
                 _ = builder.HasKey(s => s.Value);
                 _ = builder.HasIndex(s => s.SysID).IsUnique();
-                _ = builder.Property(nameof(SysScope.Value)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(SysScope.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(SysScope.ShortDescription)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(SysScope.SysID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(SysScope.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Scope.Value)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Scope.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Scope.ShortDescription)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Scope.SysID)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Scope.SourceFqdn)).UseCollation(COLLATION_NOCASE);
                 _ = builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
             })
             .Entity<GlideType>(builder =>
@@ -344,42 +344,42 @@ public partial class TypingsDbContext : DbContext
                 _ = builder.HasOne(t => t.Package).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
                 _ = builder.HasOne(t => t.Scope).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
             })
-            .Entity<TableInfo>(builder =>
+            .Entity<Table>(builder =>
             {
                 _ = builder.HasKey(t => t.Name);
                 _ = builder.HasIndex(t => t.SysID).IsUnique();
                 _ = builder.HasIndex(t => t.IsExtendable);
                 _ = builder.HasIndex(t => t.IsInterface);
-                _ = builder.Property(nameof(TableInfo.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.Label)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.SysID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.NumberPrefix)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.AccessibleFrom)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.ExtensionModel)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.SourceFqdn)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.PackageName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.ScopeValue)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.SuperClassName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(TableInfo.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.Label)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.SysID)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.NumberPrefix)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.AccessibleFrom)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.ExtensionModel)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.PackageName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.ScopeValue)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.SuperClassName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Table.SourceFqdn)).UseCollation(COLLATION_NOCASE);
                 _ = builder.HasOne(t => t.Source).WithMany(s => s.Tables).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
                 _ = builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
                 _ = builder.HasOne(t => t.Scope).WithMany(s => s.Tables).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
                 _ = builder.HasOne(t => t.SuperClass).WithMany(s => s.Derived).HasForeignKey(t => t.SuperClassName).OnDelete(DeleteBehavior.Restrict);
             })
-            .Entity<ElementInfo>(builder =>
+            .Entity<Element>(builder =>
             {
-                _ = builder.HasKey(t => t.Name);
+                _ = builder.HasKey(nameof(Element.Name));
                 _ = builder.HasIndex(t => t.SysID).IsUnique();
-                _ = builder.Property(nameof(ElementInfo.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(ElementInfo.Label)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(ElementInfo.SysID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(ElementInfo.Comments)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(ElementInfo.DefaultValue)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(ElementInfo.PackageName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(ElementInfo.TableName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(ElementInfo.TypeName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(ElementInfo.RefTableName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(ElementInfo.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.Label)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.SysID)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.Comments)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.DefaultValue)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.PackageName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.TableName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.TypeName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.RefTableName)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Element.SourceFqdn)).UseCollation(COLLATION_NOCASE);
                 _ = builder.HasOne(t => t.Source).WithMany(s => s.Elements).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
                 _ = builder.HasOne(t => t.Table).WithMany(s => s.Elements).HasForeignKey(t => t.TableName).IsRequired().OnDelete(DeleteBehavior.Restrict);
                 _ = builder.HasOne(t => t.Type).WithMany(s => s.Elements).HasForeignKey(t => t.TypeName).IsRequired().OnDelete(DeleteBehavior.Restrict);
@@ -391,17 +391,17 @@ public partial class TypingsDbContext : DbContext
     /// <summary>
     /// Gets the source ServiceNow instance information records.
     /// </summary>
-    public virtual DbSet<SourceInfo> Sources { get; set; } = null!;
+    public virtual DbSet<SncSource> Sources { get; set; } = null!;
 
     /// <summary>
     /// Gets the source packages.
     /// </summary>
-    public virtual DbSet<SysPackage> Packages { get; set; } = null!;
+    public virtual DbSet<Package> Packages { get; set; } = null!;
 
     /// <summary>
     /// Gets the scope definitions.
     /// </summary>
-    public virtual DbSet<SysScope> Scopes { get; set; } = null!;
+    public virtual DbSet<Scope> Scopes { get; set; } = null!;
 
     /// <summary>
     /// Gets the ServiceNow column types.
@@ -411,10 +411,10 @@ public partial class TypingsDbContext : DbContext
     /// <summary>
     /// Gets the ServiceNow tables.
     /// </summary>
-    public virtual DbSet<TableInfo> Tables { get; set; } = null!;
+    public virtual DbSet<Table> Tables { get; set; } = null!;
 
     /// <summary>
     /// Gets the ServiceNow table elements (columns).
     /// </summary>
-    public virtual DbSet<ElementInfo> Elements { get; set; } = null!;
+    public virtual DbSet<Element> Elements { get; set; } = null!;
 }

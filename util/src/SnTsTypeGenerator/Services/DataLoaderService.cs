@@ -16,17 +16,17 @@ public sealed class DataLoaderService : IDisposable
     private readonly Dictionary<string, string> _scopeIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, string> _tableIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, string> _packageIdMap = new(StringComparer.InvariantCultureIgnoreCase);
-    private readonly Dictionary<string, SourceInfo> _sourceCache = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, SncSource> _sourceCache = new(StringComparer.InvariantCultureIgnoreCase);
 
     /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
     internal bool InitSuccessful => _tableAPIService is not null && _tableAPIService.InitSuccessful && (_dbContext?.InitSuccessful ?? false);
 
-    private async Task<SourceInfo> GetSourceAsync(string fqdn, CancellationToken cancellationToken)
+    private async Task<SncSource> GetSourceAsync(string fqdn, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (_sourceCache.TryGetValue(fqdn, out SourceInfo? source))
+        if (_sourceCache.TryGetValue(fqdn, out SncSource? source))
             return source;
         if ((source = await _dbContext!.Sources.FirstOrDefaultAsync(s => s.FQDN == fqdn, cancellationToken)) is null)
         {
@@ -48,16 +48,16 @@ public sealed class DataLoaderService : IDisposable
         return source;
     }
 
-    internal async Task<TableInfo> GetBaseRecordTypeAsync(CancellationToken cancellationToken)
+    internal async Task<Table> GetBaseRecordTypeAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_dbContext is null)
             throw new ObjectDisposedException(nameof(DataLoaderService));
-        TableInfo? tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == TS_NAME_BASERECORD && t.IsInterface, cancellationToken);
-        if (tableInfo is null)
+        Table? table = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == TS_NAME_BASERECORD && t.IsInterface, cancellationToken);
+        if (table is null)
         {
             string sourceFqdn = _tableAPIService.SourceFqdn;
-            tableInfo = await AddTableAsync(new(
+            table = await AddTableAsync(new(
                 Name: TS_NAME_BASERECORD,
                 Label: TS_NAME_BASERECORD,
                 SysID: Guid.Empty.ToString("N"),
@@ -190,19 +190,19 @@ public sealed class DataLoaderService : IDisposable
                     DefaultValue: null,
                     Package: null,
                     SourceFqdn: sourceFqdn)
-            }, tableInfo, cancellationToken);
+            }, table, cancellationToken);
         }
-        return tableInfo;
+        return table;
     }
 
-    private async Task<ElementInfo[]> AddElementsAsync(IEnumerable<ElementRecord> elements, TableInfo table, CancellationToken cancellationToken)
+    private async Task<Element[]> AddElementsAsync(IEnumerable<ElementRecord> elements, Table table, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (!elements.Any())
-            return Array.Empty<ElementInfo>();
+            return Array.Empty<Element>();
         var source = (await table.GetReferencedEntityAsync(_dbContext!.Tables, t => t.Source, cancellationToken))!;
         _logger.LogAddingElementsToDatabase(table.Name);
-        var items = elements.Select<ElementRecord, (ElementInfo Element, RecordRef? Package, RecordRef? Reference, RecordRef? Type, string SourceFqdn)>(e => (new ElementInfo()
+        var entities = elements.Select<ElementRecord, (Element Element, RecordRef? Package, RecordRef? Reference, RecordRef? Type, string SourceFqdn)>(e => (new Element()
         {
             Name = e.Name,
             Comments = e.Comments,
@@ -223,13 +223,13 @@ public sealed class DataLoaderService : IDisposable
             Table = table,
             Source = source
         }, e.Package, e.Reference, e.Type, e.SourceFqdn));
-        foreach (var g in items.GroupBy(a => a.SourceFqdn))
+        foreach (var g in entities.GroupBy(a => a.SourceFqdn))
         {
             var s = await GetSourceAsync(g.Key, cancellationToken);
             foreach (var a in g)
                 a.Element.Source = s;
         }
-        foreach (var g in items.Where(a => a.Package is not null).GroupBy(a => a.Package!.DisplayValue))
+        foreach (var g in entities.Where(a => a.Package is not null).GroupBy(a => a.Package!.DisplayValue))
         {
             var e = g.First();
             var p = await FromPackageRefAsync(e.Package, e.Element.Source!, cancellationToken);
@@ -237,7 +237,7 @@ public sealed class DataLoaderService : IDisposable
                 foreach (var a in g)
                     a.Element.Package = p;
         }
-        foreach (var g in items.Where(a => a.Type is not null).GroupBy(a => a.Type!.DisplayValue))
+        foreach (var g in entities.Where(a => a.Type is not null).GroupBy(a => a.Type!.DisplayValue))
         {
             var e = g.First();
             var t = await FromGlideTypeRefAsync(e.Type!, e.Element.Source!, cancellationToken);
@@ -245,7 +245,7 @@ public sealed class DataLoaderService : IDisposable
                 foreach (var a in g)
                     a.Element.Type = t;
         }
-        foreach (var g in items.Where(a => a.Reference is not null).GroupBy(a => a.Reference!.Value))
+        foreach (var g in entities.Where(a => a.Reference is not null).GroupBy(a => a.Reference!.Value))
         {
             var e = g.First();
             var t = await FromTableRefAsync(g.First().Reference!, cancellationToken);
@@ -253,199 +253,199 @@ public sealed class DataLoaderService : IDisposable
                 foreach (var a in g)
                     a.Element.Reference = t;
         }
-        var result = items.Select(e => e.Element).ToArray();
+        var result = entities.Select(e => e.Element).ToArray();
         await _dbContext!.Elements.AddRangeAsync(result, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return result;
     }
 
-    private async Task<TableInfo> AddTableAsync(TableRecord table, CancellationToken cancellationToken)
+    private async Task<Table> AddTableAsync(TableRecord @record, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        SourceInfo source = await GetSourceAsync(table.SourceFqdn, cancellationToken);
-        TableInfo tableInfo = new()
+        SncSource source = await GetSourceAsync(@record.SourceFqdn, cancellationToken);
+        Table table = new()
         {
-            Name = table.Name,
-            AccessibleFrom = table.AccessibleFrom,
-            ExtensionModel = table.ExtensionModel,
-            IsExtendable = table.IsExtendable,
+            Name = @record.Name,
+            AccessibleFrom = @record.AccessibleFrom,
+            ExtensionModel = @record.ExtensionModel,
+            IsExtendable = @record.IsExtendable,
             IsInterface = false,
-            Label = table.Label,
+            Label = @record.Label,
             LastUpdated = DateTime.Now,
-            NumberPrefix = table.NumberPrefix,
+            NumberPrefix = @record.NumberPrefix,
             Source = source,
-            SysID = table.SysID,
-            Package = await FromPackageRefAsync(table.Package, source, cancellationToken),
-            Scope = await FromScopeRefAsync(table.Scope, source, cancellationToken)
+            SysID = @record.SysID,
+            Package = await FromPackageRefAsync(@record.Package, source, cancellationToken),
+            Scope = await FromScopeRefAsync(@record.Scope, source, cancellationToken)
         };
-        _logger.LogAddingTableToDb(tableInfo.Name);
-        await _dbContext!.Tables.AddAsync(tableInfo, cancellationToken);
+        _logger.LogAddingTableToDb(table.Name);
+        await _dbContext!.Tables.AddAsync(table, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        _tableIdMap.Add(tableInfo.SysID, tableInfo.Name);
-        _logger.LogNewTableSaveCompleted(tableInfo.Name);
-        TableInfo? superClass = (table.SuperClass is null) ? null : await FromTableRefAsync(table.SuperClass, cancellationToken);
-        IEnumerable<ElementInfo> superElements;
-        var elements = (await _tableAPIService.GetElementsByTableNameAsync(table.Name, cancellationToken)).ToArray();
+        _tableIdMap.Add(table.SysID, table.Name);
+        _logger.LogNewTableSaveCompleted(table.Name);
+        Table? superClass = (@record.SuperClass is null) ? null : await FromTableRefAsync(@record.SuperClass, cancellationToken);
+        IEnumerable<Element> superElements;
+        var elements = (await _tableAPIService.GetElementsByTableNameAsync(@record.Name, cancellationToken)).ToArray();
         if (superClass is null)
         {
             if (elements.ExtendsBaseRecord())
             {
                 superClass = await GetBaseRecordTypeAsync(cancellationToken);
-                tableInfo.SuperClass = superClass;
-                _dbContext.Tables.Update(tableInfo);
+                table.SuperClass = superClass;
+                _dbContext.Tables.Update(table);
                 await _dbContext.SaveChangesAsync(cancellationToken);
-                superElements = await tableInfo.GetRelatedCollectionAsync(_dbContext.Tables, e => e.Elements, cancellationToken);
+                superElements = await table.GetRelatedCollectionAsync(_dbContext.Tables, e => e.Elements, cancellationToken);
             }
             else
-                return tableInfo;
+                return table;
         }
         else
         {
-            tableInfo.SuperClass = superClass;
-            _dbContext.Tables.Update(tableInfo);
+            table.SuperClass = superClass;
+            _dbContext.Tables.Update(table);
             await _dbContext.SaveChangesAsync(cancellationToken);
             if (elements.Length == 0)
-                return tableInfo;
-            if (!(superElements = (await _dbContext.Tables.Entry(tableInfo).GetAllElementInheritancesAsync(cancellationToken)).Select(e => e.Element)).Any())
+                return table;
+            if (!(superElements = (await _dbContext.Tables.Entry(table).GetAllElementInheritancesAsync(cancellationToken)).Select(e => e.Element)).Any())
             {
-                await AddElementsAsync(elements, tableInfo, cancellationToken);
-                return tableInfo;
+                await AddElementsAsync(elements, table, cancellationToken);
+                return table;
             }
         }
 
-        await AddElementsAsync(elements.Where(e => !superElements.Any(s => e.IsIdenticalTo(s))), tableInfo, cancellationToken);
+        await AddElementsAsync(elements.Where(e => !superElements.Any(s => e.IsIdenticalTo(s))), table, cancellationToken);
 
-        return tableInfo;
+        return table;
     }
 
-    private async Task<GlideType> FromGlideTypeRefAsync(RecordRef type, SourceInfo source, CancellationToken cancellationToken)
+    private async Task<GlideType> FromGlideTypeRefAsync(RecordRef typeRef, SncSource source, CancellationToken cancellationToken)
     {
-        string name = type.Value;
-        GlideType? result = await _dbContext!.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        if (result is null)
+        string name = typeRef.Value;
+        GlideType? type = await _dbContext!.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
+        if (type is null)
         {
-            var record = await _tableAPIService.GetGlideTypeByNameAsync(name, cancellationToken);
-            if (record is not null)
+            var typeRecord = await _tableAPIService.GetGlideTypeByNameAsync(name, cancellationToken);
+            if (typeRecord is not null)
             {
-                source = await GetSourceAsync(record.SourceFqdn, cancellationToken);
-                result = new()
+                source = await GetSourceAsync(typeRecord.SourceFqdn, cancellationToken);
+                type = new()
                 {
                     Name = name,
-                    Label = record.Label,
-                    ScalarType = record.ScalarType,
-                    ScalarLength = record.ScalarLength,
-                    ClassName = record.ClassName,
-                    UseOriginalValue = record.UseOriginalValue,
-                    IsVisible = record.IsVisible,
+                    Label = typeRecord.Label,
+                    ScalarType = typeRecord.ScalarType,
+                    ScalarLength = typeRecord.ScalarLength,
+                    ClassName = typeRecord.ClassName,
+                    UseOriginalValue = typeRecord.UseOriginalValue,
+                    IsVisible = typeRecord.IsVisible,
                     LastUpdated = DateTime.Now,
-                    SysID = record.SysID,
+                    SysID = typeRecord.SysID,
                     Source = source,
-                    Package = await FromPackageRefAsync(record.Package, source, cancellationToken),
-                    Scope = await FromScopeRefAsync(record.Scope, source, cancellationToken)
+                    Package = await FromPackageRefAsync(typeRecord.Package, source, cancellationToken),
+                    Scope = await FromScopeRefAsync(typeRecord.Scope, source, cancellationToken)
                 };
             }
             else
             {
-                result = new()
+                type = new()
                 {
                     Name = name,
-                    Label = type.DisplayValue,
+                    Label = typeRef.DisplayValue,
                     LastUpdated = DateTime.Now,
                     Source = source
                 };
                 switch (name)
                 {
                     case TYPE_NAME_boolean:
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "boolean";
-                        result.SysID = "17d3ba81bf3320001875647fcf0739dc";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "boolean";
+                        type.SysID = "17d3ba81bf3320001875647fcf0739dc";
                         break;
                     case "currency":
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "decimal";
-                        result.ClassName = "Currency";
-                        result.ScalarLength = 20;
-                        result.SysID = "fd2cb3b40a0a0b3000977fec84409b73";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "decimal";
+                        type.ClassName = "Currency";
+                        type.ScalarLength = 20;
+                        type.SysID = "fd2cb3b40a0a0b3000977fec84409b73";
                         break;
                     case TYPE_NAME_document_id:
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "GUID";
-                        result.ClassName = "com.glide.script.glide_elements.GlideElementDocumentId";
-                        result.ScalarLength = 32;
-                        result.SysID = "a887c8b20a0a0b4a00258cf907c43960";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "GUID";
+                        type.ClassName = "com.glide.script.glide_elements.GlideElementDocumentId";
+                        type.ScalarLength = 32;
+                        type.SysID = "a887c8b20a0a0b4a00258cf907c43960";
                         break;
                     case TYPE_NAME_domain_id:
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "GUID";
-                        result.ClassName = "com.glide.script.glide_elements.GlideElementDomainId";
-                        result.ScalarLength = 32;
-                        result.SysID = "db52cccc0a7b7b7b0170604fc254959d";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "GUID";
+                        type.ClassName = "com.glide.script.glide_elements.GlideElementDomainId";
+                        type.ScalarLength = 32;
+                        type.SysID = "db52cccc0a7b7b7b0170604fc254959d";
                         break;
                     case TYPE_NAME_due_date:
-                        result.IsVisible = true;
-                        result.ScalarType = "datetime";
-                        result.ClassName = "GlideDueDate";
-                        result.SysID = "2eb30326c61122b8011a74ef6a7c9ee8";
+                        type.IsVisible = true;
+                        type.ScalarType = "datetime";
+                        type.ClassName = "GlideDueDate";
+                        type.SysID = "2eb30326c61122b8011a74ef6a7c9ee8";
                         break;
                     case TYPE_NAME_glide_action_list:
-                        result.ScalarType = "string";
-                        result.ClassName = "GlideActionList";
-                        result.ScalarLength = 1024;
-                        result.SysID = "355be32bbfa00100421cdc2ecf073929";
+                        type.ScalarType = "string";
+                        type.ClassName = "GlideActionList";
+                        type.ScalarLength = 1024;
+                        type.SysID = "355be32bbfa00100421cdc2ecf073929";
                         break;
                     case TYPE_NAME_glide_date_time:
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "datetime";
-                        result.ClassName = "GlideDateTime";
-                        result.SysID = "a54edbb1c0a80006014da86b91525bf3";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "datetime";
+                        type.ClassName = "GlideDateTime";
+                        type.SysID = "a54edbb1c0a80006014da86b91525bf3";
                         break;
                     case TYPE_NAME_glide_date:
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "date";
-                        result.ClassName = "GlideDate";
-                        result.SysID = "a3a73875c611227800e6f970ea4c7410";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "date";
+                        type.ClassName = "GlideDate";
+                        type.SysID = "a3a73875c611227800e6f970ea4c7410";
                         break;
                     case TYPE_NAME_glide_duration:
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "datetime";
-                        result.ClassName = "GlideDuration";
-                        result.SysID = "a946bf95c61122780075303f75c339c4";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "datetime";
+                        type.ClassName = "GlideDuration";
+                        type.SysID = "a946bf95c61122780075303f75c339c4";
                         break;
                     case TYPE_NAME_integer:
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "integer";
-                        result.SysID = "aab367c1bf3320001875647fcf073909";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "integer";
+                        type.SysID = "aab367c1bf3320001875647fcf073909";
                         break;
                     case "price":
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "decimal";
-                        result.ClassName = "Price";
-                        result.ScalarLength = 20;
-                        result.SysID = "fd39244f0a0a0b30009a9072cfd1b037";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "decimal";
+                        type.ClassName = "Price";
+                        type.ScalarLength = 20;
+                        type.SysID = "fd39244f0a0a0b30009a9072cfd1b037";
                         break;
                     case TYPE_NAME_reference:
-                        result.UseOriginalValue = true;
-                        result.IsVisible = true;
-                        result.ScalarType = "GUID";
-                        result.SysID = "52a227c1bf3320001875647fcf07396a";
+                        type.UseOriginalValue = true;
+                        type.IsVisible = true;
+                        type.ScalarType = "GUID";
+                        type.SysID = "52a227c1bf3320001875647fcf07396a";
                         break;
                     case TYPE_NAME_timer:
-                        result.UseOriginalValue = true;
-                        result.ScalarType = "datetime";
-                        result.ClassName = "com.glide.glideobject.GlideDuration";
-                        result.SysID = "0569687fc611227801e0338f57aa2ab4";
+                        type.UseOriginalValue = true;
+                        type.ScalarType = "datetime";
+                        type.ClassName = "com.glide.glideobject.GlideDuration";
+                        type.SysID = "0569687fc611227801e0338f57aa2ab4";
                         break;
                     default:
-                        result.ScalarType = "string";
+                        type.ScalarType = "string";
                         switch (name)
                         {
                             case "collection":
@@ -463,140 +463,140 @@ public sealed class DataLoaderService : IDisposable
                             case "user_roles":
                             case "variables":
                             case "version":
-                                result.UseOriginalValue = true;
+                                type.UseOriginalValue = true;
                                 break;
                             case "conditions":
                             case TYPE_NAME_glide_list:
                             case TYPE_NAME_journal_input:
                             case TYPE_NAME_journal_list:
                             case "user_image":
-                                result.IsVisible = true;
+                                type.IsVisible = true;
                                 break;
                             default:
-                                result.IsVisible = true;
-                                result.UseOriginalValue = true;
+                                type.IsVisible = true;
+                                type.UseOriginalValue = true;
                                 break;
                         }
                         switch (name)
                         {
                             case "collection":
-                                result.SysID = "a0e0cbd2c3203000bac1addbdfba8f59";
+                                type.SysID = "a0e0cbd2c3203000bac1addbdfba8f59";
                                 break;
                             case "documentation_field":
-                                result.ClassName = "GlideElementTranslatedField";
-                                result.ScalarLength = 80;
-                                result.SysID = "7c5689e1bfd030001875647fcf07392e";
+                                type.ClassName = "GlideElementTranslatedField";
+                                type.ScalarLength = 80;
+                                type.SysID = "7c5689e1bfd030001875647fcf07392e";
                                 break;
                             case "domain_path":
-                                result.ScalarLength = 255;
-                                result.SysID = "7b17c631c30310006e06addbdfba8fc1";
+                                type.ScalarLength = 255;
+                                type.SysID = "7b17c631c30310006e06addbdfba8fc1";
                                 break;
                             case "email":
-                                result.SysID = "bb3227aec0a80164012fb063bf06ebbf";
+                                type.SysID = "bb3227aec0a80164012fb063bf06ebbf";
                                 break;
                             case "expression":
-                                result.SysID = "0ab2b62665914510f8771b76afcd57d8";
+                                type.SysID = "0ab2b62665914510f8771b76afcd57d8";
                                 break;
                             case TYPE_NAME_GUID:
-                                result.ScalarLength = 32;
-                                result.SysID = "4f04a7c1bf3320001875647fcf07396b";
+                                type.ScalarLength = 32;
+                                type.SysID = "4f04a7c1bf3320001875647fcf07396b";
                                 break;
                             case "multi_two_lines":
-                                result.SysID = "c0ff45bfc611227a0020ea6c4111077d";
+                                type.SysID = "c0ff45bfc611227a0020ea6c4111077d";
                                 break;
                             case "ph_number":
-                                result.SysID = "4fea0202c611228e01ff351048e59ee1";
+                                type.SysID = "4fea0202c611228e01ff351048e59ee1";
                                 break;
                             case "sys_class_name":
-                                result.ClassName = "com.glide.glideobject.SysClassName";
-                                result.SysID = "0f66a28cc6112275013d0fea88ffa3f9";
+                                type.ClassName = "com.glide.glideobject.SysClassName";
+                                type.SysID = "0f66a28cc6112275013d0fea88ffa3f9";
                                 break;
                             case "sys_class_path":
-                                result.SysID = "38805f73672222008db1bcb532415a8b";
+                                type.SysID = "38805f73672222008db1bcb532415a8b";
                                 break;
                             case "translated_field":
-                                result.ClassName = "GlideElementTranslatedField";
-                                result.SysID = "c12757ecc0a8016400a0744011ed8262";
+                                type.ClassName = "GlideElementTranslatedField";
+                                type.SysID = "c12757ecc0a8016400a0744011ed8262";
                                 break;
                             case TYPE_NAME_user_input:
-                                result.ClassName = "GlideUserInput";
-                                result.SysID = "b7545d990a0a0a0a006e1f8f9d6fa835";
+                                type.ClassName = "GlideUserInput";
+                                type.SysID = "b7545d990a0a0a0a006e1f8f9d6fa835";
                                 break;
                             case "user_roles":
-                                result.ScalarLength = 255;
-                                result.SysID = "6670773ec0a80165010ede48f3caa831";
+                                type.ScalarLength = 255;
+                                type.SysID = "6670773ec0a80165010ede48f3caa831";
                                 break;
                             case "variables":
-                                result.SysID = "8c31e3c1bf3320001875647fcf0739d9";
+                                type.SysID = "8c31e3c1bf3320001875647fcf0739d9";
                                 break;
                             case "version":
-                                result.SysID = "89966d16c3321100bac14ddcddba8f2b";
+                                type.SysID = "89966d16c3321100bac14ddcddba8f2b";
                                 break;
                             case "conditions":
-                                result.ScalarLength = 4000;
-                                result.SysID = "4ab756cec611229b006b4082e623d8ac";
+                                type.ScalarLength = 4000;
+                                type.SysID = "4ab756cec611229b006b4082e623d8ac";
                                 break;
                             case TYPE_NAME_glide_list:
-                                result.ClassName = "GlideList";
-                                result.ScalarLength = 1024;
-                                result.SysID = "e3f24e9cc0a80166007d6acccef476e9";
+                                type.ClassName = "GlideList";
+                                type.ScalarLength = 1024;
+                                type.SysID = "e3f24e9cc0a80166007d6acccef476e9";
                                 break;
                             case TYPE_NAME_journal_input:
-                                result.ClassName = "Journal";
-                                result.SysID = "50b082d6c61122760136e69d0e2852de";
+                                type.ClassName = "Journal";
+                                type.SysID = "50b082d6c61122760136e69d0e2852de";
                                 break;
                             case TYPE_NAME_journal_list:
-                                result.ClassName = "Journal";
-                                result.SysID = "50b0a5e3c6112276017eea10c160a249";
+                                type.ClassName = "Journal";
+                                type.SysID = "50b0a5e3c6112276017eea10c160a249";
                                 break;
                             case "user_image":
-                                result.ClassName = "UserImage";
-                                result.SysID = "e5760b18c611228100a4effee22075fa";
+                                type.ClassName = "UserImage";
+                                type.SysID = "e5760b18c611228100a4effee22075fa";
                                 break;
                             case "choice":
-                                result.SysID = "5217a7c1bf3320001875647fcf0739b7";
+                                type.SysID = "5217a7c1bf3320001875647fcf0739b7";
                                 break;
                             case "field_name":
-                                result.ScalarLength = 80;
-                                result.SysID = "4df9be04c0a8016401a50976ae00ed2e";
+                                type.ScalarLength = 80;
+                                type.SysID = "4df9be04c0a8016401a50976ae00ed2e";
                                 break;
                             case TYPE_NAME_journal:
-                                result.ClassName = "Journal";
-                                result.SysID = "ee0f99bea9fe5f6201e4186985822523";
+                                type.ClassName = "Journal";
+                                type.SysID = "ee0f99bea9fe5f6201e4186985822523";
                                 break;
                             case "password":
-                                result.ClassName = "Password";
-                                result.SysID = "3393a388c61122770033c78ba16d3fcd";
+                                type.ClassName = "Password";
+                                type.SysID = "3393a388c61122770033c78ba16d3fcd";
                                 break;
                             case "script":
-                                result.ScalarLength = 4000;
-                                result.SysID = "4ab7aca2c611229b00e53ca27ac105d9";
+                                type.ScalarLength = 4000;
+                                type.SysID = "4ab7aca2c611229b00e53ca27ac105d9";
                                 break;
                             case "table_name":
-                                result.ScalarLength = 80;
-                                result.SysID = "e0baa043c0a8016501553d18374ae67a";
+                                type.ScalarLength = 80;
+                                type.SysID = "e0baa043c0a8016501553d18374ae67a";
                                 break;
                             case "translated_text":
-                                result.SysID = "e62dabc1bf3320001875647fcf073967";
+                                type.SysID = "e62dabc1bf3320001875647fcf073967";
                                 break;
                             case "workflow":
-                                result.ScalarLength = 80;
-                                result.SysID = "deb943ec7f00000101aea727f742df58";
+                                type.ScalarLength = 80;
+                                type.SysID = "deb943ec7f00000101aea727f742df58";
                                 break;
                             default:
-                                result.SysID = "747127c1bf3320001875647fcf0739e0";
+                                type.SysID = "747127c1bf3320001875647fcf0739e0";
                                 break;
                         }
                         break;
                 }
             }
-            await _dbContext.Types.AddAsync(result, cancellationToken);
+            await _dbContext.Types.AddAsync(type, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
-        return result;
+        return type;
     }
 
-    private async Task<TableInfo?> FromTableRefAsync(RecordRef? tableRef, CancellationToken cancellationToken)
+    private async Task<Table?> FromTableRefAsync(RecordRef? tableRef, CancellationToken cancellationToken)
     {
         if (tableRef is null)
             return null;
@@ -613,14 +613,14 @@ public sealed class DataLoaderService : IDisposable
         return tableInfo;
     }
 
-    private async Task<SysPackage?> FromPackageRefAsync(RecordRef? pkgRef, SourceInfo source, CancellationToken cancellationToken)
+    private async Task<Package?> FromPackageRefAsync(RecordRef? pkgRef, SncSource source, CancellationToken cancellationToken)
     {
         if (pkgRef is null)
             return null;
         if (_packageIdMap.TryGetValue(pkgRef.Value, out string? name))
             return await _dbContext!.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
         name = pkgRef.DisplayValue;
-        SysPackage? package = await _dbContext!.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
+        Package? package = await _dbContext!.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
         if (package is null)
         {
             package = new()
@@ -637,18 +637,18 @@ public sealed class DataLoaderService : IDisposable
         return package;
     }
 
-    private async Task<SysScope?> FromScopeRefAsync(RecordRef? scopeRef, SourceInfo source, CancellationToken cancellationToken)
+    private async Task<Scope?> FromScopeRefAsync(RecordRef? scopeRef, SncSource source, CancellationToken cancellationToken)
     {
         if (scopeRef is null)
             return null;
         if (_scopeIdMap.TryGetValue(scopeRef.Value, out string? value))
             return await _dbContext!.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken);
-        var scope = await _tableAPIService.GetScopeByIDAsync(scopeRef.Value, cancellationToken);
-        SysScope? result;
-        if (scope is null)
+        var scopeRecord = await _tableAPIService.GetScopeByIDAsync(scopeRef.Value, cancellationToken);
+        Scope? scope;
+        if (scopeRecord is null)
         {
             value = scopeRef.DisplayValue;
-            result = new()
+            scope = new()
             {
                 Name = value,
                 Value = value,
@@ -656,29 +656,29 @@ public sealed class DataLoaderService : IDisposable
                 SysID = scopeRef.Value,
                 Source = source
             };
-            await _dbContext!.Scopes.AddAsync(result, cancellationToken);
+            await _dbContext!.Scopes.AddAsync(scope, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
         else
         {
-            value = scope.Value;
-            if ((result = await _dbContext!.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken)) is null)
+            value = scopeRecord.Value;
+            if ((scope = await _dbContext!.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken)) is null)
             {
-                result = new()
+                scope = new()
                 {
-                    Name = scope.Name,
+                    Name = scopeRecord.Name,
                     Value = value,
                     LastUpdated = DateTime.Now,
-                    SysID = scope.SysID,
+                    SysID = scopeRecord.SysID,
                     Source = source,
-                    ShortDescription = scope.ShortDescription
+                    ShortDescription = scopeRecord.ShortDescription
                 };
-                await _dbContext!.Scopes.AddAsync(result, cancellationToken);
+                await _dbContext!.Scopes.AddAsync(scope, cancellationToken);
                 await _dbContext.SaveChangesAsync(cancellationToken);
             }
         }
         _scopeIdMap.Add(scopeRef.Value, value);
-        return result;
+        return scope;
     }
 
     /// <summary>
@@ -686,20 +686,20 @@ public sealed class DataLoaderService : IDisposable
     /// </summary>
     /// <param name="name">The name of the table.</param>
     /// <param name="cancellationToken">The token to observe.</param>
-    /// <returns>The <see cref="TableInfo"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no table was found in the database or in the remote ServiceNow instance.</returns>
-    internal async Task<TableInfo?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
+    /// <returns>The <see cref="Table"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no table was found in the database or in the remote ServiceNow instance.</returns>
+    internal async Task<Table?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_dbContext is null)
             throw new ObjectDisposedException(nameof(DataLoaderService));
-        TableInfo? tableInfo = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        if (tableInfo is null)
+        Table? table = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
+        if (table is null)
         {
             var response = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
             if (response is not null)
-                tableInfo = await AddTableAsync(response, cancellationToken);
+                table = await AddTableAsync(response, cancellationToken);
         }
-        return tableInfo;
+        return table;
     }
 
     public DataLoaderService(TypingsDbContext dbContext, TableAPIService tableAPIService, ILogger<DataLoaderService> logger)

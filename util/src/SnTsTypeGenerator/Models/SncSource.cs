@@ -7,7 +7,7 @@ using System.Text.Json.Nodes;
 namespace SnTsTypeGenerator.Models;
 
 [Table(nameof(Services.TypingsDbContext.Sources))]
-public class SourceInfo : IEquatable<SourceInfo>
+public class SncSource : IEquatable<SncSource>
 {
     private string _fqdn = string.Empty;
 
@@ -51,37 +51,37 @@ public class SourceInfo : IEquatable<SourceInfo>
     [BackingField(nameof(_types))]
     public virtual HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
 
-    private HashSet<TableInfo> _tables = new();
+    private HashSet<Table> _tables = new();
 
     [NotNull]
     [BackingField(nameof(_tables))]
-    public virtual HashSet<TableInfo> Tables { get => _tables; set => _tables = value ?? new(); }
+    public virtual HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
 
-    private HashSet<ElementInfo> _elements = new();
+    private HashSet<Element> _elements = new();
 
     [NotNull]
     [BackingField(nameof(_elements))]
-    public virtual HashSet<ElementInfo> Elements { get => _elements; set => _elements = value ?? new(); }
+    public virtual HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
 
-    private HashSet<SysScope> _scopes = new();
+    private HashSet<Scope> _scopes = new();
 
     [NotNull]
     [BackingField(nameof(_scopes))]
-    public virtual HashSet<SysScope> Scopes { get => _scopes; set => _scopes = value ?? new(); }
+    public virtual HashSet<Scope> Scopes { get => _scopes; set => _scopes = value ?? new(); }
 
-    private HashSet<SysPackage> _packages = new();
+    private HashSet<Package> _packages = new();
 
     [NotNull]
     [BackingField(nameof(_packages))]
-    public virtual HashSet<SysPackage> Packages { get => _packages; set => _packages = value ?? new(); }
+    public virtual HashSet<Package> Packages { get => _packages; set => _packages = value ?? new(); }
 
-    public bool Equals(SourceInfo? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_fqdn, other._fqdn));
+    public bool Equals(SncSource? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_fqdn, other._fqdn));
 
-    public override bool Equals(object? obj) => Equals(obj as ElementInfo);
+    public override bool Equals(object? obj) => Equals(obj as Element);
 
     public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_fqdn);
 
-    public override string ToString() => nameof(SourceInfo) + new JsonObject()
+    public override string ToString() => nameof(SncSource) + new JsonObject()
     {
         { nameof(FQDN), JsonValue.Create(_fqdn) },
         { nameof(Label), JsonValue.Create(_label) },
