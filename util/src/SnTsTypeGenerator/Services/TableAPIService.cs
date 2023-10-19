@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
-using SnTsTypeGenerator.Models.TableAPI;
+using SnTsTypeGenerator.Models;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Services;
@@ -23,7 +23,7 @@ public sealed class TableAPIService
     /// </summary>
     internal bool InitSuccessful => _handler?.InitSuccessful ?? false;
 
-    private Table? GetTableFromResponse(Uri requestUri, JsonNode? jsonNode, bool expectArray)
+    private TableRecord? GetTableFromResponse(Uri requestUri, JsonNode? jsonNode, bool expectArray)
     {
         if (jsonNode is not JsonObject resultObj)
             throw new InvalidHttpResponseException(requestUri, jsonNode);
@@ -79,8 +79,8 @@ public sealed class TableAPIService
     /// </summary>
     /// <param name="name">The name of the table.</param>
     /// <param name="cancellationToken">The token to observe.</param>
-    /// <returns>The <see cref="Table"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no table was found in the remote ServiceNow instance.</returns>
-    internal async Task<Table?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
+    /// <returns>The <see cref="TableRecord"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no table was found in the remote ServiceNow instance.</returns>
+    internal async Task<TableRecord?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
@@ -97,8 +97,8 @@ public sealed class TableAPIService
     /// </summary>
     /// <param name="sys_id">The Sys ID of the table.</param>
     /// <param name="cancellationToken">The token to observe.</param>
-    /// <returns>The <see cref="Table"/> record that matches the specified <paramref name="sys_id"/> or <see langword="null" /> if no table was found in the remote ServiceNow instance.</returns>
-    internal async Task<Table?> GetTableByIdAsync(string sys_id, CancellationToken cancellationToken)
+    /// <returns>The <see cref="TableRecord"/> record that matches the specified <paramref name="sys_id"/> or <see langword="null" /> if no table was found in the remote ServiceNow instance.</returns>
+    internal async Task<TableRecord?> GetTableByIdAsync(string sys_id, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
@@ -115,8 +115,8 @@ public sealed class TableAPIService
     /// </summary>
     /// <param name="tableName">The name of the table.</param>
     /// <param name="cancellationToken">The token to observe.</param>
-    /// <returns>The <see cref="Element"/> records that match the specified <paramref name="tableName"/>.</returns>
-    public async Task<Element[]> GetElementsByTableNameAsync(string tableName, CancellationToken cancellationToken)
+    /// <returns>The <see cref="ElementRecord"/> records that match the specified <paramref name="tableName"/>.</returns>
+    public async Task<ElementRecord[]> GetElementsByTableNameAsync(string tableName, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
@@ -132,7 +132,7 @@ public sealed class TableAPIService
         if (jsonNode is not JsonArray arr)
             throw new InvalidResponseTypeException(requestUri, resultObj);
         if (arr.Count == 0)
-            return Array.Empty<Element>();
+            return Array.Empty<ElementRecord>();
         return arr.Select((node, index) =>
         {
             if (node is not JsonObject sysDictionary)
@@ -142,7 +142,7 @@ public sealed class TableAPIService
                 if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
                     _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_SYS_ID, index, sysDictionary);
                 else
-                    return new Element(name, sysDictionary.GetFieldAsNonEmpty(JSON_KEY_COLUMN_LABEL, name), sys_id, RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_REFERENCE), sysDictionary.GetFieldAsBoolean(JSON_KEY_READ_ONLY),
+                    return new ElementRecord(name, sysDictionary.GetFieldAsNonEmpty(JSON_KEY_COLUMN_LABEL, name), sys_id, RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_REFERENCE), sysDictionary.GetFieldAsBoolean(JSON_KEY_READ_ONLY),
                         sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new RecordRef(type, displayValue ?? type) : null, sysDictionary.GetFieldAsIntOrNull(JSON_KEY_MAX_LENGTH),
                         sysDictionary.GetFieldAsBoolean(JSON_KEY_ACTIVE), sysDictionary.GetFieldAsBoolean(JSON_KEY_UNIQUE), sysDictionary.GetFieldAsBoolean(JSON_KEY_PRIMARY), sysDictionary.GetFieldAsBoolean(JSON_KEY_VIRTUAL),
                         sysDictionary.GetFieldAsIntOrNull(JSON_KEY_SIZECLASS), sysDictionary.GetFieldAsBoolean(JSON_KEY_MANDATORY), sysDictionary.GetFieldAsBoolean(JSON_KEY_ARRAY), sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_COMMENTS),
@@ -157,8 +157,8 @@ public sealed class TableAPIService
     /// </summary>
     /// <param name="id">The unique identifier of the scope record.</param>
     /// <param name="cancellationToken">The token to observe.</param>
-    /// <returns>The <see cref="Scope"/> record that matches the specified <paramref name="id"/> or <see langword="null" /> if no scope was found in the remote ServiceNow instance.</returns>
-    internal async Task<Scope?> GetScopeByIDAsync(string id, CancellationToken cancellationToken)
+    /// <returns>The <see cref="ScopeRecord"/> record that matches the specified <paramref name="id"/> or <see langword="null" /> if no scope was found in the remote ServiceNow instance.</returns>
+    internal async Task<ScopeRecord?> GetScopeByIDAsync(string id, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)

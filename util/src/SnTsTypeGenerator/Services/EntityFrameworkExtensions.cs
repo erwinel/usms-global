@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
 using SnTsTypeGenerator.Models;
-using SnTsTypeGenerator.Models.TableAPI;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Services;
@@ -167,7 +166,7 @@ public static class EntityFrameworkExtensions
             NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && x.PackageName.NoCaseEquals(y.PackageName));
     }
 
-    public static bool IsIdenticalTo(this Element x, ElementInfo y)
+    public static bool IsIdenticalTo(this ElementRecord x, ElementInfo y)
     {
         if (ReferenceEquals(x, y))
             return true;
@@ -304,7 +303,7 @@ public static class EntityFrameworkExtensions
         elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
 
-    public static bool ExtendsBaseRecord(this IEnumerable<Element> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.Type?.Value == TYPE_NAME_GUID) &&
+    public static bool ExtendsBaseRecord(this IEnumerable<ElementRecord> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.Type?.Value == TYPE_NAME_GUID) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.Type?.Value == TYPE_NAME_string) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.Type?.Value == TYPE_NAME_glide_date_time) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.Type?.Value == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.Type?.Value == TYPE_NAME_string) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.Type?.Value == TYPE_NAME_glide_date_time);

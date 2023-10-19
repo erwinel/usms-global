@@ -2,7 +2,7 @@ using System.Text.Json.Nodes;
 using SnTsTypeGenerator.Services;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
-namespace SnTsTypeGenerator.Models.TableAPI;
+namespace SnTsTypeGenerator.Models;
 
 /// <summary>
 /// Deserialized record reference.

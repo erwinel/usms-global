@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SnTsTypeGenerator.Models;
-using SnTsTypeGenerator.Models.TableAPI;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Services;
@@ -70,7 +69,7 @@ public sealed class DataLoaderService : IDisposable
                 AccessibleFrom: string.Empty,
                 ExtensionModel: null,
                 SourceFqdn: sourceFqdn), cancellationToken);
-            _ = await AddElementsAsync(new Element[] {
+            _ = await AddElementsAsync(new ElementRecord[] {
                 new(
                     Name: JSON_KEY_SYS_ID,
                     Label: "Sys ID",
@@ -196,14 +195,14 @@ public sealed class DataLoaderService : IDisposable
         return tableInfo;
     }
 
-    private async Task<ElementInfo[]> AddElementsAsync(IEnumerable<Element> elements, TableInfo table, CancellationToken cancellationToken)
+    private async Task<ElementInfo[]> AddElementsAsync(IEnumerable<ElementRecord> elements, TableInfo table, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (!elements.Any())
             return Array.Empty<ElementInfo>();
         var source = (await table.GetReferencedEntityAsync(_dbContext!.Tables, t => t.Source, cancellationToken))!;
         _logger.LogAddingElementsToDatabase(table.Name);
-        var items = elements.Select<Element, (ElementInfo Element, RecordRef? Package, RecordRef? Reference, RecordRef? Type, string SourceFqdn)>(e => (new ElementInfo()
+        var items = elements.Select<ElementRecord, (ElementInfo Element, RecordRef? Package, RecordRef? Reference, RecordRef? Type, string SourceFqdn)>(e => (new ElementInfo()
         {
             Name = e.Name,
             Comments = e.Comments,
@@ -260,7 +259,7 @@ public sealed class DataLoaderService : IDisposable
         return result;
     }
 
-    private async Task<TableInfo> AddTableAsync(Table table, CancellationToken cancellationToken)
+    private async Task<TableInfo> AddTableAsync(TableRecord table, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         SourceInfo source = await GetSourceAsync(table.SourceFqdn, cancellationToken);

@@ -1,4 +1,4 @@
-namespace SnTsTypeGenerator.Models.TableAPI;
+namespace SnTsTypeGenerator.Models;
 
 /// <summary>
 /// Deserialized <c>sys_glide_object</c> record from ServiceNow instance.
