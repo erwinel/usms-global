@@ -130,6 +130,8 @@ public static partial class StringExtensionMethods
 
     public static string AsNonEmpty(this string? value, string defaultValue) => string.IsNullOrWhiteSpace(value) ? defaultValue : value;
 
+    public static string? NullIfWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
+
     private static readonly ImmutableArray<string> JSDOC_START = new string[] { "/**" }.ToImmutableArray();
 
     private static readonly ImmutableArray<string> JSDOC_END = new string[] { " */" }.ToImmutableArray();
