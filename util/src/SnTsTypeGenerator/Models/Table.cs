@@ -119,7 +119,7 @@ public class Table : IEquatable<Table>
     /// </summary>
     public Package? Package
     {
-        get { lock(_syncroot) { return _package }; }
+        get { lock(_syncRoot) { return _package; } }
         set
         {
             lock (_syncRoot)
@@ -174,7 +174,7 @@ public class Table : IEquatable<Table>
     /// </summary>
     public Scope? Scope
     {
-        get { lock(_syncroot) { return _scope }; }
+        get { lock(_syncRoot) { return _scope; } }
         set
         {
             lock (_syncRoot)
@@ -230,7 +230,7 @@ public class Table : IEquatable<Table>
     /// </summary>
     public Table? SuperClass
     {
-        get { lock(_syncroot) { return _superClass }; }
+        get { lock(_syncRoot) { return _superClass; } }
         set
         {
             lock (_syncRoot)
@@ -275,7 +275,7 @@ public class Table : IEquatable<Table>
     /// </summary>
     public SncSource? Source
     {
-        get { lock(_syncroot) { return _source }; }
+        get { lock(_syncRoot) { return _source; } }
         set
         {
             lock (_syncRoot)
