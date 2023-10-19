@@ -81,28 +81,28 @@ public sealed class MainWorkerService : BackgroundService
             writeValueSwitch(SHORTHAND_r, "url",
                 "The base URL of the source ServiceNow instance, which should not include any path, query or fragment.",
                 "If this is not specified, you will be prompted for the URL.");
-             
+
             writeValueSwitch(SHORTHAND_u, "user_name",
                 "The account name to use as account credentials on the source ServiceNow instance.",
                 "If this is not specified, you will be prompted for the user name.");
-                
+
             writeValueSwitch(SHORTHAND_p, "*password*",
                 "The password to use as account credentials on on the source ServiceNow instance.",
                 "If this is not specified, you will be prompted for the password");
-                
+
             writeValueSwitch(SHORTHAND_x, "*secret*",
                 "The Client Secrent from the Application Registry entry in the target ServiceNow instance.",
                 "If this is not specified, and the Client ID is specified in the application settings, you will be prompted for the client secret");
-                
+
             writeValueSwitch(SHORTHAND_o, "filename",
                 "The file output path, relative to the current working directory. This defaults to a file named \"types.d.ts\".",
                 "If the file extension is omitted, it will have the default extension of \".d.ts\".");
-                
+
             static void writeBooleanSwitch(char switchChar, string desription, params string[] additionalDesc)
             {
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine();
-                Console.Write($"-{switchChar}");
+                Console.WriteLine($"-{switchChar}");
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(desription);
                 if (additionalDesc is not null)
@@ -115,19 +115,20 @@ public sealed class MainWorkerService : BackgroundService
 
             writeValueSwitch(SHORTHAND_d, "filename",
                 "Specifies the database file, relative to the current working directory. This defaults to a file named \"Typings.db\" in the same subdirectory as the application executable.");
-                
+
             writeBooleanSwitch(SHORTHAND_b, "Includes the \"$$GlideElement.Reference<TFields, TRecord>\" type definition and the \"$$tableFields.IBaseRecord\" interface in the output.");
 
             writeBooleanSwitch(SHORTHAND_i, "Includes the parent type definitions and type definitions referenced by elements, which are not explicitly included in the -{SHORTHAND_t} command line argument or {nameof(SnTsTypeGenerator)}:{nameof(AppSettings.Tables)} setting.");
 
             Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine();
             Console.WriteLine(SHORTHAND__3F_);
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\tor");
+            Console.WriteLine("  or");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(SHORTHAND_h);
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\tor");
+            Console.WriteLine("  or");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"--{nameof(AppSettings.Help)}");
             Console.ForegroundColor = ConsoleColor.Yellow;
