@@ -174,7 +174,7 @@ public static class EntityFrameworkExtensions
         return ReferenceEquals(x, y) || (x.IsActive == y.IsActive && x.IsArray == y.IsArray && x.IsCalculated == y.IsCalculated && x.IsDisplay == y.IsDisplay && x.IsMandatory == y.IsMandatory &&
             x.IsPrimary == y.IsPrimary && x.IsReadOnly == y.IsReadOnly && x.IsUnique == y.IsUnique && (x.MaxLength.HasValue ? y.MaxLength.HasValue && x.MaxLength.Value == y.MaxLength.Value : !y.MaxLength.HasValue) &&
             (x.SizeClass.HasValue ? y.SizeClass.HasValue && x.SizeClass.Value == y.SizeClass.Value : !y.MaxLength.HasValue) && NameComparer.Equals(x.SysID, y.SysID) && NameComparer.Equals(x.Name, y.Name) &&
-            NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && (x.Package?.Name).NoCaseEquals(y.PackageName));
+            NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && (x.Package?.DisplayValue).NoCaseEquals(y.PackageName));
     }
 
     internal static async Task<IEnumerable<ElementInheritance>> GetAllElementInheritancesAsync(this EntityEntry<TableInfo> entity, CancellationToken cancellationToken)
@@ -304,10 +304,10 @@ public static class EntityFrameworkExtensions
         elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
 
-    public static bool ExtendsBaseRecord(this IEnumerable<Element> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.Type?.Name == TYPE_NAME_GUID) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.Type?.Name == TYPE_NAME_string) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.Type?.Name == TYPE_NAME_glide_date_time) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.Type?.Name == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.Type?.Name == TYPE_NAME_string) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.Type?.Name == TYPE_NAME_glide_date_time);
+    public static bool ExtendsBaseRecord(this IEnumerable<Element> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.Type?.Value == TYPE_NAME_GUID) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.Type?.Value == TYPE_NAME_string) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.Type?.Value == TYPE_NAME_glide_date_time) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.Type?.Value == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.Type?.Value == TYPE_NAME_string) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.Type?.Value == TYPE_NAME_glide_date_time);
 
     public static bool IsGlobalScope(this TableInfo table) => string.IsNullOrWhiteSpace(table.ScopeValue) || NameComparer.Equals(table.ScopeValue, GLOBAL_NAMESPACE);
 

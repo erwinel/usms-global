@@ -23,12 +23,6 @@ public sealed class TableAPIService
     /// </summary>
     internal bool InitSuccessful => _handler?.InitSuccessful ?? false;
 
-    private static RecordRef? DeserializeReference(JsonObject resultObj) => (resultObj.TryGetPropertyValue(JSON_KEY_SYS_PACKAGE, out JsonNode? jsonNode) && jsonNode is JsonObject packageFieldElement &&
-        packageFieldElement.TryGetPropertyAsNonEmpty(JSON_KEY_DISPLAY_VALUE, out string? pkgName)) ? new(pkgName, packageFieldElement.GetPropertyAsNonEmpty(JSON_KEY_VALUE)) : null;
-
-    private static RecordRef? GetTable(JsonObject resultObj, string propertyName) => resultObj.TryGetFieldAsNonEmpty(propertyName, out string? super_class, out string? label) ?
-        new(label.AsNonEmpty(super_class), super_class) : null;
-
     private Table? GetTableFromResponse(Uri requestUri, JsonNode? jsonNode, bool expectArray)
     {
         if (jsonNode is not JsonObject resultObj)
@@ -67,9 +61,17 @@ public sealed class TableAPIService
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_NAME, out string? name))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_NAME);
-        return new(name, resultObj.GetFieldAsNonEmpty(JSON_KEY_LABEL, name), sys_id, resultObj.GetFieldAsBoolean(JSON_KEY_IS_EXTENDABLE),
-            (resultObj.TryGetPropertyValue(JSON_KEY_NUMBER_REF, out jsonNode) && jsonNode is JsonObject obj) ? obj.CoercePropertyAsNonEmptyOrNull(JSON_KEY_DISPLAY_VALUE) : null,
-            DeserializeReference(resultObj), DeserializeReference(resultObj), global::SnTsTypeGenerator.Services.TableAPIService.GetTable(resultObj, JSON_KEY_SUPER_CLASS), resultObj.GetFieldAsNonEmpty(JSON_KEY_ACCESS), resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_EXTENSION_MODEL), requestUri.Host);
+        return new(Name: name,
+                   Label: resultObj.GetFieldAsNonEmpty(JSON_KEY_LABEL, name),
+                   SysID: sys_id,
+                   IsExtendable: resultObj.GetFieldAsBoolean(JSON_KEY_IS_EXTENDABLE),
+                   NumberPrefix: resultObj.GetProperty<JsonObject>(JSON_KEY_NUMBER_REF)?.CoercePropertyAsNonEmptyOrNull(JSON_KEY_DISPLAY_VALUE),
+                   Package: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_PACKAGE),
+                   Scope: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_SCOPE),
+                   SuperClass: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SUPER_CLASS),
+                   AccessibleFrom: resultObj.GetFieldAsNonEmpty(JSON_KEY_ACCESS),
+                   ExtensionModel: resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_EXTENSION_MODEL),
+                   SourceFqdn: requestUri.Host);
     }
 
     /// <summary>
@@ -135,16 +137,17 @@ public sealed class TableAPIService
         {
             if (node is not JsonObject sysDictionary)
                 _logger.LogInvalidResultElementType(requestUri, node, index);
-            else if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_ELEMENT, out string? name))
-                _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_ELEMENT, index, sysDictionary);
-            else if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-                _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_SYS_ID, index, sysDictionary);
-            else
-                return new Element(name, sysDictionary.GetFieldAsNonEmpty(JSON_KEY_COLUMN_LABEL, name), sys_id, GetTable(sysDictionary, JSON_KEY_REFERENCE), sysDictionary.GetFieldAsBoolean(JSON_KEY_READ_ONLY),
-                    sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new RecordRef(type, displayValue ?? type) : null, sysDictionary.GetFieldAsIntOrNull(JSON_KEY_MAX_LENGTH),
-                    sysDictionary.GetFieldAsBoolean(JSON_KEY_ACTIVE), sysDictionary.GetFieldAsBoolean(JSON_KEY_UNIQUE), sysDictionary.GetFieldAsBoolean(JSON_KEY_PRIMARY), sysDictionary.GetFieldAsBoolean(JSON_KEY_VIRTUAL),
-                    sysDictionary.GetFieldAsIntOrNull(JSON_KEY_SIZECLASS), sysDictionary.GetFieldAsBoolean(JSON_KEY_MANDATORY), sysDictionary.GetFieldAsBoolean(JSON_KEY_ARRAY), sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_COMMENTS),
-                    sysDictionary.GetFieldAsBoolean(JSON_KEY_DISPLAY), sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_DEFAULT_VALUE), DeserializeReference(sysDictionary), requestUri.Host);
+            else if (sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_ELEMENT, out string? name))
+            {
+                if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
+                    _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_SYS_ID, index, sysDictionary);
+                else
+                    return new Element(name, sysDictionary.GetFieldAsNonEmpty(JSON_KEY_COLUMN_LABEL, name), sys_id, RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_REFERENCE), sysDictionary.GetFieldAsBoolean(JSON_KEY_READ_ONLY),
+                        sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_INTERNAL_TYPE, out string? type, out string? displayValue) ? new RecordRef(type, displayValue ?? type) : null, sysDictionary.GetFieldAsIntOrNull(JSON_KEY_MAX_LENGTH),
+                        sysDictionary.GetFieldAsBoolean(JSON_KEY_ACTIVE), sysDictionary.GetFieldAsBoolean(JSON_KEY_UNIQUE), sysDictionary.GetFieldAsBoolean(JSON_KEY_PRIMARY), sysDictionary.GetFieldAsBoolean(JSON_KEY_VIRTUAL),
+                        sysDictionary.GetFieldAsIntOrNull(JSON_KEY_SIZECLASS), sysDictionary.GetFieldAsBoolean(JSON_KEY_MANDATORY), sysDictionary.GetFieldAsBoolean(JSON_KEY_ARRAY), sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_COMMENTS),
+                        sysDictionary.GetFieldAsBoolean(JSON_KEY_DISPLAY), sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_DEFAULT_VALUE), RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_SYS_PACKAGE), requestUri.Host);
+            }
             return null!;
         }).Where(n => n is not null).ToArray();
     }
@@ -183,7 +186,12 @@ public sealed class TableAPIService
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SCOPE);
-        return new(sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value), value, sysScopeResult.GetFieldAsNonEmptyOrNull(JSON_KEY_SHORT_DESCRIPTION), sys_id, requestUri.Host);
+        return new(
+            Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
+            Value: value,
+            ShortDescription: sysScopeResult.GetFieldAsNonEmptyOrNull(JSON_KEY_SHORT_DESCRIPTION),
+            SysID: sys_id,
+            SourceFqdn: requestUri.Host);
     }
 
     /// <summary>
@@ -221,8 +229,17 @@ public sealed class TableAPIService
         resultObj = (JsonObject)jsonNode;
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
-        return new(name, resultObj.GetFieldAsNonEmpty(JSON_KEY_LABEL, name), sys_id, resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_SCALAR_TYPE), resultObj.GetFieldAsIntOrNull(JSON_KEY_SCALAR_LENGTH), resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_CLASS_NAME),
-            resultObj.GetFieldAsBoolean(JSON_KEY_USE_ORIGINAL_VALUE), resultObj.GetFieldAsBoolean(JSON_KEY_VISIBLE), DeserializeReference(resultObj), DeserializeReference(resultObj), requestUri.Host);
+        return new(Name: name,
+            Label: resultObj.GetFieldAsNonEmpty(JSON_KEY_LABEL, name),
+            SysID: sys_id,
+            ScalarType: resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_SCALAR_TYPE),
+            ScalarLength: resultObj.GetFieldAsIntOrNull(JSON_KEY_SCALAR_LENGTH),
+            ClassName: resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_CLASS_NAME),
+            UseOriginalValue: resultObj.GetFieldAsBoolean(JSON_KEY_USE_ORIGINAL_VALUE),
+            IsVisible: resultObj.GetFieldAsBoolean(JSON_KEY_VISIBLE),
+            Package: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_PACKAGE),
+            Scope: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_SCOPE),
+            SourceFqdn: requestUri.Host);
     }
 
     public TableAPIService(SnClientHandlerService handler, ILogger<TableAPIService> logger)
