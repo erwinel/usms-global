@@ -368,7 +368,7 @@ public partial class TypingsDbContext : DbContext
             })
             .Entity<Element>(builder =>
             {
-                _ = builder.HasKey(nameof(Element.Name));
+                _ = builder.HasKey(nameof(Element.Name), nameof(Element.TableName));
                 _ = builder.HasIndex(t => t.SysID).IsUnique();
                 _ = builder.Property(nameof(Element.Name)).UseCollation(COLLATION_NOCASE);
                 _ = builder.Property(nameof(Element.Label)).UseCollation(COLLATION_NOCASE);
