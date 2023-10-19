@@ -27,8 +27,8 @@
 
   // Use 'postCreateCommand' to run commands after the container is created.
   "postStartCommand": [
-    "npm install",
     "git submodule update --init --recursive",
+    "npm install",
     "dotnet restore util/src",
     "cd types/snc; git checkout master"
   ]
