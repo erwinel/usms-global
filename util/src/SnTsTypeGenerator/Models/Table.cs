@@ -86,7 +86,7 @@ public class Table : IEquatable<Table>
     [BackingField(nameof(_packageName))]
     public string? PackageName
     {
-        get => _package?.Name ?? _packageName;
+        get { lock (_syncRoot) { return _package?.Name ?? _packageName; } }
         set
         {
             lock (_syncRoot)
@@ -119,7 +119,7 @@ public class Table : IEquatable<Table>
     /// </summary>
     public Package? Package
     {
-        get => _package;
+        get { lock(_syncroot) { return _package }; }
         set
         {
             lock (_syncRoot)
@@ -141,7 +141,7 @@ public class Table : IEquatable<Table>
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue
     {
-        get => _scope?.Value ?? _scopeValue;
+        get { lock (_syncRoot) { return _scope?.Name ?? _scopeValue; } }
         set
         {
             lock (_syncRoot)
@@ -174,7 +174,7 @@ public class Table : IEquatable<Table>
     /// </summary>
     public Scope? Scope
     {
-        get => _scope;
+        get { lock(_syncroot) { return _scope }; }
         set
         {
             lock (_syncRoot)
@@ -196,7 +196,7 @@ public class Table : IEquatable<Table>
     [BackingField(nameof(_superClassName))]
     public string? SuperClassName
     {
-        get => _superClass?.Name ?? _superClassName;
+        get { lock (_syncRoot) { return _superClass?.Name ?? _superClassName; } }
         set
         {
             lock (_syncRoot)
@@ -230,7 +230,7 @@ public class Table : IEquatable<Table>
     /// </summary>
     public Table? SuperClass
     {
-        get => _superClass;
+        get { lock(_syncroot) { return _superClass }; }
         set
         {
             lock (_syncRoot)
@@ -252,7 +252,7 @@ public class Table : IEquatable<Table>
     [BackingField(nameof(_sourceFqdn))]
     public string SourceFqdn
     {
-        get => _source?.FQDN ?? _sourceFqdn;
+        get { lock (_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
         set
         {
             if (value is null)
@@ -275,7 +275,7 @@ public class Table : IEquatable<Table>
     /// </summary>
     public SncSource? Source
     {
-        get => _source;
+        get { lock(_syncroot) { return _source }; }
         set
         {
             lock (_syncRoot)
@@ -357,5 +357,4 @@ public class Table : IEquatable<Table>
         { nameof(Source), JsonValue.Create(_sourceFqdn) },
         { nameof(SysID), JsonValue.Create(_sysID) }
     }.ToJsonString();
-
 }
