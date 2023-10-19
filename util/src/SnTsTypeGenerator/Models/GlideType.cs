@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
+using static SnTsTypeGenerator.Models.EntityAccessors;
 
 namespace SnTsTypeGenerator.Models;
 
@@ -10,7 +12,7 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Field class" (<see cref="SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Types))]
-public class GlideType : IEquatable<GlideType>
+public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
 {
     private readonly object _syncRoot = new();
 
@@ -40,20 +42,24 @@ public class GlideType : IEquatable<GlideType>
         set => _label = value ?? string.Empty;
     }
 
+    private string? _scalarType;
     /// <summary>
     /// Value of the "Extends" (<see cref="SnApiConstants.JSON_KEY_SCALAR_TYPE" />) column.
     /// </summary>
-    public string? ScalarType { get; set; }
+    [BackingField(nameof(_scalarType))]
+    public string? ScalarType { get => _scalarType; set => _scalarType = value.NullIfWhiteSpace(); }
 
     /// <summary>
     /// Value of the "Length" (<see cref="SnApiConstants.JSON_KEY_SCALAR_LENGTH" />) column.
     /// </summary>
     public int? ScalarLength { get; set; }
 
+    private string? _className;
     /// <summary>
     /// Value of the "Class name" (<see cref="SnApiConstants.JSON_KEY_CLASS_NAME" />) column.
     /// </summary>
-    public string? ClassName { get; set; }
+    [BackingField(nameof(_className))]
+    public string? ClassName { get => _className; set => _className = value.NullIfWhiteSpace(); }
 
     /// <summary>
     /// Value of the "Use original value" (<see cref="SnApiConstants.JSON_KEY_USE_ORIGINAL_VALUE" />) column.
@@ -78,30 +84,8 @@ public class GlideType : IEquatable<GlideType>
     [BackingField(nameof(_packageName))]
     public string? PackageName
     {
-        get { lock(_syncRoot) { return _package?.Name ?? _packageName; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_packageName is not null)
-                    {
-                        _packageName = null;
-                        _package = null;
-                    }
-                }
-                else if (_packageName is null || !value.Equals(_packageName, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    if (_package is null)
-                        _packageName = value;
-                    else if (value.Equals(_package.Name, StringComparison.InvariantCultureIgnoreCase))
-                        _packageName = null;
-                    else
-                        _package = null;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _package?.Name ?? _packageName; } }
+        set => SetOptionalNavForeignKey(_syncRoot, value, ref _packageName, ref _package, p => p.Name);
     }
 
     private Package? _package;
@@ -111,18 +95,8 @@ public class GlideType : IEquatable<GlideType>
     /// </summary>
     public Package? Package
     {
-        get { lock(_syncRoot) { return _package; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if ((value is null) ? _package is null : _package is not null && ReferenceEquals(_package, value))
-                    return;
-
-                _package = value;
-                _packageName = null;
-            }
-        }
+        get { lock (_syncRoot) { return _package; } }
+        set => SetOptionalNavProperty(_syncRoot, value, ref _packageName, ref _package);
     }
 
     private string? _scopeValue;
@@ -133,30 +107,8 @@ public class GlideType : IEquatable<GlideType>
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue
     {
-        get { lock(_syncRoot) { return _scope?.Value ?? _scopeValue; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_scopeValue is not null)
-                    {
-                        _scopeValue = null;
-                        _scope = null;
-                    }
-                }
-                else if (_scopeValue is null || !value.Equals(_scopeValue, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    if (_scope is null)
-                        _scopeValue = value;
-                    else if (value.Equals(_scope.Value, StringComparison.InvariantCultureIgnoreCase))
-                        _scopeValue = null;
-                    else
-                        _scope = null;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _scope?.Value ?? _scopeValue; } }
+        set => SetOptionalNonEmptyNavForeignKey(_syncRoot, value, ref _scopeValue, ref _scope, s => s.Value);
     }
 
     private Scope? _scope;
@@ -166,18 +118,8 @@ public class GlideType : IEquatable<GlideType>
     /// </summary>
     public Scope? Scope
     {
-        get { lock(_syncRoot) { return _scope; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if ((value is null) ? _scope is null : _scope is not null && ReferenceEquals(_scope, value))
-                    return;
-
-                _scope = value;
-                _scopeValue = null;
-            }
-        }
+        get { lock (_syncRoot) { return _scope; } }
+        set => SetOptionalNavProperty(_syncRoot, value, ref _scopeValue, ref _scope);
     }
 
     private string _sourceFqdn = string.Empty;
@@ -188,20 +130,8 @@ public class GlideType : IEquatable<GlideType>
     [BackingField(nameof(_sourceFqdn))]
     public string SourceFqdn
     {
-        get { lock(_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
-        set
-        {
-            if (value is null)
-                throw new ArgumentNullException(nameof(value));
-            lock (_syncRoot)
-            {
-                if (_source is null || !value.Equals(_source.FQDN, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    _sourceFqdn = value;
-                    _source = null;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
+        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
     private SncSource? _source;
@@ -211,26 +141,8 @@ public class GlideType : IEquatable<GlideType>
     /// </summary>
     public SncSource? Source
     {
-        get { lock(_syncRoot) { return _source; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_source is null)
-                        return;
-                    _sourceFqdn = _source.FQDN;
-                }
-                else
-                {
-                    if (_source is not null && ReferenceEquals(_source, value))
-                        return;
-                    _source = value;
-                    _sourceFqdn = string.Empty;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _source; } }
+        set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
     private string _sysID = string.Empty;
@@ -250,7 +162,33 @@ public class GlideType : IEquatable<GlideType>
 
     [NotNull]
     [BackingField(nameof(_elements))]
-    public virtual HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
+    public HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
+
+    IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+    {
+        var results = new List<ValidationResult>();
+        var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
+        if (entry is not null)
+        {
+            if (_name.Length switch
+            {
+                0 => true,
+                1 => char.IsWhiteSpace(_name[0]),
+                _ => _name.All(char.IsWhiteSpace),
+            })
+                results.Add(new ValidationResult($"{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
+            if (_label.Length switch
+            {
+                0 => true,
+                1 => char.IsWhiteSpace(_label[0]),
+                _ => _label.All(char.IsWhiteSpace),
+            })
+                results.Add(new ValidationResult($"{nameof(Label)} cannot be empty.", new[] { nameof(Label) }));
+            if (_sourceFqdn is null)
+                results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be null.", new[] { nameof(SourceFqdn) }));
+        }
+        return results;
+    }
 
     public bool Equals(GlideType? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
 

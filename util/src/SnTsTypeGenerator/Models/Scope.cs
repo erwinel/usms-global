@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
+using static SnTsTypeGenerator.Models.EntityAccessors;
 
 namespace SnTsTypeGenerator.Models;
 
@@ -10,7 +12,7 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Application" (<see cref="SnApiConstants.TABLE_NAME_SYS_SCOPE" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Scopes))]
-public class Scope : IEquatable<Scope>
+public sealed class Scope : IEquatable<Scope>, IValidatableObject
 {
     private readonly object _syncRoot = new();
 
@@ -37,8 +39,10 @@ public class Scope : IEquatable<Scope>
         set => _name = value ?? string.Empty;
     }
 
-    public string? ShortDescription { get; set; }
-
+    private string? _shortDescription;
+    [BackingField(nameof(_shortDescription))]
+    public string? ShortDescription { get => _shortDescription; set => _shortDescription = value.NullIfWhiteSpace(); }
+    
     /// <summary>
     /// Date and time that this record was last updated.
     /// </summary>
@@ -53,19 +57,7 @@ public class Scope : IEquatable<Scope>
     public string SourceFqdn
     {
         get { lock (_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
-        set
-        {
-            if (value is null)
-                throw new ArgumentNullException(nameof(value));
-            lock (_syncRoot)
-            {
-                if (_source is null || !value.Equals(_source.FQDN, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    _sourceFqdn = value;
-                    _source = null;
-                }
-            }
-        }
+        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
     private SncSource? _source;
@@ -76,25 +68,7 @@ public class Scope : IEquatable<Scope>
     public SncSource? Source
     {
         get { lock (_syncRoot) { return _source; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_source is null)
-                        return;
-                    _sourceFqdn = _source.FQDN;
-                }
-                else
-                {
-                    if (_source is not null && ReferenceEquals(_source, value))
-                        return;
-                    _source = value;
-                    _sourceFqdn = string.Empty;
-                }
-            }
-        }
+        set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
     private string _sysID = string.Empty;
@@ -114,13 +88,39 @@ public class Scope : IEquatable<Scope>
 
     [NotNull]
     [BackingField(nameof(_types))]
-    public virtual HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
+    public HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
 
     private HashSet<Table> _tables = new();
 
     [NotNull]
     [BackingField(nameof(_tables))]
-    public virtual HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
+    public HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
+
+    IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+    {
+        var results = new List<ValidationResult>();
+        var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
+        if (entry is not null)
+        {
+            if (_value.Length switch
+            {
+                0 => true,
+                1 => char.IsWhiteSpace(_value[0]),
+                _ => _value.All(char.IsWhiteSpace),
+            })
+                results.Add(new ValidationResult($"{nameof(Value)} cannot be empty.", new[] { nameof(Value) }));
+            if (_name.Length switch
+            {
+                0 => true,
+                1 => char.IsWhiteSpace(_name[0]),
+                _ => _name.All(char.IsWhiteSpace),
+            })
+                results.Add(new ValidationResult($"{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
+            if (_sourceFqdn is null)
+                results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be null.", new[] { nameof(SourceFqdn) }));
+        }
+        return results;
+    }
 
     public bool Equals(Scope? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_value, other._value));
 

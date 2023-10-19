@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
+using static SnTsTypeGenerator.Models.EntityAccessors;
 
 namespace SnTsTypeGenerator.Models;
 
@@ -10,7 +12,7 @@ namespace SnTsTypeGenerator.Models;
 /// Represents an item from the "Dictionary Entry" (<see cref="SnApiConstants.TABLE_NAME_SYS_DICTIONARY" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Elements))]
-public class Element : IEquatable<Element>
+public sealed class Element : IEquatable<Element>, IValidatableObject
 {
     private readonly object _syncRoot = new();
 
@@ -55,15 +57,19 @@ public class Element : IEquatable<Element>
     /// </summary>
     public int? MaxLength { get; set; }
 
+    private string? _comments;
     /// <summary>
     /// Value of the "Comments" (<see cref="SnApiConstants.JSON_KEY_COMMENTS" />) column.
     /// </summary>
-    public string? Comments { get; set; }
+    [BackingField(nameof(_comments))]
+    public string? Comments { get => _comments; set => _comments = value.NullIfWhiteSpace(); }
 
+    private string? _defaultValue;
     /// <summary>
     /// Value of the "Default value" (<see cref="SnApiConstants.JSON_KEY_DEFAULT_VALUE" />) column.
     /// </summary>
-    public string? DefaultValue { get; set; }
+    [BackingField(nameof(_defaultValue))]
+    public string? DefaultValue { get => _defaultValue; set => _defaultValue = value.NullIfWhiteSpace(); }
 
     /// <summary>
     /// Value of the "Display" (<see cref="SnApiConstants.JSON_KEY_DISPLAY" />) column.
@@ -113,30 +119,8 @@ public class Element : IEquatable<Element>
     [BackingField(nameof(_packageName))]
     public string? PackageName
     {
-        get { lock(_syncRoot) { return _package?.Name ?? _packageName; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_packageName is not null)
-                    {
-                        _packageName = null;
-                        _package = null;
-                    }
-                }
-                else if (_packageName is null || !value.Equals(_packageName, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    if (_package is null)
-                        _packageName = value;
-                    else if (value.Equals(_package.Name, StringComparison.InvariantCultureIgnoreCase))
-                        _packageName = null;
-                    else
-                        _package = null;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _package?.Name ?? _packageName; } }
+        set => SetOptionalNavForeignKey(_syncRoot, value, ref _packageName, ref _package, p => p.Name);
     }
 
     private Package? _package;
@@ -146,18 +130,8 @@ public class Element : IEquatable<Element>
     /// </summary>
     public Package? Package
     {
-        get { lock(_syncRoot) { return _package; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if ((value is null) ? _package is null : _package is not null && ReferenceEquals(_package, value))
-                    return;
-
-                _package = value;
-                _packageName = null;
-            }
-        }
+        get { lock (_syncRoot) { return _package; } }
+        set => SetOptionalNavProperty(_syncRoot, value, ref _packageName, ref _package);
     }
 
     private string _tableName = string.Empty;
@@ -169,20 +143,8 @@ public class Element : IEquatable<Element>
     [Key]
     public string TableName
     {
-        get { lock(_syncRoot) { return _table?.Name ?? _tableName; } }
-        set
-        {
-            if (value is null)
-                throw new ArgumentNullException(nameof(value));
-            lock (_syncRoot)
-            {
-                if (_table is null || !value.Equals(_table.Name, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    _tableName = value;
-                    _table = null;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _table?.Name ?? _tableName; } }
+        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _tableName, ref _table, t => t.Name);
     }
 
     private Table? _table;
@@ -192,50 +154,20 @@ public class Element : IEquatable<Element>
     /// </summary>
     public Table? Table
     {
-        get { lock(_syncRoot) { return _table; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_table is null)
-                        return;
-                    _tableName = _table.Name;
-                }
-                else
-                {
-                    if (_table is not null && ReferenceEquals(_table, value))
-                        return;
-                    _table = value;
-                    _tableName = string.Empty;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _table; } }
+        set => SetRequiredNavProperty(_syncRoot, value, ref _tableName, ref _table, s => s.Name);
     }
 
-    private string _typeName = string.Empty;
+    private string? _typeName = null;
 
     /// <summary>
     /// Name of the related value for the "Type" (<see cref="SnApiConstants.JSON_KEY_INTERNAL_TYPE" />) column.
     /// </summary>
     [BackingField(nameof(_typeName))]
-    public string TypeName
+    public string? TypeName
     {
-        get { lock(_syncRoot) { return _type?.Name ?? _typeName; } }
-        set
-        {
-            if (value is null)
-                throw new ArgumentNullException(nameof(value));
-            lock (_syncRoot)
-            {
-                if (_type is null || !value.Equals(_type.Name, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    _typeName = value;
-                    _type = null;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _type?.Name ?? _typeName; } }
+        set => SetOptionalNonEmptyNavForeignKey(_syncRoot, value, ref _typeName, ref _type, t => t.Name);
     }
 
     private GlideType? _type;
@@ -245,26 +177,8 @@ public class Element : IEquatable<Element>
     /// </summary>
     public GlideType? Type
     {
-        get { lock(_syncRoot) { return _type; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_type is null)
-                        return;
-                    _typeName = _type.Name;
-                }
-                else
-                {
-                    if (_type is not null && ReferenceEquals(_type, value))
-                        return;
-                    _type = value;
-                    _typeName = string.Empty;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _type; } }
+        set => SetOptionalNavProperty(_syncRoot, value, ref _typeName, ref _type);
     }
 
     private string? _refTableName;
@@ -275,31 +189,8 @@ public class Element : IEquatable<Element>
     [BackingField(nameof(_refTableName))]
     public string? RefTableName
     {
-        get { lock(_syncRoot) { return _reference?.Name ?? _refTableName; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_refTableName is not null)
-                    {
-                        _refTableName = null;
-                        _reference = null;
-                    }
-                }
-                else if (_refTableName is null || !value.Equals(_refTableName, StringComparison.InvariantCultureIgnoreCase))
-                {
-
-                    if (_reference is null)
-                        _refTableName = value;
-                    else if (value.Equals(_reference.Name, StringComparison.InvariantCultureIgnoreCase))
-                        _refTableName = null;
-                    else
-                        _reference = null;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _reference?.Name ?? _refTableName; } }
+        set => SetOptionalNonEmptyNavForeignKey(_syncRoot, value, ref _refTableName, ref _reference, t => t.Name);
     }
 
     private Table? _reference;
@@ -309,18 +200,8 @@ public class Element : IEquatable<Element>
     /// </summary>
     public Table? Reference
     {
-        get { lock(_syncRoot) { return _reference; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if ((value is null) ? _reference is null : _reference is not null && ReferenceEquals(_reference, value))
-                    return;
-
-                _reference = value;
-                _refTableName = null;
-            }
-        }
+        get { lock (_syncRoot) { return _reference; } }
+        set => SetOptionalNavProperty(_syncRoot, value, ref _refTableName, ref _reference);
     }
 
     private string _sourceFqdn = string.Empty;
@@ -331,20 +212,8 @@ public class Element : IEquatable<Element>
     [BackingField(nameof(_sourceFqdn))]
     public string SourceFqdn
     {
-        get { lock(_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
-        set
-        {
-            if (value is null)
-                throw new ArgumentNullException(nameof(value));
-            lock (_syncRoot)
-            {
-                if (_source is null || !value.Equals(_source.FQDN, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    _sourceFqdn = value;
-                    _source = null;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
+        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
     private SncSource? _source;
@@ -354,26 +223,8 @@ public class Element : IEquatable<Element>
     /// </summary>
     public SncSource? Source
     {
-        get { lock(_syncRoot) { return _source; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_source is null)
-                        return;
-                    _sourceFqdn = _source.FQDN;
-                }
-                else
-                {
-                    if (_source is not null && ReferenceEquals(_source, value))
-                        return;
-                    _source = value;
-                    _sourceFqdn = string.Empty;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _source; } }
+        set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
     private string _sysID = string.Empty;
@@ -387,6 +238,39 @@ public class Element : IEquatable<Element>
     {
         get => _sysID;
         set => _sysID = value ?? string.Empty;
+    }
+
+    IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+    {
+        var results = new List<ValidationResult>();
+        var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
+        if (entry is not null)
+        {
+            if (_name.Length switch
+            {
+                0 => true,
+                1 => char.IsWhiteSpace(_name[0]),
+                _ => _name.All(char.IsWhiteSpace),
+            })
+                results.Add(new ValidationResult($"{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
+            if (_label.Length switch
+            {
+                0 => true,
+                1 => char.IsWhiteSpace(_label[0]),
+                _ => _label.All(char.IsWhiteSpace),
+            })
+                results.Add(new ValidationResult($"{nameof(Label)} cannot be empty.", new[] { nameof(Label) }));
+            if (_tableName.Length switch
+            {
+                0 => true,
+                1 => char.IsWhiteSpace(_tableName[0]),
+                _ => _tableName.All(char.IsWhiteSpace),
+            })
+                results.Add(new ValidationResult($"{nameof(TableName)} cannot be empty.", new[] { nameof(TableName) }));
+            if (_sourceFqdn is null)
+                results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be null.", new[] { nameof(SourceFqdn) }));
+        }
+        return results;
     }
 
     public bool Equals(Element? other) => other is not null && (ReferenceEquals(this, other) ||

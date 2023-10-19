@@ -3,13 +3,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using static SnTsTypeGenerator.Models.EntityAccessors;
 
 namespace SnTsTypeGenerator.Models;
 /// <summary>
 /// Represents an item from the "Package" (sys_package) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Packages))]
-public class Package : IEquatable<Package>
+public sealed class Package : IEquatable<Package>, IValidatableObject
 {
     private readonly object _syncRoot = new();
 
@@ -26,8 +28,10 @@ public class Package : IEquatable<Package>
         set => _name = value ?? string.Empty;
     }
 
-    public string? ShortDescription { get; set; }
-
+    private string? _shortDescription;
+    [BackingField(nameof(_shortDescription))]
+    public string? ShortDescription { get => _shortDescription; set => _shortDescription = value.NullIfWhiteSpace(); }
+    
     /// <summary>
     /// Date and time that this record was last updated.
     /// </summary>
@@ -41,20 +45,8 @@ public class Package : IEquatable<Package>
     [BackingField(nameof(_sourceFqdn))]
     public string SourceFqdn
     {
-        get { lock(_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
-        set
-        {
-            if (value is null)
-                throw new ArgumentNullException(nameof(value));
-            lock (_syncRoot)
-            {
-                if (_source is null || !value.Equals(_source.FQDN, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    _sourceFqdn = value;
-                    _source = null;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
+        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
     private SncSource? _source;
@@ -64,26 +56,8 @@ public class Package : IEquatable<Package>
     /// </summary>
     public SncSource? Source
     {
-        get { lock(_syncRoot) { return _source; } }
-        set
-        {
-            lock (_syncRoot)
-            {
-                if (value is null)
-                {
-                    if (_source is null)
-                        return;
-                    _sourceFqdn = _source.FQDN;
-                }
-                else
-                {
-                    if (_source is not null && ReferenceEquals(_source, value))
-                        return;
-                    _source = value;
-                    _sourceFqdn = string.Empty;
-                }
-            }
-        }
+        get { lock (_syncRoot) { return _source; } }
+        set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
     private string _sysId = string.Empty;
@@ -103,19 +77,28 @@ public class Package : IEquatable<Package>
 
     [NotNull]
     [BackingField(nameof(_types))]
-    public virtual HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
+    public HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
 
     private HashSet<Table> _tables = new();
 
     [NotNull]
     [BackingField(nameof(_tables))]
-    public virtual HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
+    public HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
 
     private HashSet<Element> _elements = new();
 
     [NotNull]
     [BackingField(nameof(_elements))]
-    public virtual HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
+    public HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
+
+    IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+    {
+        var results = new List<ValidationResult>();
+        var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
+        if (entry is not null && _sourceFqdn is null)
+            results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be null.", new[] { nameof(SourceFqdn) }));
+        return results;
+    }
 
     public bool Equals(Package? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
 
