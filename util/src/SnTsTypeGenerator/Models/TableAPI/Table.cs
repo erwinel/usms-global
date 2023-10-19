@@ -1,27 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using SnTsTypeGenerator.Services;
+namespace SnTsTypeGenerator.Models.TableAPI;
 
-namespace SnTsTypeGenerator.Models.TableAPI
-{
-    public record PackageRef(string Name, string SysID, string SourceFqdn);
-
-    public record ScopeRef(string Name, string SysID, string SourceFqdn);
-
-    public record Scope(string Name, string Value, string? ShortDescription, string SysID, string SourceFqdn);
-
-    public record TableRef(string Label, string SysID, string SourceFqdn);
-
-    public record GlideTypeRef(string Name, string Label, string SourceFqdn);
-
-    public record GlideTypeRecord(string Name, string Label, string SysID, string? ScalarType, int? ScalarLength, string? ClassName, bool UseOriginalValue, bool IsVisible, PackageRef? Package, ScopeRef? Scope, string SourceFqdn) : GlideTypeRef(Name, Label, SourceFqdn);
-
-    public record Element(string Name, string Label, string SysID, TableRef? Reference, bool IsReadOnly, GlideTypeRef? Type, int? MaxLength,
-        bool IsActive, bool IsUnique, bool IsPrimary, bool IsCalculated, int? SizeClass, bool IsMandatory, bool IsArray,
-        string? Comments, bool IsDisplay, string? DefaultValue, PackageRef? Package, string SourceFqdn);
-
-    public record Table(string Name, string Label, string SysID, bool IsExtendable, string? NumberPrefix, PackageRef? Package, ScopeRef? Scope, TableRef? SuperClass, string AccessibleFrom, string? ExtensionModel, string SourceFqdn) : TableRef(Label, SysID, SourceFqdn);
-}
+/// <summary>
+/// Deserialized <c>sys_db_object</c> record from ServiceNow instance.
+/// </summary>
+/// <param name="Name">The value of the <c>name.value</c> property.</param>
+/// <param name="Label">The value of the <c>label.value</c> property.</param>
+/// <param name="SysID">The value of the <c>sys_id.value</c> property.</param>
+/// <param name="IsExtendable">The boolean value of the <c>is_extendable.value</c> property.</param>
+/// <param name="NumberPrefix">The value of the <c>number_ref.display_value</c> property.</param>
+/// <param name="Package">The deserialized <c>sys_package</c> property or <see langword="null"/> if the <c>sys_package.value</c> is empty.</param>
+/// <param name="Scope">The deserialized <c>sys_scope</c> property or <see langword="null"/> if the <c>sys_scope.value</c> is empty.</param>
+/// <param name="SuperClass">The deserialized <c>super_class</c> property or <see langword="null"/> if the <c>super_class.value</c> is empty.</param>
+/// <param name="AccessibleFrom">The value of the <c>access.value</c> property.</param>
+/// <param name="ExtensionModel">The value of the <c>extension_model.value</c> property.</param>
+/// <param name="SourceFqdn">The FQDN of the source ServiceNow instance.</param>
+public record Table(string Name, string Label, string SysID, bool IsExtendable, string? NumberPrefix, RecordRef? Package, RecordRef? Scope, RecordRef? SuperClass, string AccessibleFrom, string? ExtensionModel, string SourceFqdn);

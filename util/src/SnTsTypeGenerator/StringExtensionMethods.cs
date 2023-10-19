@@ -126,10 +126,14 @@ public static partial class StringExtensionMethods
     private static partial Regex GetLineBreakRegex();
     public static readonly Regex LineBreakRegex = GetLineBreakRegex();
 
-    private static readonly ImmutableArray<string> JSDOC_START = new string[]{ "/**" }.ToImmutableArray();
-    
-    private static readonly ImmutableArray<string> JSDOC_END = new string[]{ " */" }.ToImmutableArray();
-    
+    public static string AsNonEmpty(this string? value, Func<string> getDefaultValue) => string.IsNullOrWhiteSpace(value) ? getDefaultValue() : value;
+
+    public static string AsNonEmpty(this string? value, string defaultValue) => string.IsNullOrWhiteSpace(value) ? defaultValue : value;
+
+    private static readonly ImmutableArray<string> JSDOC_START = new string[] { "/**" }.ToImmutableArray();
+
+    private static readonly ImmutableArray<string> JSDOC_END = new string[] { " */" }.ToImmutableArray();
+
     public static string[] SplitLines(this string? lines) => string.IsNullOrEmpty(lines) ? new string[] { "" } : LineBreakRegex.Split(lines);
 
     public static IEnumerable<string> ToJsDocLines(this IEnumerable<string> lines) => JSDOC_START.Concat(lines.Select(l => string.IsNullOrWhiteSpace(l) ? " *" : $" * {l}")).Concat(JSDOC_END);
