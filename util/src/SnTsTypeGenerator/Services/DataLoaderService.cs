@@ -701,6 +701,12 @@ public sealed class DataLoaderService : IDisposable
         }
         return table;
     }
+    
+    internal async Task<IEnumerable<Table>> LoadAllReferencedAsync(IEnumerable<Table> tables, CancellationToken cancellationToken)
+    {
+        TypingsDbContext? dbContext = _dbContext ?? throw new ObjectDisposedException(nameof(DataLoaderService));
+        return await dbContext.LoadAllReferencedAsync(tables, cancellationToken);
+    }
 
     public DataLoaderService(TypingsDbContext dbContext, TableAPIService tableAPIService, ILogger<DataLoaderService> logger)
     {

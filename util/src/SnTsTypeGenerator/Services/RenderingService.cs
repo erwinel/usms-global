@@ -20,7 +20,6 @@ public partial class RenderingService
     private readonly IServiceScope _scope;
     private readonly FileInfo? _outputFile;
     private readonly bool _forceOverwrite;
-    private readonly bool _includeReferenced;
     private readonly bool _emitBaseTypes;
     private readonly bool _isScoped;
 
@@ -35,11 +34,6 @@ public partial class RenderingService
             return;
         using var dbContext = _scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
         cancellationToken.ThrowIfCancellationRequested();
-        if (_includeReferenced)
-        {
-            toRender = await dbContext.LoadAllReferencedAsync(toRender, cancellationToken);
-            cancellationToken.ThrowIfCancellationRequested();
-        }
         StreamWriter streamWriter;
         try
         {
@@ -813,7 +807,6 @@ public partial class RenderingService
         }
 
         _forceOverwrite = appSettings.ForceOverwrite ?? false;
-        _includeReferenced = appSettings.IncludeReferenced ?? false;
         _emitBaseTypes = appSettings.EmitBaseTypes ?? false;
         string outputFileName = appSettings.Output!;
         if (string.IsNullOrEmpty(outputFileName))
