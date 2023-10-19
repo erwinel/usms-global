@@ -254,7 +254,7 @@ public class GlideType : IEquatable<GlideType>
 
     public bool Equals(GlideType? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
 
-    public override bool Equals(object? obj) => Equals(obj as Element);
+    public override bool Equals(object? obj) => obj is GlideType other && Equals(other);
 
     public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_name);
 
