@@ -4,12 +4,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace SnTsTypeGenerator.Services;
 
-public class BoolOptCommandLineConfigurationProvider : ConfigurationProvider
+public class AltCommandLineConfigurationProvider : ConfigurationProvider
 {
     private readonly Dictionary<string, string> _valueSwitchMappings = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _booleanwitchMappings = new(StringComparer.OrdinalIgnoreCase);
 
-    public BoolOptCommandLineConfigurationProvider(ImmutableArray<string> args, IDictionary<string, string> booleanwitchMappings, IDictionary<string, string>? switchMappings = null)
+    public AltCommandLineConfigurationProvider(ImmutableArray<string> args, IDictionary<string, string> booleanwitchMappings, IDictionary<string, string>? switchMappings = null)
     {
         Args = args;
         if (booleanwitchMappings is null)
