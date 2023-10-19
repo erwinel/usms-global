@@ -151,7 +151,7 @@ public sealed class DataLoaderService : IDisposable
                     Package: null,
                     SourceFqdn: sourceFqdn),
                 new(
-                    Name: JSON_KEY_SYS_CREATED_BY,
+                    Name: JSON_KEY_SYS_UPDATED_BY,
                     Label: "Updated by",
                     SysID: "ef0b4750753d4f6c82499a605b490af4",
                     Reference: null,
@@ -171,7 +171,7 @@ public sealed class DataLoaderService : IDisposable
                     Package: null,
                     SourceFqdn: sourceFqdn),
                 new(
-                    Name: JSON_KEY_SYS_CREATED_ON,
+                    Name: JSON_KEY_SYS_UPDATED_ON,
                     Label: "Updated",
                     SysID: "3f68a52adc8a4c5a960ec2a9a2bd9fd6",
                     Reference: null,
