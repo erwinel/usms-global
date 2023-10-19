@@ -78,7 +78,7 @@ public class GlideType : IEquatable<GlideType>
     [BackingField(nameof(_packageName))]
     public string? PackageName
     {
-        get => _package?.Name ?? _packageName;
+        get { lock(_syncRoot) { return _package?.Name ?? _packageName; } }
         set
         {
             lock (_syncRoot)
@@ -111,7 +111,7 @@ public class GlideType : IEquatable<GlideType>
     /// </summary>
     public Package? Package
     {
-        get => _package;
+        get { lock(_syncRoot) { return _package; } }
         set
         {
             lock (_syncRoot)
@@ -133,7 +133,7 @@ public class GlideType : IEquatable<GlideType>
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue
     {
-        get => _scope?.Value ?? _scopeValue;
+        get { lock(_syncRoot) { return _scope?.Value ?? _scopeValue; } }
         set
         {
             lock (_syncRoot)
@@ -166,7 +166,7 @@ public class GlideType : IEquatable<GlideType>
     /// </summary>
     public Scope? Scope
     {
-        get => _scope;
+        get { lock(_syncRoot) { return _scope; } }
         set
         {
             lock (_syncRoot)
@@ -188,7 +188,7 @@ public class GlideType : IEquatable<GlideType>
     [BackingField(nameof(_sourceFqdn))]
     public string SourceFqdn
     {
-        get => _source?.FQDN ?? _sourceFqdn;
+        get { lock(_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
         set
         {
             if (value is null)
@@ -211,7 +211,7 @@ public class GlideType : IEquatable<GlideType>
     /// </summary>
     public SncSource? Source
     {
-        get => _source;
+        get { lock(_syncRoot) { return _source; } }
         set
         {
             lock (_syncRoot)

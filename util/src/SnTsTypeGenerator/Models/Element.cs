@@ -113,7 +113,7 @@ public class Element : IEquatable<Element>
     [BackingField(nameof(_packageName))]
     public string? PackageName
     {
-        get => _package?.Name ?? _packageName;
+        get { lock(_syncRoot) { return _package?.Name ?? _packageName; } }
         set
         {
             lock (_syncRoot)
@@ -146,7 +146,7 @@ public class Element : IEquatable<Element>
     /// </summary>
     public Package? Package
     {
-        get => _package;
+        get { lock(_syncRoot) { return _package; } }
         set
         {
             lock (_syncRoot)
@@ -169,7 +169,7 @@ public class Element : IEquatable<Element>
     [Key]
     public string TableName
     {
-        get => _table?.Name ?? _tableName;
+        get { lock(_syncRoot) { return _table?.Name ?? _tableName; } }
         set
         {
             if (value is null)
@@ -192,7 +192,7 @@ public class Element : IEquatable<Element>
     /// </summary>
     public Table? Table
     {
-        get => _table;
+        get { lock(_syncRoot) { return _table; } }
         set
         {
             lock (_syncRoot)
@@ -222,7 +222,7 @@ public class Element : IEquatable<Element>
     [BackingField(nameof(_typeName))]
     public string TypeName
     {
-        get => _type?.Name ?? _typeName;
+        get { lock(_syncRoot) { return _type?.Name ?? _typeName; } }
         set
         {
             if (value is null)
@@ -245,7 +245,7 @@ public class Element : IEquatable<Element>
     /// </summary>
     public GlideType? Type
     {
-        get => _type;
+        get { lock(_syncRoot) { return _type; } }
         set
         {
             lock (_syncRoot)
@@ -275,7 +275,7 @@ public class Element : IEquatable<Element>
     [BackingField(nameof(_refTableName))]
     public string? RefTableName
     {
-        get => _reference?.Name ?? _refTableName;
+        get { lock(_syncRoot) { return _reference?.Name ?? _refTableName; } }
         set
         {
             lock (_syncRoot)
@@ -309,7 +309,7 @@ public class Element : IEquatable<Element>
     /// </summary>
     public Table? Reference
     {
-        get => _reference;
+        get { lock(_syncRoot) { return _reference; } }
         set
         {
             lock (_syncRoot)
@@ -331,7 +331,7 @@ public class Element : IEquatable<Element>
     [BackingField(nameof(_sourceFqdn))]
     public string SourceFqdn
     {
-        get => _source?.FQDN ?? _sourceFqdn;
+        get { lock(_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
         set
         {
             if (value is null)
@@ -354,7 +354,7 @@ public class Element : IEquatable<Element>
     /// </summary>
     public SncSource? Source
     {
-        get => _source;
+        get { lock(_syncRoot) { return _source; } }
         set
         {
             lock (_syncRoot)

@@ -41,7 +41,7 @@ public class Package : IEquatable<Package>
     [BackingField(nameof(_sourceFqdn))]
     public string SourceFqdn
     {
-        get => _source?.FQDN ?? _sourceFqdn;
+        get { lock(_syncRoot) { return _source?.FQDN ?? _sourceFqdn; } }
         set
         {
             if (value is null)
@@ -64,7 +64,7 @@ public class Package : IEquatable<Package>
     /// </summary>
     public SncSource? Source
     {
-        get => _source;
+        get { lock(_syncRoot) { return _source; } }
         set
         {
             lock (_syncRoot)
