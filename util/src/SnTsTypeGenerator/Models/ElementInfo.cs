@@ -166,6 +166,7 @@ public class ElementInfo : IEquatable<ElementInfo>
     /// Value of the "Table" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [BackingField(nameof(_tableName))]
+    [Key]
     public string TableName
     {
         get => _table?.Name ?? _tableName;

@@ -206,10 +206,10 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId RenderMode = new(EVENT_ID_RenderMode, nameof(RenderMode));
 
-    private static readonly Action<ILogger, string, char, string, Exception?> _renderMode1 = LoggerMessage.Define<string, char, string>(LogLevel.Trace, RenderMode,
+    private static readonly Action<ILogger, string, char, string, Exception?> _renderMode1 = LoggerMessage.Define<string, char, string>(LogLevel.Debug, RenderMode,
         "Setting {Setting} (-{Switch}) is {Value}.");
 
-    private static readonly Action<ILogger, string, char, string, Exception?> _renderMode2 = LoggerMessage.Define<string, char, string>(LogLevel.Trace, RenderMode,
+    private static readonly Action<ILogger, string, char, string, Exception?> _renderMode2 = LoggerMessage.Define<string, char, string>(LogLevel.Debug, RenderMode,
         "Setting {Setting} (-{Switch}) defaulted to {Value}.");
 
     /// <summary>
@@ -240,7 +240,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId UsingOutputFile = new(EVENT_ID_UsingOutputFile, nameof(UsingOutputFile));
 
-    private static readonly Action<ILogger, string, bool, Exception?> _usingOutputFile = LoggerMessage.Define<string, bool>(LogLevel.Trace, UsingOutputFile,
+    private static readonly Action<ILogger, string, bool, Exception?> _usingOutputFile = LoggerMessage.Define<string, bool>(LogLevel.Debug, UsingOutputFile,
         "Message {Path} {OverWrite}");
 
     /// <summary>
@@ -558,7 +558,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId ValidatingEntity = new(EVENT_ID_ValidatingEntity, nameof(ValidatingEntity));
 
-    private static readonly Action<ILogger, EntityState, string, IValidatableObject, Exception?> _validatingEntity = LoggerMessage.Define<EntityState, string, IValidatableObject>(LogLevel.Trace, ValidatingEntity,
+    private static readonly Action<ILogger, EntityState, string, IValidatableObject, Exception?> _validatingEntity = LoggerMessage.Define<EntityState, string, IValidatableObject>(LogLevel.Debug, ValidatingEntity,
         "Validating {State} {Name} {Entity}");
 
     /// <summary>
@@ -641,7 +641,7 @@ public static class LoggerMessages
     public static readonly EventId ValidationCompleted = new(EVENT_ID_ValidationCompleted, nameof(ValidationCompleted));
 
     private static readonly Action<ILogger, EntityState, string, IValidatableObject, Exception?> _validationCompleted =
-        LoggerMessage.Define<EntityState, string, IValidatableObject>(LogLevel.Trace, ValidationCompleted, "Validation for {State} {Name} {Entity}");
+        LoggerMessage.Define<EntityState, string, IValidatableObject>(LogLevel.Debug, ValidationCompleted, "Validation for {State} {Name} {Entity}");
 
     /// <summary>
     /// Logs a ValidationCompleted event with event code 0x0013.
@@ -676,7 +676,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId DbSaveChangesCompleted = new(EVENT_ID_DbSaveChangesCompleted, nameof(DbSaveChangesCompleted));
 
-    private static readonly Action<ILogger, string, int, Exception?> _dbSaveChangesCompleted = LoggerMessage.Define<string, int>(LogLevel.Trace, DbSaveChangesCompleted,
+    private static readonly Action<ILogger, string, int, Exception?> _dbSaveChangesCompleted = LoggerMessage.Define<string, int>(LogLevel.Debug, DbSaveChangesCompleted,
         "Message {MethodSignature} {ReturnValue}");
 
     /// <summary>
@@ -888,7 +888,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId APIRequestStart = new(EVENT_ID_APIRequestStart, nameof(APIRequestStart));
 
-    private static readonly Action<ILogger, Uri, Exception?> _apiRequestStart = LoggerMessage.Define<Uri>(LogLevel.Trace, APIRequestStart,
+    private static readonly Action<ILogger, Uri, Exception?> _apiRequestStart = LoggerMessage.Define<Uri>(LogLevel.Debug, APIRequestStart,
         "Sending API request to {URI}");
 
     /// <summary>
@@ -912,7 +912,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId APIRequestCompleted = new(EVENT_ID_APIRequestCompleted, nameof(APIRequestCompleted));
 
-    private static readonly Action<ILogger, Uri, string, Exception?> _apirequestCompleted = LoggerMessage.Define<Uri, string>(LogLevel.Trace, APIRequestCompleted,
+    private static readonly Action<ILogger, Uri, string, Exception?> _apirequestCompleted = LoggerMessage.Define<Uri, string>(LogLevel.Debug, APIRequestCompleted,
         "API request  returned {URL} {Result}");
 
     /// <summary>
@@ -937,7 +937,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId GettingTableByNameFromRemote = new(EVENT_ID_GettingTableByNameFromRemote, nameof(GettingTableByNameFromRemote));
 
-    private static readonly Action<ILogger, string, Exception?> _gettingTableByNameFromRemote = LoggerMessage.Define<string>(LogLevel.Trace, GettingTableByNameFromRemote,
+    private static readonly Action<ILogger, string, Exception?> _gettingTableByNameFromRemote = LoggerMessage.Define<string>(LogLevel.Debug, GettingTableByNameFromRemote,
         "Getting table by name {Name} from remote instance.");
 
     /// <summary>
@@ -961,7 +961,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId GettingTableBySysIdFromRemote = new(EVENT_ID_GettingTableBySysIdFromRemot, nameof(GettingTableBySysIdFromRemote));
 
-    private static readonly Action<ILogger, string, Exception?> _gettingTableBySysIdFromRemote = LoggerMessage.Define<string>(LogLevel.Trace, GettingTableBySysIdFromRemote,
+    private static readonly Action<ILogger, string, Exception?> _gettingTableBySysIdFromRemote = LoggerMessage.Define<string>(LogLevel.Debug, GettingTableBySysIdFromRemote,
         "Getting table by Sys ID {SysID} from remote instance.");
 
     /// <summary>
@@ -985,7 +985,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId GettingElementsByTableNameFromRemote = new(EVENT_ID_GettingElementsByTableNameFromRemote, nameof(GettingElementsByTableNameFromRemote));
 
-    private static readonly Action<ILogger, string, Exception?> _gettingElementsByTableNameFromRemote = LoggerMessage.Define<string>(LogLevel.Trace, GettingElementsByTableNameFromRemote,
+    private static readonly Action<ILogger, string, Exception?> _gettingElementsByTableNameFromRemote = LoggerMessage.Define<string>(LogLevel.Debug, GettingElementsByTableNameFromRemote,
         "Getting elements from remote instance with table name {TableName}.");
 
     /// <summary>
@@ -1009,7 +1009,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId GettingScopeByIdentifierFromRemote = new(EVENT_ID_GettingScopeByIdentifierFromRemote, nameof(GettingScopeByIdentifierFromRemote));
 
-    private static readonly Action<ILogger, string, Exception?> _gettingScopeByIdentifierFromRemote = LoggerMessage.Define<string>(LogLevel.Trace, GettingScopeByIdentifierFromRemote,
+    private static readonly Action<ILogger, string, Exception?> _gettingScopeByIdentifierFromRemote = LoggerMessage.Define<string>(LogLevel.Debug, GettingScopeByIdentifierFromRemote,
         "Getting scope by unique identifier {Identifer} from remote instance.");
 
     /// <summary>
@@ -1033,7 +1033,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId GettingTypeByNameFromRemoteTrace = new(EVENT_ID_GettingTypeByNameFromRemoteTrace, nameof(GettingTypeByNameFromRemoteTrace));
 
-    private static readonly Action<ILogger, string, Exception?> _gettingTypeByNameFromRemoteTrace = LoggerMessage.Define<string>(LogLevel.Trace, GettingTypeByNameFromRemoteTrace,
+    private static readonly Action<ILogger, string, Exception?> _gettingTypeByNameFromRemoteTrace = LoggerMessage.Define<string>(LogLevel.Debug, GettingTypeByNameFromRemoteTrace,
         "Getting type by name {TypeName} from remote instance.");
 
     /// <summary>
@@ -1057,7 +1057,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId AddingTableToDb = new(EVENT_ID_AddingTableToDb, nameof(AddingTableToDb));
 
-    private static readonly Action<ILogger, string, Exception?> _AddingTableToDb = LoggerMessage.Define<string>(LogLevel.Trace, AddingTableToDb,
+    private static readonly Action<ILogger, string, Exception?> _AddingTableToDb = LoggerMessage.Define<string>(LogLevel.Debug, AddingTableToDb,
         "Adding table {TableName} to database.");
 
     /// <summary>
@@ -1081,7 +1081,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId AddingElementsToDatabase = new(EVENT_ID_AddingElementsToDatabase, nameof(AddingElementsToDatabase));
 
-    private static readonly Action<ILogger, string, Exception?> _AddingElementsToDatabase = LoggerMessage.Define<string>(LogLevel.Trace, AddingElementsToDatabase,
+    private static readonly Action<ILogger, string, Exception?> _AddingElementsToDatabase = LoggerMessage.Define<string>(LogLevel.Debug, AddingElementsToDatabase,
         "Adding elements for table {TableName} to database.");
 
     /// <summary>
@@ -1105,7 +1105,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId NewTableSaveCompleted = new(EVENT_ID_NewTableSaveCompleted, nameof(NewTableSaveCompleted));
 
-    private static readonly Action<ILogger, string, Exception?> _newTableSaveCompleted = LoggerMessage.Define<string>(LogLevel.Trace, NewTableSaveCompleted,
+    private static readonly Action<ILogger, string, Exception?> _newTableSaveCompleted = LoggerMessage.Define<string>(LogLevel.Debug, NewTableSaveCompleted,
         "Table named {TableName} and related entites saved to database.");
 
     /// <summary>
