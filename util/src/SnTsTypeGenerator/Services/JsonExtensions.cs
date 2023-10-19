@@ -32,6 +32,19 @@ public static class JsonExtensions
         return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName}", $"{URI_PARAM_QUERY}={value}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
     }
 
+    public static T? GetProperty<T>(this JsonObject source, string propertyName) where T : JsonNode => (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is T result) ? result : null;
+
+    public static bool TryGetProperty<T>(this JsonObject source, string propertyName, [NotNullWhen(true)] out T? result) where T : JsonNode
+    {
+        if (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is T t)
+        {
+            result = t;
+            return true;
+        }
+        result = null;
+        return false;
+    }
+
     public static bool TryGetPropertyValue(this JsonObject source, string propertyName, string innerPropertyName, out JsonNode? jsonNode) =>
         source.TryGetPropertyValue(propertyName, out jsonNode) && jsonNode is JsonObject obj && obj.TryGetPropertyValue(innerPropertyName, out jsonNode);
 
