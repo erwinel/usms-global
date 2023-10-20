@@ -7,20 +7,39 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using static SnTsTypeGenerator.Models.EntityAccessors;
 
 namespace SnTsTypeGenerator.Models;
+
 /// <summary>
-/// Represents an item from the "Package" (sys_package) table.
+/// Represents an record from the "Package" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_PACKAGE" />) table.
+/// https://dev93009.service-now.com/nav_to.do?uri=sys_db_object.do?sys_id=c7795303b4232110320f8dc279c80442
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Packages))]
-public sealed class Package : IEquatable<Package>, IValidatableObject
+public sealed class Package : IValidatableObject
 {
     private readonly object _syncRoot = new();
+
+    #region ID Property
+
+    private string _id = string.Empty;
+
+    /// <summary>
+    /// The value of the <c>source</c> field.
+    /// </summary>
+    [Key]
+    [BackingField(nameof(_id))]
+    public string ID
+    {
+        get => _id;
+        set => _id = value ?? string.Empty;
+    }
+
+    #endregion
 
     #region Name Property
 
     private string _name = string.Empty;
 
     /// <summary>
-    /// Display name of the package.
+    /// The value of the <c>name</c> field.
     /// </summary>
     [Key]
     [BackingField(nameof(_name))]
@@ -32,11 +51,15 @@ public sealed class Package : IEquatable<Package>, IValidatableObject
 
     #endregion
 
-    #region ShortDescription Property
+    #region Version Property
 
-    private string? _shortDescription;
-    [BackingField(nameof(_shortDescription))]
-    public string? ShortDescription { get => _shortDescription; set => _shortDescription = value.NullIfWhiteSpace(); }
+    private string? _version;
+    
+    /// <summary>
+    /// The value of the <c>version</c> field.
+    /// </summary>
+    [BackingField(nameof(_version))]
+    public string? Version { get => _version; set => _version = value.NullIfWhiteSpace(); }
 
     #endregion
 
@@ -74,18 +97,28 @@ public sealed class Package : IEquatable<Package>, IValidatableObject
 
     #region SysId Property
 
-    private string _sysId = string.Empty;
+    private string _sysID = string.Empty;
 
     /// <summary>
     /// Value of the package reference.
     /// </summary>
     [NotNull]
-    [BackingField(nameof(_sysId))]
-    public string SysId
+    [BackingField(nameof(_sysID))]
+    public string SysID
     {
-        get => _sysId;
-        set => _sysId = value ?? string.Empty;
+        get => _sysID;
+        set => _sysID = value ?? string.Empty;
     }
+
+    #endregion
+
+    #region Elements Property
+
+    private HashSet<Element> _elements = new();
+
+    [NotNull]
+    [BackingField(nameof(_elements))]
+    public HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
 
     #endregion
 
@@ -109,37 +142,32 @@ public sealed class Package : IEquatable<Package>, IValidatableObject
 
     #endregion
 
-    #region Elements Property
-
-    private HashSet<Element> _elements = new();
-
-    [NotNull]
-    [BackingField(nameof(_elements))]
-    public HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
-
-    #endregion
-
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {
         var results = new List<ValidationResult>();
         var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
-        if (entry is not null && _sourceFqdn is null)
-            results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be null.", new[] { nameof(SourceFqdn) }));
+        if (entry is not null)
+        {
+            if (_id.Length == 0)
+                results.Add(new ValidationResult($"{nameof(ID)} cannot be empty.", new[] { nameof(SourceFqdn) }));
+            if (_sourceFqdn.Length == 0)
+                results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be empty.", new[] { nameof(SourceFqdn) }));
+        }
         return results;
     }
 
-    public bool Equals(Package? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_name, other._name));
+    public bool Equals(Package? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(ID, other.ID));
 
     public override bool Equals(object? obj) => obj is Package other && Equals(other);
 
-    public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_name);
+    public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(ID);
 
     public override string ToString() => nameof(Package) + new JsonObject()
     {
+        { nameof(ID), JsonValue.Create(ID) },
         { nameof(Name), JsonValue.Create(_name) },
-        { nameof(ShortDescription), JsonValue.Create(ShortDescription) },
         { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
         { nameof(Source), JsonValue.Create(_sourceFqdn) },
-        { nameof(SysId), JsonValue.Create(_sysId) }
+        { nameof(SysID), JsonValue.Create(_sysID) }
     }.ToJsonString();
 }

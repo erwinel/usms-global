@@ -270,13 +270,13 @@ public partial class RenderingService
         if (package is not null)
         {
             await writer.WriteAsync(" * Package: ");
-            if (string.IsNullOrWhiteSpace(package.ShortDescription) || NameComparer.Equals(package.Name, package.ShortDescription))
-                await writer.WriteLineAsync(package.Name);
+            if (string.IsNullOrWhiteSpace(package.Name) || NameComparer.Equals(package.ID, package.Name))
+                await writer.WriteLineAsync(package.ID);
             else
             {
-                await writer.WriteAsync(package.Name);
+                await writer.WriteAsync(package.ID);
                 await writer.WriteAsync(" - ");
-                await writer.WriteLineAsync(package.ShortDescription.AsWhitespaceNormalized());
+                await writer.WriteLineAsync(package.Name.AsWhitespaceNormalized());
             }
         }
 
@@ -742,11 +742,11 @@ public partial class RenderingService
                 appendLine = false;
             }
             await writer.WriteAsync(" * Package: ");
-            await writer.WriteLineAsync(package.Name);
-            if (!string.IsNullOrWhiteSpace(package.ShortDescription))
+            await writer.WriteLineAsync(package.ID);
+            if (!string.IsNullOrWhiteSpace(package.Name))
             {
-                string[] lines = package.ShortDescription.Trim().SplitLines();
-                if (NameComparer.Equals(lines[0], package.Name))
+                string[] lines = package.Name.Trim().SplitLines();
+                if (NameComparer.Equals(lines[0], package.ID))
                 {
                     if (lines.Length > 1)
                         lines = lines.Skip(1).ToArray();

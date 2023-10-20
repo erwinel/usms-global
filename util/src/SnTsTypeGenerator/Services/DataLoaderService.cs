@@ -76,7 +76,7 @@ public sealed class DataLoaderService : IDisposable
                     SysID: Guid.Empty.ToString("N"),
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Value: TYPE_NAME_GUID, DisplayValue: "Sys ID (GUID)"),
+                    Type: new(Name: TYPE_NAME_GUID, Label: "Sys ID (GUID)"),
                     MaxLength: 32,
                     IsActive: true,
                     IsUnique: false,
@@ -96,7 +96,7 @@ public sealed class DataLoaderService : IDisposable
                     SysID: "9be67479a3b34cf395f500f3c165a9af",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Value: TYPE_NAME_string, DisplayValue: "String"),
+                    Type: new(Name: TYPE_NAME_string, Label: "String"),
                     MaxLength: 40,
                     IsActive: true,
                     IsUnique: false,
@@ -116,7 +116,7 @@ public sealed class DataLoaderService : IDisposable
                     SysID: "6bd533127c67405d998d3cb50f44419a",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Value: TYPE_NAME_glide_date_time, DisplayValue: "Date/Time"),
+                    Type: new(Name: TYPE_NAME_glide_date_time, Label: "Date/Time"),
                     MaxLength: null,
                     IsActive: true,
                     IsUnique: false,
@@ -136,7 +136,7 @@ public sealed class DataLoaderService : IDisposable
                     SysID: "75a55d94320c4041a7e4a1e14813de27",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Value: TYPE_NAME_integer, DisplayValue: "Integer"),
+                    Type: new(Name: TYPE_NAME_integer, Label: "Integer"),
                     MaxLength: null,
                     IsActive: false,
                     IsUnique: false,
@@ -156,7 +156,7 @@ public sealed class DataLoaderService : IDisposable
                     SysID: "ef0b4750753d4f6c82499a605b490af4",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Value: TYPE_NAME_string, DisplayValue: "String"),
+                    Type: new(Name: TYPE_NAME_string, Label: "String"),
                     MaxLength: 40,
                     IsActive: true,
                     IsUnique: false,
@@ -176,7 +176,7 @@ public sealed class DataLoaderService : IDisposable
                     SysID: "3f68a52adc8a4c5a960ec2a9a2bd9fd6",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Value: TYPE_NAME_glide_date_time, DisplayValue: "Date/Time"),
+                    Type: new(Name: TYPE_NAME_glide_date_time, Label: "Date/Time"),
                     MaxLength: null,
                     IsActive: true,
                     IsUnique: false,
@@ -202,7 +202,7 @@ public sealed class DataLoaderService : IDisposable
             return Array.Empty<Element>();
         var source = (await table.GetReferencedEntityAsync(_dbContext.Tables, t => t.Source, cancellationToken))!;
         _logger.LogAddingElementsToDatabase(table.Name);
-        var entities = elements.Select<ElementRecord, (Element Element, RecordRef? Package, RecordRef? Reference, RecordRef? Type, string SourceFqdn)>(e =>
+        var entities = elements.Select<ElementRecord, (Element Element, PackageRef? Package, TableRef? Reference, TypeRef? Type, string SourceFqdn)>(e =>
         (new Element()
         {
             Name = e.Name,
@@ -230,7 +230,7 @@ public sealed class DataLoaderService : IDisposable
             foreach (var a in g)
                 a.Element.Source = s;
         }
-        foreach (var g in entities.Where(a => a.Package is not null).GroupBy(a => a.Package!.DisplayValue))
+        foreach (var g in entities.Where(a => a.Package is not null).GroupBy(a => a.Package!.SysID))
         {
             var e = g.First();
             var p = await FromPackageRefAsync(e.Package, e.Element.Source!, cancellationToken);
@@ -238,7 +238,7 @@ public sealed class DataLoaderService : IDisposable
                 foreach (var a in g)
                     a.Element.Package = p;
         }
-        foreach (var g in entities.Where(a => a.Type is not null).GroupBy(a => a.Type!.Value))
+        foreach (var g in entities.Where(a => a.Type is not null).GroupBy(a => a.Type!.Name))
         {
             var e = g.First();
             var t = await FromGlideTypeRefAsync(e.Type!, e.Element.Source!, cancellationToken);
@@ -246,7 +246,7 @@ public sealed class DataLoaderService : IDisposable
                 foreach (var a in g)
                     a.Element.Type = t;
         }
-        foreach (var g in entities.Where(a => a.Reference is not null).GroupBy(a => a.Reference!.Value))
+        foreach (var g in entities.Where(a => a.Reference is not null).GroupBy(a => a.Reference!.Name))
         {
             var e = g.First();
             var t = await FromTableRefAsync(e.Reference!, cancellationToken);
@@ -323,9 +323,9 @@ public sealed class DataLoaderService : IDisposable
         return table;
     }
 
-    private async Task<GlideType> FromGlideTypeRefAsync(RecordRef typeRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<GlideType> FromGlideTypeRefAsync(TypeRef typeRef, SncSource source, CancellationToken cancellationToken)
     {
-        string name = typeRef.Value;
+        string name = typeRef.Name;
         GlideType? type = await _dbContext.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         if (type is null)
         {
@@ -354,7 +354,7 @@ public sealed class DataLoaderService : IDisposable
                 type = new()
                 {
                     Name = name,
-                    Label = typeRef.DisplayValue.AsNonEmpty(name),
+                    Label = typeRef.Label,
                     LastUpdated = DateTime.Now,
                     Source = source
                 };
@@ -601,19 +601,19 @@ public sealed class DataLoaderService : IDisposable
         return type;
     }
 
-    private async Task<Table?> FromTableRefAsync(RecordRef? tableRef, CancellationToken cancellationToken)
+    private async Task<Table?> FromTableRefAsync(TableRef? tableRef, CancellationToken cancellationToken)
     {
         if (tableRef is null)
             return null;
-        string name = tableRef.Value;
+        string name = tableRef.Name;
         var table = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         if (table is not null)
             return table;
-        var tableRecord = await _tableAPIService.GetTableByNameAsync(tableRef.Value, cancellationToken);
+        var tableRecord = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
         if (tableRecord is null)
             tableRecord = new(
                 Name: name,
-                Label: tableRef.DisplayValue.AsNonEmpty(name),
+                Label: tableRef.Label,
                 SysID: Guid.NewGuid().ToString("N"),
                 IsExtendable: true,
                 NumberPrefix: null,
@@ -626,70 +626,134 @@ public sealed class DataLoaderService : IDisposable
         return await AddTableAsync(tableRecord, cancellationToken);
     }
 
-    private async Task<Table?> FromSuperClassRefAsync(RecordRef? tableRef, CancellationToken cancellationToken)
+    private async Task<Table?> FromSuperClassRefAsync(SuperClassRef? tableRef, CancellationToken cancellationToken)
     {
         if (tableRef is null)
             return null;
-        string sys_id = tableRef.Value;
+        string sys_id = tableRef.SysID;
         if (_tableIdMap.TryGetValue(sys_id, out string? name))
             return await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         var tableRecord = await _tableAPIService.GetTableByIdAsync(sys_id, cancellationToken);
-        if (tableRecord is null)
+        if (tableRecord is null) // TODO: Add warning for table not found
             return null;
         return await AddTableAsync(tableRecord, cancellationToken);
     }
 
-    private async Task<Package?> FromPackageRefAsync(RecordRef? pkgRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<Package?> FromPackageRefAsync(PackageRef? pkgRef, SncSource source, CancellationToken cancellationToken)
     {
         if (pkgRef is null)
             return null;
-        string sys_id = pkgRef.Value;
-        if (_packageIdMap.TryGetValue(sys_id, out string? name))
-            return await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
-        name = pkgRef.DisplayValue;
-        if (name is null)
-            return null;
-        Package? package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
-        if (package is null)
+        string sys_id = pkgRef.SysID;
+        if (_packageIdMap.TryGetValue(sys_id, out string? id))
+            return await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken);
+        var packageRecord = await _tableAPIService.GetPackageByIDAsync(sys_id, cancellationToken);
+        Package? package;
+        if (packageRecord is null)
         {
+            if (_scopeIdMap.TryGetValue(sys_id, out id))
+            {
+                Scope? scope = await _dbContext.Scopes.FirstOrDefaultAsync(p => p.Value == id, cancellationToken);
+                if (scope is not null)
+                {
+                    id = scope.ID;
+                    if ((package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken)) is not null)
+                    {
+                        _packageIdMap.Add(sys_id, package.ID);
+                        return package;
+                    }
+                    package = new()
+                    {
+                        ID = id,
+                        Name = scope.Name,
+                        Version = scope.Version,
+                        SysID = sys_id,
+                        LastUpdated = DateTime.Now,
+                        Source = source
+                    };
+                    await _dbContext.Packages.AddAsync(package, cancellationToken);
+                    await _dbContext.SaveChangesAsync(cancellationToken);
+                    _packageIdMap.Add(sys_id, package.ID);
+                    return package;
+                }
+            }
+            string name;
+            if (pkgRef.Name is null)
+            {
+                id = sys_id;
+                name = $"Unknown name (Sys ID {sys_id} on {source.FQDN})";
+                // TODO: Add warning for new package with unknown name and label
+            }
+            else
+            {
+                id = pkgRef.Name;
+                if ((package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == id, cancellationToken)) is not null ||
+                    (package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken)) is not null)
+                {
+                    _packageIdMap.Add(sys_id, package.ID);
+                    return package;
+                }
+                name = id;
+                // TODO: Add warning for new package with unknown name
+            }
             package = new()
             {
+                ID = id,
                 Name = name,
-                SysId = pkgRef.Value,
+                Version = string.Empty,
+                SysID = sys_id,
                 LastUpdated = DateTime.Now,
                 Source = source
             };
             await _dbContext.Packages.AddAsync(package, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
-        _packageIdMap.Add(sys_id, name);
+        else
+        {
+            id = packageRecord.ID;
+            package = new()
+            {
+                ID = id,
+                Name = packageRecord.Name,
+                Version = string.Empty,
+                SysID = sys_id,
+                LastUpdated = DateTime.Now,
+                Source = source
+            };
+            await _dbContext.Packages.AddAsync(package, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        _packageIdMap.Add(sys_id, id);
         return package;
     }
 
-    private async Task<Scope?> FromScopeRefAsync(RecordRef? scopeRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<Scope?> FromScopeRefAsync(ScopeRef? scopeRef, SncSource source, CancellationToken cancellationToken)
     {
         if (scopeRef is null)
             return null;
-        var sys_id = scopeRef.Value;
+        var sys_id = scopeRef.ID;
         if (_scopeIdMap.TryGetValue(sys_id, out string? value))
             return await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken);
         var scopeRecord = await _tableAPIService.GetScopeByIDAsync(sys_id, cancellationToken);
         Scope? scope;
         if (scopeRecord is null)
         {
-            if (scopeRef.DisplayValue is null)
+            if ((value = scopeRef.Name) == null) // TODO: Warn not found
                 return null;
-            value = scopeRef.DisplayValue;
-            scope = new()
+            if ((scope = await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Name == value, cancellationToken)) is null)
             {
-                Name = value,
-                Value = value,
-                LastUpdated = DateTime.Now,
-                SysID = sys_id,
-                Source = source
-            };
-            await _dbContext.Scopes.AddAsync(scope, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+                if (!value.IsValidScopeName()) // TODO: Warn not found
+                    return null;
+                scope = new()
+                {
+                    Name = value,
+                    Value = value,
+                    LastUpdated = DateTime.Now,
+                    SysID = sys_id,
+                    Source = source
+                };
+                await _dbContext.Scopes.AddAsync(scope, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
         }
         else
         {
@@ -709,7 +773,7 @@ public sealed class DataLoaderService : IDisposable
                 await _dbContext.SaveChangesAsync(cancellationToken);
             }
         }
-        _scopeIdMap.Add(sys_id, scope.Name);
+        _scopeIdMap.Add(sys_id, value);
         return scope;
     }
 

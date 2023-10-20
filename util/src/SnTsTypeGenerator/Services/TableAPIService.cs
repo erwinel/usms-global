@@ -23,6 +23,11 @@ public sealed class TableAPIService
     /// </summary>
     internal bool InitSuccessful => _handler?.InitSuccessful ?? false;
 
+    delegate TResult DeserializeRef<out TResult>(string value, string? display_value);
+    
+    private static T? DeserializeProperty<T>(JsonObject obj, string propertyName, DeserializeRef<T> onDeserialize) where T : class => (obj.TryGetProperty(propertyName, out JsonObject? p) && p.TryGetPropertyAsNonEmpty(JSON_KEY_VALUE, out string? value)) ?
+        onDeserialize(value, p.GetPropertyNullIfWhitespace(JSON_KEY_DISPLAY_VALUE)) : null;
+
     private TableRecord? GetTableFromResponse(Uri requestUri, JsonNode? jsonNode, bool expectArray)
     {
         if (jsonNode is not JsonObject resultObj)
@@ -66,9 +71,9 @@ public sealed class TableAPIService
                    SysID: sys_id,
                    IsExtendable: resultObj.GetFieldAsBoolean(JSON_KEY_IS_EXTENDABLE),
                    NumberPrefix: resultObj.GetProperty<JsonObject>(JSON_KEY_NUMBER_REF)?.CoercePropertyAsNonEmptyOrNull(JSON_KEY_DISPLAY_VALUE),
-                   Package: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_PACKAGE),
-                   Scope: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_SCOPE),
-                   SuperClass: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SUPER_CLASS),
+                   Package: DeserializeProperty(resultObj, JSON_KEY_SYS_PACKAGE, (sys_id, name) => new PackageRef(SysID: sys_id, Name: name.NullIfWhiteSpace())),
+                   Scope: DeserializeProperty(resultObj, JSON_KEY_SYS_SCOPE, (id, name) => new ScopeRef(ID: id, Name: name.NullIfWhiteSpace())),
+                   SuperClass: DeserializeProperty(resultObj, JSON_KEY_SUPER_CLASS, (sys_id, label) => new SuperClassRef(SysID: sys_id, Label: label.NullIfWhiteSpace())),
                    AccessibleFrom: resultObj.GetFieldAsNonEmpty(JSON_KEY_ACCESS),
                    ExtensionModel: resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_EXTENSION_MODEL),
                    SourceFqdn: requestUri.Host);
@@ -148,9 +153,9 @@ public sealed class TableAPIService
                         Name: name,
                         Label: sysDictionary.GetFieldAsNonEmpty(JSON_KEY_COLUMN_LABEL, name),
                         SysID: sys_id,
-                        Reference: RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_REFERENCE),
+                        Reference: DeserializeProperty(sysDictionary, JSON_KEY_REFERENCE, (name, label) => new TableRef(Name: name, Label: label.AsNonEmpty(name))),
                         IsReadOnly: sysDictionary.GetFieldAsBoolean(JSON_KEY_READ_ONLY),
-                        Type: RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_INTERNAL_TYPE),
+                        Type: DeserializeProperty(sysDictionary, JSON_KEY_INTERNAL_TYPE, (name, label) => new TypeRef(Name: name, Label: label.AsNonEmpty(name))),
                         MaxLength: sysDictionary.GetFieldAsIntOrNull(JSON_KEY_MAX_LENGTH),
                         IsActive: sysDictionary.GetFieldAsBoolean(JSON_KEY_ACTIVE),
                         IsUnique: sysDictionary.GetFieldAsBoolean(JSON_KEY_UNIQUE),
@@ -162,13 +167,29 @@ public sealed class TableAPIService
                         Comments: sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_COMMENTS),
                         IsDisplay: sysDictionary.GetFieldAsBoolean(JSON_KEY_DISPLAY),
                         DefaultValue: sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_DEFAULT_VALUE),
-                        Package: RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_SYS_PACKAGE),
+                        Package: DeserializeProperty(sysDictionary, JSON_KEY_SYS_PACKAGE, (sys_id, name) => new PackageRef(SysID: sys_id, Name: name.NullIfWhiteSpace())),
                         SourceFqdn: requestUri.Host);
                     return elementRecord;
                 }
             }
             return null!;
         }).Where(n => n is not null).ToArray();
+    }
+
+    private async Task<(Uri RequestUri, JsonObject? Item, JsonObject ResponseObject)> GetTableApiJsonResponseAsync(string tableName, string id, CancellationToken cancellationToken)
+    {
+        (Uri requestUri, JsonNode? jsonNode) = await _handler!.GetTableApiJsonResponseAsync(tableName, id, cancellationToken);
+        if (jsonNode is null)
+            throw new InvalidHttpResponseException(requestUri, string.Empty);
+        if (jsonNode is not JsonObject resultObj)
+            throw new InvalidHttpResponseException(requestUri, jsonNode);
+        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
+            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
+        if (jsonNode is JsonObject response)
+            return (requestUri, response, resultObj);
+        if (jsonNode is JsonArray arr && arr.Count == 0)
+            return (requestUri, null, resultObj);
+        throw new InvalidHttpResponseException(requestUri, string.Empty);
     }
 
     /// <summary>
@@ -185,32 +206,87 @@ public sealed class TableAPIService
         if (!_handler.InitSuccessful)
             throw new InvalidOperationException();
         _logger.LogGettingScopeByIdentifierFromRemote(id);
-        (Uri requestUri, JsonNode? jsonNode) = await _handler.GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
-        if (jsonNode is null)
-            throw new InvalidHttpResponseException(requestUri, string.Empty);
-        if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode);
-        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
-            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
-        if (jsonNode is not JsonObject sysScopeResult)
+        (Uri requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
+        if (sysScopeResult is null)
         {
-            if (jsonNode is JsonArray arr && arr.Count == 0)
+            (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_STORE_APP, id, cancellationToken);
+            if (sysScopeResult is null)
             {
-                _logger.LogNoResultsFromQuery(requestUri, resultObj);
-                return null;
+                (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_APP, id, cancellationToken);
+                if (sysScopeResult is null)
+                {
+                    _logger.LogNoResultsFromQuery(requestUri, responseObj);
+                    return null;
+                }
             }
-            throw new InvalidHttpResponseException(requestUri, string.Empty);
         }
         if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
-            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
+            throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SYS_ID);
         if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
-            throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SCOPE);
-        ScopeRecord scopeRecord = new(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
+            throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SCOPE);
+        return new(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
             Value: value,
-            ShortDescription: sysScopeResult.GetFieldAsNonEmptyOrNull(JSON_KEY_SHORT_DESCRIPTION),
+            ID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SOURCE),
+            Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_VERSION),
+            ShortDescription: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_DESCRIPTION),
             SysID: sys_id,
             SourceFqdn: requestUri.Host);
-        return scopeRecord;
+    }
+
+    /// <summary>
+    /// Gets the scope from the remote ServiceNow instance that matches the specified unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the scope record.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="ScopeRecord"/> record that matches the specified <paramref name="id"/> or <see langword="null" /> if no scope was found in the remote ServiceNow instance.</returns>
+    internal async Task<PackageRecord?> GetPackageByIDAsync(string id, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_handler is null)
+            throw new ObjectDisposedException(nameof(TableAPIService));
+        if (!_handler.InitSuccessful)
+            throw new InvalidOperationException();
+        _logger.LogGettingScopeByIdentifierFromRemote(id);
+        
+        (Uri? requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PLUGINS, id, cancellationToken);
+        string? sys_id;
+        if (sysScopeResult is not null)
+        {
+            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out sys_id))
+                throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SYS_ID);
+            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SOURCE, out string? source))
+                throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SOURCE);
+            return new PackageRecord(ID: source,
+                Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, source)),
+                Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_VERSION),
+                SysID: sys_id,
+                SourceFqdn: requestUri.Host);
+        }
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_STORE_APP, id, cancellationToken);
+        if (sysScopeResult is null)
+        {
+            (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_APP, id, cancellationToken);
+            if (sysScopeResult is null)
+            {
+                (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
+                if (sysScopeResult is null)
+                {
+                    _logger.LogNoResultsFromQuery(requestUri, responseObj);
+                    return null;
+                }
+            }
+        }
+        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out sys_id))
+            throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SYS_ID);
+        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
+            throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SCOPE);
+        return new ScopeRecord(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
+            Value: value,
+            ID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SOURCE),
+            Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_VERSION),
+            ShortDescription: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_DESCRIPTION),
+            SysID: sys_id,
+            SourceFqdn: requestUri.Host);
     }
 
     /// <summary>
@@ -256,8 +332,8 @@ public sealed class TableAPIService
             ClassName: resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_CLASS_NAME),
             UseOriginalValue: resultObj.GetFieldAsBoolean(JSON_KEY_USE_ORIGINAL_VALUE),
             IsVisible: resultObj.GetFieldAsBoolean(JSON_KEY_VISIBLE),
-            Package: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_PACKAGE),
-            Scope: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_SCOPE),
+            Package: DeserializeProperty(resultObj, JSON_KEY_SYS_PACKAGE, (sys_id, name) => new PackageRef(SysID: sys_id, Name: name.NullIfWhiteSpace())),
+            Scope: DeserializeProperty(resultObj, JSON_KEY_SYS_SCOPE, (id, name) => new ScopeRef(ID: id, Name: name.NullIfWhiteSpace())),
             SourceFqdn: requestUri.Host);
         return glideTypeRecord;
     }

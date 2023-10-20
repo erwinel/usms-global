@@ -49,12 +49,13 @@ public partial class TypingsDbContext : DbContext
     private static IEnumerable<string> GetPackageDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Packages)}"" (
+    ""{nameof(Package.ID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Package.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(Package.SysId)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(Package.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(Package.Version)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Package.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     ""{nameof(Package.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Packages)}_{nameof(Package.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(Packages)}"" PRIMARY KEY(""{nameof(Package.Name)}"")
+    ""{nameof(Package.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(Packages)}"" PRIMARY KEY(""{nameof(Package.ID)}"")
 )";
     }
 
@@ -63,10 +64,12 @@ public partial class TypingsDbContext : DbContext
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Scopes)}"" (
     ""{nameof(Scope.Value)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Scope.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Scope.Version)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Scope.ID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Scope.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(Scope.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Scope.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     ""{nameof(Scope.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Scopes)}_{nameof(Scope.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Scope.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(Scopes)}"" PRIMARY KEY(""{nameof(Scope.Value)}"")
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(Scopes)}_{nameof(Scope.SysID)}\" ON \"{nameof(Scopes)}\" (\"{nameof(Scope.SysID)}\" COLLATE NOCASE)";
@@ -310,11 +313,12 @@ public partial class TypingsDbContext : DbContext
             })
             .Entity<Package>(builder =>
             {
-                _ = builder.HasKey(s => s.Name);
+                _ = builder.HasKey(s => s.ID);
+                _ = builder.Property(nameof(Package.ID)).UseCollation(COLLATION_NOCASE);
                 _ = builder.Property(nameof(Package.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Package.SysId)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Package.ShortDescription)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Package.Version)).UseCollation(COLLATION_NOCASE);
                 _ = builder.Property(nameof(Package.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Package.SysID)).UseCollation(COLLATION_NOCASE);
                 _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
             })
             .Entity<Scope>(builder =>
@@ -323,9 +327,11 @@ public partial class TypingsDbContext : DbContext
                 _ = builder.HasIndex(s => s.SysID).IsUnique();
                 _ = builder.Property(nameof(Scope.Value)).UseCollation(COLLATION_NOCASE);
                 _ = builder.Property(nameof(Scope.Name)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Scope.Version)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Scope.ID)).UseCollation(COLLATION_NOCASE);
                 _ = builder.Property(nameof(Scope.ShortDescription)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Scope.SysID)).UseCollation(COLLATION_NOCASE);
                 _ = builder.Property(nameof(Scope.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                _ = builder.Property(nameof(Scope.SysID)).UseCollation(COLLATION_NOCASE);
                 _ = builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
             })
             .Entity<GlideType>(builder =>
