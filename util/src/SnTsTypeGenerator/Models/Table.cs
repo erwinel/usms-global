@@ -16,6 +16,8 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
 {
     private readonly object _syncRoot = new();
 
+    #region Name Property
+
     private string _name = string.Empty;
 
     /// <summary>
@@ -28,6 +30,10 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
         get => _name;
         set => _name = value ?? string.Empty;
     }
+
+    #endregion
+
+    #region Label Property
 
     private string _label = string.Empty;
 
@@ -42,10 +48,14 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
         set => _label = value ?? string.Empty;
     }
 
+    #endregion
+
     /// <summary>
     /// Value of the "Extensible" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     public bool IsExtendable { get; set; }
+
+    #region AccessibleFrom Property
 
     private string _accessibleFrom = string.Empty;
 
@@ -59,6 +69,11 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
         get => _accessibleFrom;
         set => _accessibleFrom = value ?? string.Empty;
     }
+
+    #endregion
+
+    #region ExtensionModel Property
+
     private string? _extensionModel;
     /// <summary>
     /// Value of the "Extension model" (<see cref="SnApiConstants.JSON_KEY_EXTENSION_MODEL" />) column.
@@ -66,12 +81,18 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     [BackingField(nameof(_extensionModel))]
     public string? ExtensionModel { get => _extensionModel; set => _extensionModel = value.NullIfWhiteSpace(); }
 
+    #endregion
+
+    #region NumberPrefix Property
+
     private string? _numberPrefix;
     /// <summary>
     /// Associated value of the "Auto number" (<see cref="SnApiConstants.JSON_KEY_NUMBER_REF" />) column.
     /// </summary>
     [BackingField(nameof(_numberPrefix))]
     public string? NumberPrefix { get => _numberPrefix; set => _numberPrefix = value.NullIfWhiteSpace(); }
+
+    #endregion
 
     /// <summary>
     /// Date and time that this record was last updated.
@@ -82,6 +103,8 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     /// Indicates whether the table is a TypeScript interface rather than a GlideRecord type.
     /// </summary>
     public bool IsInterface { get; set; }
+
+    #region Package Navigation Property
 
     /// <summary>
     /// Name of the associated record for the "Package" (<see cref="SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
@@ -106,6 +129,10 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
         set => SetOptionalNavProperty(_syncRoot, value, ref _packageName, ref _package);
     }
 
+    #endregion
+
+    #region Scope Navigation Property
+
     private string? _scopeValue;
 
     /// <summary>
@@ -128,6 +155,10 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
         get { lock (_syncRoot) { return _scope; } }
         set => SetOptionalNavProperty(_syncRoot, value, ref _scopeValue, ref _scope);
     }
+
+    #endregion
+
+    #region SuperClass Navigation Property
 
     private string? _superClassName;
 
@@ -152,6 +183,10 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
         set => SetOptionalNavProperty(_syncRoot, value, ref _superClassName, ref _superClass);
     }
 
+    #endregion
+
+    #region Source Navigation Property
+
     private string _sourceFqdn = string.Empty;
 
     /// <summary>
@@ -175,6 +210,10 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
+    #endregion
+
+    #region SysID Property
+
     private string _sysID = string.Empty;
 
     /// <summary>
@@ -188,11 +227,19 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
         set => _sysID = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region Derived Property
+
     private HashSet<Table> _derived = new();
 
     [NotNull]
     [BackingField(nameof(_derived))]
     public HashSet<Table> Derived { get => _derived; set => _derived = value ?? new(); }
+
+    #endregion
+
+    #region Elements Property
 
     private HashSet<Element> _elements = new();
 
@@ -200,11 +247,17 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     [BackingField(nameof(_elements))]
     public HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
 
+    #endregion
+
+    #region ReferredBy Property
+
     private HashSet<Element> _referredBy = new();
 
     [NotNull]
     [BackingField(nameof(_referredBy))]
     public HashSet<Element> ReferredBy { get => _referredBy; set => _referredBy = value ?? new(); }
+
+    #endregion
 
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {

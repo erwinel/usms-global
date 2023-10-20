@@ -15,6 +15,8 @@ public sealed class Package : IEquatable<Package>, IValidatableObject
 {
     private readonly object _syncRoot = new();
 
+    #region Name Property
+
     private string _name = string.Empty;
 
     /// <summary>
@@ -28,14 +30,22 @@ public sealed class Package : IEquatable<Package>, IValidatableObject
         set => _name = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region ShortDescription Property
+
     private string? _shortDescription;
     [BackingField(nameof(_shortDescription))]
     public string? ShortDescription { get => _shortDescription; set => _shortDescription = value.NullIfWhiteSpace(); }
-    
+
+    #endregion
+
     /// <summary>
     /// Date and time that this record was last updated.
     /// </summary>
     public DateTime LastUpdated { get; set; }
+
+    #region Source Navigation Property
 
     private string _sourceFqdn = string.Empty;
 
@@ -60,6 +70,10 @@ public sealed class Package : IEquatable<Package>, IValidatableObject
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
+    #endregion
+
+    #region SysId Property
+
     private string _sysId = string.Empty;
 
     /// <summary>
@@ -73,11 +87,19 @@ public sealed class Package : IEquatable<Package>, IValidatableObject
         set => _sysId = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region Types Property
+
     private HashSet<GlideType> _types = new();
 
     [NotNull]
     [BackingField(nameof(_types))]
     public HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
+
+    #endregion
+
+    #region Tables Property
 
     private HashSet<Table> _tables = new();
 
@@ -85,11 +107,17 @@ public sealed class Package : IEquatable<Package>, IValidatableObject
     [BackingField(nameof(_tables))]
     public HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
 
+    #endregion
+
+    #region Elements Property
+
     private HashSet<Element> _elements = new();
 
     [NotNull]
     [BackingField(nameof(_elements))]
     public HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
+
+    #endregion
 
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {

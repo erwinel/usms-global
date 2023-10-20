@@ -16,6 +16,8 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
 {
     private readonly object _syncRoot = new();
 
+    #region Value Property
+
     private string _value = string.Empty;
 
     [Key]
@@ -25,6 +27,10 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         get => _value;
         set => _value = value ?? string.Empty;
     }
+
+    #endregion
+
+    #region Name Property
 
     private string _name = string.Empty;
 
@@ -39,14 +45,22 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         set => _name = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region ShortDescription Property
+
     private string? _shortDescription;
     [BackingField(nameof(_shortDescription))]
     public string? ShortDescription { get => _shortDescription; set => _shortDescription = value.NullIfWhiteSpace(); }
-    
+
+    #endregion
+
     /// <summary>
     /// Date and time that this record was last updated.
     /// </summary>
     public DateTime LastUpdated { get; set; }
+
+    #region Source Navigation Property
 
     private string _sourceFqdn = string.Empty;
 
@@ -71,6 +85,10 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
+    #endregion
+
+    #region SysID Property
+
     private string _sysID = string.Empty;
 
     /// <summary>
@@ -84,17 +102,27 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         set => _sysID = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region Types Property
+
     private HashSet<GlideType> _types = new();
 
     [NotNull]
     [BackingField(nameof(_types))]
     public HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
 
+    #endregion
+
+    #region Tables Property
+
     private HashSet<Table> _tables = new();
 
     [NotNull]
     [BackingField(nameof(_tables))]
     public HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
+
+    #endregion
 
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {
