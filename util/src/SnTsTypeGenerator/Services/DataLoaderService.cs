@@ -10,11 +10,11 @@ namespace SnTsTypeGenerator.Services;
 /// </summary>
 public sealed class DataLoaderService : IDisposable
 {
-    private TypingsDbContext? _dbContext;
+    private TypingsDbContext _dbContext;
     private readonly TableAPIService _tableAPIService;
     private readonly ILogger<DataLoaderService> _logger;
-    private readonly Dictionary<string, string> _scopeIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, string> _tableIdMap = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, string> _scopeIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, string> _packageIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, SncSource> _sourceCache = new(StringComparer.InvariantCultureIgnoreCase);
 
@@ -28,7 +28,7 @@ public sealed class DataLoaderService : IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         if (_sourceCache.TryGetValue(fqdn, out SncSource? source))
             return source;
-        if ((source = await _dbContext!.Sources.FirstOrDefaultAsync(s => s.FQDN == fqdn, cancellationToken)) is null)
+        if ((source = await _dbContext.Sources.FirstOrDefaultAsync(s => s.FQDN == fqdn, cancellationToken)) is null)
         {
             source = new()
             {
@@ -37,10 +37,10 @@ public sealed class DataLoaderService : IDisposable
                 IsPersonalDev = false,
                 LastAccessed = DateTime.Now
             };
-            await _dbContext!.Sources.AddAsync(source, cancellationToken);
+            await _dbContext.Sources.AddAsync(source, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             _sourceCache.Add(fqdn, source);
-            await _dbContext!.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
         }
         else
@@ -68,7 +68,7 @@ public sealed class DataLoaderService : IDisposable
                 SuperClass: null,
                 AccessibleFrom: string.Empty,
                 ExtensionModel: null,
-                SourceFqdn: sourceFqdn), cancellationToken);
+                SourceFqdn: sourceFqdn), true, cancellationToken);
             _ = await AddElementsAsync(new ElementRecord[] {
                 new(
                     Name: JSON_KEY_SYS_ID,
@@ -200,9 +200,10 @@ public sealed class DataLoaderService : IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         if (!elements.Any())
             return Array.Empty<Element>();
-        var source = (await table.GetReferencedEntityAsync(_dbContext!.Tables, t => t.Source, cancellationToken))!;
+        var source = (await table.GetReferencedEntityAsync(_dbContext.Tables, t => t.Source, cancellationToken))!;
         _logger.LogAddingElementsToDatabase(table.Name);
-        var entities = elements.Select<ElementRecord, (Element Element, RecordRef? Package, RecordRef? Reference, RecordRef? Type, string SourceFqdn)>(e => (new Element()
+        var entities = elements.Select<ElementRecord, (Element Element, RecordRef? Package, RecordRef? Reference, RecordRef? Type, string SourceFqdn)>(e =>
+        (new Element()
         {
             Name = e.Name,
             Comments = e.Comments,
@@ -248,18 +249,20 @@ public sealed class DataLoaderService : IDisposable
         foreach (var g in entities.Where(a => a.Reference is not null).GroupBy(a => a.Reference!.Value))
         {
             var e = g.First();
-            var t = await FromTableRefAsync(g.First().Reference!, cancellationToken);
+            var t = await FromTableRefAsync(e.Reference!, cancellationToken);
             if (t is not null)
                 foreach (var a in g)
                     a.Element.Reference = t;
         }
         var result = entities.Select(e => e.Element).ToArray();
-        await _dbContext!.Elements.AddRangeAsync(result, cancellationToken);
+        await _dbContext.Elements.AddRangeAsync(result, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return result;
     }
 
-    private async Task<Table> AddTableAsync(TableRecord @record, CancellationToken cancellationToken)
+    private async Task<Table> AddTableAsync(TableRecord @record, CancellationToken cancellationToken) => await AddTableAsync(@record, false, cancellationToken);
+
+    private async Task<Table> AddTableAsync(TableRecord @record, bool isInterface, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         SncSource source = await GetSourceAsync(@record.SourceFqdn, cancellationToken);
@@ -269,7 +272,7 @@ public sealed class DataLoaderService : IDisposable
             AccessibleFrom = @record.AccessibleFrom,
             ExtensionModel = @record.ExtensionModel,
             IsExtendable = @record.IsExtendable,
-            IsInterface = false,
+            IsInterface = isInterface,
             Label = @record.Label,
             LastUpdated = DateTime.Now,
             NumberPrefix = @record.NumberPrefix,
@@ -279,11 +282,11 @@ public sealed class DataLoaderService : IDisposable
             Scope = await FromScopeRefAsync(@record.Scope, source, cancellationToken)
         };
         _logger.LogAddingTableToDb(table.Name);
-        await _dbContext!.Tables.AddAsync(table, cancellationToken);
+        await _dbContext.Tables.AddAsync(table, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         _tableIdMap.Add(table.SysID, table.Name);
         _logger.LogNewTableSaveCompleted(table.Name);
-        Table? superClass = (@record.SuperClass is null) ? null : await FromTableRefAsync(@record.SuperClass, cancellationToken);
+        Table? superClass = (@record.SuperClass is null) ? null : await FromSuperClassRefAsync(@record.SuperClass, cancellationToken);
         IEnumerable<Element> superElements;
         var elements = (await _tableAPIService.GetElementsByTableNameAsync(@record.Name, cancellationToken)).ToArray();
         if (superClass is null)
@@ -294,7 +297,7 @@ public sealed class DataLoaderService : IDisposable
                 table.SuperClass = superClass;
                 _dbContext.Tables.Update(table);
                 await _dbContext.SaveChangesAsync(cancellationToken);
-                superElements = await table.GetRelatedCollectionAsync(_dbContext.Tables, e => e.Elements, cancellationToken);
+                superElements = await superClass.GetRelatedCollectionAsync(_dbContext.Tables, e => e.Elements, cancellationToken);
             }
             else
                 return table;
@@ -306,7 +309,9 @@ public sealed class DataLoaderService : IDisposable
             await _dbContext.SaveChangesAsync(cancellationToken);
             if (elements.Length == 0)
                 return table;
-            if (!(superElements = (await _dbContext.Tables.Entry(table).GetAllElementInheritancesAsync(cancellationToken)).Select(e => e.Element)).Any())
+            var entry = _dbContext.Tables.Entry(superClass);
+            var inh = await entry.GetAllElementInheritancesAsync(cancellationToken);
+            if (!(superElements = inh.Select(e => e.Element)).Any())
             {
                 await AddElementsAsync(elements, table, cancellationToken);
                 return table;
@@ -321,7 +326,7 @@ public sealed class DataLoaderService : IDisposable
     private async Task<GlideType> FromGlideTypeRefAsync(RecordRef typeRef, SncSource source, CancellationToken cancellationToken)
     {
         string name = typeRef.Value;
-        GlideType? type = await _dbContext!.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
+        GlideType? type = await _dbContext.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         if (type is null)
         {
             var typeRecord = await _tableAPIService.GetGlideTypeByNameAsync(name, cancellationToken);
@@ -600,17 +605,38 @@ public sealed class DataLoaderService : IDisposable
     {
         if (tableRef is null)
             return null;
-        if (_tableIdMap.TryGetValue(tableRef.Value, out string? name))
-            return await _dbContext!.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        var table = await _tableAPIService.GetTableByIdAsync(tableRef.Value, cancellationToken);
-        if (table is null)
+        string name = tableRef.Value;
+        var table = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
+        if (table is not null)
+            return table;
+        var tableRecord = await _tableAPIService.GetTableByNameAsync(tableRef.Value, cancellationToken);
+        if (tableRecord is null)
+            tableRecord = new(
+                Name: name,
+                Label: tableRef.DisplayValue.AsNonEmpty(name),
+                SysID: Guid.NewGuid().ToString("N"),
+                IsExtendable: true,
+                NumberPrefix: null,
+                Package: null,
+                Scope: null,
+                SuperClass: null,
+                AccessibleFrom: string.Empty,
+                ExtensionModel: null,
+                SourceFqdn: _tableAPIService.SourceFqdn);
+        return await AddTableAsync(tableRecord, cancellationToken);
+    }
+
+    private async Task<Table?> FromSuperClassRefAsync(RecordRef? tableRef, CancellationToken cancellationToken)
+    {
+        if (tableRef is null)
             return null;
-        name = table.Name;
-        var tableInfo = await _dbContext!.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        if (tableInfo is null)
-            return await AddTableAsync(table, cancellationToken);
-        _tableIdMap.Add(tableRef.Value, tableInfo.Name);
-        return tableInfo;
+        string sys_id = tableRef.Value;
+        if (_tableIdMap.TryGetValue(sys_id, out string? name))
+            return await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
+        var tableRecord = await _tableAPIService.GetTableByIdAsync(sys_id, cancellationToken);
+        if (tableRecord is null)
+            return null;
+        return await AddTableAsync(tableRecord, cancellationToken);
     }
 
     private async Task<Package?> FromPackageRefAsync(RecordRef? pkgRef, SncSource source, CancellationToken cancellationToken)
@@ -618,19 +644,19 @@ public sealed class DataLoaderService : IDisposable
         if (pkgRef is null)
             return null;
         if (_packageIdMap.TryGetValue(pkgRef.Value, out string? name))
-            return await _dbContext!.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
+            return await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
         name = pkgRef.DisplayValue;
-        Package? package = await _dbContext!.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
+        Package? package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
         if (package is null)
         {
             package = new()
             {
-                Name = pkgRef.DisplayValue,
+                Name = name,
                 SysId = pkgRef.Value,
                 LastUpdated = DateTime.Now,
                 Source = source
             };
-            await _dbContext!.Packages.AddAsync(package, cancellationToken);
+            await _dbContext.Packages.AddAsync(package, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
         _packageIdMap.Add(pkgRef.Value, package.Name);
@@ -641,9 +667,10 @@ public sealed class DataLoaderService : IDisposable
     {
         if (scopeRef is null)
             return null;
-        if (_scopeIdMap.TryGetValue(scopeRef.Value, out string? value))
-            return await _dbContext!.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken);
-        var scopeRecord = await _tableAPIService.GetScopeByIDAsync(scopeRef.Value, cancellationToken);
+        var sys_id = scopeRef.Value;
+        if (_scopeIdMap.TryGetValue(sys_id, out string? value))
+            return await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken);
+        var scopeRecord = await _tableAPIService.GetScopeByIDAsync(sys_id, cancellationToken);
         Scope? scope;
         if (scopeRecord is null)
         {
@@ -653,16 +680,16 @@ public sealed class DataLoaderService : IDisposable
                 Name = value,
                 Value = value,
                 LastUpdated = DateTime.Now,
-                SysID = scopeRef.Value,
+                SysID = sys_id,
                 Source = source
             };
-            await _dbContext!.Scopes.AddAsync(scope, cancellationToken);
+            await _dbContext.Scopes.AddAsync(scope, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
         else
         {
             value = scopeRecord.Value;
-            if ((scope = await _dbContext!.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken)) is null)
+            if ((scope = await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken)) is null)
             {
                 scope = new()
                 {
@@ -673,11 +700,11 @@ public sealed class DataLoaderService : IDisposable
                     Source = source,
                     ShortDescription = scopeRecord.ShortDescription
                 };
-                await _dbContext!.Scopes.AddAsync(scope, cancellationToken);
+                await _dbContext.Scopes.AddAsync(scope, cancellationToken);
                 await _dbContext.SaveChangesAsync(cancellationToken);
             }
         }
-        _scopeIdMap.Add(scopeRef.Value, value);
+        _scopeIdMap.Add(sys_id, scope.Name);
         return scope;
     }
 
@@ -718,7 +745,7 @@ public sealed class DataLoaderService : IDisposable
     private void Dispose(bool disposing)
     {
         TypingsDbContext? dbContext = _dbContext;
-        _dbContext = null;
+        _dbContext = null!;
         if (disposing && dbContext is not null)
             dbContext.Dispose();
     }

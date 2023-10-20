@@ -61,7 +61,7 @@ public sealed class TableAPIService
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_NAME, out string? name))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_NAME);
-        return new(Name: name,
+        TableRecord tableRecord = new(Name: name,
                    Label: resultObj.GetFieldAsNonEmpty(JSON_KEY_LABEL, name),
                    SysID: sys_id,
                    IsExtendable: resultObj.GetFieldAsBoolean(JSON_KEY_IS_EXTENDABLE),
@@ -72,6 +72,7 @@ public sealed class TableAPIService
                    AccessibleFrom: resultObj.GetFieldAsNonEmpty(JSON_KEY_ACCESS),
                    ExtensionModel: resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_EXTENSION_MODEL),
                    SourceFqdn: requestUri.Host);
+        return tableRecord;
     }
 
     /// <summary>
@@ -142,7 +143,8 @@ public sealed class TableAPIService
                 if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
                     _logger.LogExpectedPropertyNotFound(requestUri, JSON_KEY_SYS_ID, index, sysDictionary);
                 else
-                    return new ElementRecord(
+                {
+                    ElementRecord elementRecord = new(
                         Name: name,
                         Label: sysDictionary.GetFieldAsNonEmpty(JSON_KEY_COLUMN_LABEL, name),
                         SysID: sys_id,
@@ -162,6 +164,8 @@ public sealed class TableAPIService
                         DefaultValue: sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_DEFAULT_VALUE),
                         Package: RecordRef.DeserializeProperty(sysDictionary, JSON_KEY_SYS_PACKAGE),
                         SourceFqdn: requestUri.Host);
+                    return elementRecord;
+                }
             }
             return null!;
         }).Where(n => n is not null).ToArray();
@@ -201,12 +205,12 @@ public sealed class TableAPIService
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
         if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SCOPE);
-        return new(
-            Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
+        ScopeRecord scopeRecord = new(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
             Value: value,
             ShortDescription: sysScopeResult.GetFieldAsNonEmptyOrNull(JSON_KEY_SHORT_DESCRIPTION),
             SysID: sys_id,
             SourceFqdn: requestUri.Host);
+        return scopeRecord;
     }
 
     /// <summary>
@@ -244,7 +248,7 @@ public sealed class TableAPIService
         resultObj = (JsonObject)jsonNode;
         if (!resultObj.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
             throw new ExpectedPropertyNotFoundException(requestUri, resultObj, JSON_KEY_SYS_ID);
-        return new(Name: name,
+        GlideTypeRecord glideTypeRecord = new(Name: name,
             Label: resultObj.GetFieldAsNonEmpty(JSON_KEY_LABEL, name),
             SysID: sys_id,
             ScalarType: resultObj.GetFieldAsNonEmptyOrNull(JSON_KEY_SCALAR_TYPE),
@@ -255,6 +259,7 @@ public sealed class TableAPIService
             Package: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_PACKAGE),
             Scope: RecordRef.DeserializeProperty(resultObj, JSON_KEY_SYS_SCOPE),
             SourceFqdn: requestUri.Host);
+        return glideTypeRecord;
     }
 
     public TableAPIService(SnClientHandlerService handler, ILogger<TableAPIService> logger)

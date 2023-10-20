@@ -14,7 +14,7 @@ public partial class RenderingService
 
         public GlobalElementRenderingContext(string? package) => Package = package;
 
-        public string GetElementName(string typeName) => typeName switch
+        public string GetElementName(string? typeName) => (typeName is null) ? TS_NAME_GlideElement : typeName switch
         {
             "boolean" => "GlideElementBoolean",
 
@@ -105,7 +105,7 @@ public partial class RenderingService
             _ => TS_NAME_GlideElement,
         };
 
-        public bool IsExplicitScalarType(string typeName) => typeName switch
+        public bool IsExplicitScalarType(string? typeName) => typeName is not null && typeName switch
         {
             TYPE_NAME_decimal or TYPE_NAME_float or TYPE_NAME_percent_complete or TYPE_NAME_order_index or TYPE_NAME_longint or TYPE_NAME_script_plain or TYPE_NAME_xml or TYPE_NAME_glide_date or
                 TYPE_NAME_glide_time or TYPE_NAME_timer or TYPE_NAME_glide_duration or TYPE_NAME_glide_utc_time or TYPE_NAME_due_date or TYPE_NAME_glide_precise_time or TYPE_NAME_calendar_date_time or

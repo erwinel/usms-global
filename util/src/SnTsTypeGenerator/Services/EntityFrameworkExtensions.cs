@@ -66,7 +66,8 @@ public static class EntityFrameworkExtensions
     {
         if (entity is null)
             return Enumerable.Empty<TProperty>();
-        return await dbSet.Entry(entity).GetRelatedCollectionAsync(propertyExpression, cancellationToken);
+        var entry = dbSet.Entry(entity);
+        return await entry.GetRelatedCollectionAsync(propertyExpression, cancellationToken);
     }
 
     /// <summary>

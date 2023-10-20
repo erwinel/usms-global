@@ -7,7 +7,7 @@ public partial class RenderingService
         int IndentLevel { get; }
         string? Scope { get; }
         string? Package { get; }
-        bool IsExplicitScalarType(string typeName);
-        string GetElementName(string typeName);
+        bool IsExplicitScalarType(string? typeName);
+        string GetElementName(string? typeName);
     }
 }
