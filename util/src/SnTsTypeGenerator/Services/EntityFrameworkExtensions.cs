@@ -299,15 +299,15 @@ public static class EntityFrameworkExtensions
         }).OrderBy(i => i.Element.Name, NameComparer);
     }
 
-    public static bool ExtendsBaseRecord(this IEnumerable<Element> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.TypeName == TYPE_NAME_GUID) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.TypeName == TYPE_NAME_string) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.TypeName == TYPE_NAME_glide_date_time) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName == TYPE_NAME_string) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName == TYPE_NAME_glide_date_time);
+    public static bool ExtendsBaseRecord(this IEnumerable<Element> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.TypeName.NoCaseEquals(TYPE_NAME_GUID)) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.TypeName.NoCaseEquals(TYPE_NAME_string)) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.TypeName.NoCaseEquals(TYPE_NAME_glide_date_time)) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName.NoCaseEquals(TYPE_NAME_integer)) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName.NoCaseEquals(TYPE_NAME_string)) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName.NoCaseEquals(TYPE_NAME_glide_date_time));
 
-    public static bool ExtendsBaseRecord(this IEnumerable<ElementRecord> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && e.Type?.Value == TYPE_NAME_GUID) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && e.Type?.Value == TYPE_NAME_string) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && e.Type?.Value == TYPE_NAME_glide_date_time) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.Type?.Value == TYPE_NAME_integer) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.Type?.Value == TYPE_NAME_string) &&
-        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.Type?.Value == TYPE_NAME_glide_date_time);
+    public static bool ExtendsBaseRecord(this IEnumerable<ElementRecord> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && TYPE_NAME_GUID.NoCaseEquals(e.Type?.Value)) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && TYPE_NAME_string.NoCaseEquals(e.Type?.Value)) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && TYPE_NAME_glide_date_time.NoCaseEquals(e.Type?.Value)) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && TYPE_NAME_integer.NoCaseEquals(e.Type?.Value)) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && TYPE_NAME_string.NoCaseEquals(e.Type?.Value)) &&
+        elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && TYPE_NAME_glide_date_time.NoCaseEquals(e.Type?.Value));
 
     public static bool IsGlobalScope(this Table table) => string.IsNullOrWhiteSpace(table.ScopeValue) || NameComparer.Equals(table.ScopeValue, GLOBAL_NAMESPACE);
 

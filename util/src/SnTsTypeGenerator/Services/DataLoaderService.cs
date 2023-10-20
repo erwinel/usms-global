@@ -238,7 +238,7 @@ public sealed class DataLoaderService : IDisposable
                 foreach (var a in g)
                     a.Element.Package = p;
         }
-        foreach (var g in entities.Where(a => a.Type is not null).GroupBy(a => a.Type!.DisplayValue))
+        foreach (var g in entities.Where(a => a.Type is not null).GroupBy(a => a.Type!.Value))
         {
             var e = g.First();
             var t = await FromGlideTypeRefAsync(e.Type!, e.Element.Source!, cancellationToken);
@@ -354,7 +354,7 @@ public sealed class DataLoaderService : IDisposable
                 type = new()
                 {
                     Name = name,
-                    Label = typeRef.DisplayValue,
+                    Label = typeRef.DisplayValue.AsNonEmpty(name),
                     LastUpdated = DateTime.Now,
                     Source = source
                 };
@@ -643,9 +643,12 @@ public sealed class DataLoaderService : IDisposable
     {
         if (pkgRef is null)
             return null;
-        if (_packageIdMap.TryGetValue(pkgRef.Value, out string? name))
+        string sys_id = pkgRef.Value;
+        if (_packageIdMap.TryGetValue(sys_id, out string? name))
             return await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
         name = pkgRef.DisplayValue;
+        if (name is null)
+            return null;
         Package? package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
         if (package is null)
         {
@@ -659,7 +662,7 @@ public sealed class DataLoaderService : IDisposable
             await _dbContext.Packages.AddAsync(package, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
-        _packageIdMap.Add(pkgRef.Value, package.Name);
+        _packageIdMap.Add(sys_id, name);
         return package;
     }
 
@@ -674,6 +677,8 @@ public sealed class DataLoaderService : IDisposable
         Scope? scope;
         if (scopeRecord is null)
         {
+            if (scopeRef.DisplayValue is null)
+                return null;
             value = scopeRef.DisplayValue;
             scope = new()
             {
@@ -728,7 +733,7 @@ public sealed class DataLoaderService : IDisposable
         }
         return table;
     }
-    
+
     internal async Task<IEnumerable<Table>> LoadAllReferencedAsync(IEnumerable<Table> tables, CancellationToken cancellationToken)
     {
         TypingsDbContext? dbContext = _dbContext ?? throw new ObjectDisposedException(nameof(DataLoaderService));
