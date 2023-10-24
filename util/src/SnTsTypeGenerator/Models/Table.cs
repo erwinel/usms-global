@@ -9,7 +9,7 @@ using static SnTsTypeGenerator.Models.EntityAccessors;
 namespace SnTsTypeGenerator.Models;
 
 /// <summary>
-/// Represents an item from the "Table" (<see cref="SnApiConstants.TABLE_NAME_SYS_DB_OBJECT" />) table.
+/// Represents an item from the "Table" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_DB_OBJECT" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Tables))]
 public sealed class Table : IEquatable<Table>, IValidatableObject
@@ -21,7 +21,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     private string _name = string.Empty;
 
     /// <summary>
-    /// Value of the "Name" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
+    /// Value of the "Name" (<see cref="Services.SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_name))]
@@ -38,7 +38,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     private string _label = string.Empty;
 
     /// <summary>
-    /// Value of the "Label" (<see cref="SnApiConstants.JSON_KEY_LABEL" />) column.
+    /// Value of the "Label" (<see cref="Services.SnApiConstants.JSON_KEY_LABEL" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_label))]
@@ -51,7 +51,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     #endregion
 
     /// <summary>
-    /// Value of the "Extensible" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
+    /// Value of the "Extensible" (<see cref="Services.SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     public bool IsExtendable { get; set; }
 
@@ -60,7 +60,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     private string _accessibleFrom = string.Empty;
 
     /// <summary>
-    /// Value of the "Accessible from" (<see cref="SnApiConstants.JSON_KEY_ACCESS" />) column.
+    /// Value of the "Accessible from" (<see cref="Services.SnApiConstants.JSON_KEY_ACCESS" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_accessibleFrom))]
@@ -76,7 +76,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
 
     private string? _extensionModel;
     /// <summary>
-    /// Value of the "Extension model" (<see cref="SnApiConstants.JSON_KEY_EXTENSION_MODEL" />) column.
+    /// Value of the "Extension model" (<see cref="Services.SnApiConstants.JSON_KEY_EXTENSION_MODEL" />) column.
     /// </summary>
     [BackingField(nameof(_extensionModel))]
     public string? ExtensionModel { get => _extensionModel; set => _extensionModel = value.NullIfWhiteSpace(); }
@@ -87,7 +87,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
 
     private string? _numberPrefix;
     /// <summary>
-    /// Associated value of the "Auto number" (<see cref="SnApiConstants.JSON_KEY_NUMBER_REF" />) column.
+    /// Associated value of the "Auto number" (<see cref="Services.SnApiConstants.JSON_KEY_NUMBER_REF" />) column.
     /// </summary>
     [BackingField(nameof(_numberPrefix))]
     public string? NumberPrefix { get => _numberPrefix; set => _numberPrefix = value.NullIfWhiteSpace(); }
@@ -107,7 +107,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     #region Package Navigation Property
 
     /// <summary>
-    /// Name of the associated record for the "Package" (<see cref="SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
+    /// Name of the associated record for the "Package" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
     private string? _packageName;
 
@@ -136,7 +136,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     private string? _scopeValue;
 
     /// <summary>
-    /// Value of the associated record for the "Application" (<see cref="SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
+    /// Value of the associated record for the "Application" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
     /// </summary>
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue
@@ -163,7 +163,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     private string? _superClassName;
 
     /// <summary>
-    /// Table name associated with the "Extends table" (<see cref="SnApiConstants.JSON_KEY_SUPER_CLASS" />) column.
+    /// Table name associated with the "Extends table" (<see cref="Services.SnApiConstants.JSON_KEY_SUPER_CLASS" />) column.
     /// </summary>
     [BackingField(nameof(_superClassName))]
     public string? SuperClassName
@@ -217,7 +217,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// Value of the "Sys ID" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]

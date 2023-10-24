@@ -9,7 +9,7 @@ using static SnTsTypeGenerator.Models.EntityAccessors;
 namespace SnTsTypeGenerator.Models;
 
 /// <summary>
-/// Represents an item from the "Field class" (<see cref="SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" />) table.
+/// Represents an item from the "Field class" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Types))]
 public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
@@ -21,7 +21,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private string _name = string.Empty;
 
     /// <summary>
-    /// Value of the "Name" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
+    /// Value of the "Name" (<see cref="Services.SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_name))]
@@ -38,7 +38,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private string _label = string.Empty;
 
     /// <summary>
-    /// Value of the "Label" (<see cref="SnApiConstants.JSON_KEY_LABEL" />) column.
+    /// Value of the "Label" (<see cref="Services.SnApiConstants.JSON_KEY_LABEL" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_label))]
@@ -54,7 +54,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
 
     private string? _scalarType;
     /// <summary>
-    /// Value of the "Extends" (<see cref="SnApiConstants.JSON_KEY_SCALAR_TYPE" />) column.
+    /// Value of the "Extends" (<see cref="Services.SnApiConstants.JSON_KEY_SCALAR_TYPE" />) column.
     /// </summary>
     [BackingField(nameof(_scalarType))]
     public string? ScalarType { get => _scalarType; set => _scalarType = value.NullIfWhiteSpace(); }
@@ -62,7 +62,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     #endregion
 
     /// <summary>
-    /// Value of the "Length" (<see cref="SnApiConstants.JSON_KEY_SCALAR_LENGTH" />) column.
+    /// Value of the "Length" (<see cref="Services.SnApiConstants.JSON_KEY_SCALAR_LENGTH" />) column.
     /// </summary>
     public int? ScalarLength { get; set; }
 
@@ -70,7 +70,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
 
     private string? _className;
     /// <summary>
-    /// Value of the "Class name" (<see cref="SnApiConstants.JSON_KEY_CLASS_NAME" />) column.
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_CLASS_NAME" />) column.
     /// </summary>
     [BackingField(nameof(_className))]
     public string? ClassName { get => _className; set => _className = value.NullIfWhiteSpace(); }
@@ -78,7 +78,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     #endregion
 
     /// <summary>
-    /// Value of the "Use original value" (<see cref="SnApiConstants.JSON_KEY_USE_ORIGINAL_VALUE" />) column.
+    /// Value of the "Use original value" (<see cref="Services.SnApiConstants.JSON_KEY_USE_ORIGINAL_VALUE" />) column.
     /// </summary>
     public bool UseOriginalValue { get; set; }
 
@@ -95,7 +95,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     #region Package Navigation Property
 
     /// <summary>
-    /// Name of the associated record for the "Package" (<see cref="SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
+    /// Name of the associated record for the "Package" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
     private string? _packageName;
 
@@ -124,7 +124,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private string? _scopeValue;
 
     /// <summary>
-    /// Value of the associated record for the "Application" (<see cref="SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
+    /// Value of the associated record for the "Application" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
     /// </summary>
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue
@@ -178,7 +178,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// Value of the "Sys ID" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]
