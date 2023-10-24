@@ -9,7 +9,8 @@ using static SnTsTypeGenerator.Models.EntityAccessors;
 namespace SnTsTypeGenerator.Models;
 
 /// <summary>
-/// Represents an record from the "Package" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_PACKAGE" />) table.
+/// Represents an record from the "Sys Plugins" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_PLUGINS" />), "Custom Application" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_APP" />),
+/// "Store Application" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_STORE_APP" />), or "Application" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_SCOPE" />) table.
 /// https://dev93009.service-now.com/nav_to.do?uri=sys_db_object.do?sys_id=c7795303b4232110320f8dc279c80442
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Packages))]
@@ -22,7 +23,7 @@ public sealed class Package : IValidatableObject
     private string _id = string.Empty;
 
     /// <summary>
-    /// The value of the <c>source</c> field.
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_SOURCE" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_id))]
@@ -39,7 +40,7 @@ public sealed class Package : IValidatableObject
     private string _name = string.Empty;
 
     /// <summary>
-    /// The value of the <c>name</c> field.
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_name))]
@@ -54,9 +55,9 @@ public sealed class Package : IValidatableObject
     #region Version Property
 
     private string? _version;
-    
+
     /// <summary>
-    /// The value of the <c>version</c> field.
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_VERSION" />) column.
     /// </summary>
     [BackingField(nameof(_version))]
     public string? Version { get => _version; set => _version = value.NullIfWhiteSpace(); }
@@ -100,7 +101,7 @@ public sealed class Package : IValidatableObject
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the package reference.
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]

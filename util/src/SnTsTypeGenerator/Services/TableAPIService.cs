@@ -227,7 +227,7 @@ public sealed class TableAPIService
         return new(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
             Value: value,
             ID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SOURCE),
-            Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_VERSION),
+            Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
             ShortDescription: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_DESCRIPTION),
             SysID: sys_id,
             SourceFqdn: requestUri.Host);
@@ -258,7 +258,7 @@ public sealed class TableAPIService
                 throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SOURCE);
             return new PackageRecord(ID: source,
                 Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, source)),
-                Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_VERSION),
+                Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
                 SysID: sys_id,
                 SourceFqdn: requestUri.Host);
         }
@@ -283,7 +283,7 @@ public sealed class TableAPIService
         return new ScopeRecord(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
             Value: value,
             ID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SOURCE),
-            Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_VERSION),
+            Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
             ShortDescription: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_DESCRIPTION),
             SysID: sys_id,
             SourceFqdn: requestUri.Host);

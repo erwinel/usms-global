@@ -23,6 +23,9 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
 
     [Key]
     [BackingField(nameof(_value))]
+    /// <summary>
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_SCOPE" />) column.
+    /// </summary>
     public string Value
     {
         get => _value;
@@ -36,7 +39,7 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
     private string _name = string.Empty;
 
     /// <summary>
-    /// The value of the <c>name</c> field.
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_name))]
@@ -51,9 +54,9 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
     #region Version Property
 
     private string? _version;
-    
+
     /// <summary>
-    /// The value of the <c>version</c> field.
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_VERSION" />) column.
     /// </summary>
     [BackingField(nameof(_version))]
     public string? Version { get => _version; set => _version = value.NullIfWhiteSpace(); }
@@ -65,7 +68,7 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
     private string _id = string.Empty;
 
     /// <summary>
-    /// The value of the <c>source</c> field.
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_SOURCE" />) column.
     /// </summary>
     [BackingField(nameof(_id))]
     public string ID
@@ -121,7 +124,7 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the package reference.
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]

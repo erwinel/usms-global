@@ -103,7 +103,7 @@ Package (sys_package)
     /// </summary>
     internal const string JSON_KEY_NAME = "name";
 
-    internal const string JSON_KEY_SHORT_VERSION = "version";
+    internal const string JSON_KEY_VERSION = "version";
 
     internal const string JSON_KEY_SHORT_DESCRIPTION = "short_description";
 
