@@ -65,8 +65,11 @@ public static class JsonExtensions
     public static string? GetPropertyAsString(this JsonObject source, string propertyName) =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result)) ? result : null;
 
-    public static string GetPropertyAsNonEmpty(this JsonObject source, string propertyName) =>
+    public static string GetPropertyEmptyIfNullOrWhitespace(this JsonObject source, string propertyName) =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result) && !string.IsNullOrWhiteSpace(result)) ? result : string.Empty;
+
+    public static string? GetPropertyNullIfWhitespace(this JsonObject source, string propertyName) =>
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue && jsonValue.TryGetValue(out string? result) && !string.IsNullOrWhiteSpace(result)) ? result : null;
 
     public static bool TryCoercePropertyAsString(this JsonObject source, string propertyName, [NotNullWhen(true)] out string? result)
     {

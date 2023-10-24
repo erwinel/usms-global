@@ -16,6 +16,8 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
 {
     private readonly object _syncRoot = new();
 
+    #region Name Property
+
     private string _name = string.Empty;
 
     /// <summary>
@@ -28,6 +30,10 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         get => _name;
         set => _name = value ?? string.Empty;
     }
+
+    #endregion
+
+    #region Label Property
 
     private string _label = string.Empty;
 
@@ -42,6 +48,10 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         set => _label = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region ScalarType Property
+
     private string? _scalarType;
     /// <summary>
     /// Value of the "Extends" (<see cref="SnApiConstants.JSON_KEY_SCALAR_TYPE" />) column.
@@ -49,10 +59,14 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     [BackingField(nameof(_scalarType))]
     public string? ScalarType { get => _scalarType; set => _scalarType = value.NullIfWhiteSpace(); }
 
+    #endregion
+
     /// <summary>
     /// Value of the "Length" (<see cref="SnApiConstants.JSON_KEY_SCALAR_LENGTH" />) column.
     /// </summary>
     public int? ScalarLength { get; set; }
+
+    #region ClassName Property
 
     private string? _className;
     /// <summary>
@@ -60,6 +74,8 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     /// </summary>
     [BackingField(nameof(_className))]
     public string? ClassName { get => _className; set => _className = value.NullIfWhiteSpace(); }
+
+    #endregion
 
     /// <summary>
     /// Value of the "Use original value" (<see cref="SnApiConstants.JSON_KEY_USE_ORIGINAL_VALUE" />) column.
@@ -75,6 +91,8 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     /// Date and time that this record was last updated.
     /// </summary>
     public DateTime LastUpdated { get; set; }
+
+    #region Package Navigation Property
 
     /// <summary>
     /// Name of the associated record for the "Package" (<see cref="SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
@@ -99,6 +117,10 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         set => SetOptionalNavProperty(_syncRoot, value, ref _packageName, ref _package);
     }
 
+    #endregion
+
+    #region Scope Navigation Property
+
     private string? _scopeValue;
 
     /// <summary>
@@ -121,6 +143,10 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         get { lock (_syncRoot) { return _scope; } }
         set => SetOptionalNavProperty(_syncRoot, value, ref _scopeValue, ref _scope);
     }
+
+    #endregion
+
+    #region Source Navigation Property
 
     private string _sourceFqdn = string.Empty;
 
@@ -145,6 +171,10 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
+    #endregion
+
+    #region SysID Property
+
     private string _sysID = string.Empty;
 
     /// <summary>
@@ -158,11 +188,17 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         set => _sysID = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region Elements Property
+
     private HashSet<Element> _elements = new();
 
     [NotNull]
     [BackingField(nameof(_elements))]
     public HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
+
+    #endregion
 
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {

@@ -16,6 +16,8 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
 {
     private readonly object _syncRoot = new();
 
+    #region Name Property
+
     private string _name = string.Empty;
 
     /// <summary>
@@ -29,6 +31,10 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         set => _name = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region Label Property
+
     private string _label = string.Empty;
 
     /// <summary>
@@ -41,6 +47,8 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         get => _label;
         set => _label = value ?? string.Empty;
     }
+
+    #endregion
 
     /// <summary>
     /// Value of the "Active" (<see cref="SnApiConstants.JSON_KEY_ACTIVE" />) column.
@@ -57,6 +65,8 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
     /// </summary>
     public int? MaxLength { get; set; }
 
+    #region Comments Property
+
     private string? _comments;
     /// <summary>
     /// Value of the "Comments" (<see cref="SnApiConstants.JSON_KEY_COMMENTS" />) column.
@@ -64,12 +74,18 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
     [BackingField(nameof(_comments))]
     public string? Comments { get => _comments; set => _comments = value.NullIfWhiteSpace(); }
 
+    #endregion
+
+    #region DefaultValue Property
+
     private string? _defaultValue;
     /// <summary>
     /// Value of the "Default value" (<see cref="SnApiConstants.JSON_KEY_DEFAULT_VALUE" />) column.
     /// </summary>
     [BackingField(nameof(_defaultValue))]
     public string? DefaultValue { get => _defaultValue; set => _defaultValue = value.NullIfWhiteSpace(); }
+
+    #endregion
 
     /// <summary>
     /// Value of the "Display" (<see cref="SnApiConstants.JSON_KEY_DISPLAY" />) column.
@@ -111,6 +127,8 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
     /// </summary>
     public DateTime LastUpdated { get; set; }
 
+    #region Package Navigation Property
+
     private string? _packageName;
 
     /// <summary>
@@ -133,6 +151,10 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         get { lock (_syncRoot) { return _package; } }
         set => SetOptionalNavProperty(_syncRoot, value, ref _packageName, ref _package);
     }
+
+    #endregion
+
+    #region Table Navigation Property
 
     private string _tableName = string.Empty;
 
@@ -158,6 +180,10 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         set => SetRequiredNavProperty(_syncRoot, value, ref _tableName, ref _table, s => s.Name);
     }
 
+    #endregion
+
+    #region GlideType Navigation Property
+
     private string? _typeName = null;
 
     /// <summary>
@@ -180,6 +206,10 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         get { lock (_syncRoot) { return _type; } }
         set => SetOptionalNavProperty(_syncRoot, value, ref _typeName, ref _type);
     }
+
+    #endregion
+
+    #region Reference Navigation Property
 
     private string? _refTableName;
 
@@ -204,6 +234,10 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         set => SetOptionalNavProperty(_syncRoot, value, ref _refTableName, ref _reference);
     }
 
+    #endregion
+
+    #region Source Navigation Property
+
     private string _sourceFqdn = string.Empty;
 
     /// <summary>
@@ -227,6 +261,10 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
+    #endregion
+
+    #region SysID Property
+
     private string _sysID = string.Empty;
 
     /// <summary>
@@ -239,6 +277,8 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         get => _sysID;
         set => _sysID = value ?? string.Empty;
     }
+
+    #endregion
 
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {

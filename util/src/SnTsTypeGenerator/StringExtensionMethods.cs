@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.RegularExpressions;
 using static SnTsTypeGenerator.Services.SnApiConstants;
@@ -122,10 +123,6 @@ public static partial class StringExtensionMethods
 
     public static string AsWhitespaceNormalized(this string? text) => text is null || (text = text.Trim()).Length == 0 ? string.Empty : AbnormalWsRegex.Replace(text, " ");
 
-    [GeneratedRegex(@"\r\n?|\n", RegexOptions.Compiled)]
-    private static partial Regex GetLineBreakRegex();
-    public static readonly Regex LineBreakRegex = GetLineBreakRegex();
-
     public static string AsNonEmpty(this string? value, Func<string> getDefaultValue) => string.IsNullOrWhiteSpace(value) ? getDefaultValue() : value;
 
     public static string AsNonEmpty(this string? value, string defaultValue) => string.IsNullOrWhiteSpace(value) ? defaultValue : value;
@@ -136,7 +133,17 @@ public static partial class StringExtensionMethods
 
     private static readonly ImmutableArray<string> JSDOC_END = new string[] { " */" }.ToImmutableArray();
 
+    [GeneratedRegex(@"\r\n?|\n", RegexOptions.Compiled)]
+    private static partial Regex GetLineBreakRegex();
+    public static readonly Regex LineBreakRegex = GetLineBreakRegex();
+
     public static string[] SplitLines(this string? lines) => string.IsNullOrEmpty(lines) ? new string[] { "" } : LineBreakRegex.Split(lines);
 
     public static IEnumerable<string> ToJsDocLines(this IEnumerable<string> lines) => JSDOC_START.Concat(lines.Select(l => string.IsNullOrWhiteSpace(l) ? " *" : $" * {l}")).Concat(JSDOC_END);
+
+    [GeneratedRegex(@"^[a-z_][a-z\d_]*$", RegexOptions.Compiled)]
+    private static partial Regex GetScopeNameRegex();
+    public static readonly Regex ScopeNameRegex = GetScopeNameRegex();
+
+    public static bool IsValidScopeName([NotNullWhen(true)] this string? value) => !string.IsNullOrEmpty(value) && ScopeNameRegex.IsMatch(value);
 }

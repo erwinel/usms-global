@@ -9,12 +9,15 @@ using static SnTsTypeGenerator.Models.EntityAccessors;
 namespace SnTsTypeGenerator.Models;
 
 /// <summary>
-/// Represents an item from the "Application" (<see cref="SnApiConstants.TABLE_NAME_SYS_SCOPE" />) table.
+/// Represents an record from the "Store Application" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_STORE_APP" />),
+/// "Custom Application" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_APP" />) or "Application" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_SCOPE" />) table.
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Scopes))]
 public sealed class Scope : IEquatable<Scope>, IValidatableObject
 {
     private readonly object _syncRoot = new();
+
+    #region Value Property
 
     private string _value = string.Empty;
 
@@ -26,12 +29,16 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         set => _value = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region Name Property
+
     private string _name = string.Empty;
 
     /// <summary>
-    /// Value of the "Name" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column.
+    /// The value of the <c>name</c> field.
     /// </summary>
-    [NotNull]
+    [Key]
     [BackingField(nameof(_name))]
     public string Name
     {
@@ -39,14 +46,50 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         set => _name = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region Version Property
+
+    private string? _version;
+    
+    /// <summary>
+    /// The value of the <c>version</c> field.
+    /// </summary>
+    [BackingField(nameof(_version))]
+    public string? Version { get => _version; set => _version = value.NullIfWhiteSpace(); }
+
+    #endregion
+
+    #region ID Property
+
+    private string _id = string.Empty;
+
+    /// <summary>
+    /// The value of the <c>source</c> field.
+    /// </summary>
+    [BackingField(nameof(_id))]
+    public string ID
+    {
+        get => _id;
+        set => _id = value ?? string.Empty;
+    }
+
+    #endregion
+
+    #region ShortDescription Property
+
     private string? _shortDescription;
     [BackingField(nameof(_shortDescription))]
     public string? ShortDescription { get => _shortDescription; set => _shortDescription = value.NullIfWhiteSpace(); }
-    
+
+    #endregion
+
     /// <summary>
     /// Date and time that this record was last updated.
     /// </summary>
     public DateTime LastUpdated { get; set; }
+
+    #region Source Navigation Property
 
     private string _sourceFqdn = string.Empty;
 
@@ -71,10 +114,14 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
+    #endregion
+
+    #region SysId Property
+
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// Value of the package reference.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]
@@ -84,17 +131,27 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         set => _sysID = value ?? string.Empty;
     }
 
+    #endregion
+
+    #region Types Property
+
     private HashSet<GlideType> _types = new();
 
     [NotNull]
     [BackingField(nameof(_types))]
     public HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
 
+    #endregion
+
+    #region Tables Property
+
     private HashSet<Table> _tables = new();
 
     [NotNull]
     [BackingField(nameof(_tables))]
     public HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
+
+    #endregion
 
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {
@@ -109,15 +166,15 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
                 _ => _value.All(char.IsWhiteSpace),
             })
                 results.Add(new ValidationResult($"{nameof(Value)} cannot be empty.", new[] { nameof(Value) }));
-            if (_name.Length switch
+            if (Name.Length switch
             {
                 0 => true,
-                1 => char.IsWhiteSpace(_name[0]),
-                _ => _name.All(char.IsWhiteSpace),
+                1 => char.IsWhiteSpace(Name[0]),
+                _ => Name.All(char.IsWhiteSpace),
             })
                 results.Add(new ValidationResult($"{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
-            if (_sourceFqdn is null)
-                results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be null.", new[] { nameof(SourceFqdn) }));
+            if (_sourceFqdn.Length == 0)
+                results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be empty.", new[] { nameof(SourceFqdn) }));
         }
         return results;
     }
@@ -131,10 +188,10 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
     public override string ToString() => nameof(Scope) + new JsonObject()
     {
         { nameof(Value), JsonValue.Create(_value) },
-        { nameof(Name), JsonValue.Create(_name) },
+        { nameof(Name), JsonValue.Create(Name) },
         { nameof(ShortDescription), JsonValue.Create(ShortDescription) },
         { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
-        { nameof(Source), JsonValue.Create(_sourceFqdn) },
-        { nameof(SysID), JsonValue.Create(_sysID) }
+        { nameof(Source), JsonValue.Create(SourceFqdn) },
+        { nameof(SysID), JsonValue.Create(SysID) }
     }.ToJsonString();
 }

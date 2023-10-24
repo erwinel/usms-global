@@ -10,6 +10,8 @@ namespace SnTsTypeGenerator.Models;
 [Table(nameof(Services.TypingsDbContext.Sources))]
 public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
 {
+    #region FQDN Property
+
     private string _fqdn = string.Empty;
 
     /// <summary>
@@ -22,6 +24,10 @@ public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
         get => _fqdn;
         set => _fqdn = value ?? string.Empty;
     }
+
+    #endregion
+
+    #region Label Property
 
     private string _label = string.Empty;
 
@@ -36,6 +42,8 @@ public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
         set => _label = value ?? string.Empty;
     }
 
+    #endregion
+
     /// <summary>
     /// Indicates whether this instanced is a personal developer instance.
     /// </summary>
@@ -46,11 +54,17 @@ public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
     /// </summary>
     public DateTime LastAccessed { get; set; }
 
+    #region Types Property
+
     private HashSet<GlideType> _types = new();
 
     [NotNull]
     [BackingField(nameof(_types))]
     public HashSet<GlideType> Types { get => _types; set => _types = value ?? new(); }
+
+    #endregion
+
+    #region Tables Property
 
     private HashSet<Table> _tables = new();
 
@@ -58,11 +72,19 @@ public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
     [BackingField(nameof(_tables))]
     public HashSet<Table> Tables { get => _tables; set => _tables = value ?? new(); }
 
+    #endregion
+
+    #region Elements Property
+
     private HashSet<Element> _elements = new();
 
     [NotNull]
     [BackingField(nameof(_elements))]
     public HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }
+
+    #endregion
+
+    #region Scopes Property
 
     private HashSet<Scope> _scopes = new();
 
@@ -70,11 +92,17 @@ public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
     [BackingField(nameof(_scopes))]
     public HashSet<Scope> Scopes { get => _scopes; set => _scopes = value ?? new(); }
 
+    #endregion
+
+    #region Packages Property
+
     private HashSet<Package> _packages = new();
 
     [NotNull]
     [BackingField(nameof(_packages))]
     public HashSet<Package> Packages { get => _packages; set => _packages = value ?? new(); }
+
+    #endregion
 
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {

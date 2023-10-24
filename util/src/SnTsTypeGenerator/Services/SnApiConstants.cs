@@ -23,15 +23,37 @@ internal static class SnApiConstants
     internal const string URI_PATH_API = "/api/now/table";
 
     /// <summary>
-    /// Table name for ServiceNow table definitions.
+    /// Table name for Table records.
     /// </summary>
     internal const string TABLE_NAME_SYS_DB_OBJECT = "sys_db_object";
 
     /// <summary>
-    /// Table name for ServiceNow table definitions.
+    /// Table name for Application records.
     /// </summary>
     internal const string TABLE_NAME_SYS_SCOPE = "sys_scope";
 
+    /// <summary>
+    /// Table name for Store Application records.
+    /// </summary>
+    internal const string TABLE_NAME_SYS_STORE_APP = "sys_store_app";
+
+    /// <summary>
+    /// Table name for Custom Application records.
+    /// </summary>
+    internal const string TABLE_NAME_SYS_APP = "sys_app";
+
+    /// <summary>
+    /// Table name for Sys Plugins records.
+    /// </summary>
+    internal const string TABLE_NAME_SYS_PLUGINS = "sys_plugins";
+
+/*
+Package (sys_package)
+    Application (sys_scope)
+        Store Application (sys_store_app)
+        Custom Application (sys_app)
+    Sys Plugins (sys_plugins)
+*/
     /// <summary>
     /// Table name for ServiceNow column (element) definitions.
     /// </summary>
@@ -81,6 +103,8 @@ internal static class SnApiConstants
     /// </summary>
     internal const string JSON_KEY_NAME = "name";
 
+    internal const string JSON_KEY_SHORT_VERSION = "version";
+
     internal const string JSON_KEY_SHORT_DESCRIPTION = "short_description";
 
     /// <summary>
@@ -107,6 +131,11 @@ internal static class SnApiConstants
     /// "Scope" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_SCOPE = "scope";
+
+    /// <summary>
+    /// "ID" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_SOURCE = "source";
 
     /// <summary>
     /// "Application" Column (element) name.
