@@ -610,8 +610,7 @@ public sealed class DataLoaderService : IDisposable
         if (table is not null)
             return table;
         var tableRecord = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
-        if (tableRecord is null)
-            tableRecord = new(
+        tableRecord ??= new(
                 Name: name,
                 Label: tableRef.Label,
                 SysID: Guid.NewGuid().ToString("N"),
@@ -653,14 +652,11 @@ public sealed class DataLoaderService : IDisposable
             if (_scopeIdMap.TryGetValue(sys_id, out id))
             {
                 Scope? scope = await _dbContext.Scopes.FirstOrDefaultAsync(p => p.Value == id, cancellationToken);
-                if (scope is not null)
+                if (scope is null)
+                    return null;
+                id = scope.ID;
+                if ((package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken)) is null)
                 {
-                    id = scope.ID;
-                    if ((package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken)) is not null)
-                    {
-                        _packageIdMap.Add(sys_id, package.ID);
-                        return package;
-                    }
                     package = new()
                     {
                         ID = id,
@@ -672,40 +668,15 @@ public sealed class DataLoaderService : IDisposable
                     };
                     await _dbContext.Packages.AddAsync(package, cancellationToken);
                     await _dbContext.SaveChangesAsync(cancellationToken);
-                    _packageIdMap.Add(sys_id, package.ID);
-                    return package;
                 }
-            }
-            string name;
-            if (pkgRef.Name is null)
-            {
-                id = sys_id;
-                name = $"Unknown name (Sys ID {sys_id} on {source.FQDN})";
-                // TODO: Add warning for new package with unknown name and label
             }
             else
             {
-                id = pkgRef.Name;
-                if ((package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == id, cancellationToken)) is not null ||
-                    (package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken)) is not null)
-                {
-                    _packageIdMap.Add(sys_id, package.ID);
-                    return package;
-                }
-                name = id;
-                // TODO: Add warning for new package with unknown name
+                var name = pkgRef.Name;
+                if (name is null || (package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name)) is null)
+                    return null;
+                id = package.ID;
             }
-            package = new()
-            {
-                ID = id,
-                Name = name,
-                Version = string.Empty,
-                SysID = sys_id,
-                LastUpdated = DateTime.Now,
-                Source = source
-            };
-            await _dbContext.Packages.AddAsync(package, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
         }
         else
         {
@@ -737,23 +708,8 @@ public sealed class DataLoaderService : IDisposable
         Scope? scope;
         if (scopeRecord is null)
         {
-            if ((value = scopeRef.Name) == null) // TODO: Warn not found
-                return null;
-            if ((scope = await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Name == value, cancellationToken)) is null)
-            {
-                if (!value.IsValidScopeName()) // TODO: Warn not found
-                    return null;
-                scope = new()
-                {
-                    Name = value,
-                    Value = value,
-                    LastUpdated = DateTime.Now,
-                    SysID = sys_id,
-                    Source = source
-                };
-                await _dbContext.Scopes.AddAsync(scope, cancellationToken);
-                await _dbContext.SaveChangesAsync(cancellationToken);
-            }
+            if ((value = scopeRef.Name) == null || (scope = await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Name == value, cancellationToken)) is null)
+                return null; // TODO: Warn not found
         }
         else
         {
