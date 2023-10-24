@@ -28,174 +28,6 @@ public partial class RenderingService
     /// </summary>
     internal bool InitSuccessful => _outputFile is not null;
 
-    internal async Task RenderAsync(IEnumerable<Table> toRender, CancellationToken cancellationToken)
-    {
-        if (_outputFile is null)
-            return;
-        using var dbContext = _scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
-        cancellationToken.ThrowIfCancellationRequested();
-        StreamWriter streamWriter;
-        try
-        {
-            streamWriter = new(_outputFile.FullName, new FileStreamOptions()
-            {
-                Access = FileAccess.Write,
-                Mode = _forceOverwrite ? FileMode.Create : FileMode.CreateNew
-            });
-        }
-        catch (Exception error)
-        {
-            _logger.LogOutputFileAccessError(_outputFile.FullName, error);
-            return;
-        }
-        try
-        {
-            using (streamWriter)
-            {
-                using IndentedTextWriter writer = new(streamWriter, "    ");
-
-                var byNamespace = toRender.GroupBy(t => t.GetNamespace(), NameComparer);
-                var gns = byNamespace.FirstOrDefault(n => NameComparer.Equals(n.Key, GLOBAL_NAMESPACE));
-                bool appendNewLine = gns is not null;
-                if (appendNewLine)
-                {
-                    var entries = gns!.OrderBy(t => t.Name, NameComparer).Select(dbContext.Tables.Entry);
-                    await writer.WriteDeclareNamespace(NS_NAME_GlideRecord);
-                    await RenderGlobalGlideRecordAsync(entries.First(), writer, cancellationToken);
-                    foreach (var e in entries.Skip(1))
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        await writer.WriteLineAsync();
-                        await RenderGlobalGlideRecordAsync(e, writer, cancellationToken);
-                    }
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
-                    await writer.WriteLineAsync();
-
-                    await writer.WriteDeclareNamespace(NS_NAME_GlideElement);
-                    if (_emitBaseTypes)
-                    {
-                        await RenderReferenceBaseTypeAsync(writer);
-                        foreach (var e in entries)
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-                            await writer.WriteLineAsync();
-                            await RenderGlobalGlideElementAsync(e.Entity, writer);
-                        }
-                    }
-                    else
-                    {
-                        await RenderGlobalGlideElementAsync(entries.First().Entity, writer);
-                        foreach (var e in entries.Skip(1))
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-                            await writer.WriteLineAsync();
-                            await RenderGlobalGlideElementAsync(e.Entity, writer);
-                        }
-                    }
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
-                    await writer.WriteLineAsync();
-
-                    await writer.WriteDeclareNamespace(NS_NAME_tableFields);
-                    if (_emitBaseTypes)
-                    {
-                        await RenderIBaseRecordAsync(writer, dbContext, cancellationToken);
-                        foreach (var e in entries)
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-                            await writer.WriteLineAsync();
-                            await RenderGlobalTableFieldsAsync(e, writer, dbContext, cancellationToken);
-                        }
-                    }
-                    else
-                    {
-                        await RenderGlobalTableFieldsAsync(entries.First(), writer, dbContext, cancellationToken);
-                        foreach (var e in entries.Skip(1))
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-                            await writer.WriteLineAsync();
-                            await RenderGlobalTableFieldsAsync(e, writer, dbContext, cancellationToken);
-                        }
-                    }
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
-                    byNamespace = byNamespace.Where(g => !NameComparer.Equals(g.Key, GLOBAL_NAMESPACE));
-                }
-                else if (_emitBaseTypes)
-                {
-                    await writer.WriteDeclareNamespace(NS_NAME_GlideElement);
-                    await RenderReferenceBaseTypeAsync(writer);
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
-                    await writer.WriteDeclareNamespace(NS_NAME_tableFields);
-                    await RenderIBaseRecordAsync(writer, dbContext, cancellationToken);
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
-                }
-                foreach (var scoped in byNamespace.OrderBy(g => g.Key, NameComparer))
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    if (appendNewLine)
-                        await writer.WriteLineAsync();
-                    else
-                        appendNewLine = true;
-                    await writer.WriteDeclareNamespace(scoped.Key);
-                    await writer.WriteLineAsync(" {");
-                    var entries = scoped.OrderBy(t => t.Name, NameComparer).Select(dbContext.Tables.Entry);
-                    writer.Indent = 1;
-                    await writer.WriteExportNamespace(NS_NAME_record);
-                    await RenderScopedGlideRecordAsync(entries.First(), writer, cancellationToken);
-                    foreach (var e in entries.Skip(1))
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        await writer.WriteLineAsync();
-                        await RenderScopedGlideRecordAsync(e, writer, cancellationToken);
-                    }
-                    writer.Indent = 1;
-                    await writer.WriteLineAsync("}");
-                    await writer.WriteLineAsync();
-
-                    await writer.WriteExportNamespace(NS_NAME_element);
-                    await RenderScopedGlideElementAsync(entries.First().Entity, writer);
-                    foreach (var e in entries.Skip(1))
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        await writer.WriteLineAsync();
-                        await RenderScopedGlideElementAsync(e.Entity, writer);
-                    }
-                    writer.Indent = 1;
-                    await writer.WriteLineAsync("}");
-                    await writer.WriteLineAsync();
-
-                    await writer.WriteExportNamespace(NS_NAME_fields);
-                    await RenderScopedTableFieldsAsync(entries.First(), writer, dbContext, cancellationToken);
-                    foreach (var e in entries.Skip(1))
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        await writer.WriteLineAsync();
-                        await RenderScopedTableFieldsAsync(e, writer, dbContext, cancellationToken);
-                    }
-                    writer.Indent = 1;
-                    await writer.WriteLineAsync("}");
-                    writer.Indent = 0;
-                    await writer.WriteLineAsync("}");
-                }
-
-                try
-                {
-                    await writer.FlushAsync();
-                    await streamWriter.FlushAsync();
-                }
-                catch (Exception exception)
-                {
-                    _logger.LogOutputFileAccessError(_outputFile.FullName, exception);
-                }
-            }
-        }
-        catch (Exception error) { _logger.LogUnexpecteException(error); }
-    }
-
     private async Task RenderIBaseRecordAsync(IndentedTextWriter writer, TypingsDbContext dbContext, CancellationToken cancellationToken)
     {
         var loaderService = _scope.ServiceProvider.GetRequiredService<DataLoaderService>();
@@ -769,6 +601,174 @@ public partial class RenderingService
             }
         }
         await writer.WriteLineAsync(CLOSE_JSDOC);
+    }
+
+    internal async Task RenderAsync(IEnumerable<Table> toRender, CancellationToken cancellationToken)
+    {
+        if (_outputFile is null)
+            return;
+        using var dbContext = _scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
+        cancellationToken.ThrowIfCancellationRequested();
+        StreamWriter streamWriter;
+        try
+        {
+            streamWriter = new(_outputFile.FullName, new FileStreamOptions()
+            {
+                Access = FileAccess.Write,
+                Mode = _forceOverwrite ? FileMode.Create : FileMode.CreateNew
+            });
+        }
+        catch (Exception error)
+        {
+            _logger.LogOutputFileAccessError(_outputFile.FullName, error);
+            return;
+        }
+        try
+        {
+            using (streamWriter)
+            {
+                using IndentedTextWriter writer = new(streamWriter, "    ");
+
+                var byNamespace = toRender.GroupBy(t => t.GetNamespace(), NameComparer);
+                var gns = byNamespace.FirstOrDefault(n => NameComparer.Equals(n.Key, GLOBAL_NAMESPACE));
+                bool appendNewLine = gns is not null;
+                if (appendNewLine)
+                {
+                    var entries = gns!.OrderBy(t => t.Name, NameComparer).Select(dbContext.Tables.Entry);
+                    await writer.WriteDeclareNamespace(NS_NAME_GlideRecord);
+                    await RenderGlobalGlideRecordAsync(entries.First(), writer, cancellationToken);
+                    foreach (var e in entries.Skip(1))
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        await writer.WriteLineAsync();
+                        await RenderGlobalGlideRecordAsync(e, writer, cancellationToken);
+                    }
+                    writer.Indent = 0;
+                    await writer.WriteLineAsync("}");
+                    await writer.WriteLineAsync();
+
+                    await writer.WriteDeclareNamespace(NS_NAME_GlideElement);
+                    if (_emitBaseTypes)
+                    {
+                        await RenderReferenceBaseTypeAsync(writer);
+                        foreach (var e in entries)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            await writer.WriteLineAsync();
+                            await RenderGlobalGlideElementAsync(e.Entity, writer);
+                        }
+                    }
+                    else
+                    {
+                        await RenderGlobalGlideElementAsync(entries.First().Entity, writer);
+                        foreach (var e in entries.Skip(1))
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            await writer.WriteLineAsync();
+                            await RenderGlobalGlideElementAsync(e.Entity, writer);
+                        }
+                    }
+                    writer.Indent = 0;
+                    await writer.WriteLineAsync("}");
+                    await writer.WriteLineAsync();
+
+                    await writer.WriteDeclareNamespace(NS_NAME_tableFields);
+                    if (_emitBaseTypes)
+                    {
+                        await RenderIBaseRecordAsync(writer, dbContext, cancellationToken);
+                        foreach (var e in entries)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            await writer.WriteLineAsync();
+                            await RenderGlobalTableFieldsAsync(e, writer, dbContext, cancellationToken);
+                        }
+                    }
+                    else
+                    {
+                        await RenderGlobalTableFieldsAsync(entries.First(), writer, dbContext, cancellationToken);
+                        foreach (var e in entries.Skip(1))
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            await writer.WriteLineAsync();
+                            await RenderGlobalTableFieldsAsync(e, writer, dbContext, cancellationToken);
+                        }
+                    }
+                    writer.Indent = 0;
+                    await writer.WriteLineAsync("}");
+                    byNamespace = byNamespace.Where(g => !NameComparer.Equals(g.Key, GLOBAL_NAMESPACE));
+                }
+                else if (_emitBaseTypes)
+                {
+                    await writer.WriteDeclareNamespace(NS_NAME_GlideElement);
+                    await RenderReferenceBaseTypeAsync(writer);
+                    writer.Indent = 0;
+                    await writer.WriteLineAsync("}");
+                    await writer.WriteDeclareNamespace(NS_NAME_tableFields);
+                    await RenderIBaseRecordAsync(writer, dbContext, cancellationToken);
+                    writer.Indent = 0;
+                    await writer.WriteLineAsync("}");
+                }
+                foreach (var scoped in byNamespace.OrderBy(g => g.Key, NameComparer))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (appendNewLine)
+                        await writer.WriteLineAsync();
+                    else
+                        appendNewLine = true;
+                    await writer.WriteDeclareNamespace(scoped.Key);
+                    await writer.WriteLineAsync(" {");
+                    var entries = scoped.OrderBy(t => t.Name, NameComparer).Select(dbContext.Tables.Entry);
+                    writer.Indent = 1;
+                    await writer.WriteExportNamespace(NS_NAME_record);
+                    await RenderScopedGlideRecordAsync(entries.First(), writer, cancellationToken);
+                    foreach (var e in entries.Skip(1))
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        await writer.WriteLineAsync();
+                        await RenderScopedGlideRecordAsync(e, writer, cancellationToken);
+                    }
+                    writer.Indent = 1;
+                    await writer.WriteLineAsync("}");
+                    await writer.WriteLineAsync();
+
+                    await writer.WriteExportNamespace(NS_NAME_element);
+                    await RenderScopedGlideElementAsync(entries.First().Entity, writer);
+                    foreach (var e in entries.Skip(1))
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        await writer.WriteLineAsync();
+                        await RenderScopedGlideElementAsync(e.Entity, writer);
+                    }
+                    writer.Indent = 1;
+                    await writer.WriteLineAsync("}");
+                    await writer.WriteLineAsync();
+
+                    await writer.WriteExportNamespace(NS_NAME_fields);
+                    await RenderScopedTableFieldsAsync(entries.First(), writer, dbContext, cancellationToken);
+                    foreach (var e in entries.Skip(1))
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        await writer.WriteLineAsync();
+                        await RenderScopedTableFieldsAsync(e, writer, dbContext, cancellationToken);
+                    }
+                    writer.Indent = 1;
+                    await writer.WriteLineAsync("}");
+                    writer.Indent = 0;
+                    await writer.WriteLineAsync("}");
+                }
+
+                try
+                {
+                    await writer.FlushAsync();
+                    await streamWriter.FlushAsync();
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogOutputFileAccessError(_outputFile.FullName, exception);
+                }
+            }
+        }
+        catch (Exception error) { _logger.LogUnexpecteException(error); }
     }
 
     public RenderingService(ILogger<RenderingService> logger, IServiceProvider services, IOptions<AppSettings> appSettingsOptions)

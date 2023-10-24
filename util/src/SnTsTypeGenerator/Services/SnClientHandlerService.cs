@@ -31,14 +31,6 @@ public sealed class SnClientHandlerService
     /// </summary>
     internal bool InitSuccessful => BaseURL.IsAbsoluteUri && UserCredentials is not null;
 
-    internal HttpClientHandler CreateHttpClientHandler()
-    {
-        if (!InitSuccessful)
-            throw new InvalidOperationException();
-        // return (ClientCredentials is null) ? new() { Credentials = UserCredentials } : new();
-        return new() { Credentials = UserCredentials };
-    }
-
     private async Task<JsonNode?> GetJsonResponseAsync(HttpClientHandler handler, HttpRequestMessage message, Uri requestUri, CancellationToken cancellationToken)
     {
         using HttpClient httpClient = new(handler);
@@ -63,6 +55,37 @@ public sealed class SnClientHandlerService
         catch (JsonException exception) { throw new ResponseParsingException(requestUri, responseBody, exception); }
         _logger.LogAPIRequestCompleted(requestUri, result);
         return result;
+    }
+
+    private async Task<JsonNode?> GetJsonAsync(HttpClientHandler handler, Uri requestUri, Action<HttpRequestHeaders>? configureHeaders, CancellationToken cancellationToken)
+    {
+        using HttpRequestMessage message = new(HttpMethod.Get, requestUri);
+        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+        if (ClientCredentials is not null)
+            message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, (await GetAccessTokenAsync(cancellationToken)).AccessToken);
+        configureHeaders?.Invoke(message.Headers);
+        return await GetJsonResponseAsync(handler, message, requestUri, cancellationToken);
+    }
+
+    private async Task<JsonNode?> PostJsonAsync(HttpClientHandler handler, Uri requestUri, JsonNode? content, Action<HttpRequestHeaders>? configureHeaders, CancellationToken cancellationToken)
+    {
+        using HttpClient httpClient = new(handler);
+        HttpRequestMessage message = new(HttpMethod.Post, requestUri);
+        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
+        if (ClientCredentials is not null)
+            message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, (await GetAccessTokenAsync(cancellationToken)).AccessToken);
+        configureHeaders?.Invoke(message.Headers);
+        if (content is not null)
+            message.Content = JsonContent.Create(content, new MediaTypeHeaderValue(MediaTypeNames.Application.Json));
+        return await GetJsonResponseAsync(handler, message, requestUri, cancellationToken);
+    }
+
+    internal HttpClientHandler CreateHttpClientHandler()
+    {
+        if (!InitSuccessful)
+            throw new InvalidOperationException();
+        // return (ClientCredentials is null) ? new() { Credentials = UserCredentials } : new();
+        return new() { Credentials = UserCredentials };
     }
 
     /// <summary>
@@ -129,29 +152,6 @@ public sealed class SnClientHandlerService
             return token;
         }
         throw new InvalidHttpResponseException(requestUri, resultObj);
-    }
-
-    private async Task<JsonNode?> GetJsonAsync(HttpClientHandler handler, Uri requestUri, Action<HttpRequestHeaders>? configureHeaders, CancellationToken cancellationToken)
-    {
-        using HttpRequestMessage message = new(HttpMethod.Get, requestUri);
-        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-        if (ClientCredentials is not null)
-            message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, (await GetAccessTokenAsync(cancellationToken)).AccessToken);
-        configureHeaders?.Invoke(message.Headers);
-        return await GetJsonResponseAsync(handler, message, requestUri, cancellationToken);
-    }
-
-    private async Task<JsonNode?> PostJsonAsync(HttpClientHandler handler, Uri requestUri, JsonNode? content, Action<HttpRequestHeaders>? configureHeaders, CancellationToken cancellationToken)
-    {
-        using HttpClient httpClient = new(handler);
-        HttpRequestMessage message = new(HttpMethod.Post, requestUri);
-        message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
-        if (ClientCredentials is not null)
-            message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, (await GetAccessTokenAsync(cancellationToken)).AccessToken);
-        configureHeaders?.Invoke(message.Headers);
-        if (content is not null)
-            message.Content = JsonContent.Create(content, new MediaTypeHeaderValue(MediaTypeNames.Application.Json));
-        return await GetJsonResponseAsync(handler, message, requestUri, cancellationToken);
     }
 
     internal async Task<(Uri RequestUri, JsonNode? Response)> GetJsonAsync(string path, CancellationToken cancellationToken)

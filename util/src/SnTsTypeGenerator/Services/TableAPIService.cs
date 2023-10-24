@@ -24,7 +24,7 @@ public sealed class TableAPIService
     internal bool InitSuccessful => _handler?.InitSuccessful ?? false;
 
     delegate TResult DeserializeRef<out TResult>(string value, string? display_value);
-    
+
     private static T? DeserializeProperty<T>(JsonObject obj, string propertyName, DeserializeRef<T> onDeserialize) where T : class => (obj.TryGetProperty(propertyName, out JsonObject? p) && p.TryGetPropertyAsNonEmpty(JSON_KEY_VALUE, out string? value)) ?
         onDeserialize(value, p.GetPropertyNullIfWhitespace(JSON_KEY_DISPLAY_VALUE)) : null;
 
@@ -80,6 +80,22 @@ public sealed class TableAPIService
         return tableRecord;
     }
 
+    private async Task<(Uri RequestUri, JsonObject? Item, JsonObject ResponseObject)> GetTableApiJsonResponseAsync(string tableName, string id, CancellationToken cancellationToken)
+    {
+        (Uri requestUri, JsonNode? jsonNode) = await _handler!.GetTableApiJsonResponseAsync(tableName, id, cancellationToken);
+        if (jsonNode is null)
+            throw new InvalidHttpResponseException(requestUri, string.Empty);
+        if (jsonNode is not JsonObject resultObj)
+            throw new InvalidHttpResponseException(requestUri, jsonNode);
+        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
+            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
+        if (jsonNode is JsonObject response)
+            return (requestUri, response, resultObj);
+        if (jsonNode is JsonArray arr && arr.Count == 0)
+            return (requestUri, null, resultObj);
+        throw new InvalidHttpResponseException(requestUri, string.Empty);
+    }
+
     /// <summary>
     /// Gets the table from the remote ServiceNow instance that matches the specified name.
     /// </summary>
@@ -122,7 +138,7 @@ public sealed class TableAPIService
     /// <param name="tableName">The name of the table.</param>
     /// <param name="cancellationToken">The token to observe.</param>
     /// <returns>The <see cref="ElementRecord"/> records that match the specified <paramref name="tableName"/>.</returns>
-    public async Task<ElementRecord[]> GetElementsByTableNameAsync(string tableName, CancellationToken cancellationToken)
+    internal async Task<ElementRecord[]> GetElementsByTableNameAsync(string tableName, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (_handler is null)
@@ -174,22 +190,6 @@ public sealed class TableAPIService
             }
             return null!;
         }).Where(n => n is not null).ToArray();
-    }
-
-    private async Task<(Uri RequestUri, JsonObject? Item, JsonObject ResponseObject)> GetTableApiJsonResponseAsync(string tableName, string id, CancellationToken cancellationToken)
-    {
-        (Uri requestUri, JsonNode? jsonNode) = await _handler!.GetTableApiJsonResponseAsync(tableName, id, cancellationToken);
-        if (jsonNode is null)
-            throw new InvalidHttpResponseException(requestUri, string.Empty);
-        if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode);
-        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
-            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
-        if (jsonNode is JsonObject response)
-            return (requestUri, response, resultObj);
-        if (jsonNode is JsonArray arr && arr.Count == 0)
-            return (requestUri, null, resultObj);
-        throw new InvalidHttpResponseException(requestUri, string.Empty);
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ public sealed class TableAPIService
         if (!_handler.InitSuccessful)
             throw new InvalidOperationException();
         _logger.LogGettingScopeByIdentifierFromRemote(id);
-        
+
         (Uri? requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PLUGINS, id, cancellationToken);
         string? sys_id;
         if (sysScopeResult is not null)
