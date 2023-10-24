@@ -110,19 +110,9 @@ public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
         var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
         if (entry is not null)
         {
-            if (_fqdn.Length switch
-            {
-                0 => true,
-                1 => char.IsWhiteSpace(_fqdn[0]),
-                _ => _fqdn.All(char.IsWhiteSpace),
-            })
+            if (string.IsNullOrWhiteSpace(_fqdn))
                 results.Add(new ValidationResult($"{nameof(FQDN)} cannot be empty.", new[] { nameof(FQDN) }));
-            if (_label.Length switch
-            {
-                0 => true,
-                1 => char.IsWhiteSpace(_label[0]),
-                _ => _label.All(char.IsWhiteSpace),
-            })
+            if (string.IsNullOrWhiteSpace(_label))
                 results.Add(new ValidationResult($"{nameof(Label)} cannot be empty.", new[] { nameof(Label) }));
         }
         return results;

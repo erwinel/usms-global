@@ -70,7 +70,7 @@ public sealed class SnClientHandlerService
     private async Task<JsonNode?> PostJsonAsync(HttpClientHandler handler, Uri requestUri, JsonNode? content, Action<HttpRequestHeaders>? configureHeaders, CancellationToken cancellationToken)
     {
         using HttpClient httpClient = new(handler);
-        HttpRequestMessage message = new(HttpMethod.Post, requestUri);
+        using HttpRequestMessage message = new(HttpMethod.Post, requestUri);
         message.Headers.Add(HEADER_KEY_ACCEPT, MediaTypeNames.Application.Json);
         if (ClientCredentials is not null)
             message.Headers.Add(HEADER_KEY_ACCESS_TOKEN, (await GetAccessTokenAsync(cancellationToken)).AccessToken);

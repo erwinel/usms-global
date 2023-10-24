@@ -286,26 +286,11 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
         if (entry is not null)
         {
-            if (_name.Length switch
-            {
-                0 => true,
-                1 => char.IsWhiteSpace(_name[0]),
-                _ => _name.All(char.IsWhiteSpace),
-            })
+            if (string.IsNullOrWhiteSpace(_name))
                 results.Add(new ValidationResult($"{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
-            if (_label.Length switch
-            {
-                0 => true,
-                1 => char.IsWhiteSpace(_label[0]),
-                _ => _label.All(char.IsWhiteSpace),
-            })
+            if (string.IsNullOrWhiteSpace(_label))
                 results.Add(new ValidationResult($"{nameof(Label)} cannot be empty.", new[] { nameof(Label) }));
-            if (_tableName.Length switch
-            {
-                0 => true,
-                1 => char.IsWhiteSpace(_tableName[0]),
-                _ => _tableName.All(char.IsWhiteSpace),
-            })
+            if (string.IsNullOrWhiteSpace(_tableName))
                 results.Add(new ValidationResult($"{nameof(TableName)} cannot be empty.", new[] { nameof(TableName) }));
             if (_sourceFqdn is null)
                 results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be null.", new[] { nameof(SourceFqdn) }));

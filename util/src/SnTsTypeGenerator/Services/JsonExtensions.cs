@@ -138,11 +138,11 @@ public static class JsonExtensions
     }
 
     public static int? CoercePropertyAsIntOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out int? result) ? result :
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out int result) ? result :
             jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i) ? i : null : null;
 
     public static int CoercePropertyAsInt(this JsonObject source, string propertyName, int defaultValue = 0) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out int? result) ? result.Value :
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out int result) ? result :
             jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i) ? i : defaultValue : defaultValue;
 
     public static bool TryCoercePropertyAsBoolean(this JsonObject source, string propertyName, out bool result)
@@ -162,11 +162,11 @@ public static class JsonExtensions
     }
 
     public static bool? CoercePropertyAsBooleanOrNull(this JsonObject source, string propertyName) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out bool? result) ? result :
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out bool result) ? result :
             jsonValue.TryGetValue(out string? s) && bool.TryParse(s, out bool b) ? b : null : null;
 
     public static bool CoercePropertyAsBoolean(this JsonObject source, string propertyName, bool defaultValue = false) =>
-        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out bool? result) ? result.Value :
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out bool result) ? result :
             jsonValue.TryGetValue(out string? s) && bool.TryParse(s, out bool b) ? b : defaultValue : defaultValue;
 
     public static bool TryGetFieldAsString(this JsonObject source, string propertyName, [NotNullWhen(true)] out string? value, out string? display_value)

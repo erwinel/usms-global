@@ -162,19 +162,9 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
         if (entry is not null)
         {
-            if (_value.Length switch
-            {
-                0 => true,
-                1 => char.IsWhiteSpace(_value[0]),
-                _ => _value.All(char.IsWhiteSpace),
-            })
+            if (string.IsNullOrWhiteSpace(_value))
                 results.Add(new ValidationResult($"{nameof(Value)} cannot be empty.", new[] { nameof(Value) }));
-            if (Name.Length switch
-            {
-                0 => true,
-                1 => char.IsWhiteSpace(Name[0]),
-                _ => Name.All(char.IsWhiteSpace),
-            })
+            if (string.IsNullOrWhiteSpace(_name))
                 results.Add(new ValidationResult($"{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
             if (_sourceFqdn.Length == 0)
                 results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be empty.", new[] { nameof(SourceFqdn) }));
@@ -191,10 +181,10 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
     public override string ToString() => nameof(Scope) + new JsonObject()
     {
         { nameof(Value), JsonValue.Create(_value) },
-        { nameof(Name), JsonValue.Create(Name) },
-        { nameof(ShortDescription), JsonValue.Create(ShortDescription) },
+        { nameof(Name), JsonValue.Create(_name) },
+        { nameof(ShortDescription), JsonValue.Create(_shortDescription) },
         { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
-        { nameof(Source), JsonValue.Create(SourceFqdn) },
-        { nameof(SysID), JsonValue.Create(SysID) }
+        { nameof(Source), JsonValue.Create(_sourceFqdn) },
+        { nameof(SysID), JsonValue.Create(_sysID) }
     }.ToJsonString();
 }

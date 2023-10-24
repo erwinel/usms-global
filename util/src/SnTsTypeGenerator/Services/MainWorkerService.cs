@@ -161,7 +161,9 @@ public sealed class MainWorkerService : BackgroundService
                 return;
             IEnumerable<Table> toRender;
 
+#pragma warning disable CA1804 // Remove unused locals.
             using (var scope = _logger.BeginScope(STAGE_NAME_LOAD))
+#pragma warning restore CA1804
             {
                 Collection<Table> tables = new();
                 foreach (string name in _tableNames)
@@ -192,7 +194,9 @@ public sealed class MainWorkerService : BackgroundService
             }
             if (!stoppingToken.IsCancellationRequested)
             {
+#pragma warning disable CA1804 // Remove unused locals.
                 using var scope2 = _logger.BeginScope(STAGE_NAME_RENDER);
+#pragma warning restore CA1804
                 await _renderer.RenderAsync(toRender, stoppingToken);
             }
         }
