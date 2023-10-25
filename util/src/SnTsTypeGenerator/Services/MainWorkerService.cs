@@ -11,8 +11,6 @@ namespace SnTsTypeGenerator.Services;
 
 public sealed class MainWorkerService : BackgroundService
 {
-    private const string STAGE_NAME_LOAD = "Load";
-    private const string STAGE_NAME_RENDER = "Render";
     private readonly ILogger _logger;
     private readonly IServiceScope _scope;
     private readonly IHostApplicationLifetime _applicationLifetime;
@@ -162,7 +160,7 @@ public sealed class MainWorkerService : BackgroundService
                 return;
             IEnumerable<Table> toRender;
 
-            using (var scope = _logger.BeginScope(STAGE_NAME_LOAD)) //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
+            using (var scope = _logger.BeginLoadStageScope()) //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
             {
                 Collection<Table> tables = new();
                 foreach (string name in _tableNames)
@@ -186,7 +184,7 @@ public sealed class MainWorkerService : BackgroundService
             }
             if (!stoppingToken.IsCancellationRequested)
             {
-                using var scope2 = _logger.BeginScope(STAGE_NAME_RENDER); //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
+                using var scope2 = _logger.BeginRenderStageScope(); //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
                 await _renderer.RenderAsync(toRender, stoppingToken);
             }
         }

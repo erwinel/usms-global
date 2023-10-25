@@ -12,7 +12,14 @@ namespace SnTsTypeGenerator;
 
 public static class LoggerMessages
 {
-    public static bool IsNotLogged<T>(this ILogger logger, T exception) where T : Exception
+    /// <summary>
+    /// Indicates whether an exception has been logged.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="exception">The exception.</param>
+    /// <returns><see langword="true"/> if the <paramref name="exception"/> does not implement <see cref="ILogTrackable"/>;
+    /// otherwise, this will log the exception if <see cref="ILogTrackable.IsLogged"/> is <see langword="false"/>.</returns>
+    public static bool IsNotLogged(this ILogger logger, Exception exception)
     {
         if (exception is ILogTrackable logTrackable)
         {
@@ -22,6 +29,64 @@ public static class LoggerMessages
         }
         return true;
     }
+
+    #region Scope Definitions
+
+    #region LoadStage Scope
+
+    private static readonly Func<ILogger, IDisposable?> _loadStageScope = LoggerMessage.DefineScope("Loading tables to render.");
+
+    /// <summary>
+    /// Formats the LoadStage message and creates a scope.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
+    public static IDisposable? BeginLoadStageScope(this ILogger logger) => _loadStageScope(logger);
+
+    #endregion
+
+    #region RenderStage Scope
+
+    private static readonly Func<ILogger, IDisposable?> _renderStageScope = LoggerMessage.DefineScope("Rendering code.");
+
+    /// <summary>
+    /// Formats the RenderStage message and creates a scope.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
+    public static IDisposable? BeginRenderStageScope(this ILogger logger) => _renderStageScope(logger);
+
+    #endregion
+
+    #region BeforeSaveDbChanges Scope
+
+    private static readonly Func<ILogger, IDisposable?> _beforeSaveDbChangesScope = LoggerMessage.DefineScope("Validating Entities before Saving Database changes.");
+
+    /// <summary>
+    /// Formats the BeforeSaveDbChanges message and creates a scope.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
+    public static IDisposable? BeginBeforeSaveDbChangesScope(this ILogger logger) => _beforeSaveDbChangesScope(logger);
+
+    #endregion
+
+    #region SaveDbChanges Scope
+
+    private static readonly Func<ILogger, bool, bool?, IDisposable?> _saveDbChangesScope = LoggerMessage.DefineScope<bool, bool?>("Saving Database changes: isAsynchronous={isAsynchronous}; acceptAllChangesOnSuccess={acceptAllChangesOnSuccess}.");
+
+    /// <summary>
+    /// Formats the SaveDbChanges message and creates a scope.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="isAsynchronous">Indicates whether the save method is asynchronous.</param>
+    /// <param name="acceptAllChangesOnSuccess">The value of the <c>acceptAllChangesOnSuccess</c> parameter.</param>
+    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
+    public static IDisposable? BeginSaveDbChangesScope(this ILogger logger, bool isAsynchronous = false, bool? acceptAllChangesOnSuccess = null) => _saveDbChangesScope(logger, isAsynchronous, acceptAllChangesOnSuccess);
+
+    #endregion
+
+    #endregion
 
     #region Critical UnexpectedServiceException (0xffff)
 
@@ -528,32 +593,6 @@ public static class LoggerMessages
     /// <param name="response">The response text.</param>
     /// <param name="error">The exception that caused the event</param>
     public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, JsonNode? response) => _invalidHttpResponse(logger, uri, (response is null) ? "null" : response.ToJsonString(), null);
-
-    #endregion
-
-    #region ExecuteMethod Scope
-
-    private static readonly Func<ILogger, string, IDisposable?> _executeMethodScope = LoggerMessage.DefineScope<string>("Execute method {MethodName}()");
-
-    /// <summary>
-    /// Formats the ExecuteMethod message and creates a scope.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <param name="methodName">The name of the method.</param>
-    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
-    public static IDisposable? BeginExecuteMethodScope(this ILogger logger, string methodName) => _executeMethodScope(logger, methodName);
-
-    private static readonly Func<ILogger, string, string, object?, IDisposable?> _executeMethodScope1 = LoggerMessage.DefineScope<string, string, object?>("Execute method {MethodName}({ParamName}: {ParamValue})");
-
-    /// <summary>
-    /// Formats the ExecuteMethod1 message and creates a scope.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <param name="methodName">The name of the method.</param>
-    /// <param name="paramName">The name of the method parameter.</param>
-    /// <param name="paramValue">The value of the method parameter.</param>
-    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
-    public static IDisposable? BeginExecuteMethodScope(this ILogger logger, string methodName, string paramName, object? paramValue) => _executeMethodScope1(logger, methodName, paramName, paramValue);
 
     #endregion
 

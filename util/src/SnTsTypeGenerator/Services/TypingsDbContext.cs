@@ -242,7 +242,7 @@ public partial class TypingsDbContext : DbContext
     {
         if (cancellationToken.IsCancellationRequested)
             return;
-        using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(OnBeforeSave));
+        using IDisposable? scope = _logger.BeginBeforeSaveDbChangesScope();
         using IServiceScope serviceScope = _scopeFactory.CreateScope();
         foreach (EntityEntry e in ChangeTracker.Entries())
         {
@@ -271,7 +271,7 @@ public partial class TypingsDbContext : DbContext
 
     public override int SaveChanges()
     {
-        using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(SaveChanges));
+        using IDisposable? scope = _logger.BeginSaveDbChangesScope();
         OnBeforeSave();
         int returnValue = base.SaveChanges();
         _logger.LogDbSaveChangesCompleted(false, null, returnValue);
@@ -280,7 +280,7 @@ public partial class TypingsDbContext : DbContext
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
-        using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(SaveChanges), nameof(acceptAllChangesOnSuccess), acceptAllChangesOnSuccess);
+        using IDisposable? scope = _logger.BeginSaveDbChangesScope(false, acceptAllChangesOnSuccess);
         OnBeforeSave();
         int returnValue = base.SaveChanges(acceptAllChangesOnSuccess);
         _logger.LogDbSaveChangesCompleted(false, acceptAllChangesOnSuccess, returnValue);
@@ -289,8 +289,8 @@ public partial class TypingsDbContext : DbContext
 
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
-        using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(SaveChangesAsync), nameof(acceptAllChangesOnSuccess), acceptAllChangesOnSuccess);
-        OnBeforeSave();
+        using IDisposable? scope = _logger.BeginSaveDbChangesScope(true, acceptAllChangesOnSuccess);
+        OnBeforeSave(cancellationToken);
         int returnValue = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         _logger.LogDbSaveChangesCompleted(true, acceptAllChangesOnSuccess, returnValue);
         return returnValue;
@@ -298,8 +298,8 @@ public partial class TypingsDbContext : DbContext
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        using IDisposable? scope = _logger.BeginExecuteMethodScope(nameof(SaveChangesAsync));
-        OnBeforeSave();
+        using IDisposable? scope = _logger.BeginSaveDbChangesScope(true);
+        OnBeforeSave(cancellationToken);
         int returnValue = await base.SaveChangesAsync(cancellationToken);
         _logger.LogDbSaveChangesCompleted(true, null, returnValue);
         return returnValue;
