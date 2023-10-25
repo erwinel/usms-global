@@ -34,6 +34,7 @@
         "formulahendry.auto-close-tag",
         "formulahendry.dotnet",
         "formulahendry.dotnet-test-explorer",
+        "github.vscode-github-actions",
         "GitHub.vscode-pull-request-github",
         "GregorBiswanger.json2ts",
         "HookyQR.JSDocTagComplete",
