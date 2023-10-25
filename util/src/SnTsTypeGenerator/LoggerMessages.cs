@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 using static SnTsTypeGenerator.Services.CmdLineConstants;
 using SnTsTypeGenerator.Services;
+using System.Data.Common;
+using System.Data;
 
 namespace SnTsTypeGenerator;
 
@@ -128,13 +130,22 @@ public static class LoggerMessages
     /// </summary>
     public const int EVENT_ID_DbfileValidationError = 0x0001;
 
+    public const string TEMPLATE_DbfileValidationError_Unexpected = "Unexpected error validating DB file path \"{DbFile}\".";
+    
+    public const string TEMPLATE_DbfileValidationError_Invalid = "DB file path is invalid: \"{DbFile}\"";
+    
+    public const string TEMPLATE_DbfileValidationError_TooLong = "DB file path is too long: {DbFile}";
+    
     /// <summary>
     /// Event ID for database file validation error.
     /// </summary>
     public static readonly EventId DbfileValidationError = new(EVENT_ID_DbfileValidationError, nameof(DbfileValidationError));
 
-    private static readonly Action<ILogger, string, Exception?> _dbfileValidationError = LoggerMessage.Define<string>(LogLevel.Critical, DbfileValidationError,
-        "Unexpected error validating DB file path \"{DbFile}\".");
+    private static readonly Action<ILogger, string, Exception?> _dbfileValidationError = LoggerMessage.Define<string>(LogLevel.Critical, DbfileValidationError, TEMPLATE_DbfileValidationError_Unexpected);
+
+    private static readonly Action<ILogger, string, Exception?> _dbfilePathInvalid = LoggerMessage.Define<string>(LogLevel.Critical, DbfileValidationError, TEMPLATE_DbfileValidationError_Invalid);
+
+    private static readonly Action<ILogger, string, Exception?> _dbfilePathTooLong = LoggerMessage.Define<string>(LogLevel.Critical, DbfileValidationError, TEMPLATE_DbfileValidationError_TooLong);
 
     /// <summary>
     /// Logs a database validation error event (DbfileValidationError) with event code 0x0001.
@@ -142,7 +153,41 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="dbFile">The path of the database file.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogDbfileValidationError(this ILogger logger, string dbFile, Exception error) => _dbfileValidationError(logger, dbFile, error);
+    public static void LogDbfilePathInvalid(this ILogger? logger, string dbFile, NotSupportedException error)
+    {
+        if (logger is null)
+            Serilog.Log.Logger.Fatal(error, TEMPLATE_DbfileValidationError_Invalid, dbFile);
+        else
+            _dbfilePathInvalid(logger, dbFile, error);
+    }
+
+    /// <summary>
+    /// Logs a database validation error event (DbfileValidationError) with event code 0x0001.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="dbFile">The path of the database file.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogDbfilePathTooLong(this ILogger? logger, string dbFile, PathTooLongException error)
+    {
+        if (logger is null)
+            Serilog.Log.Logger.Fatal(error, TEMPLATE_DbfileValidationError_TooLong, dbFile);
+        else
+            _dbfilePathTooLong(logger, dbFile, error);
+    }
+
+    /// <summary>
+    /// Logs a database validation error event (DbfileValidationError) with event code 0x0001.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="dbFile">The path of the database file.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogDbfileValidationError(this ILogger? logger, string dbFile, Exception error)
+    {
+        if (logger is null)
+            Serilog.Log.Logger.Fatal(error, TEMPLATE_DbfileAccessError, dbFile);
+        else
+            _dbfileValidationError(logger, dbFile, error);
+    }
 
     #endregion
 
@@ -165,9 +210,9 @@ public static class LoggerMessages
     /// Logs an DbFileDirectoryNotFound event with event code 0x0002.
     /// </summary>
     /// <param name="logger">The current logger.</param>
-    /// <param name="dbFile">The database file object.</param>
+    /// <param name="dbFilePath">The database file path.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogDbFileDirectoryNotFound(this ILogger logger, FileInfo dbFile, Exception? error = null) => _dbFileDirectoryNotFound(logger, dbFile.FullName, error);
+    public static void LogDbFileDirectoryNotFound(this ILogger logger, string dbFilePath, Exception? error = null) => _dbFileDirectoryNotFound(logger, dbFilePath, error);
 
     #endregion
 
@@ -178,13 +223,14 @@ public static class LoggerMessages
     /// </summary>
     public const int EVENT_ID_DbfileAccessError = 0x0003;
 
+    public const string TEMPLATE_DbfileAccessError = "Unable to create DB file \"{Dbfile}\".";
+
     /// <summary>
     /// Event ID for database file access error.
     /// </summary>
     public static readonly EventId DbfileAccessError = new(EVENT_ID_DbfileAccessError, nameof(DbfileAccessError));
 
-    private static readonly Action<ILogger, string, Exception?> _dbfileAccessError = LoggerMessage.Define<string>(LogLevel.Critical, DbfileAccessError,
-        "Unable to create DB file \"{Dbfile}\".");
+    private static readonly Action<ILogger, string, Exception?> _dbfileAccessError = LoggerMessage.Define<string>(LogLevel.Critical, DbfileAccessError, TEMPLATE_DbfileAccessError);
 
     /// <summary>
     /// Logs a database file access error event (DbfileAccessError) with event code 0x0003.
@@ -192,7 +238,13 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="dbFile">The path of the database file.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogDbfileAccessError(this ILogger logger, string dbFile, Exception error) => _dbfileAccessError(logger, dbFile, error);
+    public static void LogDbfileAccessError(this ILogger? logger, string dbFile, Exception error)
+    {
+        if (logger is null)
+            Serilog.Log.Logger.Fatal(error, TEMPLATE_DbfileAccessError, dbFile);
+        else
+            _dbfileAccessError(logger, dbFile, error);
+    }
 
     #endregion
 
@@ -208,11 +260,33 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId DbInitializationFailure = new(EVENT_ID_DbInitializationFailure, nameof(DbInitializationFailure));
 
-    private static readonly Action<ILogger, string, Type, string, Exception> _dbInitializationFailure1 = LoggerMessage.Define<string, Type, string>(LogLevel.Critical, DbInitializationFailure,
-        "Unexpected error while executing DB initialization query {QueryString} for {Type} in {DbPath}.");
+    private static readonly Action<ILogger, int, CommandType?, string?, Type, string, Exception> _dbInitializationFailure1 = LoggerMessage.Define<int, CommandType?, string?, Type, string>(LogLevel.Critical, DbInitializationFailure,
+        "Error code {ErrorCode} while executing DB initialization {CommandType} query {CommandText} for {EntityType} in {DbPath}.");
 
-    private static readonly Action<ILogger, string, Exception> _dbInitializationFailure2 = LoggerMessage.Define<string>(LogLevel.Critical, DbInitializationFailure,
+    private static readonly Action<ILogger, string, Type, string, Exception> _dbInitializationFailure2 = LoggerMessage.Define<string, Type, string>(LogLevel.Critical, DbInitializationFailure,
+        "Unexpected error while executing DB initialization query {QueryString} for {EntityType} in {DbPath}.");
+
+    private static readonly Action<ILogger, string?, int?, string?, CommandType?, string?, Exception> _dbInitializationFailure3 = LoggerMessage.Define<string?, int?, string?, CommandType?, string?>(LogLevel.Critical, DbInitializationFailure,
+        "Error code {ErrorCode} ({SqlState}) while executing DB initialization {CommandType} query {CommandText} on {ConnectionString}.");
+
+    private static readonly Action<ILogger, Type?, int?, string?, CommandType?, string?, string?, Exception> _dbInitializationFailure4 = LoggerMessage.Define<Type?, int?, string?, CommandType?, string?, string?>(LogLevel.Critical, DbInitializationFailure,
+        "Error code {ErrorCode} ({SqlState}) while executing DB initialization {CommandType} query {CommandText} for {EntityType} in {DbPath}.");
+
+    private static readonly Action<ILogger, string, Exception> _dbInitializationFailure5 = LoggerMessage.Define<string>(LogLevel.Critical, DbInitializationFailure,
         "Unexpected error while executing DB initialization for {DbPath}.");
+
+    private static readonly Action<ILogger, string, Exception> _dbInitializationFailure6 = LoggerMessage.Define<string>(LogLevel.Critical, DbInitializationFailure,
+        "Unexpected error while executing DB initialization for {ConnectionString}.");
+
+    /// <summary>
+    /// Logs a database initialization error event (DbInitializationFailure) with event code 0x0004.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="dbFile">The database file.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    /// <typeparam name="T">The entity type.</typeparam>
+    public static void LogDbInitializationFailure<T>(this ILogger logger, FileInfo dbFile, DbException error) =>
+        _dbInitializationFailure1(logger, error.ErrorCode, error.BatchCommand?.CommandType, error.BatchCommand?.CommandText, typeof(T), dbFile.FullName, error);
 
     /// <summary>
     /// Logs a database initialization error event (DbInitializationFailure) with event code 0x0004.
@@ -222,8 +296,19 @@ public static class LoggerMessages
     /// <param name="type">The DB entity object type.</param>
     /// <param name="dbFile">The database file.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogDbInitializationFailure(this ILogger logger, string querystring, Type type, FileInfo dbFile, Exception error) =>
-        _dbInitializationFailure1(logger, querystring, type, dbFile.FullName, error);
+    /// <typeparam name="T">The entity type.</typeparam>
+    public static void LogDbInitializationFailure<T>(this ILogger logger, string querystring, FileInfo dbFile, Exception error) =>
+        _dbInitializationFailure2(logger, querystring, typeof(T), dbFile.FullName, error);
+
+    public static void LogDbInitializationFailure(this ILogger logger, string connectionString, int? errorCode, string? sqlState, CommandType? commandType, string? commandText, Exception error)
+    {
+        _dbInitializationFailure3(logger, connectionString, errorCode, sqlState, commandType, commandText, error);
+    }
+
+    public static void LogDbInitializationFailure(this ILogger logger, Type? entityType, int? errorCode, string? sqlState, CommandType? commandType, string? commandText, string? dbPath, Exception error)
+    {
+        _dbInitializationFailure4(logger, entityType, errorCode, sqlState, commandType, commandText, dbPath, error);
+    }
 
     /// <summary>
     /// Logs a database initialization error event (DbInitializationFailure) with event code 0x0004.
@@ -231,7 +316,15 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="dbFile">The database file.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogDbInitializationFailure(this ILogger logger, FileInfo dbFile, Exception error) => _dbInitializationFailure2(logger, dbFile.FullName, error);
+    public static void LogDbInitializationFailure(this ILogger logger, FileInfo dbFile, Exception error) => _dbInitializationFailure5(logger, dbFile.FullName, error);
+
+    /// <summary>
+    /// Logs a database initialization error event (DbInitializationFailure) with event code 0x0004.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="connectionString">The connection string.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogDbInitializationFailure(this ILogger logger, string connectionString, Exception error) => _dbInitializationFailure6(logger, connectionString, error);
 
     #endregion
 

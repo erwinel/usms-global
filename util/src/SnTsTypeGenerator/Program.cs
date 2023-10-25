@@ -24,19 +24,55 @@ internal class Program
         builder.Logging.AddSerilog();
         builder.Services.Configure<SnTsTypeGenerator.Services.AppSettings>(builder.Configuration.GetSection(nameof(SnTsTypeGenerator)));
         SnTsTypeGenerator.Services.AppSettings.Configure(args, builder.Configuration);
-        builder.Services.AddDbContextPool<SnTsTypeGenerator.Services.TypingsDbContext>(options =>
+        builder.Services.AddDbContextPool<SnTsTypeGenerator.Services.TypingsDbContext>((serviceProvider, options) =>
+        {
+            if (builder.Environment.IsDevelopment())
+                options.EnableSensitiveDataLogging(true);
+            var dbFile = builder.Configuration.GetSection(nameof(SnTsTypeGenerator)).Get<SnTsTypeGenerator.Services.AppSettings>()?.DbFile;
+            try
             {
-                if (builder.Environment.IsDevelopment())
-                    options.EnableSensitiveDataLogging(true);
-                var dbFile = builder.Configuration.GetSection(nameof(SnTsTypeGenerator)).Get<SnTsTypeGenerator.Services.AppSettings>()?.DbFile;
-                try { dbFile = Path.GetFullPath(string.IsNullOrEmpty(dbFile) ? Path.Combine(builder.Environment.ContentRootPath, DEFAULT_DbFile) : dbFile); } catch { }
-                options.UseSqlite(new SqliteConnectionStringBuilder
-                {
-                    DataSource = dbFile,
-                    ForeignKeys = true,
-                    Mode = SqliteOpenMode.ReadWrite
-                }.ConnectionString);
-            })
+                if (string.IsNullOrEmpty(dbFile))
+                    try { dbFile = Path.Combine(builder.Environment.ContentRootPath, DEFAULT_DbFile); }
+                    catch
+                    {
+                        dbFile = $"{(string.IsNullOrEmpty(builder.Environment.ContentRootPath) ? "." : builder.Environment.ContentRootPath)}/{DEFAULT_DbFile}";
+                        throw;
+                    }
+                else
+                    dbFile = Path.GetFullPath(dbFile);
+            }
+            catch (System.Security.SecurityException exc)
+            {
+                SnTsTypeGenerator.LoggerMessages.LogDbfileAccessError(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
+                dbFile = null;
+            }
+            catch (UnauthorizedAccessException exc)
+            {
+                SnTsTypeGenerator.LoggerMessages.LogDbfileAccessError(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
+                dbFile = null;
+            }
+            catch (NotSupportedException exc)
+            {
+                SnTsTypeGenerator.LoggerMessages.LogDbfilePathInvalid(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
+                dbFile = null;
+            }
+            catch (PathTooLongException exc)
+            {
+                SnTsTypeGenerator.LoggerMessages.LogDbfilePathTooLong(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
+                dbFile = null;
+            }
+            catch (Exception exc)
+            {
+                SnTsTypeGenerator.LoggerMessages.LogDbfileValidationError(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
+                dbFile = null;
+            }
+            options.UseSqlite(new SqliteConnectionStringBuilder
+            {
+                DataSource = dbFile,
+                ForeignKeys = true,
+                Mode = SqliteOpenMode.ReadWrite
+            }.ConnectionString);
+        })
             .AddHostedService<SnTsTypeGenerator.Services.MainWorkerService>()
             .AddTransient<SnTsTypeGenerator.Services.SnClientHandlerService>()
             .AddTransient<SnTsTypeGenerator.Services.TableAPIService>()

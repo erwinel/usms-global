@@ -152,34 +152,34 @@ public partial class TypingsDbContext : DbContext
         yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.IsPrimary)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.IsPrimary)}\")";
     }
     
-    internal async static Task<bool> InitializeAsync(IServiceScope scope, CancellationToken cancellationToken)
+    internal async static Task InitializeAsync(IServiceScope scope, CancellationToken cancellationToken)
     {
         using var dbContext = scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
-        return await dbContext.InitializeAsync(cancellationToken);
+        await dbContext.InitializeAsync(cancellationToken);
     }
 
-    private async Task<bool> InitializeAsync(CancellationToken cancellationToken)
+    private async Task InitializeAsync(CancellationToken cancellationToken)
     {
         SqliteConnectionStringBuilder csb;
+        string path;
         string connectionString = Database.GetConnectionString()!;
+        try { path = (csb = new(connectionString)).DataSource; }
+        catch (Exception exc) { throw new DbInitializationException(exc, connectionString); }
         FileInfo dbFile;
         try
         {
-            string path = (csb = new(connectionString)).DataSource;
-            dbFile = new(Path.IsPathFullyQualified(path) ? path : Path.Combine(Program.Host.Services.GetRequiredService<IHostEnvironment>().ContentRootPath, path));
+            if (string.IsNullOrEmpty(path))
+                return;
+            path = (dbFile = new(path)).FullName;
         }
-        catch (Exception exception)
+        catch (Exception exc)
         {
-            _logger.LogDbfileValidationError(connectionString, exception);
-            return false;
+            throw new DbfileAccessException(exc, path);
         }
         if (dbFile.Exists)
-            return true;
+            return;
         if (dbFile.Directory is null || !dbFile.Directory.Exists)
-        {
-            _logger.LogDbFileDirectoryNotFound(dbFile);
-            return false;
-        }
+            throw new DbFileDirectoryNotFoundException(dbFile.DirectoryName);
 
         csb.Mode = SqliteOpenMode.ReadWriteCreate;
         SqliteConnection connection;
@@ -187,18 +187,10 @@ public partial class TypingsDbContext : DbContext
         {
             connection = new(csb.ConnectionString);
             await connection.OpenAsync(cancellationToken);
-        }
-        catch (Exception exception)
-        {
-            _logger.LogDbfileAccessError(connectionString, exception);
-            return false;
-        }
-        try
-        {
             using (connection)
             {
                 var transaction = connection.BeginTransaction();
-                async Task<bool> executeDbInitCommandsAsync<T>(IEnumerable<string> commands)
+                async Task executeDbInitCommandsAsync<T>(IEnumerable<string> commands)
                 {
                     foreach (string query in commands)
                     {
@@ -206,29 +198,33 @@ public partial class TypingsDbContext : DbContext
                         command.CommandText = query;
                         command.CommandType = System.Data.CommandType.Text;
                         try { _ = await command.ExecuteNonQueryAsync(cancellationToken); }
-                        catch (Exception exception)
+                        catch (Exception exception) //codeql[cs/catch-of-all-exceptions] Won't fix.
                         {
-                            _logger.LogDbInitializationFailure(query, typeof(T), dbFile, exception);
-                            return true;
+                            throw new DbInitializationException(dbFile.FullName, typeof(T), exception);
                         }
                     }
-                    return false;
                 }
-                if (await executeDbInitCommandsAsync<SncSource>(GetSncSourceDbInitCommands()) || await executeDbInitCommandsAsync<Package>(GetPackageDbInitCommands()) ||
-                    await executeDbInitCommandsAsync<Scope>(GetScopeDbInitCommands()) || await executeDbInitCommandsAsync<GlideType>(GetGlideTypeDbInitCommands()) || await executeDbInitCommandsAsync<Table>(GetTableDbInitCommands()) ||
-                    await executeDbInitCommandsAsync<Element>(GetElementDbInitCommands()))
+                try
+                {
+                    await executeDbInitCommandsAsync<SncSource>(GetSncSourceDbInitCommands());
+                    await executeDbInitCommandsAsync<Package>(GetPackageDbInitCommands());
+                    await executeDbInitCommandsAsync<Scope>(GetScopeDbInitCommands());
+                    await executeDbInitCommandsAsync<GlideType>(GetGlideTypeDbInitCommands());
+                    await executeDbInitCommandsAsync<Table>(GetTableDbInitCommands());
+                    await executeDbInitCommandsAsync<Element>(GetElementDbInitCommands());
+                }
+                catch
                 {
                     transaction.Rollback();
-                    return false;
+                    throw;
                 }
                 transaction.Commit();
             }
-            return true;
         }
-        catch (Exception error)
+        catch (DbInitializationException) { throw; }
+        catch (Exception exception) //codeql[cs/catch-of-all-exceptions] Won't fix.
         {
-            _logger.LogDbInitializationFailure(dbFile, error);
-            return false;
+            throw new DbInitializationException(exception, connectionString);
         }
     }
 

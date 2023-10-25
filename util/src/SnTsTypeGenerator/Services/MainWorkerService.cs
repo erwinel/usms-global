@@ -151,8 +151,7 @@ public sealed class MainWorkerService : BackgroundService
                 WriteHelpToConsole();
                 return;
             }
-            if (!await TypingsDbContext.InitializeAsync(_scope, stoppingToken))
-                return;
+            await TypingsDbContext.InitializeAsync(_scope, stoppingToken);
             DataLoaderService _dataLoader = _scope.ServiceProvider.GetRequiredService<DataLoaderService>();
             RenderingService _renderer = _scope.ServiceProvider.GetRequiredService<RenderingService>();
 
@@ -173,10 +172,10 @@ public sealed class MainWorkerService : BackgroundService
                         if (tableInfo is not null)
                             tables.Add(tableInfo);
                     }
-                    catch (Exception exception) //codeql[cs/catch-of-all-exceptions] No need to record exception.
+                    catch (Exception exception) //codeql[cs/catch-of-all-exceptions] Won't fix.
                     {
                         if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(exception))
-                            _logger.LogUnexpecteException(exception);
+                            _logger.LogUnexpectedServiceException<MainWorkerService>(exception);
                         return;
                     }
                 }
@@ -185,13 +184,20 @@ public sealed class MainWorkerService : BackgroundService
             if (!stoppingToken.IsCancellationRequested)
             {
                 using var scope2 = _logger.BeginRenderStageScope(); //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
-                await _renderer.RenderAsync(toRender, stoppingToken);
+                try { await _renderer.RenderAsync(toRender, stoppingToken); }
+                catch (Exception exception) //codeql[cs/catch-of-all-exceptions] Won't fix.
+                {
+                    if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(exception))
+                        _logger.LogUnexpectedServiceException<MainWorkerService>(exception);
+                    return;
+                }
             }
         }
         catch (OperationCanceledException) { throw; }
         catch (Exception error) //codeql[cs/catch-of-all-exceptions]
         {
-            _logger.LogUnexpectedServiceException<MainWorkerService>(error);
+            if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(error))
+                _logger.LogUnexpectedServiceException<MainWorkerService>(error);
         }
         finally
         {
