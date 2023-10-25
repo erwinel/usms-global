@@ -12,6 +12,17 @@ namespace SnTsTypeGenerator;
 
 public static class LoggerMessages
 {
+    public static bool IsNotLogged<T>(this ILogger logger, T exception) where T : Exception
+    {
+        if (exception is ILogTrackable logTrackable)
+        {
+            if (!logTrackable.IsLogged)
+                logTrackable.Log(logger);
+            return false;
+        }
+        return true;
+    }
+
     #region Critical UnexpectedServiceException (0xffff)
 
     /// <summary>

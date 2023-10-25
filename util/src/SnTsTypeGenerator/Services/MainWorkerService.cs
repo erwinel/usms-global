@@ -177,14 +177,7 @@ public sealed class MainWorkerService : BackgroundService
                     }
                     catch (Exception exception) //codeql[cs/catch-of-all-exceptions] No need to record exception.
                     {
-                        if (stoppingToken.IsCancellationRequested)
-                            return;
-                        if (exception is ILogTrackable logTrackable)
-                        {
-                            if (!logTrackable.IsLogged)
-                                logTrackable.Log(_logger);
-                        }
-                        else
+                        if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(exception))
                             _logger.LogUnexpecteException(exception);
                         return;
                     }
