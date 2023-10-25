@@ -42,7 +42,7 @@ public sealed class SnClientHandlerService
         {
             string? text;
             try { text = await response.Content.ReadAsStringAsync(cancellationToken); }
-            catch { text = null; }
+            catch { text = null; } //codeql[cs/catch-of-all-exceptions] No need to record exception since there may not be string content.
             throw new RequestFailedException(requestUri, exception, text);
         }
         string responseBody;

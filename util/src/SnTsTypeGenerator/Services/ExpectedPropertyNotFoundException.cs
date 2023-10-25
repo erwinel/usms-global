@@ -47,7 +47,7 @@ internal class ExpectedPropertyNotFoundException : Exception, ILogTrackable
             Element = new();
         else
             try { Element = (JsonNode.Parse(value) as JsonObject) ?? new(); }
-            catch { Element = new(); }
+            catch { Element = new(); } //codeql[cs/catch-of-all-exceptions] No need to record exception.
         PropertyName = info.GetString(nameof(PropertyName)) ?? string.Empty;
         RequestUri = string.IsNullOrEmpty(value = info.GetString(nameof(RequestUri))) ? EmptyURI : Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) ? uri : new Uri(value, UriKind.Relative);
     }

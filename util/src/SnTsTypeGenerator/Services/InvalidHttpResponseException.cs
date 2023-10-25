@@ -45,7 +45,7 @@ internal class InvalidHttpResponseException : Exception, ILogTrackable
             Response = null;
         else
             try { Response = JsonNode.Parse(value); }
-            catch { Response = null; }
+            catch { Response = null; } //codeql[cs/catch-of-all-exceptions] No need to record exception.
         RequestUri = string.IsNullOrEmpty(value = info.GetString(nameof(RequestUri))) ? EmptyURI : Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) ? uri : new Uri(value, UriKind.Relative);
     }
 

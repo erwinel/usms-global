@@ -161,6 +161,7 @@ public static class EntityFrameworkExtensions
     {
         if (ReferenceEquals(x, y))
             return true;
+        //codeql[cs/complex-condition] Accepting complex query.
         return ReferenceEquals(x, y) || (x.IsActive == y.IsActive && x.IsArray == y.IsArray && x.IsCalculated == y.IsCalculated && x.IsDisplay == y.IsDisplay && x.IsMandatory == y.IsMandatory &&
             x.IsPrimary == y.IsPrimary && x.IsReadOnly == y.IsReadOnly && x.IsUnique == y.IsUnique && (x.MaxLength.HasValue ? y.MaxLength.HasValue && x.MaxLength.Value == y.MaxLength.Value : !y.MaxLength.HasValue) &&
             (x.SizeClass.HasValue ? y.SizeClass.HasValue && x.SizeClass.Value == y.SizeClass.Value : !y.MaxLength.HasValue) && NameComparer.Equals(x.SysID, y.SysID) && NameComparer.Equals(x.Name, y.Name) &&
@@ -171,6 +172,7 @@ public static class EntityFrameworkExtensions
     {
         if (ReferenceEquals(x, y))
             return true;
+        //codeql[cs/complex-condition] Accepting complex query.
         return ReferenceEquals(x, y) || (x.IsActive == y.IsActive && x.IsArray == y.IsArray && x.IsCalculated == y.IsCalculated && x.IsDisplay == y.IsDisplay && x.IsMandatory == y.IsMandatory &&
             x.IsPrimary == y.IsPrimary && x.IsReadOnly == y.IsReadOnly && x.IsUnique == y.IsUnique && (x.MaxLength.HasValue ? y.MaxLength.HasValue && x.MaxLength.Value == y.MaxLength.Value : !y.MaxLength.HasValue) &&
             (x.SizeClass.HasValue ? y.SizeClass.HasValue && x.SizeClass.Value == y.SizeClass.Value : !y.MaxLength.HasValue) && NameComparer.Equals(x.SysID, y.SysID) && NameComparer.Equals(x.Name, y.Name) &&
@@ -216,7 +218,7 @@ public static class EntityFrameworkExtensions
     internal static bool TryFindByName(this IEnumerable<Table>? tables, string name, [NotNullWhen(true)] out Table? result)
     {
         if (tables is not null)
-            foreach (Table t in tables)
+            foreach (Table t in tables) //codeql[cs/linq/missed-where] Where Linq query would not make sense here.
                 if (NameComparer.Equals(t.Name, name))
                 {
                     result = t;
@@ -229,7 +231,7 @@ public static class EntityFrameworkExtensions
     internal static bool TryFindByName(this IEnumerable<Element>? elements, string name, [NotNullWhen(true)] out Element? result)
     {
         if (elements is not null)
-            foreach (Element e in elements)
+            foreach (Element e in elements) //codeql[cs/linq/missed-where] Where Linq query would not make sense here.
                 if (NameComparer.Equals(e.Name, name))
                 {
                     result = e;

@@ -176,7 +176,7 @@ public sealed class MainWorkerService : BackgroundService
                         if (tableInfo is not null)
                             tables.Add(tableInfo);
                     }
-                    catch (Exception exception)
+                    catch (Exception exception) //codeql[cs/catch-of-all-exceptions] No need to record exception.
                     {
                         if (stoppingToken.IsCancellationRequested)
                             return;
@@ -201,7 +201,7 @@ public sealed class MainWorkerService : BackgroundService
             }
         }
         catch (OperationCanceledException) { throw; }
-        catch (Exception error)
+        catch (Exception error) //codeql[cs/catch-of-all-exceptions]
         {
             _logger.LogUnexpectedServiceException<MainWorkerService>(error);
         }
