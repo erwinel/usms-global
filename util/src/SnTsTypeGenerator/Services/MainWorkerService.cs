@@ -153,7 +153,8 @@ public sealed class MainWorkerService : BackgroundService
                 WriteHelpToConsole();
                 return;
             }
-
+            if (!await TypingsDbContext.InitializeAsync(_scope, stoppingToken))
+                return;
             DataLoaderService _dataLoader = _scope.ServiceProvider.GetRequiredService<DataLoaderService>();
             RenderingService _renderer = _scope.ServiceProvider.GetRequiredService<RenderingService>();
 
@@ -161,9 +162,7 @@ public sealed class MainWorkerService : BackgroundService
                 return;
             IEnumerable<Table> toRender;
 
-#pragma warning disable CA1804 // Remove unused locals.
-            using (var scope = _logger.BeginScope(STAGE_NAME_LOAD))
-#pragma warning restore CA1804
+            using (var scope = _logger.BeginScope(STAGE_NAME_LOAD)) //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
             {
                 Collection<Table> tables = new();
                 foreach (string name in _tableNames)
@@ -194,9 +193,7 @@ public sealed class MainWorkerService : BackgroundService
             }
             if (!stoppingToken.IsCancellationRequested)
             {
-#pragma warning disable CA1804 // Remove unused locals.
-                using var scope2 = _logger.BeginScope(STAGE_NAME_RENDER);
-#pragma warning restore CA1804
+                using var scope2 = _logger.BeginScope(STAGE_NAME_RENDER); //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
                 await _renderer.RenderAsync(toRender, stoppingToken);
             }
         }

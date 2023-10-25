@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -27,12 +29,10 @@ public partial class TypingsDbContext : DbContext
     private readonly ILogger<TypingsDbContext> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 
-    private readonly bool _pathValidated;
-
     /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
-    internal bool InitSuccessful => _pathValidated && Database.CanConnect();
+    internal bool InitSuccessful => Database.CanConnect();
 
     private static IEnumerable<string> GetSncSourceDbInitCommands()
     {
@@ -151,11 +151,15 @@ public partial class TypingsDbContext : DbContext
         yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.IsDisplay)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.IsDisplay)}\")";
         yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.IsPrimary)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.IsPrimary)}\")";
     }
-
-    public TypingsDbContext(DbContextOptions<TypingsDbContext> options) : base(options)
+    
+    internal async static Task<bool> InitializeAsync(IServiceScope scope, CancellationToken cancellationToken)
     {
-        _logger = Program.Host.Services.GetRequiredService<ILogger<TypingsDbContext>>();
-        _scopeFactory = Program.Host.Services.GetRequiredService<IServiceScopeFactory>();
+        using var dbContext = scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
+        return await dbContext.InitializeAsync(cancellationToken);
+    }
+
+    private async Task<bool> InitializeAsync(CancellationToken cancellationToken)
+    {
         SqliteConnectionStringBuilder csb;
         string connectionString = Database.GetConnectionString()!;
         FileInfo dbFile;
@@ -167,19 +171,14 @@ public partial class TypingsDbContext : DbContext
         catch (Exception exception)
         {
             _logger.LogDbfileValidationError(connectionString, exception);
-            _pathValidated = false;
-            return;
+            return false;
         }
         if (dbFile.Exists)
-        {
-            _pathValidated = true;
-            return;
-        }
+            return true;
         if (dbFile.Directory is null || !dbFile.Directory.Exists)
         {
             _logger.LogDbFileDirectoryNotFound(dbFile);
-            _pathValidated = false;
-            return;
+            return false;
         }
 
         csb.Mode = SqliteOpenMode.ReadWriteCreate;
@@ -187,27 +186,26 @@ public partial class TypingsDbContext : DbContext
         try
         {
             connection = new(csb.ConnectionString);
-            connection.Open();
+            await connection.OpenAsync(cancellationToken);
         }
         catch (Exception exception)
         {
             _logger.LogDbfileAccessError(connectionString, exception);
-            _pathValidated = false;
-            return;
+            return false;
         }
         try
         {
             using (connection)
             {
                 var transaction = connection.BeginTransaction();
-                bool executeDbInitCommands<T>(IEnumerable<string> commands)
+                async Task<bool> executeDbInitCommandsAsync<T>(IEnumerable<string> commands)
                 {
                     foreach (string query in commands)
                     {
                         using SqliteCommand command = connection.CreateCommand();
                         command.CommandText = query;
                         command.CommandType = System.Data.CommandType.Text;
-                        try { _ = command.ExecuteNonQuery(); }
+                        try { _ = await command.ExecuteNonQueryAsync(cancellationToken); }
                         catch (Exception exception)
                         {
                             _logger.LogDbInitializationFailure(query, typeof(T), dbFile, exception);
@@ -216,23 +214,28 @@ public partial class TypingsDbContext : DbContext
                     }
                     return false;
                 }
-                if (executeDbInitCommands<SncSource>(GetSncSourceDbInitCommands()) || executeDbInitCommands<Package>(GetPackageDbInitCommands()) ||
-                    executeDbInitCommands<Scope>(GetScopeDbInitCommands()) || executeDbInitCommands<GlideType>(GetGlideTypeDbInitCommands()) || executeDbInitCommands<Table>(GetTableDbInitCommands()) ||
-                    executeDbInitCommands<Element>(GetElementDbInitCommands()))
+                if (await executeDbInitCommandsAsync<SncSource>(GetSncSourceDbInitCommands()) || await executeDbInitCommandsAsync<Package>(GetPackageDbInitCommands()) ||
+                    await executeDbInitCommandsAsync<Scope>(GetScopeDbInitCommands()) || await executeDbInitCommandsAsync<GlideType>(GetGlideTypeDbInitCommands()) || await executeDbInitCommandsAsync<Table>(GetTableDbInitCommands()) ||
+                    await executeDbInitCommandsAsync<Element>(GetElementDbInitCommands()))
                 {
                     transaction.Rollback();
-                    _pathValidated = false;
-                    return;
+                    return false;
                 }
                 transaction.Commit();
             }
-            _pathValidated = true;
+            return true;
         }
         catch (Exception error)
         {
             _logger.LogDbInitializationFailure(dbFile, error);
-            _pathValidated = false;
+            return false;
         }
+    }
+
+    public TypingsDbContext(DbContextOptions<TypingsDbContext> options) : base(options)
+    {
+        _logger = Program.Host.Services.GetRequiredService<ILogger<TypingsDbContext>>();
+        _scopeFactory = Program.Host.Services.GetRequiredService<IServiceScopeFactory>();
     }
 
     private void OnBeforeSave(CancellationToken cancellationToken = default)
