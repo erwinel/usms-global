@@ -1,11 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SnTsTypeGenerator.Models;
 
@@ -151,7 +148,7 @@ public partial class TypingsDbContext : DbContext
         yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.IsDisplay)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.IsDisplay)}\")";
         yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.IsPrimary)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.IsPrimary)}\")";
     }
-    
+
     internal async static Task InitializeAsync(IServiceScope scope, CancellationToken cancellationToken)
     {
         using var dbContext = scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
