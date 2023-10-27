@@ -55,6 +55,7 @@
         "mindaro-dev.file-downloader",
         "ms-dotnettools.csharp",
         "ms-vscode.powershell",
+        "ms-vscode-remote.remote-containers",
         "ms-vscode.vscode-typescript-next",
         "mtxr.sqltools",
         "mtxr.sqltools-driver-sqlite",
