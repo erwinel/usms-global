@@ -139,6 +139,20 @@ public sealed class MainWorkerService : BackgroundService
         finally { Console.ResetColor(); }
     }
 
+    private async Task<IEnumerable<Table>> GetTablesToRender(DataLoaderService dataLoader, CancellationToken stoppingToken)
+    {
+        Collection<Table> tables = new();
+        foreach (string name in _tableNames)
+        {
+            if (stoppingToken.IsCancellationRequested)
+                return tables;
+            var tableInfo = await _logger.WithActivityScopeAsync(LoggerActivityType.Get_Table_From_Arg, name, dataLoader.GetTableByNameAsync(name, stoppingToken));
+            if (tableInfo is not null)
+                tables.Add(tableInfo);
+        }
+        return (stoppingToken.IsCancellationRequested || !_includeReferenced) ? tables : await dataLoader.LoadAllReferencedAsync(tables, stoppingToken);
+    }
+
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
@@ -152,57 +166,21 @@ public sealed class MainWorkerService : BackgroundService
                 return;
             }
             await TypingsDbContext.InitializeAsync(_scope, stoppingToken);
-            DataLoaderService _dataLoader = _scope.ServiceProvider.GetRequiredService<DataLoaderService>();
-            RenderingService _renderer = _scope.ServiceProvider.GetRequiredService<RenderingService>();
+            DataLoaderService dataLoader = _scope.ServiceProvider.GetRequiredService<DataLoaderService>();
+            RenderingService renderer = _scope.ServiceProvider.GetRequiredService<RenderingService>();
 
-            if (!(_dataLoader.InitSuccessful && _renderer.InitSuccessful))
+            if (!(dataLoader.InitSuccessful && renderer.InitSuccessful))
                 return;
-            IEnumerable<Table> toRender;
-
-            //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
-            using (var loadScope = _logger.BeginLoadStageScope())
-            {
-                Collection<Table> tables = new();
-                foreach (string name in _tableNames)
-                {
-                    if (stoppingToken.IsCancellationRequested)
-                        return;
-                    try
-                    {
-                        var tableInfo = await _dataLoader.GetTableByNameAsync(name, stoppingToken);
-                        if (tableInfo is not null)
-                            tables.Add(tableInfo);
-                    }
-                    //codeql[cs/catch-of-all-exceptions] Won't fix.
-                    catch (Exception exception)
-                    {
-                        if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(exception))
-                            _logger.LogUnexpectedServiceException<MainWorkerService>(exception);
-                        return;
-                    }
-                }
-                toRender = (stoppingToken.IsCancellationRequested || !_includeReferenced) ? tables : await _dataLoader.LoadAllReferencedAsync(tables, stoppingToken);
-            }
+            IEnumerable<Table> toRender = await _logger.WithActivityScopeAsync(LoggerActivityType.Load_Tables, GetTablesToRender(dataLoader, stoppingToken));
             if (!stoppingToken.IsCancellationRequested)
-            {
-                //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
-                using var renderScope = _logger.BeginRenderStageScope();
-                try { await _renderer.RenderAsync(toRender, stoppingToken); }
-                //codeql[cs/catch-of-all-exceptions] Won't fix.
-                catch (Exception exception)
-                {
-                    if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(exception))
-                        _logger.LogUnexpectedServiceException<MainWorkerService>(exception);
-                    return;
-                }
-            }
+                await _logger.WithActivityScopeAsync(LoggerActivityType.Render_Types, renderer.RenderAsync(toRender, stoppingToken));
         }
         catch (OperationCanceledException) { throw; }
         //codeql[cs/catch-of-all-exceptions]
         catch (Exception error)
         {
             if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(error))
-                _logger.LogUnexpectedServiceException<MainWorkerService>(error);
+                _logger.LogUnexpectedException(error);
         }
         finally
         {

@@ -11,9 +11,9 @@ internal class GetResponseContentFailedException : Exception, ILogTrackable
 
     public bool IsLogged { get; private set; }
 
-    public void Log(ILogger logger, bool force = false)
+    public void Log(ILogger logger)
     {
-        if (IsLogged && !force)
+        if (IsLogged)
             return;
         logger.LogGetResponseContentFailed(RequestUri);
         IsLogged = true;

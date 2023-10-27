@@ -24,9 +24,9 @@ public class DbInitializationException : Exception, ILogTrackable
 
     public Type? EntityType { get; private set; }
 
-    public void Log(ILogger logger, bool force = false)
+    public void Log(ILogger logger)
     {
-        if (IsLogged && !force)
+        if (IsLogged)
             return;
         if (string.IsNullOrWhiteSpace(ConnectionString))
             logger.LogDbInitializationFailure(EntityType, ErrorCode, SqlState, CommandType, CommandText, DbPath, InnerException ?? this);

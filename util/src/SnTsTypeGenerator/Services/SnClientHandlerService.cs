@@ -107,10 +107,17 @@ public sealed class SnClientHandlerService
         Uri requestUri;
         if (token is null)
         {
+            requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
+            using var getTokenScope = _logger.BeginActivityScope(LoggerActivityType.Get_Access_Token, new JsonObject()
+            {
+                { nameof(HttpRequestMessage.RequestUri), JsonValue.Create(requestUri.AbsoluteUri) },
+                { HEADER_KEY_CLIENT_ID, JsonValue.Create(ClientCredentials.UserName) },
+                { HEADER_KEY_USERNAME, JsonValue.Create(UserCredentials.UserName) }
+            });
+            
             createdOn = DateTime.Now;
             using HttpClientHandler handler = CreateHttpClientHandler();
             using HttpClient httpClient = new(handler);
-            requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
             using HttpRequestMessage message = new(HttpMethod.Post, requestUri)
             {
                 Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
@@ -129,10 +136,16 @@ public sealed class SnClientHandlerService
         {
             if (token.ExpiresOn > DateTime.Now)
                 return token;
+            requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
+            using var refreshTokenScope = _logger.BeginActivityScope(LoggerActivityType.Refresh_Access_Token, new JsonObject()
+            {
+                { nameof(HttpRequestMessage.RequestUri), JsonValue.Create(requestUri.AbsoluteUri) },
+                { HEADER_KEY_CLIENT_ID, JsonValue.Create(ClientCredentials.UserName) },
+                { HEADER_KEY_REFRESH_TOKEN, JsonValue.Create(token.RefreshToken) }
+            });
             createdOn = DateTime.Now;
             using HttpClientHandler handler = CreateHttpClientHandler();
             using HttpClient httpClient = new(handler);
-            requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
             using HttpRequestMessage message = new(HttpMethod.Post, requestUri)
             {
                 Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
@@ -325,7 +338,7 @@ public sealed class SnClientHandlerService
             if (clientId is null)
             {
                 if (clientSecret is not null)
-                    throw new Exception("Client ID is required when ClientSecret is specified.");
+                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientId));
             }
             else
             {

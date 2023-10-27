@@ -260,23 +260,21 @@ public partial class TypingsDbContext : DbContext
         }
     }
 
-    public override int SaveChanges()
+    public override int SaveChanges() => _logger.WithActivityScope(LoggerActivityType.Save_Db_Changes, () =>
     {
-        using IDisposable? scope = _logger.BeginSaveDbChangesScope();
         OnBeforeSave();
         int returnValue = base.SaveChanges();
         _logger.LogDbSaveChangesCompleted(false, null, returnValue);
         return returnValue;
-    }
+    });
 
-    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    public override int SaveChanges(bool acceptAllChangesOnSuccess) => _logger.WithActivityScope(LoggerActivityType.Save_Db_Changes, acceptAllChangesOnSuccess, () =>
     {
-        using IDisposable? scope = _logger.BeginSaveDbChangesScope(false, acceptAllChangesOnSuccess);
         OnBeforeSave();
         int returnValue = base.SaveChanges(acceptAllChangesOnSuccess);
         _logger.LogDbSaveChangesCompleted(false, acceptAllChangesOnSuccess, returnValue);
         return returnValue;
-    }
+    });
 
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {

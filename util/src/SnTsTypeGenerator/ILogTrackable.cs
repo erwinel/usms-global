@@ -5,5 +5,5 @@ namespace SnTsTypeGenerator;
 public interface ILogTrackable
 {
     bool IsLogged { get; }
-    void Log(ILogger logger, bool force = false);
+    void Log(ILogger logger);
 }

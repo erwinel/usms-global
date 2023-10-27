@@ -10,9 +10,9 @@ public class DbFileDirectoryNotFoundException : Exception, ILogTrackable
 
     public string DbPath { get; private set; }
 
-    public void Log(ILogger logger, bool force = false)
+    public void Log(ILogger logger)
     {
-        if (IsLogged && !force)
+        if (IsLogged)
             return;
         logger.LogDbFileDirectoryNotFound(DbPath);
     }

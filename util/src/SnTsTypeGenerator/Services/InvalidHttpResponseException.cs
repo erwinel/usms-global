@@ -15,9 +15,9 @@ internal class InvalidHttpResponseException : Exception, ILogTrackable
 
     public bool IsLogged { get; private set; }
 
-    public void Log(ILogger logger, bool force = false)
+    public void Log(ILogger logger)
     {
-        if (IsLogged && !force)
+        if (IsLogged)
             return;
         logger.LogInvalidHttpResponse(RequestUri, Response);
         IsLogged = true;

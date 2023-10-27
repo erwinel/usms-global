@@ -9,9 +9,9 @@ using static SnTsTypeGenerator.Services.CmdLineConstants;
 using SnTsTypeGenerator.Services;
 using System.Data.Common;
 using System.Data;
+using SnTsTypeGenerator.Models;
 
 namespace SnTsTypeGenerator;
-
 public static class LoggerMessages
 {
     /// <summary>
@@ -32,33 +32,243 @@ public static class LoggerMessages
         return true;
     }
 
+    public static void LogOrThrowIfNotTrackable(this ILogger logger, Exception exception)
+    {
+        if (exception is ILogTrackable logTrackable)
+        {
+            if (!logTrackable.IsLogged)
+                logTrackable.Log(logger);
+        }
+        else
+        {
+            logger.LogUnexpectedException(exception);
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static void WithActivityScope(this ILogger logger, LoggerActivityType type, Action action)
+    {
+        using var scope = logger.BeginActivityScope(type);
+        try { action(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static async Task WithActivityScopeAsync(this ILogger logger, LoggerActivityType type, Task task)
+    {
+        using var scope = logger.BeginActivityScope(type);
+        try { await task; }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static void WithActivityScope(this ILogger logger, LoggerActivityType type, string context, Action action)
+    {
+        using var scope = logger.BeginActivityScope(type, context);
+        try { action(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static async Task WithActivityScopeAsync(this ILogger logger, LoggerActivityType type, string context, Task task)
+    {
+        using var scope = logger.BeginActivityScope(type, context);
+        try { await task; }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static void WithActivityScope(this ILogger logger, LoggerActivityType type, JsonNode context, Action action)
+    {
+        using var scope = logger.BeginActivityScope(type, context);
+        try { action(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static async Task WithActivityScopeAsync(this ILogger logger, LoggerActivityType type, JsonNode context, Task task)
+    {
+        using var scope = logger.BeginActivityScope(type, context);
+        try { await task; }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static T WithActivityScope<T>(this ILogger logger, LoggerActivityType type, Func<T> func)
+    {
+        using var scope = logger.BeginActivityScope(type);
+        try { return func(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static async Task<T> WithActivityScopeAsync<T>(this ILogger logger, LoggerActivityType type, Task<T> task)
+    {
+        using var scope = logger.BeginActivityScope(type);
+        try { return await task; }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static T WithActivityScope<T>(this ILogger logger, LoggerActivityType type, string context, Func<T> func)
+    {
+        using var scope = logger.BeginActivityScope(type, context);
+        try { return func(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static async Task<T> WithActivityScopeAsync<T>(this ILogger logger, LoggerActivityType type, string context, Task<T> task)
+    {
+        using var scope = logger.BeginActivityScope(type, context);
+        try { return await task; }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static T WithActivityScope<T>(this ILogger logger, LoggerActivityType type, JsonNode context, Func<T> func)
+    {
+        using var scope = logger.BeginActivityScope(type, context);
+        try { return func(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    public static async Task<T> WithActivityScopeAsync<T>(this ILogger logger, LoggerActivityType type, JsonNode context, Task<T> task)
+    {
+        using var scope = logger.BeginActivityScope(type, context);
+        try { return await task; }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception, type.ToString("F").Replace("_", " "));
+            throw new TrackedException(exception);
+        }
+    }
+
+    #region Activity Scope
+
+    private static readonly Func<ILogger, LoggerActivityType, IDisposable?> _activityScope1 = LoggerMessage.DefineScope<LoggerActivityType>("Activity: {Activity}");
+
+    private static readonly Func<ILogger, LoggerActivityType, string, IDisposable?> _activityScope2 = LoggerMessage.DefineScope<LoggerActivityType, string>("Activity: {Activity}; Context: {Context}");
+
+    /// <summary>
+    /// Formats the Activity message and creates a scope.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
+    public static IDisposable? BeginActivityScope(this ILogger logger, LoggerActivityType type, JsonNode context) => _activityScope2(logger, type, context.ToJsonString());
+
+    public static IDisposable? BeginActivityScope(this ILogger logger, LoggerActivityType type, string? context = null) => (context is null) ? _activityScope1(logger, type) :
+        _activityScope2(logger, type, context);
+
+    #endregion
+
     #region Scope Definitions
-
-    #region LoadStage Scope
-
-    private static readonly Func<ILogger, IDisposable?> _loadStageScope = LoggerMessage.DefineScope("Loading tables to render.");
-
-    /// <summary>
-    /// Formats the LoadStage message and creates a scope.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
-    public static IDisposable? BeginLoadStageScope(this ILogger logger) => _loadStageScope(logger);
-
-    #endregion
-
-    #region RenderStage Scope
-
-    private static readonly Func<ILogger, IDisposable?> _renderStageScope = LoggerMessage.DefineScope("Rendering code.");
-
-    /// <summary>
-    /// Formats the RenderStage message and creates a scope.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
-    public static IDisposable? BeginRenderStageScope(this ILogger logger) => _renderStageScope(logger);
-
-    #endregion
 
     #region BeforeSaveDbChanges Scope
 
@@ -69,6 +279,7 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
+    [Obsolete("Use BeginActivityScope(ILogger, LoggerActivityType.Validate_Before_Save)")]
     public static IDisposable? BeginBeforeSaveDbChangesScope(this ILogger logger) => _beforeSaveDbChangesScope(logger);
 
     #endregion
@@ -84,6 +295,7 @@ public static class LoggerMessages
     /// <param name="isAsynchronous">Indicates whether the save method is asynchronous.</param>
     /// <param name="acceptAllChangesOnSuccess">The value of the <c>acceptAllChangesOnSuccess</c> parameter.</param>
     /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
+    [Obsolete("Use BeginActivityScope(ILogger, LoggerActivityType.Save_Db_Changes)")]
     public static IDisposable? BeginSaveDbChangesScope(this ILogger logger, bool isAsynchronous = false, bool? acceptAllChangesOnSuccess = null) => _saveDbChangesScope(logger, isAsynchronous, acceptAllChangesOnSuccess);
 
     #endregion
@@ -111,6 +323,7 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="type">The service type that failed.</param>
     /// <param name="error">The exception that caused the event.</param>
+    [Obsolete("Use LogUnexpectedException")]
     public static void LogUnexpectedServiceException(this ILogger logger, Type type, Exception? error) => _unexpectedServiceException(logger, type.FullName ?? type.Name, error);
 
     /// <summary>
@@ -119,6 +332,7 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="error">The exception that caused the event.</param>
     /// <typeparam name="T">The service type that failed.</typeparam>
+    [Obsolete("Use LogUnexpectedException")]
     public static void LogUnexpectedServiceException<T>(this ILogger logger, Exception error) => LogUnexpectedServiceException(logger, typeof(T), error);
 
     #endregion
@@ -1266,22 +1480,32 @@ public static class LoggerMessages
     /// <summary>
     /// Numerical event code for UnexpecteException.
     /// </summary>
-    public const int EVENT_ID_UnexpecteException = 0x00ff;
+    public const int EVENT_ID_UnexpectedException = 0x00ff;
 
     /// <summary>
     /// Event ID for UnexpecteException.
     /// </summary>
-    public static readonly EventId UnexpecteException = new(EVENT_ID_UnexpecteException, nameof(UnexpecteException));
+    public static readonly EventId UnexpectedException = new(EVENT_ID_UnexpectedException, nameof(UnexpectedException));
 
-    private static readonly Action<ILogger, Exception?> _unexpecteException = LoggerMessage.Define(LogLevel.Critical, UnexpecteException,
+    private static readonly Action<ILogger, Exception?> _unexpectedException1 = LoggerMessage.Define(LogLevel.Critical, UnexpectedException,
         "An unexpected exception has occurred.");
+
+    
+    private static readonly Action<ILogger, string, Exception?> _unexpectedException2 = LoggerMessage.Define<string>(LogLevel.Critical, UnexpectedException,
+        "An unexpected exception has occurred - Activity: {Activity}");
 
     /// <summary>
     /// Logs an UnexpecteException event with event code 0x00ff.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogUnexpecteException(this ILogger logger, Exception error) => _unexpecteException(logger, error);
+    public static void LogUnexpectedException(this ILogger logger, Exception error, string? activity = null)
+    {
+        if (string.IsNullOrWhiteSpace(activity) && string.IsNullOrWhiteSpace(activity = error?.Message))
+            _unexpectedException1(logger, error);
+        else
+            _unexpectedException2(logger, activity, error);
+    }
 
     #endregion
 }

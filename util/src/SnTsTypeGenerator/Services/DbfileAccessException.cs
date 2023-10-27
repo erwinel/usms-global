@@ -10,9 +10,9 @@ public class DbfileAccessException : Exception, ILogTrackable
 
     public string DbFilePath { get; private set; }
 
-    public void Log(ILogger logger, bool force = false)
+    public void Log(ILogger logger)
     {
-        if (IsLogged && !force)
+        if (IsLogged)
             return;
         if (InnerException is System.Security.SecurityException || InnerException is UnauthorizedAccessException)
             logger.LogDbfileAccessError(DbFilePath, InnerException);
