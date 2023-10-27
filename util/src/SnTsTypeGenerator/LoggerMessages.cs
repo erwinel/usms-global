@@ -544,7 +544,7 @@ public static class LoggerMessages
         "Error accessing output file {Path}.");
 
     private static readonly Action<ILogger, string, string, Exception?> _outputFileAccessError2 = LoggerMessage.Define<string, string>(LogLevel.Critical, OutputFileAccessError,
-        "Error accessing output file {Path}: {Message}");
+        "Error accessing output file {Path}: {Reason}");
 
     /// <summary>
     /// Logs an output file access error event (OutputFileAccessError) with event code 0x000c.
@@ -559,8 +559,9 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="path">The path of the output file.</param>
-    /// <param name="message">The message describing the error.</param>
-    public static void LogOutputFileAccessError(this ILogger logger, string path, string message) => _outputFileAccessError2(logger, path, message, null);
+    /// <param name="reason">The message describing the error.</param>
+    /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
+    public static void LogOutputFileAccessError(this ILogger logger, string path, string reason, Exception? error = null) => _outputFileAccessError2(logger, path, reason, error);
 
     #endregion
 

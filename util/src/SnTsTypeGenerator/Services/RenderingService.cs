@@ -618,10 +618,14 @@ public partial class RenderingService
                 Mode = _forceOverwrite ? FileMode.Create : FileMode.CreateNew
             });
         }
+        catch (ArgumentException error)
+        {
+            throw new LogOutputFileAccessException("Output file is not writable", error, _outputFile.FullName);
+        }
+        //codeql[cs/catch-of-all-exceptions] Won't fix
         catch (Exception error)
         {
-            _logger.LogOutputFileAccessError(_outputFile.FullName, error);
-            return;
+            throw new LogOutputFileAccessException(error, _outputFile.FullName);
         }
         try
         {
@@ -762,13 +766,26 @@ public partial class RenderingService
                     await writer.FlushAsync();
                     await streamWriter.FlushAsync();
                 }
+                catch (Exception exception) when (exception is ILogTrackable)
+                {
+                    throw;
+                }
+                //codeql[cs/catch-of-all-exceptions] Won't fix
                 catch (Exception exception)
                 {
-                    _logger.LogOutputFileAccessError(_outputFile.FullName, exception);
+                    throw new LogOutputFileAccessException("Unexpected error while closing output stream", exception, _outputFile.FullName);
                 }
             }
         }
-        catch (Exception error) { _logger.LogUnexpecteException(error); }
+        catch (Exception exception) when (exception is ILogTrackable)
+        {
+            throw;
+        }
+        //codeql[cs/catch-of-all-exceptions] Won't fix
+        catch (Exception error)
+        {
+            throw new LogOutputFileAccessException("Unexpected error while writing to output file", error, _outputFile.FullName);
+        }
     }
 
     public RenderingService(ILogger<RenderingService> logger, IServiceProvider services, IOptions<AppSettings> appSettingsOptions)
@@ -831,10 +848,10 @@ public partial class RenderingService
             _logger.LogUsingOutputFile(outputFileName, _forceOverwrite);
             _outputFile = outputFile;
         }
+        //codeql[cs/catch-of-all-exceptions] Won't fix
         catch (Exception exception)
         {
             _logger.LogOutputFileAccessError(outputFileName, exception);
-            return;
         }
     }
 }
