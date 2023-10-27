@@ -165,17 +165,11 @@ public partial class TypingsDbContext : DbContext
         string connectionString = Database.GetConnectionString()!;
         try { path = (csb = new(connectionString)).DataSource; }
         catch (Exception exc) { throw new DbInitializationException(exc, connectionString); }
+        if (string.IsNullOrEmpty(path))
+            return;
         FileInfo dbFile;
-        try
-        {
-            if (string.IsNullOrEmpty(path))
-                return;
-            path = (dbFile = new(path)).FullName;
-        }
-        catch (Exception exc)
-        {
-            throw new DbfileAccessException(exc, path);
-        }
+        try { dbFile = new(path); }
+        catch (Exception exc) { throw new DbfileAccessException(exc, path); }
         if (dbFile.Exists)
             return;
         if (dbFile.Directory is null || !dbFile.Directory.Exists)
