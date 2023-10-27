@@ -218,7 +218,8 @@ public static class EntityFrameworkExtensions
     internal static bool TryFindByName(this IEnumerable<Table>? tables, string name, [NotNullWhen(true)] out Table? result)
     {
         if (tables is not null)
-            foreach (Table t in tables) //codeql[cs/linq/missed-where] Where Linq query would not make sense here.
+            //codeql[cs/linq/missed-where] Where Linq query would not make sense here.
+            foreach (Table t in tables)
                 if (NameComparer.Equals(t.Name, name))
                 {
                     result = t;
@@ -231,7 +232,8 @@ public static class EntityFrameworkExtensions
     internal static bool TryFindByName(this IEnumerable<Element>? elements, string name, [NotNullWhen(true)] out Element? result)
     {
         if (elements is not null)
-            foreach (Element e in elements) //codeql[cs/linq/missed-where] Where Linq query would not make sense here.
+            //codeql[cs/linq/missed-where] Where Linq query would not make sense here.
+            foreach (Element e in elements)
                 if (NameComparer.Equals(e.Name, name))
                 {
                     result = e;

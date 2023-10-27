@@ -45,7 +45,8 @@ internal class ResponseResultPropertyNotFoundException : Exception, ILogTrackabl
             Result = new();
         else
             try { Result = (JsonObject.Parse(value) as JsonObject) ?? new(); }
-            catch { Result = new(); } //codeql[cs/catch-of-all-exceptions] No need to record exception.
+            //codeql[cs/catch-of-all-exceptions] No need to record exception.
+            catch { Result = new(); }
         RequestUri = string.IsNullOrEmpty(value = info.GetString(nameof(RequestUri))) ? EmptyURI : Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) ? uri : new Uri(value, UriKind.Relative);
     }
 

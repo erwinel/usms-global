@@ -46,7 +46,8 @@ internal class InvalidResultElementTypeException : Exception, ILogTrackable
             Element = new();
         else
             try { Element = (JsonNode.Parse(value) as JsonObject) ?? new(); }
-            catch { Element = new(); } //codeql[cs/catch-of-all-exceptions] No need to record exception.
+            //codeql[cs/catch-of-all-exceptions] No need to record exception.
+            catch { Element = new(); }
         Index = info.GetInt32(nameof(Index));
         RequestUri = string.IsNullOrEmpty(value = info.GetString(nameof(RequestUri))) ? EmptyURI : Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) ? uri : new Uri(value, UriKind.Relative);
     }

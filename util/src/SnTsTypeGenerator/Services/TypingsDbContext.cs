@@ -164,11 +164,13 @@ public partial class TypingsDbContext : DbContext
         string path;
         string connectionString = Database.GetConnectionString()!;
         try { path = (csb = new(connectionString)).DataSource; }
+        //codeql[cs/catch-of-all-exceptions] Won't fix.
         catch (Exception exc) { throw new DbInitializationException(exc, connectionString); }
         if (string.IsNullOrEmpty(path))
             return;
         FileInfo dbFile;
         try { dbFile = new(path); }
+        //codeql[cs/catch-of-all-exceptions] Won't fix.
         catch (Exception exc) { throw new DbfileAccessException(exc, path); }
         if (dbFile.Exists)
             return;
@@ -192,7 +194,8 @@ public partial class TypingsDbContext : DbContext
                         command.CommandText = query;
                         command.CommandType = System.Data.CommandType.Text;
                         try { _ = await command.ExecuteNonQueryAsync(cancellationToken); }
-                        catch (Exception exception) //codeql[cs/catch-of-all-exceptions] Won't fix.
+                        //codeql[cs/catch-of-all-exceptions] Won't fix.
+                        catch (Exception exception)
                         {
                             throw new DbInitializationException(dbFile.FullName, typeof(T), exception);
                         }
@@ -216,7 +219,8 @@ public partial class TypingsDbContext : DbContext
             }
         }
         catch (DbInitializationException) { throw; }
-        catch (Exception exception) //codeql[cs/catch-of-all-exceptions] Won't fix.
+        //codeql[cs/catch-of-all-exceptions] Won't fix.
+        catch (Exception exception)
         {
             throw new DbInitializationException(exception, connectionString);
         }

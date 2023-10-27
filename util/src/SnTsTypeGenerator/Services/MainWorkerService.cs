@@ -159,7 +159,8 @@ public sealed class MainWorkerService : BackgroundService
                 return;
             IEnumerable<Table> toRender;
 
-            using (var scope = _logger.BeginLoadStageScope()) //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
+            //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
+            using (var loadScope = _logger.BeginLoadStageScope())
             {
                 Collection<Table> tables = new();
                 foreach (string name in _tableNames)
@@ -172,7 +173,8 @@ public sealed class MainWorkerService : BackgroundService
                         if (tableInfo is not null)
                             tables.Add(tableInfo);
                     }
-                    catch (Exception exception) //codeql[cs/catch-of-all-exceptions] Won't fix.
+                    //codeql[cs/catch-of-all-exceptions] Won't fix.
+                    catch (Exception exception)
                     {
                         if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(exception))
                             _logger.LogUnexpectedServiceException<MainWorkerService>(exception);
@@ -183,9 +185,11 @@ public sealed class MainWorkerService : BackgroundService
             }
             if (!stoppingToken.IsCancellationRequested)
             {
-                using var scope2 = _logger.BeginRenderStageScope(); //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
+                //codeql[cs/useless-assignment-to-local] Variable disposal marks end of scope.
+                using var renderScope = _logger.BeginRenderStageScope();
                 try { await _renderer.RenderAsync(toRender, stoppingToken); }
-                catch (Exception exception) //codeql[cs/catch-of-all-exceptions] Won't fix.
+                //codeql[cs/catch-of-all-exceptions] Won't fix.
+                catch (Exception exception)
                 {
                     if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(exception))
                         _logger.LogUnexpectedServiceException<MainWorkerService>(exception);
@@ -194,7 +198,8 @@ public sealed class MainWorkerService : BackgroundService
             }
         }
         catch (OperationCanceledException) { throw; }
-        catch (Exception error) //codeql[cs/catch-of-all-exceptions]
+        //codeql[cs/catch-of-all-exceptions]
+        catch (Exception error)
         {
             if (!stoppingToken.IsCancellationRequested && _logger.IsNotLogged(error))
                 _logger.LogUnexpectedServiceException<MainWorkerService>(error);

@@ -61,6 +61,7 @@ internal class Program
                 SnTsTypeGenerator.LoggerMessages.LogDbfilePathTooLong(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
                 dbFile = null;
             }
+            //codeql[cs/catch-of-all-exceptions] Won't fix.
             catch (Exception exc)
             {
                 SnTsTypeGenerator.LoggerMessages.LogDbfileValidationError(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
