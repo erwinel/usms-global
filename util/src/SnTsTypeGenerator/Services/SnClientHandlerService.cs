@@ -48,6 +48,7 @@ public sealed class SnClientHandlerService
         }
         string responseBody;
         try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
+        //codeql[cs/catch-of-all-exceptions] Won't fix - API documentation doesn't indicate what type of exception may be thrown.
         catch (Exception exception) { throw new GetResponseContentFailedException(requestUri, exception); }
         cancellationToken.ThrowIfCancellationRequested();
         if (string.IsNullOrWhiteSpace(responseBody)) { throw new InvalidHttpResponseException(requestUri, responseBody); }
