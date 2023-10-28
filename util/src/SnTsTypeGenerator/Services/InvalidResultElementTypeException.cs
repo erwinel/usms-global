@@ -20,7 +20,7 @@ internal class InvalidResultElementTypeException : Exception, ILogTrackable
     {
         if (IsLogged)
             return;
-        logger.LogInvalidResultElementType(RequestUri, Element, Index);
+        logger.LogInvalidResultElementType(RequestUri, Element, Index, InnerException ?? this);
         IsLogged = true;
     }
 

@@ -18,7 +18,7 @@ internal class ResponseResultPropertyNotFoundException : Exception, ILogTrackabl
     {
         if (IsLogged)
             return;
-        logger.LogResponseResultPropertyNotFound(RequestUri, Result);
+        logger.LogResponseResultPropertyNotFound(RequestUri, Result, InnerException ?? this);
         IsLogged = true;
     }
 

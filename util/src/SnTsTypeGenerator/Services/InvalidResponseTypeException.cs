@@ -18,7 +18,7 @@ internal class InvalidResponseTypeException : Exception, ILogTrackable
     {
         if (IsLogged)
             return;
-        logger.LogInvalidResponseType(RequestUri, Result);
+        logger.LogInvalidResponseType(RequestUri, Result, InnerException ?? this);
         IsLogged = true;
     }
 

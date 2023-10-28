@@ -18,7 +18,7 @@ internal class ResponseParsingException : Exception, ILogTrackable
     {
         if (IsLogged)
             return;
-        logger.LogJsonCouldNotBeParsed(RequestUri, ResponseBody, InnerException as JsonException);
+        logger.LogJsonCouldNotBeParsed(RequestUri, ResponseBody, InnerException ?? this);
         IsLogged = true;
     }
 

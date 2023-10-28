@@ -838,16 +838,16 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI that failed.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogHttpRequestFailed(this ILogger logger, Uri uri, HttpRequestException? error)
+    public static void LogHttpRequestFailed(this ILogger logger, Uri uri, Exception? error = null)
     {
         if (error is null)
             _httpRequestFailed1(logger, uri, error);
-        else if (error.StatusCode.HasValue)
+        else if (error is HttpRequestException exception && exception.StatusCode.HasValue)
         {
             if (string.IsNullOrWhiteSpace(error.Message))
-                _httpRequestFailed3(logger, uri, (int)error.StatusCode.Value, error.StatusCode.Value.ToDisplayName(), error);
+                _httpRequestFailed3(logger, uri, (int)exception.StatusCode.Value, exception.StatusCode.Value.ToDisplayName(), error);
             else
-                _httpRequestFailed4(logger, uri, (int)error.StatusCode.Value, error.StatusCode.Value.ToDisplayName(), error.Message, error);
+                _httpRequestFailed4(logger, uri, (int)exception.StatusCode.Value, exception.StatusCode.Value.ToDisplayName(), error.Message, error);
         }
         else if (string.IsNullOrWhiteSpace(error.Message))
             _httpRequestFailed1(logger, uri, error);
@@ -904,7 +904,7 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="content">The content that could not be parsed.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogJsonCouldNotBeParsed(this ILogger logger, Uri uri, string content, JsonException? error) => _jsonCouldNotBeParsed(logger, uri, content, error);
+    public static void LogJsonCouldNotBeParsed(this ILogger logger, Uri uri, string content, Exception? error) => _jsonCouldNotBeParsed(logger, uri, content, error);
 
     #endregion
 
@@ -930,7 +930,7 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="response">The response text.</param>
     /// <param name="error">The exception that caused the event</param>
-    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, JsonNode? response) => _invalidHttpResponse(logger, uri, (response is null) ? "null" : response.ToJsonString(), null);
+    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, JsonNode? response, Exception? error = null) => _invalidHttpResponse(logger, uri, (response is null) ? "null" : response.ToJsonString(), error);
 
     #endregion
 
@@ -1102,14 +1102,14 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
-    /// <param name="type">The unexpected type.</param>
     /// <param name="response">The actual response.</param>
-    public static void LogInvalidResponseType(this ILogger logger, Uri uri, JsonNode? response)
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogInvalidResponseType(this ILogger logger, Uri uri, JsonNode? response, Exception? error = null)
     {
         if (response is null)
             _invalidResponseType1(logger, uri, null);
         else
-            _invalidResponseType2(logger, uri, response.GetType().Name, response.ToJsonString(), null);
+            _invalidResponseType2(logger, uri, response.GetType().Name, response.ToJsonString(), error);
     }
 
     #endregion
@@ -1135,7 +1135,8 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
     /// <param name="response">The actual response.</param>
-    public static void LogResponseResultPropertyNotFound(this ILogger logger, Uri uri, JsonObject response) => _responseResultPropertyNotFound(logger, uri, response.ToJsonString(), null);
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogResponseResultPropertyNotFound(this ILogger logger, Uri uri, JsonObject response, Exception? error = null) => _responseResultPropertyNotFound(logger, uri, response.ToJsonString(), error);
 
     #endregion
 
@@ -1213,12 +1214,13 @@ public static class LoggerMessages
     /// <param name="type">The unexpected type.</param>
     /// <param name="index">The element index.</param>
     /// <param name="response">The actual element.</param>
-    public static void LogInvalidResultElementType(this ILogger logger, Uri uri, JsonNode? element, int index)
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogInvalidResultElementType(this ILogger logger, Uri uri, JsonNode? element, int index, Exception? error = null)
     {
         if (element is null)
             _invalidResultElementType(logger, uri, "null", index, "", null);
         else
-            _invalidResultElementType(logger, uri, element.GetType().Name, index, element.ToJsonString(), null);
+            _invalidResultElementType(logger, uri, element.GetType().Name, index, element.ToJsonString(), error);
     }
 
     #endregion
@@ -1249,8 +1251,8 @@ public static class LoggerMessages
     /// <param name="propertyname">The name of the missing field.</param>
     /// <param name="index">The index of the result item.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogExpectedPropertyNotFound(this ILogger logger, Uri uri, string propertyname, int index, JsonObject element) =>
-        _expectedPropertyNotFound1(logger, uri, propertyname, index, element.ToJsonString(), null);
+    public static void LogExpectedPropertyNotFound(this ILogger logger, Uri uri, string propertyname, int index, JsonObject element, Exception? error = null) =>
+        _expectedPropertyNotFound1(logger, uri, propertyname, index, element.ToJsonString(), error);
 
     /// <summary>
     /// Logs an ExpectedPropertyNotFound event with event code 0x001a.
@@ -1260,7 +1262,8 @@ public static class LoggerMessages
     /// <param name="propertyname">The name of the missing field.</param>
     /// <param name="response">The actual response.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogExpectedPropertyNotFound(this ILogger logger, Uri uri, string propertyname, JsonObject element) => _expectedPropertyNotFound2(logger, uri, propertyname, element.ToJsonString(), null);
+    public static void LogExpectedPropertyNotFound(this ILogger logger, Uri uri, string propertyname, JsonObject element, Exception? error = null) =>
+        _expectedPropertyNotFound2(logger, uri, propertyname, element.ToJsonString(), error);
 
     #endregion
 

@@ -14,7 +14,7 @@ public class DbFileDirectoryNotFoundException : Exception, ILogTrackable
     {
         if (IsLogged)
             return;
-        logger.LogDbFileDirectoryNotFound(DbPath);
+        logger.LogDbFileDirectoryNotFound(DbPath, InnerException ?? this);
     }
 
     public DbFileDirectoryNotFoundException() => DbPath = string.Empty;
