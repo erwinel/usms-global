@@ -395,4 +395,3 @@ FodyWeavers.xsd
 
 package-lock.json
 util/src/SnTsTypeGenerator/Typings.db
-util/src/SnTsTypeGenerator/log*.txt
