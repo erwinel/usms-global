@@ -32,6 +32,70 @@ public static class LoggerMessages
         return true;
     }
 
+    public static void LogIfThrown(this ILogger logger, Action action)
+    {
+        try { action(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception);
+            throw new TrackedException(exception);
+        }
+    }
+    
+    public static async Task LogIfThrownAsync(this ILogger logger, Func<Task> asyncAction)
+    {
+        try { await asyncAction(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception);
+            throw new TrackedException(exception);
+        }
+    }
+    
+    public static T LogIfThrown<T>(this ILogger logger, Func<T> func)
+    {
+        try { return func(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception);
+            throw new TrackedException(exception);
+        }
+    }
+    
+    public static async Task<T> LogIfThrownAsync<T>(this ILogger logger, Func<Task<T>> asyncFunc)
+    {
+        try { return await asyncFunc(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception);
+            throw new TrackedException(exception);
+        }
+    }
+    
     public static void LogOrThrowIfNotTrackable(this ILogger logger, Exception exception)
     {
         if (exception is ILogTrackable logTrackable)
