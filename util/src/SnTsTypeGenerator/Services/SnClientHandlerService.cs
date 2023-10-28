@@ -54,8 +54,10 @@ public sealed class SnClientHandlerService
             throw new GetResponseContentFailedException(requestUri, exception);
         }
         cancellationToken.ThrowIfCancellationRequested();
-        string? mediaType;
-        if (string.IsNullOrWhiteSpace(responseBody) || (!string.IsNullOrEmpty(mediaType = response.Content.Headers.ContentType?.MediaType) && mediaType != MediaTypeNames.Application.Json))
+        string? mediaType = response.Content.Headers.ContentType?.MediaType;
+        if (!string.IsNullOrEmpty(mediaType) && mediaType != MediaTypeNames.Application.Json)
+            throw new InvalidHttpResponseException(requestUri, responseBody, mediaType);
+        else if (string.IsNullOrWhiteSpace(responseBody))
             throw new InvalidHttpResponseException(requestUri, responseBody);
         JsonNode? result;
         try { result = JsonNode.Parse(responseBody); }
@@ -171,7 +173,7 @@ public sealed class SnClientHandlerService
             _token = token = new(access_token, refresh_token, createdOn.AddSeconds(expires_in));
             return token;
         }
-        throw new InvalidHttpResponseException(requestUri, resultObj);
+        throw new InvalidHttpResponseException(requestUri, resultObj.ToJsonString());
     }
 
     internal async Task<(Uri RequestUri, JsonNode? Response)> GetJsonAsync(string path, CancellationToken cancellationToken)

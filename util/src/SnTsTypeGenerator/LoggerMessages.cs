@@ -920,8 +920,11 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId InvalidHttpResponse = new(EVENT_ID_InvalidHttpResponse, nameof(InvalidHttpResponse));
 
-    private static readonly Action<ILogger, Uri, string, Exception?> _invalidHttpResponse = LoggerMessage.Define<Uri, string>(LogLevel.Error, InvalidHttpResponse,
-        "Response from {URI} did not match the expected type; Content: {Content}");
+    private static readonly Action<ILogger, Uri, string, Exception?> _invalidHttpResponse1 = LoggerMessage.Define<Uri, string>(LogLevel.Error, InvalidHttpResponse,
+        "Response from {URI} did not match the expected format. Content: {Content}");
+
+    private static readonly Action<ILogger, Uri, string, string, string?, Exception?> _invalidHttpResponse2 = LoggerMessage.Define<Uri, string, string, string?>(LogLevel.Error, InvalidHttpResponse,
+        "Response from {URI} did not match the expected content type. Expected: {Expected}; Actual: {Actual}; Content: {Content}");
 
     /// <summary>
     /// Logs an invalid HTTP response event (InvalidHttpResponse) with event code 0x0010.
@@ -930,7 +933,16 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="response">The response text.</param>
     /// <param name="error">The exception that caused the event</param>
-    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, JsonNode? response, Exception? error = null) => _invalidHttpResponse(logger, uri, (response is null) ? "null" : response.ToJsonString(), error);
+    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, JsonNode? response, Exception? error = null) => _invalidHttpResponse1(logger, uri, (response is null) ? "null" : response.ToJsonString(), error);
+
+    /// <summary>
+    /// Logs an invalid HTTP response event (InvalidHttpResponse) with event code 0x0010.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The request URI.</param>
+    /// <param name="response">The response text.</param>
+    /// <param name="error">The exception that caused the event</param>
+    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, string actualContentType, string? response, Exception? error = null) => _invalidHttpResponse2(logger, uri, System.Net.Mime.MediaTypeNames.Application.Json, actualContentType, response, error);
 
     #endregion
 
