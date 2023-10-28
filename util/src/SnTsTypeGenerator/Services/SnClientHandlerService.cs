@@ -108,7 +108,7 @@ public sealed class SnClientHandlerService
         if (token is null)
         {
             requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
-            using var getTokenScope = _logger.BeginActivityScope(LoggerActivityType.Get_Access_Token, new JsonObject()
+            using var getTokenScope = _logger.BeginActivityScope(LogActivityType.GetAccessToken, new JsonObject()
             {
                 { nameof(HttpRequestMessage.RequestUri), JsonValue.Create(requestUri.AbsoluteUri) },
                 { HEADER_KEY_CLIENT_ID, JsonValue.Create(ClientCredentials.UserName) },
@@ -137,7 +137,7 @@ public sealed class SnClientHandlerService
             if (token.ExpiresOn > DateTime.Now)
                 return token;
             requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
-            using var refreshTokenScope = _logger.BeginActivityScope(LoggerActivityType.Refresh_Access_Token, new JsonObject()
+            using var refreshTokenScope = _logger.BeginActivityScope(LogActivityType.RefreshAccessToken, new JsonObject()
             {
                 { nameof(HttpRequestMessage.RequestUri), JsonValue.Create(requestUri.AbsoluteUri) },
                 { HEADER_KEY_CLIENT_ID, JsonValue.Create(ClientCredentials.UserName) },

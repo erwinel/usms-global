@@ -146,7 +146,7 @@ public sealed class MainWorkerService : BackgroundService
         {
             if (stoppingToken.IsCancellationRequested)
                 return tables;
-            var tableInfo = await _logger.WithActivityScopeAsync(LoggerActivityType.Get_Table_From_Arg, name, dataLoader.GetTableByNameAsync(name, stoppingToken));
+            var tableInfo = await _logger.WithActivityScopeAsync(LogActivityType.GetTableFromArg, name, () => dataLoader.GetTableByNameAsync(name, stoppingToken));
             if (tableInfo is not null)
                 tables.Add(tableInfo);
         }
@@ -171,9 +171,9 @@ public sealed class MainWorkerService : BackgroundService
 
             if (!(dataLoader.InitSuccessful && renderer.InitSuccessful))
                 return;
-            IEnumerable<Table> toRender = await _logger.WithActivityScopeAsync(LoggerActivityType.Load_Tables, GetTablesToRender(dataLoader, stoppingToken));
+            IEnumerable<Table> toRender = await _logger.WithActivityScopeAsync(LogActivityType.LoadTables, () => GetTablesToRender(dataLoader, stoppingToken));
             if (!stoppingToken.IsCancellationRequested)
-                await _logger.WithActivityScopeAsync(LoggerActivityType.Render_Types, renderer.RenderAsync(toRender, stoppingToken));
+                await _logger.WithActivityScopeAsync(LogActivityType.RenderTypes, () => renderer.RenderAsync(toRender, stoppingToken));
         }
         catch (OperationCanceledException) { throw; }
         //codeql[cs/catch-of-all-exceptions]

@@ -158,8 +158,8 @@ public partial class TypingsDbContext : DbContext
     private async Task InitializeAsync(CancellationToken cancellationToken)
     {
         SqliteConnectionStringBuilder csb;
-        string path;
         string connectionString = Database.GetConnectionString()!;
+        string path;
         try { path = (csb = new(connectionString)).DataSource; }
         //codeql[cs/catch-of-all-exceptions] Won't fix.
         catch (Exception exc) { throw new DbInitializationException(exc, connectionString); }
@@ -173,54 +173,43 @@ public partial class TypingsDbContext : DbContext
             return;
         if (dbFile.Directory is null || !dbFile.Directory.Exists)
             throw new DbFileDirectoryNotFoundException(dbFile.DirectoryName);
-
         csb.Mode = SqliteOpenMode.ReadWriteCreate;
-        SqliteConnection connection;
-        try
+        await _logger.WithActivityScopeAsync(LogActivityType.InitializeDatabase, async () =>
         {
-            connection = new(csb.ConnectionString);
+            using SqliteConnection connection = new(csb.ConnectionString);
             await connection.OpenAsync(cancellationToken);
-            using (connection)
+            async Task executeDbInitCommandsAsync<T>(IEnumerable<string> commands)
             {
-                var transaction = connection.BeginTransaction();
-                async Task executeDbInitCommandsAsync<T>(IEnumerable<string> commands)
+                foreach (string query in commands)
                 {
-                    foreach (string query in commands)
+                    using SqliteCommand command = connection.CreateCommand();
+                    command.CommandText = query;
+                    command.CommandType = System.Data.CommandType.Text;
+                    try { _ = await command.ExecuteNonQueryAsync(cancellationToken); }
+                    //codeql[cs/catch-of-all-exceptions] Won't fix.
+                    catch (Exception exception)
                     {
-                        using SqliteCommand command = connection.CreateCommand();
-                        command.CommandText = query;
-                        command.CommandType = System.Data.CommandType.Text;
-                        try { _ = await command.ExecuteNonQueryAsync(cancellationToken); }
-                        //codeql[cs/catch-of-all-exceptions] Won't fix.
-                        catch (Exception exception)
-                        {
-                            throw new DbInitializationException(dbFile.FullName, typeof(T), exception);
-                        }
+                        throw new DbInitializationException(dbFile.FullName, typeof(T), exception);
                     }
                 }
-                try
-                {
-                    await executeDbInitCommandsAsync<SncSource>(GetSncSourceDbInitCommands());
-                    await executeDbInitCommandsAsync<Package>(GetPackageDbInitCommands());
-                    await executeDbInitCommandsAsync<Scope>(GetScopeDbInitCommands());
-                    await executeDbInitCommandsAsync<GlideType>(GetGlideTypeDbInitCommands());
-                    await executeDbInitCommandsAsync<Table>(GetTableDbInitCommands());
-                    await executeDbInitCommandsAsync<Element>(GetElementDbInitCommands());
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-                transaction.Commit();
             }
-        }
-        catch (DbInitializationException) { throw; }
-        //codeql[cs/catch-of-all-exceptions] Won't fix.
-        catch (Exception exception)
-        {
-            throw new DbInitializationException(exception, connectionString);
-        }
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Sources), () => executeDbInitCommandsAsync<SncSource>(GetSncSourceDbInitCommands()));
+                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Packages), () => executeDbInitCommandsAsync<Package>(GetPackageDbInitCommands()));
+                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Scopes), () => executeDbInitCommandsAsync<Scope>(GetScopeDbInitCommands()));
+                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Types), () => executeDbInitCommandsAsync<GlideType>(GetGlideTypeDbInitCommands()));
+                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Tables), () => executeDbInitCommandsAsync<Table>(GetTableDbInitCommands()));
+                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Elements), () => executeDbInitCommandsAsync<Element>(GetElementDbInitCommands()));
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+            transaction.Commit();
+        });
     }
 
     public TypingsDbContext(DbContextOptions<TypingsDbContext> options) : base(options)
@@ -233,157 +222,171 @@ public partial class TypingsDbContext : DbContext
     {
         if (cancellationToken.IsCancellationRequested)
             return;
-        using IDisposable? scope = _logger.BeginBeforeSaveDbChangesScope();
-        using IServiceScope serviceScope = _scopeFactory.CreateScope();
-        foreach (EntityEntry e in ChangeTracker.Entries())
+        _logger.WithActivityScope(LogActivityType.ValidateBeforeSave, () =>
         {
-            if (cancellationToken.IsCancellationRequested)
-                break;
-            if (e.Entity is IValidatableObject entity)
+            using IServiceScope serviceScope = _scopeFactory.CreateScope();
+            foreach (EntityEntry e in ChangeTracker.Entries())
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
                 switch (e.State)
                 {
                     case EntityState.Added:
                     case EntityState.Modified:
                         DbContextServiceProvider serviceProvider = new(this, serviceScope.ServiceProvider, e);
-                        ValidationContext validationContext = new(entity, serviceProvider, null);
-                        _logger.LogValidatingEntity(e.State, e.Metadata, entity);
-                        try { Validator.ValidateObject(entity, validationContext, true); }
+                        ValidationContext validationContext = new(e.Entity, serviceProvider, null);
+                        _logger.LogValidatingEntity(e.State, e.Metadata, e.Entity);
+                        try { Validator.ValidateObject(e.Entity, validationContext, true); }
                         catch (ValidationException validationException)
                         {
-                            LoggerMessages.LogEntityValidationFailure(_logger, e.Metadata, entity, validationException);
-                            _logger.LogEntityValidationFailure(e.Metadata, entity, validationException);
+                            LoggerMessages.LogEntityValidationFailure(_logger, e.Metadata, e.Entity, validationException);
+                            _logger.LogEntityValidationFailure(e.Metadata, e.Entity, validationException);
                             throw;
                         }
-                        _logger.LogValidationCompleted(e.State, e.Metadata, entity);
+                        _logger.LogValidationCompleted(e.State, e.Metadata, e.Entity);
                         break;
                 }
-        }
+            }
+        });
     }
 
-    public override int SaveChanges() => _logger.WithActivityScope(LoggerActivityType.Save_Db_Changes, () =>
+    public override int SaveChanges() => _logger.WithActivityScope(LogActivityType.SaveDbChanges, () =>
     {
         OnBeforeSave();
-        int returnValue = base.SaveChanges();
-        _logger.LogDbSaveChangesCompleted(false, null, returnValue);
-        return returnValue;
+        return _logger.WithActivityScope(LogActivityType.SaveDbChanges, () =>
+        {
+            int returnValue = base.SaveChanges();
+            _logger.LogDbSaveChangesCompleted(false, null, returnValue);
+            return returnValue;
+        });
     });
 
-    public override int SaveChanges(bool acceptAllChangesOnSuccess) => _logger.WithActivityScope(LoggerActivityType.Save_Db_Changes, acceptAllChangesOnSuccess, () =>
+    public override int SaveChanges(bool acceptAllChangesOnSuccess) => _logger.WithActivityScope(LogActivityType.SaveDbChanges, acceptAllChangesOnSuccess, () =>
     {
         OnBeforeSave();
-        int returnValue = base.SaveChanges(acceptAllChangesOnSuccess);
-        _logger.LogDbSaveChangesCompleted(false, acceptAllChangesOnSuccess, returnValue);
-        return returnValue;
+        return _logger.WithActivityScope(LogActivityType.SaveDbChanges, () =>
+        {
+            int returnValue = base.SaveChanges(acceptAllChangesOnSuccess);
+            _logger.LogDbSaveChangesCompleted(false, acceptAllChangesOnSuccess, returnValue);
+            return returnValue;
+        });
     });
 
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
-        using IDisposable? scope = _logger.BeginSaveDbChangesScope(true, acceptAllChangesOnSuccess);
         OnBeforeSave(cancellationToken);
-        int returnValue = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        _logger.LogDbSaveChangesCompleted(true, acceptAllChangesOnSuccess, returnValue);
-        return returnValue;
+        return await _logger.WithActivityScopeAsync(LogActivityType.SaveDbChanges, async () =>
+        {
+            int returnValue = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+            _logger.LogDbSaveChangesCompleted(true, acceptAllChangesOnSuccess, returnValue);
+            return returnValue;
+        });
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        using IDisposable? scope = _logger.BeginSaveDbChangesScope(true);
         OnBeforeSave(cancellationToken);
-        int returnValue = await base.SaveChangesAsync(cancellationToken);
-        _logger.LogDbSaveChangesCompleted(true, null, returnValue);
-        return returnValue;
+        return await _logger.WithActivityScopeAsync(LogActivityType.SaveDbChanges, async () =>
+        {
+            int returnValue = await base.SaveChangesAsync(cancellationToken);
+            _logger.LogDbSaveChangesCompleted(true, null, returnValue);
+            return returnValue;
+        });
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        _ = modelBuilder.Entity<SncSource>(builder =>
-            {
-                _ = builder.HasKey(s => s.FQDN);
-                _ = builder.HasIndex(t => t.IsPersonalDev);
-                _ = builder.Property(nameof(SncSource.FQDN)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(SncSource.Label)).UseCollation(COLLATION_NOCASE);
-            })
-            .Entity<Package>(builder =>
-            {
-                _ = builder.HasKey(s => s.ID);
-                _ = builder.Property(nameof(Package.ID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Package.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Package.Version)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Package.SourceFqdn)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Package.SysID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-            })
-            .Entity<Scope>(builder =>
-            {
-                _ = builder.HasKey(s => s.Value);
-                _ = builder.HasIndex(s => s.SysID).IsUnique();
-                _ = builder.Property(nameof(Scope.Value)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Scope.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Scope.Version)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Scope.ID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Scope.ShortDescription)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Scope.SourceFqdn)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Scope.SysID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-            })
-            .Entity<GlideType>(builder =>
-            {
-                _ = builder.HasKey(t => t.Name);
-                _ = builder.HasIndex(t => t.SysID).IsUnique();
-                _ = builder.Property(nameof(GlideType.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(GlideType.Label)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(GlideType.SysID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(GlideType.ScalarType)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(GlideType.ClassName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(GlideType.PackageName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(GlideType.ScopeValue)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(GlideType.SourceFqdn)).UseCollation(COLLATION_NOCASE);
-                _ = builder.HasOne(t => t.Source).WithMany(s => s.Types).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.Package).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.Scope).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
-            })
-            .Entity<Table>(builder =>
-            {
-                _ = builder.HasKey(t => t.Name);
-                _ = builder.HasIndex(t => t.SysID).IsUnique();
-                _ = builder.HasIndex(t => t.IsExtendable);
-                _ = builder.HasIndex(t => t.IsInterface);
-                _ = builder.Property(nameof(Table.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.Label)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.SysID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.NumberPrefix)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.AccessibleFrom)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.ExtensionModel)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.SourceFqdn)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.PackageName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.ScopeValue)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.SuperClassName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Table.SourceFqdn)).UseCollation(COLLATION_NOCASE);
-                _ = builder.HasOne(t => t.Source).WithMany(s => s.Tables).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.Scope).WithMany(s => s.Tables).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.SuperClass).WithMany(s => s.Derived).HasForeignKey(t => t.SuperClassName).OnDelete(DeleteBehavior.Restrict);
-            })
-            .Entity<Element>(builder =>
-            {
-                _ = builder.HasKey(nameof(Element.Name), nameof(Element.TableName));
-                _ = builder.HasIndex(t => t.SysID).IsUnique();
-                _ = builder.Property(nameof(Element.Name)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Element.Label)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Element.SysID)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Element.Comments)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Element.DefaultValue)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Element.PackageName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Element.TableName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Element.TypeName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Element.RefTableName)).UseCollation(COLLATION_NOCASE);
-                _ = builder.Property(nameof(Element.SourceFqdn)).UseCollation(COLLATION_NOCASE);
-                _ = builder.HasOne(t => t.Source).WithMany(s => s.Elements).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.Table).WithMany(s => s.Elements).HasForeignKey(t => t.TableName).IsRequired().OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.Type).WithMany(s => s.Elements).HasForeignKey(t => t.TypeName).IsRequired().OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.Package).WithMany(s => s.Elements).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
-                _ = builder.HasOne(t => t.Reference).WithMany(s => s.ReferredBy).HasForeignKey(t => t.RefTableName).OnDelete(DeleteBehavior.Restrict);
-            });
+        _logger.WithActivityScope(LogActivityType.ModelCreating, () =>
+        {
+            _ = modelBuilder.Entity<SncSource>(builder =>
+                {
+                    _ = builder.HasKey(s => s.FQDN);
+                    _ = builder.HasIndex(t => t.IsPersonalDev);
+                    _ = builder.Property(nameof(SncSource.FQDN)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(SncSource.Label)).UseCollation(COLLATION_NOCASE);
+                })
+                .Entity<Package>(builder =>
+                {
+                    _ = builder.HasKey(s => s.ID);
+                    _ = builder.Property(nameof(Package.ID)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Package.Name)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Package.Version)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Package.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Package.SysID)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                })
+                .Entity<Scope>(builder =>
+                {
+                    _ = builder.HasKey(s => s.Value);
+                    _ = builder.HasIndex(s => s.SysID).IsUnique();
+                    _ = builder.Property(nameof(Scope.Value)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Scope.Name)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Scope.Version)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Scope.ID)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Scope.ShortDescription)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Scope.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Scope.SysID)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.HasOne(t => t.Source).WithMany(s => s.Scopes).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                })
+                .Entity<GlideType>(builder =>
+                {
+                    _ = builder.HasKey(t => t.Name);
+                    _ = builder.HasIndex(t => t.SysID).IsUnique();
+                    _ = builder.Property(nameof(GlideType.Name)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(GlideType.Label)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(GlideType.SysID)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(GlideType.ScalarType)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(GlideType.ClassName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(GlideType.PackageName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(GlideType.ScopeValue)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(GlideType.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.HasOne(t => t.Source).WithMany(s => s.Types).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Package).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Scope).WithMany(s => s.Types).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
+                })
+                .Entity<Table>(builder =>
+                {
+                    _ = builder.HasKey(t => t.Name);
+                    _ = builder.HasIndex(t => t.SysID).IsUnique();
+                    _ = builder.HasIndex(t => t.IsExtendable);
+                    _ = builder.HasIndex(t => t.IsInterface);
+                    _ = builder.Property(nameof(Table.Name)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.Label)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.SysID)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.NumberPrefix)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.AccessibleFrom)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.ExtensionModel)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.PackageName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.ScopeValue)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.SuperClassName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.HasOne(t => t.Source).WithMany(s => s.Tables).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Scope).WithMany(s => s.Tables).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.SuperClass).WithMany(s => s.Derived).HasForeignKey(t => t.SuperClassName).OnDelete(DeleteBehavior.Restrict);
+                })
+                .Entity<Element>(builder =>
+                {
+                    _ = builder.HasKey(nameof(Element.Name), nameof(Element.TableName));
+                    _ = builder.HasIndex(t => t.SysID).IsUnique();
+                    _ = builder.Property(nameof(Element.Name)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.Label)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.SysID)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.Comments)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.DefaultValue)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.PackageName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.TableName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.TypeName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.RefTableName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.SourceFqdn)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.HasOne(t => t.Source).WithMany(s => s.Elements).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Table).WithMany(s => s.Elements).HasForeignKey(t => t.TableName).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Type).WithMany(s => s.Elements).HasForeignKey(t => t.TypeName).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Package).WithMany(s => s.Elements).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Reference).WithMany(s => s.ReferredBy).HasForeignKey(t => t.RefTableName).OnDelete(DeleteBehavior.Restrict);
+                });
+        });
     }
 
     /// <summary>

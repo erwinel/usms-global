@@ -746,11 +746,13 @@ public sealed class DataLoaderService : IDisposable
             throw new ObjectDisposedException(nameof(DataLoaderService));
         Table? table = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         if (table is null)
-        {
-            var response = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
-            if (response is not null)
-                table = await AddTableAsync(response, cancellationToken);
-        }
+            return await _logger.WithActivityScope(LogActivityType.AddNewTable, name, async () =>
+            {
+                var response = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
+                if (response is not null)
+                    table = await AddTableAsync(response, cancellationToken);
+                return table;
+            });
         return table;
     }
 
