@@ -654,7 +654,7 @@ public static class LoggerMessages
     public static readonly EventId UsingOutputFile = new(EVENT_ID_UsingOutputFile, nameof(UsingOutputFile));
 
     private static readonly Action<ILogger, string, bool, Exception?> _usingOutputFile = LoggerMessage.Define<string, bool>(LogLevel.Debug, UsingOutputFile,
-        "Message {Path} {OverWrite}");
+        "Writing output to {$Path} (Overwrite is {OverWrite})");
 
     /// <summary>
     /// Logs an UsingOutputFile event with event code 0x0007.
