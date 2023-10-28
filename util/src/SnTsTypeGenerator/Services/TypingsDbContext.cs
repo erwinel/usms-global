@@ -161,14 +161,27 @@ public partial class TypingsDbContext : DbContext
         string connectionString = Database.GetConnectionString()!;
         string path;
         try { path = (csb = new(connectionString)).DataSource; }
-        //codeql[cs/catch-of-all-exceptions] Won't fix.
-        catch (Exception exc) { throw new DbInitializationException(exc, connectionString); }
+        catch (ArgumentException exc) { throw new DbInitializationException("Invalid connection string", exc, connectionString); }
         if (string.IsNullOrEmpty(path))
             return;
         FileInfo dbFile;
         try { dbFile = new(path); }
-        //codeql[cs/catch-of-all-exceptions] Won't fix.
-        catch (Exception exc) { throw new DbfileAccessException(exc, path); }
+        catch (System.Security.SecurityException exception)
+        {
+            throw new DbfileAccessException("Insufficent permissions to access database.", exception, path);
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            throw new DbfileAccessException("Access to database is denied.", exception, path);
+        }
+        catch (PathTooLongException exception)
+        {
+            throw new DbfileAccessException("The database path, file name, or both exceed the system-defined maximum length.", exception, path);
+        }
+        catch (NotSupportedException exception)
+        {
+            throw new DbfileAccessException("The database path is invalid.", exception, path);
+        }
         if (dbFile.Exists)
             return;
         if (dbFile.Directory is null || !dbFile.Directory.Exists)
@@ -186,8 +199,7 @@ public partial class TypingsDbContext : DbContext
                     command.CommandText = query;
                     command.CommandType = System.Data.CommandType.Text;
                     try { _ = await command.ExecuteNonQueryAsync(cancellationToken); }
-                    //codeql[cs/catch-of-all-exceptions] Won't fix.
-                    catch (Exception exception)
+                    catch (System.Data.Common.DbException exception)
                     {
                         throw new DbInitializationException(dbFile.FullName, typeof(T), exception);
                     }
@@ -222,76 +234,103 @@ public partial class TypingsDbContext : DbContext
     {
         if (cancellationToken.IsCancellationRequested)
             return;
-        _logger.WithActivityScope(LogActivityType.ValidateBeforeSave, () =>
+        using var scope = _logger.BeginActivityScope(LogActivityType.ValidateBeforeSave);
+        using IServiceScope serviceScope = _scopeFactory.CreateScope();
+        foreach (EntityEntry e in ChangeTracker.Entries())
         {
-            using IServiceScope serviceScope = _scopeFactory.CreateScope();
-            foreach (EntityEntry e in ChangeTracker.Entries())
+            if (cancellationToken.IsCancellationRequested)
+                break;
+            switch (e.State)
             {
-                if (cancellationToken.IsCancellationRequested)
+                case EntityState.Added:
+                case EntityState.Modified:
+                    DbContextServiceProvider serviceProvider = new(this, serviceScope.ServiceProvider, e);
+                    ValidationContext validationContext = new(e.Entity, serviceProvider, null);
+                    _logger.LogValidatingEntity(e.State, e.Metadata, e.Entity);
+                    try { Validator.ValidateObject(e.Entity, validationContext, true); }
+                    catch (ValidationException validationException)
+                    {
+                        LoggerMessages.LogEntityValidationFailure(_logger, e.Metadata, e.Entity, validationException);
+                        _logger.LogEntityValidationFailure(e.Metadata, e.Entity, validationException);
+                        throw;
+                    }
+                    _logger.LogValidationCompleted(e.State, e.Metadata, e.Entity);
                     break;
-                switch (e.State)
-                {
-                    case EntityState.Added:
-                    case EntityState.Modified:
-                        DbContextServiceProvider serviceProvider = new(this, serviceScope.ServiceProvider, e);
-                        ValidationContext validationContext = new(e.Entity, serviceProvider, null);
-                        _logger.LogValidatingEntity(e.State, e.Metadata, e.Entity);
-                        try { Validator.ValidateObject(e.Entity, validationContext, true); }
-                        catch (ValidationException validationException)
-                        {
-                            LoggerMessages.LogEntityValidationFailure(_logger, e.Metadata, e.Entity, validationException);
-                            _logger.LogEntityValidationFailure(e.Metadata, e.Entity, validationException);
-                            throw;
-                        }
-                        _logger.LogValidationCompleted(e.State, e.Metadata, e.Entity);
-                        break;
-                }
             }
-        });
+        }
     }
 
+    /// <summary>
+    /// Saves all changes made in this context to the database.
+    /// </summary>
+    /// <returns>The number of state entries written to the database.</returns>
+    /// <exception cref="ValidationException">An entity validation error is encountered before saving to the database.</exception>
+    /// <exception cref="DbUpdateException">An error is encountered while saving to the database.</exception>
+    /// <exception cref="DbUpdateConcurrencyException">A concurrency violation is encountered while saving to the database.
+    /// A concurrency violation occurs when an unexpected number of rows are affected during save. This is usually because the data in the database has been modified since it was loaded into memory.</exception>
     public override int SaveChanges() => _logger.WithActivityScope(LogActivityType.SaveDbChanges, () =>
     {
         OnBeforeSave();
-        return _logger.WithActivityScope(LogActivityType.SaveDbChanges, () =>
-        {
-            int returnValue = base.SaveChanges();
-            _logger.LogDbSaveChangesCompleted(false, null, returnValue);
-            return returnValue;
-        });
+        using var scope = _logger.BeginActivityScope(LogActivityType.SaveDbChanges);
+        int returnValue;
+        returnValue = base.SaveChanges();
+        _logger.LogDbSaveChangesCompleted(false, null, returnValue);
+        return returnValue;
     });
 
+    /// <summary>
+    /// Saves all changes made in this context to the database.
+    /// </summary>
+    /// <param name="acceptAllChangesOnSuccess">Indicates whether <see cref="ChangeTracker.AcceptAllChanges"/> is called after the changes have been sent successfully to the database.</param>
+    /// <returns>The number of state entries written to the database.</returns>
+    /// <exception cref="ValidationException">An entity validation error is encountered before saving to the database.</exception>
+    /// <exception cref="DbUpdateException">An error is encountered while saving to the database.</exception>
+    /// <exception cref="DbUpdateConcurrencyException">A concurrency violation is encountered while saving to the database.
+    /// A concurrency violation occurs when an unexpected number of rows are affected during save. This is usually because the data in the database has been modified since it was loaded into memory.</exception>
     public override int SaveChanges(bool acceptAllChangesOnSuccess) => _logger.WithActivityScope(LogActivityType.SaveDbChanges, acceptAllChangesOnSuccess, () =>
     {
         OnBeforeSave();
-        return _logger.WithActivityScope(LogActivityType.SaveDbChanges, () =>
-        {
-            int returnValue = base.SaveChanges(acceptAllChangesOnSuccess);
-            _logger.LogDbSaveChangesCompleted(false, acceptAllChangesOnSuccess, returnValue);
-            return returnValue;
-        });
+        using var scope = _logger.BeginActivityScope(LogActivityType.SaveDbChanges);
+        int returnValue = base.SaveChanges(acceptAllChangesOnSuccess);
+        _logger.LogDbSaveChangesCompleted(false, acceptAllChangesOnSuccess, returnValue);
+        return returnValue;
     });
 
+    /// <summary>
+    /// Saves all changes made in this context to the database.
+    /// </summary>
+    /// <param name="acceptAllChangesOnSuccess">Indicates whether <see cref="ChangeTracker.AcceptAllChanges"/> is called after the changes have been sent successfully to the database.</param>
+    /// <param name="cancellationToken">The token to observe while waiting for the task to complete.</param>
+    /// <returns>The number of state entries written to the database.</returns>
+    /// <exception cref="ValidationException">An entity validation error is encountered before saving to the database.</exception>
+    /// <exception cref="DbUpdateException">An error is encountered while saving to the database.</exception>
+    /// <exception cref="DbUpdateConcurrencyException">A concurrency violation is encountered while saving to the database.
+    /// A concurrency violation occurs when an unexpected number of rows are affected during save. This is usually because the data in the database has been modified since it was loaded into memory.</exception>
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
         OnBeforeSave(cancellationToken);
-        return await _logger.WithActivityScopeAsync(LogActivityType.SaveDbChanges, async () =>
-        {
-            int returnValue = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-            _logger.LogDbSaveChangesCompleted(true, acceptAllChangesOnSuccess, returnValue);
-            return returnValue;
-        });
+        using var scope = _logger.BeginActivityScope(LogActivityType.SaveDbChanges);
+        int returnValue = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        _logger.LogDbSaveChangesCompleted(true, acceptAllChangesOnSuccess, returnValue);
+        return returnValue;
     }
 
+    /// <summary>
+    /// Saves all changes made in this context to the database.
+    /// </summary>
+    /// <param name="cancellationToken">The token to observe while waiting for the task to complete.</param>
+    /// <returns>The number of state entries written to the database.</returns>
+    /// <exception cref="ValidationException">An entity validation error is encountered before saving to the database.</exception>
+    /// <exception cref="DbUpdateException">An error is encountered while saving to the database.</exception>
+    /// <exception cref="DbUpdateConcurrencyException">A concurrency violation is encountered while saving to the database.
+    /// A concurrency violation occurs when an unexpected number of rows are affected during save. This is usually because the data in the database has been modified since it was loaded into memory.</exception>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         OnBeforeSave(cancellationToken);
-        return await _logger.WithActivityScopeAsync(LogActivityType.SaveDbChanges, async () =>
-        {
-            int returnValue = await base.SaveChangesAsync(cancellationToken);
-            _logger.LogDbSaveChangesCompleted(true, null, returnValue);
-            return returnValue;
-        });
+        using var scope = _logger.BeginActivityScope(LogActivityType.SaveDbChanges);
+        int returnValue = await base.SaveChangesAsync(cancellationToken);
+        _logger.LogDbSaveChangesCompleted(true, null, returnValue);
+        return returnValue;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
