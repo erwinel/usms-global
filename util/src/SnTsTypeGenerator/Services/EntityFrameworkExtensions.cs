@@ -1,5 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -10,6 +12,82 @@ namespace SnTsTypeGenerator.Services;
 
 public static class EntityFrameworkExtensions
 {
+    public static bool TryLookupResource(Type provider, string key, [NotNullWhen(true)] out string? value)
+    {
+        var properptyInfo = provider.GetProperty(key, BindingFlags.Static | BindingFlags.Public, null, typeof(string), Array.Empty<Type>(), null);
+        if (properptyInfo != null)
+            return (value = properptyInfo.GetMethod?.Invoke(null, null) as string) is not null;
+        value = null;
+        return false;
+    }
+
+    public static bool TryGetEnumDisplay<T>(this T value, out string name, [NotNullWhen(true)] out DisplayAttribute? displayAttribute) where T : struct, Enum
+    {
+        Type type = value.GetType();
+        name = value.ToString("F");
+        var fieldInfo = type.GetField(name)!;
+        if (fieldInfo is not null)
+            return (displayAttribute = fieldInfo.GetCustomAttribute<DisplayAttribute>()) is not null;
+        displayAttribute = null;
+        return false;
+    }
+
+    public static bool TryGetEnumDisplay<T>(this T value, [NotNullWhen(true)] out DisplayAttribute? displayAttribute) where T : struct, Enum
+    {
+        Type type = value.GetType();
+        string name = value.ToString("F");
+        var fieldInfo = type.GetField(name)!;
+        if (fieldInfo is not null)
+            return (displayAttribute = fieldInfo.GetCustomAttribute<DisplayAttribute>()) is not null;
+        displayAttribute = null;
+        return false;
+    }
+
+    public static string GetDisplayName<T>(this T value) where T : struct, Enum
+    {
+        Type type = value.GetType();
+        string name = value.ToString("F");
+        var fieldInfo = type.GetField(name)!;
+        if (fieldInfo is null)
+            return name;
+        DisplayAttribute? attribute = fieldInfo.GetCustomAttribute<DisplayAttribute>();
+        if (attribute is not null && !string.IsNullOrEmpty(attribute.Name))
+            return (attribute.ResourceType is not null && TryLookupResource(attribute.ResourceType, attribute.Name, out string? r)) ? r : attribute.Name;
+        return fieldInfo.Name;
+    }
+
+    public static bool TryGetPropertyDisplay<T>(T obj, string propertyName, [NotNullWhen(true)] out DisplayAttribute? attribute) where T : class
+    {
+        Type type = obj.GetType();
+        var propertyInfo = type.GetProperty(propertyName, BindingFlags.Static | BindingFlags.Public)!;
+        if (propertyInfo is not null)
+            return (attribute = propertyInfo.GetCustomAttribute<DisplayAttribute>()) is not null;
+        attribute = null;
+        return false;
+    }
+
+    public static string GetDisplayName<T>(this T entity, string propertyName) where T : class
+    {
+        Type type = entity.GetType();
+        var propertyInfo = type.GetProperty(propertyName, BindingFlags.Static | BindingFlags.Public)!;
+        if (propertyInfo is null)
+            return propertyName;
+        DisplayAttribute? attribute = propertyInfo.GetCustomAttribute<DisplayAttribute>();
+        if (attribute is not null && !string.IsNullOrEmpty(attribute.Name))
+            return (attribute.ResourceType is not null && TryLookupResource(attribute.ResourceType, attribute.Name, out string? r)) ? r : attribute.Name;
+        return propertyInfo.Name;
+    }
+
+    // public static string GetPropertyDisplayName<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> expr) where TEntity : class
+    // {
+    //     string name = ((MemberExpression)expr.Body).Member.Name;
+    //     var property = (PropertyInfo)((MemberExpression)expr.Body).Member;
+    //     DisplayAttribute? attribute = property.GetCustomAttribute<DisplayAttribute>();
+    //     if (attribute is not null && !string.IsNullOrEmpty(attribute.Name))
+    //         return attribute.Name;
+    //     return property.Name.Contains('_') ? property.Name.Replace('_', ' ').Trim() : property.Name;
+    // }
+
     /// <summary>
     /// Indicates whether the entry exists in the target database.
     /// </summary>

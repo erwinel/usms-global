@@ -20,7 +20,7 @@ internal class ExpectedPropertyNotFoundException : Exception, ILogTrackable
     {
         if (IsLogged)
             return;
-        logger.LogExpectedPropertyNotFound(RequestUri, PropertyName, Element);
+        logger.LogExpectedPropertyNotFound(RequestUri, PropertyName, Element, InnerException ?? this);
         IsLogged = true;
     }
 

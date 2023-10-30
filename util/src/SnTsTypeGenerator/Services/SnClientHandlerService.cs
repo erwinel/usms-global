@@ -49,9 +49,16 @@ public sealed class SnClientHandlerService
         string responseBody;
         try { responseBody = await response.Content.ReadAsStringAsync(cancellationToken); }
         //codeql[cs/catch-of-all-exceptions] Won't fix - API documentation doesn't indicate what type of exception may be thrown.
-        catch (Exception exception) { throw new GetResponseContentFailedException(requestUri, exception); }
+        catch (Exception exception)
+        {
+            throw new GetResponseContentFailedException(requestUri, exception);
+        }
         cancellationToken.ThrowIfCancellationRequested();
-        if (string.IsNullOrWhiteSpace(responseBody)) { throw new InvalidHttpResponseException(requestUri, responseBody); }
+        string? mediaType = response.Content.Headers.ContentType?.MediaType;
+        if (!string.IsNullOrEmpty(mediaType) && mediaType != MediaTypeNames.Application.Json)
+            throw new InvalidHttpResponseException(requestUri, responseBody, mediaType);
+        else if (string.IsNullOrWhiteSpace(responseBody))
+            throw new InvalidHttpResponseException(requestUri, responseBody);
         JsonNode? result;
         try { result = JsonNode.Parse(responseBody); }
         catch (JsonException exception) { throw new ResponseParsingException(requestUri, responseBody, exception); }
@@ -108,7 +115,7 @@ public sealed class SnClientHandlerService
         if (token is null)
         {
             requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
-            using var getTokenScope = _logger.BeginActivityScope(LoggerActivityType.Get_Access_Token, new JsonObject()
+            using var getTokenScope = _logger.BeginActivityScope(LogActivityType.GetAccessToken, new JsonObject()
             {
                 { nameof(HttpRequestMessage.RequestUri), JsonValue.Create(requestUri.AbsoluteUri) },
                 { HEADER_KEY_CLIENT_ID, JsonValue.Create(ClientCredentials.UserName) },
@@ -137,7 +144,7 @@ public sealed class SnClientHandlerService
             if (token.ExpiresOn > DateTime.Now)
                 return token;
             requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
-            using var refreshTokenScope = _logger.BeginActivityScope(LoggerActivityType.Refresh_Access_Token, new JsonObject()
+            using var refreshTokenScope = _logger.BeginActivityScope(LogActivityType.RefreshAccessToken, new JsonObject()
             {
                 { nameof(HttpRequestMessage.RequestUri), JsonValue.Create(requestUri.AbsoluteUri) },
                 { HEADER_KEY_CLIENT_ID, JsonValue.Create(ClientCredentials.UserName) },
@@ -166,7 +173,7 @@ public sealed class SnClientHandlerService
             _token = token = new(access_token, refresh_token, createdOn.AddSeconds(expires_in));
             return token;
         }
-        throw new InvalidHttpResponseException(requestUri, resultObj);
+        throw new InvalidHttpResponseException(requestUri, resultObj.ToJsonString());
     }
 
     internal async Task<(Uri RequestUri, JsonNode? Response)> GetJsonAsync(string path, CancellationToken cancellationToken)

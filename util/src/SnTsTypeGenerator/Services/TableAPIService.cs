@@ -31,7 +31,7 @@ public sealed class TableAPIService
     private TableRecord? GetTableFromResponse(Uri requestUri, JsonNode? jsonNode, bool expectArray)
     {
         if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode);
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
             throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
         if (expectArray)
@@ -86,7 +86,7 @@ public sealed class TableAPIService
         if (jsonNode is null)
             throw new InvalidHttpResponseException(requestUri, string.Empty);
         if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode);
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
             throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
         if (jsonNode is JsonObject response)
@@ -148,7 +148,7 @@ public sealed class TableAPIService
         _logger.LogGettingElementsByTableNameFromRemote(tableName);
         (Uri requestUri, JsonNode? jsonNode) = await _handler.GetTableApiJsonResponseAsync(TABLE_NAME_SYS_DICTIONARY, JSON_KEY_NAME, tableName, cancellationToken);
         if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode);
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
             throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
         if (jsonNode is not JsonArray arr)
@@ -305,7 +305,7 @@ public sealed class TableAPIService
         _logger.LogGettingTypeByNameFromRemoteTrace(name);
         (Uri requestUri, JsonNode? jsonNode) = await _handler.GetTableApiJsonResponseAsync(TABLE_NAME_SYS_GLIDE_OBJECT, JSON_KEY_NAME, name, cancellationToken);
         if (jsonNode is not JsonObject resultObj)
-            throw new InvalidHttpResponseException(requestUri, jsonNode);
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
         if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
             throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
         if (jsonNode is not JsonArray arr)

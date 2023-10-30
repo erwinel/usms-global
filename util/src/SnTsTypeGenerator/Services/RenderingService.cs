@@ -732,7 +732,7 @@ public partial class RenderingService
             return;
         using var dbContext = _scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
         cancellationToken.ThrowIfCancellationRequested();
-        using StreamWriter streamWriter = _logger.WithActivityScope(LoggerActivityType.Open_Output_File, _outputFile.FullName, () =>
+        using StreamWriter streamWriter = _logger.WithActivityScope(LogActivityType.OpenOutputFile, _outputFile.FullName, () =>
         {
             try
             {
@@ -754,23 +754,23 @@ public partial class RenderingService
         bool appendNewLine = gns is not null;
         if (appendNewLine)
         {
-            await _logger.WithActivityScopeAsync(LoggerActivityType.Render_Global_Types, RenderGlobalTypesAsync(gns!, writer, dbContext, cancellationToken));
+            await _logger.WithActivityScopeAsync(LogActivityType.RenderGlobalTypes, () => RenderGlobalTypesAsync(gns!, writer, dbContext, cancellationToken));
             byNamespace = byNamespace.Where(g => !NameComparer.Equals(g.Key, GLOBAL_NAMESPACE));
         }
         else if (_emitBaseTypes)
-            await _logger.WithActivityScopeAsync(LoggerActivityType.Render_Global_Types, RenderBaseTypesAsync(writer, dbContext, cancellationToken));
+            await _logger.WithActivityScopeAsync(LogActivityType.RenderGlobalTypes, () => RenderBaseTypesAsync(writer, dbContext, cancellationToken));
         byNamespace = byNamespace.OrderBy(g => g.Key, NameComparer);
         if (!appendNewLine)
         {
             var f = byNamespace.FirstOrDefault();
             if (f is not null)
             {
-                await _logger.WithActivityScopeAsync(LoggerActivityType.Render_Namespace_Types, f.Key, RenderByNamespaceAsync(f.Key, f, writer, false, dbContext, cancellationToken));
+                await _logger.WithActivityScopeAsync(LogActivityType.RenderNamespaceTypes, f.Key, () => RenderByNamespaceAsync(f.Key, f, writer, false, dbContext, cancellationToken));
                 byNamespace = byNamespace.Skip(1);
             }
         }
         foreach (var scoped in byNamespace)
-            await _logger.WithActivityScopeAsync(LoggerActivityType.Render_Namespace_Types, scoped.Key, RenderByNamespaceAsync(scoped.Key, scoped, writer, true, dbContext, cancellationToken));
+            await _logger.WithActivityScopeAsync(LogActivityType.RenderNamespaceTypes, scoped.Key, () => RenderByNamespaceAsync(scoped.Key, scoped, writer, true, dbContext, cancellationToken));
 
         try
         {

@@ -11,7 +11,9 @@ internal class InvalidHttpResponseException : Exception, ILogTrackable
 {
     public Uri RequestUri { get; }
 
-    public JsonNode? Response { get; }
+    public string? Response { get; }
+
+    public string? ContentType { get; }
 
     public bool IsLogged { get; private set; }
 
@@ -19,42 +21,45 @@ internal class InvalidHttpResponseException : Exception, ILogTrackable
     {
         if (IsLogged)
             return;
-        logger.LogInvalidHttpResponse(RequestUri, Response);
+        if (string.IsNullOrEmpty(ContentType))
+            logger.LogInvalidHttpResponse(RequestUri, Response, InnerException ?? this);
+        else
+            logger.LogInvalidHttpResponse(RequestUri, ContentType, Response, InnerException ?? this);
         IsLogged = true;
     }
 
-    public InvalidHttpResponseException() => (RequestUri, Response) = (EmptyURI, null);
+    public InvalidHttpResponseException() => RequestUri = EmptyURI;
 
-    public InvalidHttpResponseException(string? message) : base(message) => (RequestUri, Response) = (EmptyURI, null);
 
-    public InvalidHttpResponseException(string? message, Exception? innerException) : base(message, innerException) => (RequestUri, Response) = (EmptyURI, null);
+    public InvalidHttpResponseException(string? message) : base(message) => RequestUri = EmptyURI;
 
-    internal InvalidHttpResponseException(Uri requestUri, JsonNode? response) => (RequestUri, Response) = (requestUri, response);
+    public InvalidHttpResponseException(string? message, Exception? innerException) : base(message, innerException) => RequestUri = EmptyURI;
 
-    internal InvalidHttpResponseException(Uri requestUri, JsonNode? response, string? message) : base(message) => (RequestUri, Response) = (requestUri, response);
+    internal InvalidHttpResponseException(Uri requestUri, string? response, string? contentType = null) => (RequestUri, Response, ContentType) = (requestUri, response, contentType);
 
-    internal InvalidHttpResponseException(Uri requestUri, JsonNode? response, JsonException? innerException) : this(requestUri, response, null, innerException) { }
+    internal InvalidHttpResponseException(Uri requestUri, string? response, string? contentType, string? message) : base(message) => (RequestUri, Response, ContentType) = (requestUri, response, contentType);
 
-    internal InvalidHttpResponseException(Uri requestUri, JsonNode? response, string? message, JsonException? innerException) : base(message, innerException) => (RequestUri, Response) = (requestUri, response);
+    internal InvalidHttpResponseException(Uri requestUri, string? response, string? contentType, JsonException? innerException) : this(requestUri, response, contentType, null, innerException) { }
+
+    internal InvalidHttpResponseException(Uri requestUri, string? response, JsonException? innerException) : this(requestUri, response, null, null, innerException) { }
+
+    internal InvalidHttpResponseException(Uri requestUri, string? response, string? contentType, string? message, JsonException? innerException) : base(message, innerException) => (RequestUri, Response, ContentType) = (requestUri, response, contentType);
 
     protected InvalidHttpResponseException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
         IsLogged = info.GetBoolean(nameof(IsLogged));
-        string? value = info.GetString(nameof(Response));
-        if (string.IsNullOrWhiteSpace(value))
-            Response = null;
-        else
-            try { Response = JsonNode.Parse(value); }
-            //codeql[cs/catch-of-all-exceptions] No need to record exception.
-            catch { Response = null; }
-        RequestUri = string.IsNullOrEmpty(value = info.GetString(nameof(RequestUri))) ? EmptyURI : Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) ? uri : new Uri(value, UriKind.Relative);
+        Response = info.GetString(nameof(Response));
+        ContentType = info.GetString(nameof(ContentType));
+        string? value = info.GetString(nameof(RequestUri));
+        RequestUri = string.IsNullOrEmpty(value) ? EmptyURI : Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) ? uri : new Uri(value, UriKind.Relative);
     }
 
     public override void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         base.GetObjectData(info, context);
         info.AddValue(nameof(RequestUri), RequestUri.OriginalString);
-        info.AddValue(nameof(Response), Response?.ToJsonString());
+        info.AddValue(nameof(Response), Response);
+        info.AddValue(nameof(ContentType), ContentType);
         info.AddValue(nameof(IsLogged), IsLogged);
     }
 }

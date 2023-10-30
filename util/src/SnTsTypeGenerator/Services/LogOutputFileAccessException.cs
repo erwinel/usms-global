@@ -15,9 +15,9 @@ internal class LogOutputFileAccessException : Exception, ILogTrackable
         if (IsLogged)
             return;
         if (string.IsNullOrWhiteSpace(Message))
-            logger.LogOutputFileAccessError(Path, InnerException);
+            logger.LogOutputFileAccessError(Path, InnerException ?? this);
         else
-            logger.LogOutputFileAccessError(Path, Message, InnerException);
+            logger.LogOutputFileAccessError(Path, Message, InnerException ?? this);
         IsLogged = true;
     }
 

@@ -32,6 +32,70 @@ public static class LoggerMessages
         return true;
     }
 
+    public static void LogIfThrown(this ILogger logger, Action action)
+    {
+        try { action(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception);
+            throw new TrackedException(exception);
+        }
+    }
+    
+    public static async Task LogIfThrownAsync(this ILogger logger, Func<Task> asyncAction)
+    {
+        try { await asyncAction(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception);
+            throw new TrackedException(exception);
+        }
+    }
+    
+    public static T LogIfThrown<T>(this ILogger logger, Func<T> func)
+    {
+        try { return func(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception);
+            throw new TrackedException(exception);
+        }
+    }
+    
+    public static async Task<T> LogIfThrownAsync<T>(this ILogger logger, Func<Task<T>> asyncFunc)
+    {
+        try { return await asyncFunc(); }
+        catch (Exception exception)
+        {
+            if (exception is ILogTrackable logTrackable)
+            {
+                if (!logTrackable.IsLogged)
+                    logTrackable.Log(logger);
+                throw;
+            }
+            logger.LogUnexpectedException(exception);
+            throw new TrackedException(exception);
+        }
+    }
+    
     public static void LogOrThrowIfNotTrackable(this ILogger logger, Exception exception)
     {
         if (exception is ILogTrackable logTrackable)
@@ -46,7 +110,7 @@ public static class LoggerMessages
         }
     }
 
-    public static void WithActivityScope(this ILogger logger, LoggerActivityType type, Action action)
+    public static void WithActivityScope(this ILogger logger, LogActivityType type, Action action)
     {
         using var scope = logger.BeginActivityScope(type);
         try { action(); }
@@ -63,10 +127,10 @@ public static class LoggerMessages
         }
     }
 
-    public static async Task WithActivityScopeAsync(this ILogger logger, LoggerActivityType type, Task task)
+    public static async Task WithActivityScopeAsync(this ILogger logger, LogActivityType type, Func<Task> asyncAction)
     {
         using var scope = logger.BeginActivityScope(type);
-        try { await task; }
+        try { await asyncAction(); }
         catch (Exception exception)
         {
             if (exception is ILogTrackable logTrackable)
@@ -80,7 +144,7 @@ public static class LoggerMessages
         }
     }
 
-    public static void WithActivityScope(this ILogger logger, LoggerActivityType type, string context, Action action)
+    public static void WithActivityScope(this ILogger logger, LogActivityType type, string context, Action action)
     {
         using var scope = logger.BeginActivityScope(type, context);
         try { action(); }
@@ -97,10 +161,10 @@ public static class LoggerMessages
         }
     }
 
-    public static async Task WithActivityScopeAsync(this ILogger logger, LoggerActivityType type, string context, Task task)
+    public static async Task WithActivityScopeAsync(this ILogger logger, LogActivityType type, string context, Func<Task> asyncAction)
     {
         using var scope = logger.BeginActivityScope(type, context);
-        try { await task; }
+        try { await asyncAction(); }
         catch (Exception exception)
         {
             if (exception is ILogTrackable logTrackable)
@@ -114,7 +178,7 @@ public static class LoggerMessages
         }
     }
 
-    public static void WithActivityScope(this ILogger logger, LoggerActivityType type, JsonNode context, Action action)
+    public static void WithActivityScope(this ILogger logger, LogActivityType type, JsonNode context, Action action)
     {
         using var scope = logger.BeginActivityScope(type, context);
         try { action(); }
@@ -131,10 +195,10 @@ public static class LoggerMessages
         }
     }
 
-    public static async Task WithActivityScopeAsync(this ILogger logger, LoggerActivityType type, JsonNode context, Task task)
+    public static async Task WithActivityScopeAsync(this ILogger logger, LogActivityType type, JsonNode context, Func<Task> asyncAction)
     {
         using var scope = logger.BeginActivityScope(type, context);
-        try { await task; }
+        try { await asyncAction(); }
         catch (Exception exception)
         {
             if (exception is ILogTrackable logTrackable)
@@ -148,7 +212,7 @@ public static class LoggerMessages
         }
     }
 
-    public static T WithActivityScope<T>(this ILogger logger, LoggerActivityType type, Func<T> func)
+    public static T WithActivityScope<T>(this ILogger logger, LogActivityType type, Func<T> func)
     {
         using var scope = logger.BeginActivityScope(type);
         try { return func(); }
@@ -165,10 +229,10 @@ public static class LoggerMessages
         }
     }
 
-    public static async Task<T> WithActivityScopeAsync<T>(this ILogger logger, LoggerActivityType type, Task<T> task)
+    public static async Task<T> WithActivityScopeAsync<T>(this ILogger logger, LogActivityType type, Func<Task<T>> asyncFunc)
     {
         using var scope = logger.BeginActivityScope(type);
-        try { return await task; }
+        try { return await asyncFunc(); }
         catch (Exception exception)
         {
             if (exception is ILogTrackable logTrackable)
@@ -182,7 +246,7 @@ public static class LoggerMessages
         }
     }
 
-    public static T WithActivityScope<T>(this ILogger logger, LoggerActivityType type, string context, Func<T> func)
+    public static T WithActivityScope<T>(this ILogger logger, LogActivityType type, string context, Func<T> func)
     {
         using var scope = logger.BeginActivityScope(type, context);
         try { return func(); }
@@ -199,10 +263,10 @@ public static class LoggerMessages
         }
     }
 
-    public static async Task<T> WithActivityScopeAsync<T>(this ILogger logger, LoggerActivityType type, string context, Task<T> task)
+    public static async Task<T> WithActivityScopeAsync<T>(this ILogger logger, LogActivityType type, string context, Func<Task<T>> asyncFunc)
     {
         using var scope = logger.BeginActivityScope(type, context);
-        try { return await task; }
+        try { return await asyncFunc(); }
         catch (Exception exception)
         {
             if (exception is ILogTrackable logTrackable)
@@ -216,7 +280,7 @@ public static class LoggerMessages
         }
     }
 
-    public static T WithActivityScope<T>(this ILogger logger, LoggerActivityType type, JsonNode context, Func<T> func)
+    public static T WithActivityScope<T>(this ILogger logger, LogActivityType type, JsonNode context, Func<T> func)
     {
         using var scope = logger.BeginActivityScope(type, context);
         try { return func(); }
@@ -233,10 +297,10 @@ public static class LoggerMessages
         }
     }
 
-    public static async Task<T> WithActivityScopeAsync<T>(this ILogger logger, LoggerActivityType type, JsonNode context, Task<T> task)
+    public static async Task<T> WithActivityScopeAsync<T>(this ILogger logger, LogActivityType type, JsonNode context, Func<Task<T>> asyncFunc)
     {
         using var scope = logger.BeginActivityScope(type, context);
-        try { return await task; }
+        try { return await asyncFunc(); }
         catch (Exception exception)
         {
             if (exception is ILogTrackable logTrackable)
@@ -252,53 +316,19 @@ public static class LoggerMessages
 
     #region Activity Scope
 
-    private static readonly Func<ILogger, LoggerActivityType, IDisposable?> _activityScope1 = LoggerMessage.DefineScope<LoggerActivityType>("Activity: {Activity}");
+    private static readonly Func<ILogger, LogActivityType, IDisposable?> _activityScope1 = LoggerMessage.DefineScope<LogActivityType>("Activity: {Activity}");
 
-    private static readonly Func<ILogger, LoggerActivityType, string, IDisposable?> _activityScope2 = LoggerMessage.DefineScope<LoggerActivityType, string>("Activity: {Activity}; Context: {Context}");
+    private static readonly Func<ILogger, LogActivityType, string, IDisposable?> _activityScope2 = LoggerMessage.DefineScope<LogActivityType, string>("Activity: {Activity}; Context: {Context}");
 
     /// <summary>
     /// Formats the Activity message and creates a scope.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
-    public static IDisposable? BeginActivityScope(this ILogger logger, LoggerActivityType type, JsonNode context) => _activityScope2(logger, type, context.ToJsonString());
+    public static IDisposable? BeginActivityScope(this ILogger logger, LogActivityType type, JsonNode context) => _activityScope2(logger, type, context.ToJsonString());
 
-    public static IDisposable? BeginActivityScope(this ILogger logger, LoggerActivityType type, string? context = null) => (context is null) ? _activityScope1(logger, type) :
+    public static IDisposable? BeginActivityScope(this ILogger logger, LogActivityType type, string? context = null) => (context is null) ? _activityScope1(logger, type) :
         _activityScope2(logger, type, context);
-
-    #endregion
-
-    #region Scope Definitions
-
-    #region BeforeSaveDbChanges Scope
-
-    private static readonly Func<ILogger, IDisposable?> _beforeSaveDbChangesScope = LoggerMessage.DefineScope("Validating Entities before Saving Database changes.");
-
-    /// <summary>
-    /// Formats the BeforeSaveDbChanges message and creates a scope.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
-    [Obsolete("Use BeginActivityScope(ILogger, LoggerActivityType.Validate_Before_Save)")]
-    public static IDisposable? BeginBeforeSaveDbChangesScope(this ILogger logger) => _beforeSaveDbChangesScope(logger);
-
-    #endregion
-
-    #region SaveDbChanges Scope
-
-    private static readonly Func<ILogger, bool, bool?, IDisposable?> _saveDbChangesScope = LoggerMessage.DefineScope<bool, bool?>("Saving Database changes: isAsynchronous={isAsynchronous}; acceptAllChangesOnSuccess={acceptAllChangesOnSuccess}.");
-
-    /// <summary>
-    /// Formats the SaveDbChanges message and creates a scope.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <param name="isAsynchronous">Indicates whether the save method is asynchronous.</param>
-    /// <param name="acceptAllChangesOnSuccess">The value of the <c>acceptAllChangesOnSuccess</c> parameter.</param>
-    /// <returns>A disposable scope object representing the lifetime of the logger scope.</returns>
-    [Obsolete("Use BeginActivityScope(ILogger, LoggerActivityType.Save_Db_Changes)")]
-    public static IDisposable? BeginSaveDbChangesScope(this ILogger logger, bool isAsynchronous = false, bool? acceptAllChangesOnSuccess = null) => _saveDbChangesScope(logger, isAsynchronous, acceptAllChangesOnSuccess);
-
-    #endregion
 
     #endregion
 
@@ -624,7 +654,7 @@ public static class LoggerMessages
     public static readonly EventId UsingOutputFile = new(EVENT_ID_UsingOutputFile, nameof(UsingOutputFile));
 
     private static readonly Action<ILogger, string, bool, Exception?> _usingOutputFile = LoggerMessage.Define<string, bool>(LogLevel.Debug, UsingOutputFile,
-        "Message {Path} {OverWrite}");
+        "Writing output to {$Path} (Overwrite is {OverWrite})");
 
     /// <summary>
     /// Logs an UsingOutputFile event with event code 0x0007.
@@ -808,16 +838,16 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI that failed.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogHttpRequestFailed(this ILogger logger, Uri uri, HttpRequestException? error)
+    public static void LogHttpRequestFailed(this ILogger logger, Uri uri, Exception? error = null)
     {
         if (error is null)
             _httpRequestFailed1(logger, uri, error);
-        else if (error.StatusCode.HasValue)
+        else if (error is HttpRequestException exception && exception.StatusCode.HasValue)
         {
             if (string.IsNullOrWhiteSpace(error.Message))
-                _httpRequestFailed3(logger, uri, (int)error.StatusCode.Value, error.StatusCode.Value.ToDisplayName(), error);
+                _httpRequestFailed3(logger, uri, (int)exception.StatusCode.Value, exception.StatusCode.Value.ToDisplayName(), error);
             else
-                _httpRequestFailed4(logger, uri, (int)error.StatusCode.Value, error.StatusCode.Value.ToDisplayName(), error.Message, error);
+                _httpRequestFailed4(logger, uri, (int)exception.StatusCode.Value, exception.StatusCode.Value.ToDisplayName(), error.Message, error);
         }
         else if (string.IsNullOrWhiteSpace(error.Message))
             _httpRequestFailed1(logger, uri, error);
@@ -874,7 +904,7 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="content">The content that could not be parsed.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogJsonCouldNotBeParsed(this ILogger logger, Uri uri, string content, JsonException? error) => _jsonCouldNotBeParsed(logger, uri, content, error);
+    public static void LogJsonCouldNotBeParsed(this ILogger logger, Uri uri, string content, Exception? error) => _jsonCouldNotBeParsed(logger, uri, content, error);
 
     #endregion
 
@@ -890,8 +920,11 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId InvalidHttpResponse = new(EVENT_ID_InvalidHttpResponse, nameof(InvalidHttpResponse));
 
-    private static readonly Action<ILogger, Uri, string, Exception?> _invalidHttpResponse = LoggerMessage.Define<Uri, string>(LogLevel.Error, InvalidHttpResponse,
-        "Response from {URI} did not match the expected type; Content: {Content}");
+    private static readonly Action<ILogger, Uri, string, Exception?> _invalidHttpResponse1 = LoggerMessage.Define<Uri, string>(LogLevel.Error, InvalidHttpResponse,
+        "Response from {URI} did not match the expected format. Content: {Content}");
+
+    private static readonly Action<ILogger, Uri, string, string, string?, Exception?> _invalidHttpResponse2 = LoggerMessage.Define<Uri, string, string, string?>(LogLevel.Error, InvalidHttpResponse,
+        "Response from {URI} did not match the expected content type. Expected: {Expected}; Actual: {Actual}; Content: {Content}");
 
     /// <summary>
     /// Logs an invalid HTTP response event (InvalidHttpResponse) with event code 0x0010.
@@ -900,7 +933,16 @@ public static class LoggerMessages
     /// <param name="uri">The request URI.</param>
     /// <param name="response">The response text.</param>
     /// <param name="error">The exception that caused the event</param>
-    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, JsonNode? response) => _invalidHttpResponse(logger, uri, (response is null) ? "null" : response.ToJsonString(), null);
+    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, JsonNode? response, Exception? error = null) => _invalidHttpResponse1(logger, uri, (response is null) ? "null" : response.ToJsonString(), error);
+
+    /// <summary>
+    /// Logs an invalid HTTP response event (InvalidHttpResponse) with event code 0x0010.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="uri">The request URI.</param>
+    /// <param name="response">The response text.</param>
+    /// <param name="error">The exception that caused the event</param>
+    public static void LogInvalidHttpResponse(this ILogger logger, Uri uri, string actualContentType, string? response, Exception? error = null) => _invalidHttpResponse2(logger, uri, System.Net.Mime.MediaTypeNames.Application.Json, actualContentType, response, error);
 
     #endregion
 
@@ -916,7 +958,7 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId ValidatingEntity = new(EVENT_ID_ValidatingEntity, nameof(ValidatingEntity));
 
-    private static readonly Action<ILogger, EntityState, string, IValidatableObject, Exception?> _validatingEntity = LoggerMessage.Define<EntityState, string, IValidatableObject>(LogLevel.Debug, ValidatingEntity,
+    private static readonly Action<ILogger, EntityState, string, object, Exception?> _validatingEntity = LoggerMessage.Define<EntityState, string, object>(LogLevel.Debug, ValidatingEntity,
         "Validating {State} {Name} {Entity}");
 
     /// <summary>
@@ -926,7 +968,7 @@ public static class LoggerMessages
     /// <param name="state">The entity state while being validated.</param>
     /// <param name="metadata">The entity metadata.</param>
     /// <param name="entity">The entity object.</param>
-    public static void LogValidatingEntity(this ILogger logger, EntityState state, IEntityType metadata, IValidatableObject entity)
+    public static void LogValidatingEntity(this ILogger logger, EntityState state, IEntityType metadata, object entity)
     {
         string displayName = metadata.DisplayName()?.Trim()!;
         if (string.IsNullOrEmpty(displayName) && string.IsNullOrEmpty(displayName = metadata.Name?.Trim()!))
@@ -952,11 +994,11 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId EntityValidationFailure = new(EVENT_ID_EntityValidationFailure, nameof(EntityValidationFailure));
 
-    private static readonly Action<ILogger, string, string, IValidatableObject, ValidationException> _entityValidationFailure1 =
-        LoggerMessage.Define<string, string, IValidatableObject>(LogLevel.Error, EntityValidationFailure, "Error Validating {Name} ({ValidationMessage}) {Entity}");
+    private static readonly Action<ILogger, string, string, object, ValidationException> _entityValidationFailure1 =
+        LoggerMessage.Define<string, string, object>(LogLevel.Error, EntityValidationFailure, "Error Validating {Name} ({ValidationMessage}) {Entity}");
 
-    private static readonly Action<ILogger, string, string, string, IValidatableObject, ValidationException> _entityValidationFailure2 =
-        LoggerMessage.Define<string, string, string, IValidatableObject>(LogLevel.Error, EntityValidationFailure, "Error Validating {Name} [{Properties}] ({ValidationMessage}) {Entity}");
+    private static readonly Action<ILogger, string, string, string, object, ValidationException> _entityValidationFailure2 =
+        LoggerMessage.Define<string, string, string, object>(LogLevel.Error, EntityValidationFailure, "Error Validating {Name} [{Properties}] ({ValidationMessage}) {Entity}");
 
     /// <summary>
     /// Logs an EntityValidationFailure event with event code 0x0012.
@@ -965,7 +1007,7 @@ public static class LoggerMessages
     /// <param name="metadata">The entity metadata.</param>
     /// <param name="entity">The entity object.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogEntityValidationFailure(this ILogger logger, IEntityType metadata, IValidatableObject entity, ValidationException error)
+    public static void LogEntityValidationFailure(this ILogger logger, IEntityType metadata, object entity, ValidationException error)
     {
         IEnumerable<string> memberNames = error.ValidationResult.MemberNames.Where(n => !string.IsNullOrWhiteSpace(n));
         string name = metadata.DisplayName()?.Trim()!;
@@ -998,8 +1040,8 @@ public static class LoggerMessages
     /// </summary>
     public static readonly EventId ValidationCompleted = new(EVENT_ID_ValidationCompleted, nameof(ValidationCompleted));
 
-    private static readonly Action<ILogger, EntityState, string, IValidatableObject, Exception?> _validationCompleted =
-        LoggerMessage.Define<EntityState, string, IValidatableObject>(LogLevel.Debug, ValidationCompleted, "Validation for {State} {Name} {Entity}");
+    private static readonly Action<ILogger, EntityState, string, object, Exception?> _validationCompleted =
+        LoggerMessage.Define<EntityState, string, object>(LogLevel.Debug, ValidationCompleted, "Validation for {State} {Name} {Entity}");
 
     /// <summary>
     /// Logs a ValidationCompleted event with event code 0x0013.
@@ -1008,7 +1050,7 @@ public static class LoggerMessages
     /// <param name="state">The entity state during validation.</param>
     /// <param name="metadata">The entity metadata.</param>
     /// <param name="entity">The entity object.</param>
-    public static void LogValidationCompleted(this ILogger logger, EntityState state, IEntityType metadata, IValidatableObject entity)
+    public static void LogValidationCompleted(this ILogger logger, EntityState state, IEntityType metadata, object entity)
     {
         string name = metadata.DisplayName()?.Trim()!;
         if (name.Length == 0)
@@ -1072,14 +1114,14 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
-    /// <param name="type">The unexpected type.</param>
     /// <param name="response">The actual response.</param>
-    public static void LogInvalidResponseType(this ILogger logger, Uri uri, JsonNode? response)
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogInvalidResponseType(this ILogger logger, Uri uri, JsonNode? response, Exception? error = null)
     {
         if (response is null)
             _invalidResponseType1(logger, uri, null);
         else
-            _invalidResponseType2(logger, uri, response.GetType().Name, response.ToJsonString(), null);
+            _invalidResponseType2(logger, uri, response.GetType().Name, response.ToJsonString(), error);
     }
 
     #endregion
@@ -1105,7 +1147,8 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="uri">The request URI.</param>
     /// <param name="response">The actual response.</param>
-    public static void LogResponseResultPropertyNotFound(this ILogger logger, Uri uri, JsonObject response) => _responseResultPropertyNotFound(logger, uri, response.ToJsonString(), null);
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogResponseResultPropertyNotFound(this ILogger logger, Uri uri, JsonObject response, Exception? error = null) => _responseResultPropertyNotFound(logger, uri, response.ToJsonString(), error);
 
     #endregion
 
@@ -1183,12 +1226,13 @@ public static class LoggerMessages
     /// <param name="type">The unexpected type.</param>
     /// <param name="index">The element index.</param>
     /// <param name="response">The actual element.</param>
-    public static void LogInvalidResultElementType(this ILogger logger, Uri uri, JsonNode? element, int index)
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogInvalidResultElementType(this ILogger logger, Uri uri, JsonNode? element, int index, Exception? error = null)
     {
         if (element is null)
             _invalidResultElementType(logger, uri, "null", index, "", null);
         else
-            _invalidResultElementType(logger, uri, element.GetType().Name, index, element.ToJsonString(), null);
+            _invalidResultElementType(logger, uri, element.GetType().Name, index, element.ToJsonString(), error);
     }
 
     #endregion
@@ -1219,8 +1263,8 @@ public static class LoggerMessages
     /// <param name="propertyname">The name of the missing field.</param>
     /// <param name="index">The index of the result item.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogExpectedPropertyNotFound(this ILogger logger, Uri uri, string propertyname, int index, JsonObject element) =>
-        _expectedPropertyNotFound1(logger, uri, propertyname, index, element.ToJsonString(), null);
+    public static void LogExpectedPropertyNotFound(this ILogger logger, Uri uri, string propertyname, int index, JsonObject element, Exception? error = null) =>
+        _expectedPropertyNotFound1(logger, uri, propertyname, index, element.ToJsonString(), error);
 
     /// <summary>
     /// Logs an ExpectedPropertyNotFound event with event code 0x001a.
@@ -1230,7 +1274,8 @@ public static class LoggerMessages
     /// <param name="propertyname">The name of the missing field.</param>
     /// <param name="response">The actual response.</param>
     /// <param name="error">The exception that caused the event or <see langword="null" /> for no exception.</param>
-    public static void LogExpectedPropertyNotFound(this ILogger logger, Uri uri, string propertyname, JsonObject element) => _expectedPropertyNotFound2(logger, uri, propertyname, element.ToJsonString(), null);
+    public static void LogExpectedPropertyNotFound(this ILogger logger, Uri uri, string propertyname, JsonObject element, Exception? error = null) =>
+        _expectedPropertyNotFound2(logger, uri, propertyname, element.ToJsonString(), error);
 
     #endregion
 

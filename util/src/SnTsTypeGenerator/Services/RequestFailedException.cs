@@ -20,7 +20,7 @@ internal class RequestFailedException : Exception, ILogTrackable
     {
         if (IsLogged)
             return;
-        logger.LogHttpRequestFailed(RequestUri, InnerException as HttpRequestException);
+        logger.LogHttpRequestFailed(RequestUri, InnerException ?? this);
         IsLogged = true;
     }
 

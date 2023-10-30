@@ -48,6 +48,15 @@ public sealed class DataLoaderService : IDisposable
         return source;
     }
 
+    /// <summary>
+    /// Gets the table entity representing the <see cref="TS_NAME_BASERECORD"/>.
+    /// </summary>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="Table"/> entity representing the <see cref="TS_NAME_BASERECORD"/>.</returns>
+    /// <exception cref="System.ComponentModel.DataAnnotations.ValidationException">An entity validation error is encountered before saving to the database.</exception>
+    /// <exception cref="DbUpdateException">An error is encountered while saving to the database.</exception>
+    /// <exception cref="DbUpdateConcurrencyException">A concurrency violation is encountered while saving to the database.
+    /// A concurrency violation occurs when an unexpected number of rows are affected during save. This is usually because the data in the database has been modified since it was loaded into memory.</exception>
     internal async Task<Table> GetBaseRecordTypeAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -673,7 +682,7 @@ public sealed class DataLoaderService : IDisposable
             else
             {
                 var name = pkgRef.Name;
-                if (name is null || (package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name)) is null)
+                if (name is null || (package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken)) is null)
                     return null;
                 id = package.ID;
             }
@@ -739,6 +748,10 @@ public sealed class DataLoaderService : IDisposable
     /// <param name="name">The name of the table.</param>
     /// <param name="cancellationToken">The token to observe.</param>
     /// <returns>The <see cref="Table"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no table was found in the database or in the remote ServiceNow instance.</returns>
+    /// <exception cref="System.ComponentModel.DataAnnotations.ValidationException">An entity validation error is encountered before saving to the database.</exception>
+    /// <exception cref="DbUpdateException">An error is encountered while saving to the database.</exception>
+    /// <exception cref="DbUpdateConcurrencyException">A concurrency violation is encountered while saving to the database.
+    /// A concurrency violation occurs when an unexpected number of rows are affected during save. This is usually because the data in the database has been modified since it was loaded into memory.</exception>
     internal async Task<Table?> GetTableByNameAsync(string name, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -746,11 +759,13 @@ public sealed class DataLoaderService : IDisposable
             throw new ObjectDisposedException(nameof(DataLoaderService));
         Table? table = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         if (table is null)
-        {
-            var response = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
-            if (response is not null)
-                table = await AddTableAsync(response, cancellationToken);
-        }
+            return await _logger.WithActivityScope(LogActivityType.AddNewTable, name, async () =>
+            {
+                var response = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
+                if (response is not null)
+                    table = await AddTableAsync(response, cancellationToken);
+                return table;
+            });
         return table;
     }
 
