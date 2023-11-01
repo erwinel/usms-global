@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnTsTypeGenerator", "SnTsTy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPRangeHelper", "IPRangeHelper\IPRangeHelper.csproj", "{DEE09D10-81A3-4809-B42E-6737B5772F1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPRangeHelperTests", "IPRangeHelperTests\IPRangeHelperTests.csproj", "{9AFA0ACF-EDD4-498A-9479-058C0925B330}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,5 +49,17 @@ Global
 		{DEE09D10-81A3-4809-B42E-6737B5772F1F}.Release|x64.Build.0 = Release|Any CPU
 		{DEE09D10-81A3-4809-B42E-6737B5772F1F}.Release|x86.ActiveCfg = Release|Any CPU
 		{DEE09D10-81A3-4809-B42E-6737B5772F1F}.Release|x86.Build.0 = Release|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Debug|x64.Build.0 = Debug|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Debug|x86.Build.0 = Debug|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Release|x64.ActiveCfg = Release|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Release|x64.Build.0 = Release|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Release|x86.ActiveCfg = Release|Any CPU
+		{9AFA0ACF-EDD4-498A-9479-058C0925B330}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
