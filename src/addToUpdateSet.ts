@@ -1,4 +1,4 @@
-/// <reference path="../types/index.d.ts" />
+/// <reference path="../types/snc/index.d.ts" />
 
 declare let action: GlideActionURL;
 /**
