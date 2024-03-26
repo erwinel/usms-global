@@ -1,5 +1,7 @@
+using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SnTsTypeGenerator.Models;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
@@ -13,6 +15,7 @@ public sealed class DataLoaderService : IDisposable
     private TypingsDbContext _dbContext;
     private readonly TableAPIService _tableAPIService;
     private readonly ILogger<DataLoaderService> _logger;
+    private readonly ReadOnlyDictionary<string, KnownGlideType> _knownGlideTypes;
     private readonly Dictionary<string, string> _tableIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, string> _scopeIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, string> _packageIdMap = new(StringComparer.InvariantCultureIgnoreCase);
@@ -357,6 +360,13 @@ public sealed class DataLoaderService : IDisposable
                     Package = await FromPackageRefAsync(typeRecord.Package, source, cancellationToken),
                     Scope = await FromScopeRefAsync(typeRecord.Scope, source, cancellationToken)
                 };
+                if (_knownGlideTypes.TryGetValue(name, out KnownGlideType? knownGlideType))
+                {
+                    if (!string.IsNullOrWhiteSpace(knownGlideType.GlobalElementType))
+                        type.GlobalElementType = knownGlideType.GlobalElementType;
+                    if (!string.IsNullOrWhiteSpace(knownGlideType.ScopedElementType))
+                        type.ScopedElementType = knownGlideType.ScopedElementType;
+                }
             }
             else
             {
@@ -367,242 +377,20 @@ public sealed class DataLoaderService : IDisposable
                     LastUpdated = DateTime.Now,
                     Source = source
                 };
-                switch (name)
+                if (_knownGlideTypes.TryGetValue(name, out KnownGlideType? knownGlideType))
                 {
-                    case TYPE_NAME_boolean:
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "boolean";
-                        type.SysID = "17d3ba81bf3320001875647fcf0739dc";
-                        break;
-                    case "currency":
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "decimal";
-                        type.ClassName = "Currency";
-                        type.ScalarLength = 20;
-                        type.SysID = "fd2cb3b40a0a0b3000977fec84409b73";
-                        break;
-                    case TYPE_NAME_document_id:
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "GUID";
-                        type.ClassName = "com.glide.script.glide_elements.GlideElementDocumentId";
-                        type.ScalarLength = 32;
-                        type.SysID = "a887c8b20a0a0b4a00258cf907c43960";
-                        break;
-                    case TYPE_NAME_domain_id:
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "GUID";
-                        type.ClassName = "com.glide.script.glide_elements.GlideElementDomainId";
-                        type.ScalarLength = 32;
-                        type.SysID = "db52cccc0a7b7b7b0170604fc254959d";
-                        break;
-                    case TYPE_NAME_due_date:
-                        type.IsVisible = true;
-                        type.ScalarType = "datetime";
-                        type.ClassName = "GlideDueDate";
-                        type.SysID = "2eb30326c61122b8011a74ef6a7c9ee8";
-                        break;
-                    case TYPE_NAME_glide_action_list:
-                        type.ScalarType = "string";
-                        type.ClassName = "GlideActionList";
-                        type.ScalarLength = 1024;
-                        type.SysID = "355be32bbfa00100421cdc2ecf073929";
-                        break;
-                    case TYPE_NAME_glide_date_time:
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "datetime";
-                        type.ClassName = "GlideDateTime";
-                        type.SysID = "a54edbb1c0a80006014da86b91525bf3";
-                        break;
-                    case TYPE_NAME_glide_date:
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "date";
-                        type.ClassName = "GlideDate";
-                        type.SysID = "a3a73875c611227800e6f970ea4c7410";
-                        break;
-                    case TYPE_NAME_glide_duration:
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "datetime";
-                        type.ClassName = "GlideDuration";
-                        type.SysID = "a946bf95c61122780075303f75c339c4";
-                        break;
-                    case TYPE_NAME_integer:
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "integer";
-                        type.SysID = "aab367c1bf3320001875647fcf073909";
-                        break;
-                    case "price":
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "decimal";
-                        type.ClassName = "Price";
-                        type.ScalarLength = 20;
-                        type.SysID = "fd39244f0a0a0b30009a9072cfd1b037";
-                        break;
-                    case TYPE_NAME_reference:
-                        type.UseOriginalValue = true;
-                        type.IsVisible = true;
-                        type.ScalarType = "GUID";
-                        type.SysID = "52a227c1bf3320001875647fcf07396a";
-                        break;
-                    case TYPE_NAME_timer:
-                        type.UseOriginalValue = true;
-                        type.ScalarType = "datetime";
-                        type.ClassName = "com.glide.glideobject.GlideDuration";
-                        type.SysID = "0569687fc611227801e0338f57aa2ab4";
-                        break;
-                    default:
-                        type.ScalarType = "string";
-                        switch (name)
-                        {
-                            case "collection":
-                            case "documentation_field":
-                            case "domain_path":
-                            case "email":
-                            case "expression":
-                            case TYPE_NAME_GUID:
-                            case "multi_two_lines":
-                            case "ph_number":
-                            case "sys_class_name":
-                            case "sys_class_path":
-                            case "translated_field":
-                            case "user_input":
-                            case "user_roles":
-                            case "variables":
-                            case "version":
-                                type.UseOriginalValue = true;
-                                break;
-                            case "conditions":
-                            case TYPE_NAME_glide_list:
-                            case TYPE_NAME_journal_input:
-                            case TYPE_NAME_journal_list:
-                            case "user_image":
-                                type.IsVisible = true;
-                                break;
-                            default:
-                                type.IsVisible = true;
-                                type.UseOriginalValue = true;
-                                break;
-                        }
-                        switch (name)
-                        {
-                            case "collection":
-                                type.SysID = "a0e0cbd2c3203000bac1addbdfba8f59";
-                                break;
-                            case "documentation_field":
-                                type.ClassName = "GlideElementTranslatedField";
-                                type.ScalarLength = 80;
-                                type.SysID = "7c5689e1bfd030001875647fcf07392e";
-                                break;
-                            case "domain_path":
-                                type.ScalarLength = 255;
-                                type.SysID = "7b17c631c30310006e06addbdfba8fc1";
-                                break;
-                            case "email":
-                                type.SysID = "bb3227aec0a80164012fb063bf06ebbf";
-                                break;
-                            case "expression":
-                                type.SysID = "0ab2b62665914510f8771b76afcd57d8";
-                                break;
-                            case TYPE_NAME_GUID:
-                                type.ScalarLength = 32;
-                                type.SysID = "4f04a7c1bf3320001875647fcf07396b";
-                                break;
-                            case "multi_two_lines":
-                                type.SysID = "c0ff45bfc611227a0020ea6c4111077d";
-                                break;
-                            case "ph_number":
-                                type.SysID = "4fea0202c611228e01ff351048e59ee1";
-                                break;
-                            case "sys_class_name":
-                                type.ClassName = "com.glide.glideobject.SysClassName";
-                                type.SysID = "0f66a28cc6112275013d0fea88ffa3f9";
-                                break;
-                            case "sys_class_path":
-                                type.SysID = "38805f73672222008db1bcb532415a8b";
-                                break;
-                            case "translated_field":
-                                type.ClassName = "GlideElementTranslatedField";
-                                type.SysID = "c12757ecc0a8016400a0744011ed8262";
-                                break;
-                            case TYPE_NAME_user_input:
-                                type.ClassName = "GlideUserInput";
-                                type.SysID = "b7545d990a0a0a0a006e1f8f9d6fa835";
-                                break;
-                            case "user_roles":
-                                type.ScalarLength = 255;
-                                type.SysID = "6670773ec0a80165010ede48f3caa831";
-                                break;
-                            case "variables":
-                                type.SysID = "8c31e3c1bf3320001875647fcf0739d9";
-                                break;
-                            case "version":
-                                type.SysID = "89966d16c3321100bac14ddcddba8f2b";
-                                break;
-                            case "conditions":
-                                type.ScalarLength = 4000;
-                                type.SysID = "4ab756cec611229b006b4082e623d8ac";
-                                break;
-                            case TYPE_NAME_glide_list:
-                                type.ClassName = "GlideList";
-                                type.ScalarLength = 1024;
-                                type.SysID = "e3f24e9cc0a80166007d6acccef476e9";
-                                break;
-                            case TYPE_NAME_journal_input:
-                                type.ClassName = "Journal";
-                                type.SysID = "50b082d6c61122760136e69d0e2852de";
-                                break;
-                            case TYPE_NAME_journal_list:
-                                type.ClassName = "Journal";
-                                type.SysID = "50b0a5e3c6112276017eea10c160a249";
-                                break;
-                            case "user_image":
-                                type.ClassName = "UserImage";
-                                type.SysID = "e5760b18c611228100a4effee22075fa";
-                                break;
-                            case "choice":
-                                type.SysID = "5217a7c1bf3320001875647fcf0739b7";
-                                break;
-                            case "field_name":
-                                type.ScalarLength = 80;
-                                type.SysID = "4df9be04c0a8016401a50976ae00ed2e";
-                                break;
-                            case TYPE_NAME_journal:
-                                type.ClassName = "Journal";
-                                type.SysID = "ee0f99bea9fe5f6201e4186985822523";
-                                break;
-                            case "password":
-                                type.ClassName = "Password";
-                                type.SysID = "3393a388c61122770033c78ba16d3fcd";
-                                break;
-                            case "script":
-                                type.ScalarLength = 4000;
-                                type.SysID = "4ab7aca2c611229b00e53ca27ac105d9";
-                                break;
-                            case "table_name":
-                                type.ScalarLength = 80;
-                                type.SysID = "e0baa043c0a8016501553d18374ae67a";
-                                break;
-                            case "translated_text":
-                                type.SysID = "e62dabc1bf3320001875647fcf073967";
-                                break;
-                            case "workflow":
-                                type.ScalarLength = 80;
-                                type.SysID = "deb943ec7f00000101aea727f742df58";
-                                break;
-                            default:
-                                type.SysID = "747127c1bf3320001875647fcf0739e0";
-                                break;
-                        }
-                        break;
+                    if (string.IsNullOrWhiteSpace(typeRef.Label))
+                        type.Label = string.IsNullOrWhiteSpace(knownGlideType.Label) ? name : knownGlideType.Label;
+                    type.ScalarLength = knownGlideType.ScalarLength;
+                    if (!string.IsNullOrWhiteSpace(knownGlideType.ScalarType))
+                        type.ScalarType = knownGlideType.ScalarType;
+                    if (!string.IsNullOrWhiteSpace(knownGlideType.GlobalElementType))
+                        type.GlobalElementType = knownGlideType.GlobalElementType;
+                    if (!string.IsNullOrWhiteSpace(knownGlideType.ScopedElementType))
+                        type.ScopedElementType = knownGlideType.ScopedElementType;
                 }
+                else if (string.IsNullOrWhiteSpace(typeRef.Label))
+                    type.Label = name;
             }
             await _dbContext.Types.AddAsync(type, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -775,11 +563,12 @@ public sealed class DataLoaderService : IDisposable
         return await dbContext.LoadAllReferencedAsync(tables, cancellationToken);
     }
 
-    public DataLoaderService(TypingsDbContext dbContext, TableAPIService tableAPIService, ILogger<DataLoaderService> logger)
+    public DataLoaderService(TypingsDbContext dbContext, TableAPIService tableAPIService, IOptions<AppSettings> appSettingsOptions, ILogger<DataLoaderService> logger)
     {
         _dbContext = dbContext;
         _tableAPIService = tableAPIService;
         _logger = logger;
+        _knownGlideTypes = appSettingsOptions.Value.GetKnownGlideTypes();
     }
 
     private void Dispose(bool disposing)

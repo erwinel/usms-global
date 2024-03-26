@@ -190,10 +190,44 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
 
     #endregion
 
+    #region GlobalElementType Property
+
+    private string? _globalElementType;
+
+    /// <summary>
+    /// Gets the TypeScript GlideElement type name used in globally-scoped scripts.
+    /// </summary>
+    /// <value>The TypeScript name to use when referring to the corresponding GlideElement object in globally-scoped scripts or <see langword="null"/> to use the default type name.</value>
+    /// <remarks>This should correspond to the name of a TypeScript definition that is assignable from the 'GlideElement' type,
+    /// and is defined in any of the <c>*.d.ts</c> files in the <c>Resources/ts/global</c> folder.</remarks>
+    [BackingField(nameof(_globalElementType))]
+    public string? GlobalElementType { get => _globalElementType; set => _globalElementType = value.NullIfWhiteSpace(); }
+
+    #endregion
+
+    #region ScopedElementType Property
+
+    private string? _scopedElementType;
+    
+    /// <summary>
+    /// Gets the TypeScript GlideElement type name used in scoped applications.
+    /// </summary>
+    /// <value>The TypeScript name to use when referring to the corresponding GlideElement object in scoped applications or <see langword="null"/> to use the default type name.</value>
+    /// <remarks>This should correspond to the name of a TypeScript definition that is assignable from the 'GlideElement' type,
+    /// and is defined in any of the <c>*.d.ts</c> files in the <c>Resources/ts/scoped</c> folder.</remarks>
+    [BackingField(nameof(_scopedElementType))]
+    public string? ScopedElementType { get => _scopedElementType; set => _scopedElementType = value.NullIfWhiteSpace(); }
+
+    #endregion
+
     #region Elements Property
 
     private HashSet<Element> _elements = new();
 
+    /// <summary>
+    /// Gets the elements (columns) that use this type.
+    /// </summary>
+    /// <returns>The <see cref="Element"/> objects that reference this type.</returns>
     [NotNull]
     [BackingField(nameof(_elements))]
     public HashSet<Element> Elements { get => _elements; set => _elements = value ?? new(); }

@@ -83,6 +83,8 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(GlideType.ClassName)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(GlideType.UseOriginalValue)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(GlideType.IsVisible)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.GlobalElementType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.ScopedElementType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(GlideType.LastUpdated)}"" DATETIME NOT NULL,
     ""{nameof(GlideType.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Scope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(Scope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,

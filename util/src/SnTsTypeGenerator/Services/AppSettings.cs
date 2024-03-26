@@ -1,5 +1,6 @@
 
 using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using Microsoft.Extensions.Configuration;
 using static SnTsTypeGenerator.Services.CmdLineConstants;
 
@@ -76,9 +77,47 @@ public class AppSettings
     /// <remarks>The default behavior is <see cref="MODE_GLOBAL"/>.</remarks>
     public string? Mode { get; set; }
 
+    /// <summary>
+    /// Gets the glide type mappings to refer to when adding new rows to the <see cref="Models.GlideType"/> table.
+    /// </summary>
+    public List<KnownGlideType>? KnownGlideTypes { get; set; }
+
     public bool? Help { get; set; }
 
     public bool ShowHelp() => Help ?? false;
+
+    private ReadOnlyDictionary<string, KnownGlideType>? _knownGlideTypes = null;
+    public ReadOnlyDictionary<string, KnownGlideType> GetKnownGlideTypes()
+    {
+        if (_knownGlideTypes is not null) return _knownGlideTypes;
+        Dictionary<string, KnownGlideType> result = new(StringComparer.InvariantCultureIgnoreCase);
+        _knownGlideTypes = new(result);
+        if (KnownGlideTypes is not null)
+            foreach (KnownGlideType t in KnownGlideTypes.Where(t => t is not null && !string.IsNullOrEmpty(t.Name)))
+            {
+                if (!result.ContainsKey(t.Name))
+                    result.Add(t.Name, t);
+            }
+        foreach (KnownGlideType t in KnownGlideType.GetDefaultKnownTypes())
+        {
+            if (result.TryGetValue(t.Name, out KnownGlideType? existing))
+            {
+                if (string.IsNullOrWhiteSpace(existing.Label) && !string.IsNullOrWhiteSpace(t.Label))
+                    existing.Label = t.Label;
+                if (string.IsNullOrWhiteSpace(existing.ScalarType) && !string.IsNullOrWhiteSpace(t.ScalarType))
+                    existing.ScalarType = t.ScalarType;
+                if (string.IsNullOrWhiteSpace(existing.GlobalElementType) && !string.IsNullOrWhiteSpace(t.GlobalElementType))
+                    existing.GlobalElementType = t.GlobalElementType;
+                if (string.IsNullOrWhiteSpace(existing.ScopedElementType) && !string.IsNullOrWhiteSpace(t.ScopedElementType))
+                    existing.ScopedElementType = t.ScopedElementType;
+                if (!existing.ScalarLength.HasValue && t.ScalarLength.HasValue)
+                    existing.ScalarLength = t.ScalarLength;
+            }
+            else
+                result.Add(t.Name, t);
+        }
+        return _knownGlideTypes;
+    }
 
     private static readonly Dictionary<string, string> _valueSwitchMappings = new()
     {
