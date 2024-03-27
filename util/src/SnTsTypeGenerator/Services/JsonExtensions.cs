@@ -304,6 +304,8 @@ public static class JsonExtensions
     public static string GetFieldAsString(this JsonObject source, string propertyName, string defaultValue = "") =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsString(JSON_KEY_VALUE, out string? value)) ? value : defaultValue;
 
+    public static string[] GetFieldAsStringArray(this JsonObject source, string propertyName, char separator = ',') => source.GetFieldAsNonEmptyOrNull(propertyName)?.Split(separator).Where(s => s.Length > 0).ToArray() ?? Array.Empty<string>();
+
     public static string GetFieldAsNonEmpty(this JsonObject source, string propertyName, string defaultValue = "") =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field && field.TryCoercePropertyAsNonEmpty(JSON_KEY_VALUE, out string? value)) ? value : defaultValue;
 
