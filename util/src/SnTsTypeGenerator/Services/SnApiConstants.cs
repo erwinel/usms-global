@@ -47,13 +47,18 @@ internal static class SnApiConstants
     /// </summary>
     internal const string TABLE_NAME_SYS_PLUGINS = "sys_plugins";
 
-/*
-Package (sys_package)
-    Application (sys_scope)
-        Store Application (sys_store_app)
-        Custom Application (sys_app)
-    Sys Plugins (sys_plugins)
-*/
+    /// <summary>
+    /// Table name for Package records.
+    /// </summary>
+    internal const string TABLE_NAME_SYS_PACKAGE = "sys_package";
+
+    /*
+    Package (sys_package)
+        Application (sys_scope)
+            Store Application (sys_store_app)
+            Custom Application (sys_app)
+        Sys Plugins (sys_plugins)
+    */
     /// <summary>
     /// Table name for ServiceNow column (element) definitions.
     /// </summary>
@@ -113,6 +118,11 @@ Package (sys_package)
     internal const string JSON_KEY_LABEL = "label";
 
     /// <summary>
+    /// "Parent" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_PARENT = "parent";
+
+    /// <summary>
     /// "Comments" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_COMMENTS = "comments";
@@ -148,6 +158,11 @@ Package (sys_package)
     internal const string JSON_KEY_SYS_PACKAGE = "sys_package";
 
     /// <summary>
+    /// "Dependencies" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_DEPENDENCIES = "dependencies";
+
+    /// <summary>
     /// "Extends table" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_SUPER_CLASS = "super_class";
@@ -181,6 +196,11 @@ Package (sys_package)
     /// "Active" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_ACTIVE = "active";
+
+    /// <summary>
+    /// "Licensable" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_LICENSABLE = "licensable";
 
     /// <summary>
     /// "Array" Column (element) name.
@@ -443,6 +463,11 @@ Package (sys_package)
     /// GlideRecord TypeScript class name.
     /// </summary>
     internal const string TS_NAME_GlideRecord = "GlideRecord";
+
+    /// <summary>
+    /// ScopedGlideRecord TypeScript class name.
+    /// </summary>
+    internal const string TS_NAME_ScopedGlideRecord = "ScopedGlideRecord";
 
     /// <summary>
     /// GlideElement TypeScript class name.

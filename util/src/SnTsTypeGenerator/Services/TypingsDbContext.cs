@@ -49,7 +49,9 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(Package.ID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Package.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Package.Version)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(Package.IsBaseline)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(Package.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    ""{nameof(Package.ParentID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Packages)}_{nameof(Package.Parent)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Package.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Packages)}_{nameof(Package.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Package.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(Packages)}"" PRIMARY KEY(""{nameof(Package.ID)}"")
@@ -86,7 +88,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(GlideType.GlobalElementType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(GlideType.ScopedElementType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(GlideType.LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(GlideType.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.PackageID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Scope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(Scope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(GlideType.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(Types)}"" PRIMARY KEY(""{nameof(GlideType.Name)}"")
@@ -108,7 +110,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(Table.IsExtendable)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(Table.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     ""{nameof(Table.IsInterface)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(Table.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Table.PackageID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Table.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Scope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(Scope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Table.SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.SuperClass)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(Table.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Table.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
@@ -138,7 +140,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(Element.IsCalculated)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(Element.IsUnique)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(Element.LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(Element.PackageName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Element.PackageID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Element.TableName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Table)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(Table.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Element.TypeName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Type)}"" REFERENCES ""{nameof(Types)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Element.RefTableName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Reference)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(Table.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
@@ -355,6 +357,7 @@ public partial class TypingsDbContext : DbContext
                     _ = builder.Property(nameof(Package.SourceFqdn)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Package.SysID)).UseCollation(COLLATION_NOCASE);
                     _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Parent).WithMany(s => s.Children).HasForeignKey(t => t.ParentID).OnDelete(DeleteBehavior.Restrict);
                 })
                 .Entity<Scope>(builder =>
                 {
@@ -378,7 +381,7 @@ public partial class TypingsDbContext : DbContext
                     _ = builder.Property(nameof(GlideType.SysID)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(GlideType.ScalarType)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(GlideType.ClassName)).UseCollation(COLLATION_NOCASE);
-                    _ = builder.Property(nameof(GlideType.PackageName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(GlideType.PackageID)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(GlideType.ScopeValue)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(GlideType.SourceFqdn)).UseCollation(COLLATION_NOCASE);
                     _ = builder.HasOne(t => t.Source).WithMany(s => s.Types).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
@@ -398,12 +401,12 @@ public partial class TypingsDbContext : DbContext
                     _ = builder.Property(nameof(Table.AccessibleFrom)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Table.ExtensionModel)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Table.SourceFqdn)).UseCollation(COLLATION_NOCASE);
-                    _ = builder.Property(nameof(Table.PackageName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Table.PackageID)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Table.ScopeValue)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Table.SuperClassName)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Table.SourceFqdn)).UseCollation(COLLATION_NOCASE);
                     _ = builder.HasOne(t => t.Source).WithMany(s => s.Tables).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
-                    _ = builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Package).WithMany(s => s.Tables).HasForeignKey(t => t.PackageID).OnDelete(DeleteBehavior.Restrict);
                     _ = builder.HasOne(t => t.Scope).WithMany(s => s.Tables).HasForeignKey(t => t.ScopeValue).OnDelete(DeleteBehavior.Restrict);
                     _ = builder.HasOne(t => t.SuperClass).WithMany(s => s.Derived).HasForeignKey(t => t.SuperClassName).OnDelete(DeleteBehavior.Restrict);
                 })
@@ -416,7 +419,7 @@ public partial class TypingsDbContext : DbContext
                     _ = builder.Property(nameof(Element.SysID)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Element.Comments)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Element.DefaultValue)).UseCollation(COLLATION_NOCASE);
-                    _ = builder.Property(nameof(Element.PackageName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Element.PackageID)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Element.TableName)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Element.TypeName)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Element.RefTableName)).UseCollation(COLLATION_NOCASE);
@@ -424,7 +427,7 @@ public partial class TypingsDbContext : DbContext
                     _ = builder.HasOne(t => t.Source).WithMany(s => s.Elements).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
                     _ = builder.HasOne(t => t.Table).WithMany(s => s.Elements).HasForeignKey(t => t.TableName).IsRequired().OnDelete(DeleteBehavior.Restrict);
                     _ = builder.HasOne(t => t.Type).WithMany(s => s.Elements).HasForeignKey(t => t.TypeName).IsRequired().OnDelete(DeleteBehavior.Restrict);
-                    _ = builder.HasOne(t => t.Package).WithMany(s => s.Elements).HasForeignKey(t => t.PackageName).OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Package).WithMany(s => s.Elements).HasForeignKey(t => t.PackageID).OnDelete(DeleteBehavior.Restrict);
                     _ = builder.HasOne(t => t.Reference).WithMany(s => s.ReferredBy).HasForeignKey(t => t.RefTableName).OnDelete(DeleteBehavior.Restrict);
                 });
         });

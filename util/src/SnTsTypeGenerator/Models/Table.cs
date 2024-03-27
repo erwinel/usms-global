@@ -109,13 +109,13 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     /// <summary>
     /// Name of the associated record for the "Package" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
-    private string? _packageName;
+    private string? _packageID;
 
-    [BackingField(nameof(_packageName))]
-    public string? PackageName
+    [BackingField(nameof(_packageID))]
+    public string? PackageID
     {
-        get { lock (_syncRoot) { return _package?.Name ?? _packageName; } }
-        set => SetOptionalNavForeignKey(_syncRoot, value, ref _packageName, ref _package, p => p.Name);
+        get { lock (_syncRoot) { return _package?.ID ?? _packageID; } }
+        set => SetOptionalNavForeignKey(_syncRoot, value, ref _packageID, ref _package, p => p.ID);
     }
 
     private Package? _package;
@@ -126,7 +126,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     public Package? Package
     {
         get { lock (_syncRoot) { return _package; } }
-        set => SetOptionalNavProperty(_syncRoot, value, ref _packageName, ref _package);
+        set => SetOptionalNavProperty(_syncRoot, value, ref _packageID, ref _package);
     }
 
     #endregion
@@ -298,7 +298,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
         { nameof(NumberPrefix), JsonValue.Create(NumberPrefix) },
         { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
         { nameof(IsInterface), JsonValue.Create(IsInterface) },
-        { nameof(Package), JsonValue.Create(_packageName) },
+        { nameof(Package), JsonValue.Create(_packageID) },
         { nameof(Scope), JsonValue.Create(_scopeValue) },
         { nameof(SuperClass), JsonValue.Create(_superClassName) },
         { nameof(Source), JsonValue.Create(_sourceFqdn) },

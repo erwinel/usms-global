@@ -23,7 +23,7 @@ public sealed class Package : IValidatableObject
     private string _id = string.Empty;
 
     /// <summary>
-    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_SOURCE" />) column.
+    /// Value of the "ID" (<see cref="Services.SnApiConstants.JSON_KEY_SOURCE" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_id))]
@@ -42,7 +42,6 @@ public sealed class Package : IValidatableObject
     /// <summary>
     /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
-    [Key]
     [BackingField(nameof(_name))]
     public string Name
     {
@@ -63,6 +62,11 @@ public sealed class Package : IValidatableObject
     public string? Version { get => _version; set => _version = value.NullIfWhiteSpace(); }
 
     #endregion
+
+    /// <summary>
+    /// Indicates whether the package is considered a baseline package.
+    /// </summary>
+    public bool IsBaseline { get; set; }
 
     /// <summary>
     /// Date and time that this record was last updated.
@@ -96,6 +100,33 @@ public sealed class Package : IValidatableObject
 
     #endregion
 
+    #region Parent Navigation Property
+
+    /// <summary>
+    /// Name of the associated record for the "Parent" (<see cref="Services.SnApiConstants.JSON_KEY_PARENT" />) column.
+    /// </summary>
+    private string? _parentId;
+
+    [BackingField(nameof(_parentId))]
+    public string? ParentID
+    {
+        get { lock (_syncRoot) { return _parent?.ID ?? _parentId; } }
+        set => SetOptionalNavForeignKey(_syncRoot, value, ref _parentId, ref _parent, p => p.ID);
+    }
+
+    private Package? _parent;
+
+    /// <summary>
+    /// The parent package.
+    /// </summary>
+    public Package? Parent
+    {
+        get { lock (_syncRoot) { return _parent; } }
+        set => SetOptionalNavProperty(_syncRoot, value, ref _parentId, ref _parent);
+    }
+
+    #endregion
+
     #region SysId Property
 
     private string _sysID = string.Empty;
@@ -110,6 +141,16 @@ public sealed class Package : IValidatableObject
         get => _sysID;
         set => _sysID = value ?? string.Empty;
     }
+
+    #endregion
+
+    #region Children Property
+
+    private HashSet<Package> _children = new();
+
+    [NotNull]
+    [BackingField(nameof(_children))]
+    public HashSet<Package> Children { get => _children; set => _children = value ?? new(); }
 
     #endregion
 

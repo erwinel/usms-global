@@ -485,10 +485,23 @@ public sealed class DataLoaderService : IDisposable
                 Version = string.Empty,
                 SysID = sys_id,
                 LastUpdated = DateTime.Now,
-                Source = source
+                Source = source,
+                IsBaseline = packageRecord.Active && !packageRecord.Licensable
             };
+            // if (packageRecord is ScopeRecord scopeRecord)
+            // {
+
+            // }
+            // else
+            // {
+
+            // }
             await _dbContext.Packages.AddAsync(package, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
+            // if (packageRecord is PluginRecord pluginRecord && pluginRecord.ParentID is not null)
+            // {
+                // TODO: Ensure parent is in DB and set parent
+            // }
         }
         _packageIdMap.Add(sys_id, id);
         return package;

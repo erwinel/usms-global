@@ -243,7 +243,7 @@ public static class EntityFrameworkExtensions
         return ReferenceEquals(x, y) || (x.IsActive == y.IsActive && x.IsArray == y.IsArray && x.IsCalculated == y.IsCalculated && x.IsDisplay == y.IsDisplay && x.IsMandatory == y.IsMandatory &&
             x.IsPrimary == y.IsPrimary && x.IsReadOnly == y.IsReadOnly && x.IsUnique == y.IsUnique && (x.MaxLength.HasValue ? y.MaxLength.HasValue && x.MaxLength.Value == y.MaxLength.Value : !y.MaxLength.HasValue) &&
             (x.SizeClass.HasValue ? y.SizeClass.HasValue && x.SizeClass.Value == y.SizeClass.Value : !y.MaxLength.HasValue) && NameComparer.Equals(x.SysID, y.SysID) && NameComparer.Equals(x.Name, y.Name) &&
-            NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && x.PackageName.NoCaseEquals(y.PackageName));
+            NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && x.PackageID.NoCaseEquals(y.PackageID));
     }
 
     public static bool IsIdenticalTo(this ElementRecord x, Element y)
@@ -254,7 +254,7 @@ public static class EntityFrameworkExtensions
         return ReferenceEquals(x, y) || (x.IsActive == y.IsActive && x.IsArray == y.IsArray && x.IsCalculated == y.IsCalculated && x.IsDisplay == y.IsDisplay && x.IsMandatory == y.IsMandatory &&
             x.IsPrimary == y.IsPrimary && x.IsReadOnly == y.IsReadOnly && x.IsUnique == y.IsUnique && (x.MaxLength.HasValue ? y.MaxLength.HasValue && x.MaxLength.Value == y.MaxLength.Value : !y.MaxLength.HasValue) &&
             (x.SizeClass.HasValue ? y.SizeClass.HasValue && x.SizeClass.Value == y.SizeClass.Value : !y.MaxLength.HasValue) && NameComparer.Equals(x.SysID, y.SysID) && NameComparer.Equals(x.Name, y.Name) &&
-            NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && (x.Package?.Name).NoCaseEquals(y.PackageName));
+            NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && (x.Package?.Name).NoCaseEquals(y.PackageID));
     }
 
     internal static async Task<IEnumerable<ElementInheritance>> GetAllElementInheritancesAsync(this EntityEntry<Table> entity, CancellationToken cancellationToken)

@@ -230,6 +230,8 @@ public sealed class TableAPIService
             Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
             ShortDescription: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_DESCRIPTION),
             SysID: sys_id,
+            Licensable: sysScopeResult.GetFieldAsBoolean(JSON_KEY_LICENSABLE),
+            Active: sysScopeResult.GetFieldAsBoolean(JSON_KEY_ACTIVE),
             SourceFqdn: requestUri.Host);
     }
 
@@ -249,43 +251,73 @@ public sealed class TableAPIService
         _logger.LogGettingScopeByIdentifierFromRemote(id);
 
         (Uri? requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PLUGINS, id, cancellationToken);
-        string? sys_id;
+        string? sys_id, source;
         if (sysScopeResult is not null)
         {
             if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out sys_id))
                 throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SYS_ID);
-            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SOURCE, out string? source))
+            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SOURCE, out source))
                 throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SOURCE);
-            return new PackageRecord(ID: source,
-                Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, source)),
+            return new PluginRecord(ID: source,
+                Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, source),
                 Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
                 SysID: sys_id,
+                ParentID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_PARENT),
+                Licensable: sysScopeResult.GetFieldAsBoolean(JSON_KEY_LICENSABLE),
+                Active: sysScopeResult.GetFieldAsBoolean(JSON_KEY_ACTIVE),
                 SourceFqdn: requestUri.Host);
         }
         (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_STORE_APP, id, cancellationToken);
+        if (sysScopeResult is not null)
+        {
+            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out sys_id))
+                throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SYS_ID);
+            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
+                throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SCOPE);
+            return new StoreAppRecord(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
+                Value: value,
+                ID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SOURCE),
+                Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
+                ShortDescription: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_DESCRIPTION),
+                SysID: sys_id,
+                Licensable: sysScopeResult.GetFieldAsBoolean(JSON_KEY_LICENSABLE),
+                Active: sysScopeResult.GetFieldAsBoolean(JSON_KEY_ACTIVE),
+                Dependencies: sysScopeResult.GetFieldAsStringArray(JSON_KEY_DEPENDENCIES),
+                SourceFqdn: requestUri.Host);
+        }
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
+        if (sysScopeResult is not null)
+        {
+            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out sys_id))
+                throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SYS_ID);
+            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
+                throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SCOPE);
+            return new ScopeRecord(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
+                Value: value,
+                ID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SOURCE),
+                Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
+                ShortDescription: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_DESCRIPTION),
+                SysID: sys_id,
+                Licensable: sysScopeResult.GetFieldAsBoolean(JSON_KEY_LICENSABLE),
+                Active: sysScopeResult.GetFieldAsBoolean(JSON_KEY_ACTIVE),
+                SourceFqdn: requestUri.Host);
+        }
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PACKAGE, id, cancellationToken);
         if (sysScopeResult is null)
         {
-            (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_APP, id, cancellationToken);
-            if (sysScopeResult is null)
-            {
-                (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
-                if (sysScopeResult is null)
-                {
-                    _logger.LogNoResultsFromQuery(requestUri, responseObj);
-                    return null;
-                }
-            }
+            _logger.LogNoResultsFromQuery(requestUri, responseObj);
+            return null;
         }
         if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out sys_id))
             throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SYS_ID);
-        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
-            throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SCOPE);
-        return new ScopeRecord(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
-            Value: value,
-            ID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SOURCE),
+        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SOURCE, out source))
+            throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SOURCE);
+        return new PackageRecord(ID: source,
+            Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, source),
             Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
-            ShortDescription: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_DESCRIPTION),
             SysID: sys_id,
+            Licensable: sysScopeResult.GetFieldAsBoolean(JSON_KEY_LICENSABLE),
+            Active: sysScopeResult.GetFieldAsBoolean(JSON_KEY_ACTIVE),
             SourceFqdn: requestUri.Host);
     }
 

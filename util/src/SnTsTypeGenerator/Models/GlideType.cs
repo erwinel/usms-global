@@ -97,13 +97,13 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     /// <summary>
     /// Name of the associated record for the "Package" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
-    private string? _packageName;
+    private string? _packageID;
 
-    [BackingField(nameof(_packageName))]
-    public string? PackageName
+    [BackingField(nameof(_packageID))]
+    public string? PackageID
     {
-        get { lock (_syncRoot) { return _package?.Name ?? _packageName; } }
-        set => SetOptionalNavForeignKey(_syncRoot, value, ref _packageName, ref _package, p => p.Name);
+        get { lock (_syncRoot) { return _package?.ID ?? _packageID; } }
+        set => SetOptionalNavForeignKey(_syncRoot, value, ref _packageID, ref _package, p => p.ID);
     }
 
     private Package? _package;
@@ -114,7 +114,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     public Package? Package
     {
         get { lock (_syncRoot) { return _package; } }
-        set => SetOptionalNavProperty(_syncRoot, value, ref _packageName, ref _package);
+        set => SetOptionalNavProperty(_syncRoot, value, ref _packageID, ref _package);
     }
 
     #endregion
@@ -208,7 +208,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     #region ScopedElementType Property
 
     private string? _scopedElementType;
-    
+
     /// <summary>
     /// Gets the TypeScript GlideElement type name used in scoped applications.
     /// </summary>
@@ -266,7 +266,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         { nameof(UseOriginalValue), JsonValue.Create(UseOriginalValue) },
         { nameof(IsVisible), JsonValue.Create(IsVisible) },
         { nameof(LastUpdated), JsonValue.Create(LastUpdated) },
-        { nameof(Package), JsonValue.Create(_packageName) },
+        { nameof(Package), JsonValue.Create(_packageID) },
         { nameof(Scope), JsonValue.Create(_scopeValue) },
         { nameof(Source), JsonValue.Create(_sourceFqdn) },
         { nameof(SysID), JsonValue.Create(_sysID) }

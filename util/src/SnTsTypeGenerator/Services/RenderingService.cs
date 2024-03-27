@@ -35,7 +35,7 @@ public partial class RenderingService
         await writer.WriteAsync("export interface ");
         await writer.WriteAsync(baseRecord.Name);
         await writer.WriteLineAsync("{");
-        var renderingConext = new GlobalElementRenderingContext(baseRecord.PackageName);
+        var renderingConext = new GlobalElementRenderingContext(baseRecord.PackageID);
         var elements = (await dbContext.Tables.Entry(baseRecord).GetElementsAsync(cancellationToken)).ToArray();
         await RenderElementAsync(elements[0], renderingConext, writer, dbContext, cancellationToken);
         foreach (var e in elements.Skip(1))
@@ -56,6 +56,7 @@ public partial class RenderingService
     // export type Reference<TFields = $$tableFields.IBaseRecord, TRecord extends GlideRecord & TFields = GlideRecord & TFields> = TFields & {
     //     getRefRecord(): TRecord;
     // } & GlideElementReference;
+    [Obsolete("No longer necessary - will be referencing Reference definition from .d.ts resource files")]
     private static async Task RenderReferenceBaseTypeAsync(IndentedTextWriter writer)
     {
         await writer.WriteLineAsync(OPEN_JSDOC);
@@ -157,7 +158,7 @@ public partial class RenderingService
         await writer.WriteAsync(" & ");
         Table? superClass = await entry.GetReferencedEntityAsync(t => t.SuperClass, cancellationToken);
         if (superClass is null)
-            await writer.WriteAsync(TS_NAME_GlideRecord);
+            await writer.WriteAsync(TS_NAME_ScopedGlideRecord);
         else if (NameComparer.Equals(superClass.ScopeValue, table.ScopeValue))
             await writer.WriteAsync(superClass.Name);
         else if (superClass.IsGlobalScope())
@@ -287,7 +288,7 @@ public partial class RenderingService
             return;
         }
         await writer.WriteLineAsync(" {");
-        var renderingConext = new GlobalElementRenderingContext(table.PackageName);
+        var renderingConext = new GlobalElementRenderingContext(table.PackageID);
         await RenderElementAsync(elements[0], renderingConext, writer, dbContext, cancellationToken);
         foreach (var e in elements.Skip(1))
         {
@@ -356,7 +357,7 @@ public partial class RenderingService
             return;
         }
         await writer.WriteLineAsync(" {");
-        var renderingConext = new ScopedElementRenderingContext(table.ScopeValue!, table.PackageName);
+        var renderingConext = new ScopedElementRenderingContext(table.ScopeValue!, table.PackageID);
         await RenderElementAsync(elements[0], renderingConext, writer, dbContext, cancellationToken);
         foreach (var e in elements.Skip(1))
         {
@@ -732,6 +733,7 @@ public partial class RenderingService
             return;
         using var dbContext = _scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
         cancellationToken.ThrowIfCancellationRequested();
+        // TODO: Change logic to emitting to files according to their package, or if they are baseline
         using StreamWriter streamWriter = _logger.WithActivityScope(LogActivityType.OpenOutputFile, _outputFile.FullName, () =>
         {
             try
