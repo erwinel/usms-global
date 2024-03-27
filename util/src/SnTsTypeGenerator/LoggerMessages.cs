@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -9,7 +8,6 @@ using static SnTsTypeGenerator.Services.CmdLineConstants;
 using SnTsTypeGenerator.Services;
 using System.Data.Common;
 using System.Data;
-using SnTsTypeGenerator.Models;
 
 namespace SnTsTypeGenerator;
 public static class LoggerMessages
