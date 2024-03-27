@@ -29,10 +29,10 @@ declare interface GlideActionURL {
     getURLParameter(parameterName: string): string | undefined;
 
     /**
-     * Opens a page with a GlideRecord in the user view.
-     * @param {GlideRecord} gr - GlideRecord of the page to be opened in the user view.
+     * Opens a page with a ScopedGlideRecord in the user view.
+     * @param {ScopedGlideRecord} gr - ScopedGlideRecord of the page to be opened in the user view.
      */
-    openGlideRecord(gr: GlideRecord): void;
+    openGlideRecord(gr: ScopedGlideRecord): void;
 
     /**
      * Indicates whether to enable or disable pop-up windows on the page in the current view.
@@ -42,15 +42,15 @@ declare interface GlideActionURL {
 
     /**
      * Sets the redirect URI for this transaction, which determines the next page the user sees.
-     * @param {(string | GlideRecord)} url - URL or GlideRecord to set as the redirect.
+     * @param {(string | ScopedGlideRecord)} url - URL or ScopedGlideRecord to set as the redirect.
      */
-    setRedirectURL(url: string | GlideRecord): void;
+    setRedirectURL(url: string | ScopedGlideRecord): void;
 
     /**
      * Sets the return URI for this transaction after a UI action is complete. You can use this method to determine what page the user has in view when they return from submit.
-     * @param {(string | GlideRecord)} url - URI to set as the return location after a UI action is complete.
+     * @param {(string | ScopedGlideRecord)} url - URI to set as the return location after a UI action is complete.
      */
-    setReturnURL(url: string | GlideRecord): void;
+    setReturnURL(url: string | ScopedGlideRecord): void;
 
     /**
      * Sets a URL parameter name and value.
@@ -92,10 +92,10 @@ declare class Action implements Packages.com.glide.script.fencing.ScopedAction {
     getURLParameter(parameterName: $$rhino.String): $$rhino.String;
 
     /**
-     * Opens a page with a GlideRecord in the user view.
-     * @param {GlideRecord} gr - GlideRecord of the page to be opened in the user view.
+     * Opens a page with a ScopedGlideRecord in the user view.
+     * @param {ScopedGlideRecord} gr - ScopedGlideRecord of the page to be opened in the user view.
      */
-    openGlideRecord(gr: GlideRecord): void;
+    openGlideRecord(gr: ScopedGlideRecord): void;
 
     /**
      * Indicates whether to enable or disable pop-up windows on the page in the current view.
@@ -105,16 +105,16 @@ declare class Action implements Packages.com.glide.script.fencing.ScopedAction {
 
     /**
      * Sets the redirect URI for this transaction, which determines the next page the user sees.
-     * @param {(string | GlideRecord)} url - URL to set as the redirect. You can provide the URL as a string or a GlideRecord.
-     * If you pass the URL as a GlideRecord, this value takes the focus to that record's form.
+     * @param {(string | ScopedGlideRecord)} url - URL to set as the redirect. You can provide the URL as a string or a ScopedGlideRecord.
+     * If you pass the URL as a ScopedGlideRecord, this value takes the focus to that record's form.
      */
-    setRedirectURL(url: string | GlideRecord): void;
+    setRedirectURL(url: string | ScopedGlideRecord): void;
 
     /**
      * Sets the return URI for this transaction after a UI action is complete. You can use this method to determine what page the user has in view when they return from submit.
-     * @param {(string | GlideRecord)} url - URI to set as the return location after a UI action is complete. You can provide the URL as a string or a GlideRecord.
+     * @param {(string | ScopedGlideRecord)} url - URI to set as the return location after a UI action is complete. You can provide the URL as a string or a ScopedGlideRecord.
      */
-    setReturnURL(url: string | GlideRecord): void;
+    setReturnURL(url: string | ScopedGlideRecord): void;
 
     /**
      * Sets a URL parameter name and value.
@@ -578,11 +578,11 @@ declare class GlideSystem implements Packages.com.glide.script.fencing.ScopedGli
     eventQueueScheduled(name: string, instance: any, parm1?: string, parm2?: string, expiration?: any): void;
     /**
      * Executes a job for a scoped application.
-     * @param {GlideRecord} job - The job to be run.
+     * @param {ScopedGlideRecord} job - The job to be run.
      * @returns {string} Returns the sysID of the scheduled job. Returns null if the job is global.
      * @description 
      */
-    executeNow(job: GlideRecord): string;
+    executeNow(job: ScopedGlideRecord): string;
     /**
      * Generates a GUID that can be used when a unique identifier is required.
      * @returns {string} A 32-character hexadecimal GUID.
@@ -1011,6 +1011,15 @@ declare class GlideSystem implements Packages.com.glide.script.fencing.ScopedGli
 
 declare const gs: GlideSystem;
 
+export type ScopedGlideRecord = GlideRecord | GlideRecordSecure & {
+    /**
+     * Returns a GlideRecord object for a given reference element.
+     * @return {ScopedGlideElementReference}
+     * @returns {ScopedGlideElementReference} A GlideRecord object.
+     */
+    getRefRecord(): ScopedGlideElementReference;
+}
+
 /**
  * TODO: Document GlideRecord
  * @class GlideRecord
@@ -1018,6 +1027,528 @@ declare const gs: GlideSystem;
  * @see {@link https://developer.servicenow.com/dev.do#!/reference/api/rome/server/no-namespace/c_GlideRecordScopedAPI}
  */
 declare class GlideRecord implements Packages.com.glide.script.fencing.ScopedGlideRecord {
+    /**
+     * Creates an instance of the GlideRecord class for the specified table.
+     * @constructor
+     * @param {string} tableName - The table to be used.
+     */
+    constructor(tableName: string);
+
+    /**
+     * Adds a filter to return active records.
+     * @return {GlideQueryCondition} Filter to return active records.
+     */
+    addActiveQuery(): GlideQueryCondition;
+
+    /**
+     * Adds an encoded query to other queries that may have been set.
+     * @param {string} query - An encoded query string.
+     */
+    addEncodedQuery(query: string): void;
+    
+    /**
+     * Applies a pre-defined GlideDBFunctionBuilder object to a record.
+     * @param {GlideDBFunctionBuilder} f - GlideDBFunctionBuilder object that defines a SQL operation.
+     */
+    addFunction(f: GlideDBFunctionBuilder): void;
+    
+    /**
+     * Adds a filter to return records based on a relationship in a table related to the current GlideRecord.
+     * @param {string} joinTable - Name of table to use in the join, such as 'incident'.
+     * @param {string} [primaryField] - Name of the field in the GlideRecord to use to join the field specified in the joinTableField parameter. Defaults to sys_id.
+     * @param {string} [joinTableField] - Name of the field in the table specified in joinTable to use to join the tables. Defaults to first field in the table specified in joinTable that is a reference field to the current GlideRecord table.
+     * @return {GlideQueryCondition} Filter that lists records where the relationships match.
+     */
+    addJoinQuery(joinTable: string, primaryField?: string, joinTableField?: string): GlideQueryCondition;
+    
+    /**
+     * A filter that specifies records where the value of the field passed in the parameter is not null.
+     * @param {string} fieldName - The name of the field to be checked.
+     * @return {GlideQueryCondition} A filter that specifies records where the value of the field passed in the parameter is not null.
+     */
+    addNotNullQuery(fieldName: string): GlideQueryCondition;
+    
+    /**
+     * Adds a filter to return records where the value of the specified field is null.
+     * @param {string} fieldName - The name of the field to be checked.
+     * @return {GlideQueryCondition} The query condition added to the GlideRecord.
+     */
+    addNullQuery(fieldName: string): GlideQueryCondition;
+    
+    /**
+     * Build a search query and return the rows that match the request.
+     * @param {string} name - Name of the table field to query, or one of the following reserved names: 123TEXTQUERY321; 123TEXTINDEXGROUP321.
+     * @param {*} value - Value on which to query (not case-sensitive).
+     * @return {GlideQueryCondition} Query condition added to the GlideRecord.
+     */
+    addQuery(name: string, value: any): GlideQueryCondition;
+    
+    /**
+     * Provides the ability to build a request, which when executed, returns the rows from the specified table, that match the request.
+     * @param {string} name - Table field name.
+     * @param {QueryOperator} operator - Query operator
+     * @param {*} value - Value on which to query (not case-sensitive).
+     * @return {GlideQueryCondition} The query condition that was added to the GlideRecord.
+     */
+    addQuery(name: string, operator: QueryOperator, value: any): GlideQueryCondition;
+    
+    /**
+     * Adds a filter to return records using an encoded query string.
+     * @param {string} query - An encoded query string.
+     * @return {GlideQueryCondition} The query condition added to the GlideRecord.
+     */
+    addQuery(query: string): GlideQueryCondition;
+    
+    /**
+     * Provides atomic add and subtract operations on a specified number field at the database level for the current GlideRecord object.
+     * @param {string} field - The name of the field in this GlideRecord to modify.
+     * @param {number} value - The amount to add to the value when the record is saved. To perform a subtraction operation, simply pass a negative value.
+     */
+    addValue(field: string, value: number): void;
+    
+    /**
+     * Sets the values of the specified encoded query terms and applies them to the current GlideRecord.
+     * @param {string} queryString - Encoded query to apply to the current GlideRecord.
+     */
+    applyEncodedQuery(queryString: string): void;
+    
+    /**
+     * Determines if the Access Control Rules, which include the user's roles, permit inserting new records in this table.
+     * @return {boolean} Flag that indicates whether the user's roles permit creating of records in this table.
+     */
+    canCreate(): boolean;
+    
+    /**
+     * Determines if the Access Control Rules, which include the user's roles, permit deleting records in this table.
+     * @return {boolean} Flag that indicates whether the user's roles permit deleting of records in this table.
+     */
+    canDelete(): boolean;
+    
+    /**
+     * Determines if the Access Control Rules (ACLs) permit reading records in this table. This method evaluates all ACL types, such as user roles, scripted ACLs, ACLs with scripted conditions, and so on.
+     * @return {boolean} Flag that indicates whether the user's roles permit reading of records in this table.
+     */
+    canRead(): boolean;
+    
+    /**
+     * Determines if the Access Control Rules, which include the user's roles, permit editing records in this table.
+     * @return {boolean} Flag that indicates whether the user's roles permit writing of records in this table.
+     */
+    canWrite(): boolean;
+    
+    /**
+     * Sets a range of rows to be returned by subsequent queries.
+     * @param {number} firstRow - First row to include. Because the index starts at 0, a value of 0 returns the first row.
+     * @param {number} lastRow - 0-based row number of the first row NOT to return. Behaves similar to Java's String.substring(a,b) method.
+     * @param {boolean} [forceCount] - Flag that indicates whether to force a row count query.
+     */
+    chooseWindow(firstRow: number, lastRow: number, forceCount?: boolean): void;
+    
+    /**
+     * Deletes multiple records that satisfy the query condition.
+     */
+    deleteMultiple(): void;
+    
+    /**
+     * Deletes the current record.
+     * @return {boolean} Flag that indicates whether the record was successfully deleted.
+     */
+    deleteRecord(): boolean;
+    
+    /**
+     * Returns the specified record in the current GlideRecord object.
+     * @param {string} name - Name of the instantiated GlideRecord column to search for the specified value parameter.
+     * @param {*} value - Value to match.
+     * @return {boolean} Flag that indicates whether the requested record was located.
+     */
+    get(name: string, value: any): boolean;
+    
+    /**
+     * Returns the specified record in the current GlideRecord object.
+     * @param {*} value - The sys_id or display value to match.
+     * @return {boolean} Flag that indicates whether the requested record was located.
+     */
+    get(value: any): boolean;
+    
+    /**
+     * Returns the dictionary attributes for the specified field.
+     * @param {string} fieldName - Field name for which to return the dictionary attributes.
+     * @return {string} Dictionary attributes
+     */
+    getAttribute(fieldName: string): string;
+    
+    /**
+     * Returns the current table's label.
+     * @return {string} Label that identifies the table.
+     */
+    getClassDisplayValue(): string;
+    
+    /**
+     * Retrieves the display value for the field of the current record.
+     * @param {string} fieldName - Field name for which to return the display value.
+     * @return {string} Display value for the specified field.
+     */
+    getDisplayValue(fieldName?: string): string;
+    
+    /**
+     * Retrieves the display value for the current record.
+     * @return {string} Display value for the current record.
+     */
+    getDisplayValue(): string;
+    
+    /**
+     * Returns the element's descriptor.
+     * @return {GlideElementDescriptor} The element's descriptor.
+     */
+    getED(): GlideElementDescriptor;
+    
+    /**
+     * Retrieves the GlideElement object for the specified field.
+     * @param {string} fieldName - Column name for which to return the GlideElement object.
+     * @return {GlideElement} The GlideElement for the specified column of the current record.
+     */
+    getElement(fieldName: string): GlideElement;
+    
+    /**
+     * Returns an array of GlideElement objects.
+     * @return {GlideElement[]} Array of GlideElement objects. Each object describes a field in the current GlideRecord.
+     */
+    getElements(): GlideElement[];
+    
+    /**
+     * Retrieves the query condition of the current result set as an encoded query string.
+     * @return {string} An encoded query string.
+     */
+    getEncodedQuery(): string;
+    
+    /**
+     * Returns the field's label.
+     * @return {string} The field's label.
+     */
+    getLabel(): string;
+    
+    /**
+     * Retrieves the last error message. If there is no last error message, null is returned.
+     * @return {(string | null)}
+     */
+    getLastErrorMessage(): string | null;
+    
+    /**
+     * Retrieves the link to the current record.
+     * @param {boolean} noStack - Flag indicating whether to append the sysparm_stack parameter to the returned link.
+     * @return {string} Link to the current record.
+     */
+    getLink(noStack: boolean): string;
+    
+    /**
+     * Retrieves the class name for the current record.
+     * @return {string} Retrieves the class name for the current record.
+     */
+    getRecordClassName(): string;
+    
+    /**
+     * Retrieves the number of rows in the query result.
+     * @return {number} Number of rows.
+     */
+    getRowCount(): number;
+    
+    /**
+     * Retrieves the name of the table associated with the GlideRecord.
+     * @return {string} The table name.
+     */
+    getTableName(): string;
+    
+    /**
+     * Gets the primary key of the record, which is usually the sys_id unless otherwise specified.
+     * @return {(string | null)} The unique primary key as a String, or null if the key is null.
+     */
+    getUniqueValue(): string | null;
+    
+    /**
+     * Retrieves the string value of an underlying element in a field.
+     * @param {string} name - The name of the field to get the value from.
+     * @return {(string | null)} The string value of the underlying element. Returns null if the field is empty or the field does not exist. Boolean values return as "0" and "1" string values instead of false and true.
+     */
+    getValue(name: string): string | null;
+    
+    /**
+     * Determines if there are any more records in the GlideRecord object.
+     * @return {boolean} True if there are more records in the query result set.
+     */
+    hasNext(): boolean;
+    
+    /**
+     * Creates an empty record suitable for population before an insert.
+     */
+    initialize(): void;
+    
+    /**
+     * Inserts a new record using the field values that have been set for the current record.
+     * @return {(string | null)} Sys_id of the inserted record, or null if the record is not inserted
+     */
+    insert(): string | null;
+    
+    /**
+     * Checks to see if the current database action is to be aborted.
+     * @return {boolean} Flag that indicates if the current database action is to be aborted.
+     */
+    isActionAborted(): boolean;
+    
+    /**
+     * Verifies whether the specified encoded query is valid.
+     * @param {string} query - Encoded query to validate.
+     * @return {boolean} Flag that indicates whether the specified encoded query is valid.
+     */
+    isEncodedQueryValid(query: string): boolean;
+    
+    /**
+     * Checks if the current record is a new record that has not yet been inserted into the database.
+     * @return {boolean} True if the record is new and has not been inserted into the database.
+     */
+    isNewRecord(): boolean;
+    
+    /**
+     * Determines if the current table is valid or if the record was successfully retrieved.
+     * @return {boolean} Flag that indicates if the table is valid or if the record was successfully retrieved.
+     */
+    isValid(): boolean;
+    
+    /**
+     * Verifies whether the specified encoded query is valid.
+     * @param {string} query - Encoded query to validate.
+     * @return {boolean} Flag that indicates whether the specified encoded query is valid.
+     */
+    isValidEncodedQuery(query: string): boolean;
+    
+    /**
+     * Determines if the specified field is defined in the current table.
+     * @param {string} columnName - The name of the field.
+     * @return {boolean} True if the field is defined for the current table.
+     */
+    isValidField(columnName: string): boolean;
+    
+    /**
+     * Determines if a record was actually returned by the query/get record operation.
+     * @return {boolean} Flag that indicates whether a record was actually returned by the query/get operation.
+     */
+    isValidRecord(): boolean;
+    
+    /**
+     * Verifies whether the record was created in a view or a table.
+     * @return {boolean} Flag that indicates whether the record was created in table that is a view.
+     */
+    isView(): boolean;
+    
+    /**
+     * Creates a new GlideRecord record, sets the default values for the fields, and assigns a unique ID to the record.
+     */
+    newRecord(): void;
+    
+    /**
+     * Moves to the next record in the GlideRecord object.
+     * @return {boolean} Flag that indicates if there is a "next" record in the GlideRecord.
+     */
+    next(): boolean;
+    
+    /**
+     * Moves to the next record in the GlideRecord object.
+     * @return {boolean} Flag that indicates if there is a "next" record in the GlideRecord.
+     */
+    _next(): boolean;
+    
+    /**
+     * Determines if an operation is insert, update, or delete.
+     * @return {GlideRecordOperationType} The current operation.
+     */
+    operation(): GlideRecordOperationType;
+    
+    /**
+     * Specifies an orderBy column. Call this method more than once to order by multiple columns.
+     * @param {string} name - Column name to use to order the records in this GlideRecord object.
+     */
+    orderBy(name: string): void;
+    
+    /**
+     * Specifies a descending orderBy column. Call this method more than once to order by multiple columns.
+     * @param {string} name - Column name to use to order the records in a GlideRecord object.
+     */
+    orderByDesc(name: string): void;
+    
+    /**
+     * Runs a query against the table based on the filters specified by query methods such as addQuery() and addEncodedQuery().
+     * @param {string} field - 
+     * @param {string} value -
+     */
+    query(field: string, value: string): void;
+    
+    /**
+     * Runs a query against the table based on the filters specified by query methods such as addQuery() and addEncodedQuery().
+     */
+    query(): void;
+    
+    /**
+     * Runs a query against the table based on the filters specified by query methods such as addQuery() and addEncodedQuery().
+     * @param {string} field - Name of the field to search for the value specified in the value parameter.
+     * @param {string} value - Value to search for in the specified field parameter.
+     */
+    _query(field: string, value: string): void;
+    
+    /**
+     * Runs a query against the table based on the filters specified by query methods such as addQuery() and addEncodedQuery().
+     */
+    _query(): void;
+    
+    /**
+     * Sets a flag to indicate if the next database action (insert, update, delete) is to be aborted. This is often used in business rules.
+     * @param {boolean} b - True to abort the next action. False if the action is to be allowed.
+     */
+    setAbortAction(b: boolean): void;
+    
+    /**
+     * Sets the limit for number of records are fetched by the GlideRecord query.
+     * @param {number} maxNumRecords - The maximum number of records to fetch.
+     */
+    setLimit(maxNumRecords: number): void;
+    
+    /**
+     * Sets the sys_id value for the current record.
+     * @param {string} guid - GUID to assign to the current record.
+     */
+    setNewGuidValue(guid: string): void;
+    
+    /**
+     * Sets the value of the field with the specified name to the specified value.
+     * @param {string} name - Name of the field.
+     * @param {*} value - Value to assign to the field.
+     */
+    setValue(name: string, value: any): void;
+    
+    /**
+     * Enables or disables the running of business rules, script engines, and audit.
+     * @param {boolean} enable - Enables or disables the running of business rules, script engines, and audit.
+     */
+    setWorkflow(enable: boolean): void;
+    
+    /**
+     * Updates the GlideRecord with any changes that have been made. If the record does not already exist, it is inserted.
+     * @param {string} [reason] - Reason for the update. The reason appears in the audit record.
+     * @return {(string | null)} Sys_id of the new or updated record. Returns null if the update fails.
+     */
+    update(reason?: string): string | null;
+    
+    /**
+     * Updates each GlideRecord in a stated query with a specified set of changes.
+     */
+    updateMultiple(): void;
+
+    equals(obj: object): $$rhino.Boolean;
+    hashCode(): $$rhino.Number;
+    toString(): $$rhino.String;
+    // TODO: Implement _next                  from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement _next                  from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement _query                 from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement _query                 from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addActiveQuery         from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addActiveQuery         from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addEncodedQuery        from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addEncodedQuery        from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addFunction            from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addInactiveQuery       from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addJoinQuery           from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addNotNullQuery        from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addNotNullQuery        from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addNullQuery           from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addNullQuery           from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addQuery               from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement addQuery               from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement applyEncodedQuery      from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement autoSysFields          from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement canCreate              from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement canDelete              from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement canRead                from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement canWrite               from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement chooseWindow           from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement deleteMultiple         from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement deleteMultiple         from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement deleteRecord           from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement deleteRecord           from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement get                    from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement get                    from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getAttribute           from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getBooleanAttribute    from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getCategory            from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getClassDisplayValue   from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getDisplayName         from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getDisplayValue        from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getDisplayValue        from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getED                  from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getElement             from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getElements            from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getEncodedQuery        from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getEscapedDisplayValue from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getLabel               from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getLabel               from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getLastErrorMessage    from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getLink                from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getPlural              from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getRecordClassName     from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getRecordClassName     from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getRowCount            from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getTableName           from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getTableName           from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getUniqueValue         from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getUniqueValue         from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getValue               from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement getValue               from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement hasNext                from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement hasNext                from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement initialize             from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement initialize             from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement insert                 from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement insert                 from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isActionAborted        from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isEncodedQueryValid    from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isNewRecord            from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isNewRecord            from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isValid                from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isValid                from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isValidField           from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isValidRecord          from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isValidRecord          from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement isWorkflow             from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement newRecord              from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement next                   from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement next                   from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement operation              from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement orderBy                from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement orderBy                from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement orderByDesc            from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement orderByDesc            from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement query                  from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement query                  from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement queryNoDomain          from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement setAbortAction         from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement setCategory            from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement setCategory            from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement setLimit               from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement setLimit               from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement setNewGuidValue        from com.glide.script.GlideRecord               under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement setValue               from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement setWorkflow            from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement update                 from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement update                 from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement updateMultiple         from com.glide.script.fencing.ScopedGlideRecord under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement updateMultiple         from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement updateNoDomain         from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+    // TODO: Implement updateWithReferences   from com.glide.script.GlideRecordSandbox        under com.glide.script.fencing.ScopedGlideRecord
+}
+
+/**
+ * TODO: Document GlideRecordSecure
+ * @class GlideRecordSecure
+ * @implements {Packages.com.glide.script.fencing.ScopedGlideRecordSecure}
+ */
+declare class GlideRecordSecure implements Packages.com.glide.script.fencing.ScopedGlideRecordSecure {
     /**
      * Creates an instance of the GlideRecord class for the specified table.
      * @constructor
@@ -1549,13 +2080,13 @@ declare class GlideElement implements Packages.com.glide.script.fencing.ScopedGl
     canCreate(): boolean;
 
     /**
-     * Indicates whether the user's role permits them to read the associated {@link GlideRecord}.
+     * Indicates whether the user's role permits them to read the associated {@link ScopedGlideRecord}.
      * @return {boolean} True if the field can be read; otherwise, false.
      */
     canRead(): boolean;
 
     /**
-     * Determines whether the user's role permits them to write to the associated {@link GlideRecord}.
+     * Determines whether the user's role permits them to write to the associated {@link ScopedGlideRecord}.
      * @return {boolean} True if the user can write to the field; otherwise, false.
      */
     canWrite(): boolean;
@@ -1771,7 +2302,6 @@ declare type JournalGlideElement = {
      * @returns {string} For the most recent entry, returns a string that contains the field label, timestamp, and user display name of the journal entry.For all journal entries, returns the same information for all journal entries ever entered as a single string with each entry delimited by "\n\n".
      */
     getJournalEntry(mostRecent: number): string;
-
 } & GlideElement;
 
 declare type GlideDateTimeElement = {
@@ -1788,6 +2318,8 @@ declare type GlideDateTimeElement = {
     setDateNumericValue(milliseconds: number): void;
 } & GlideElement;
 
+declare type ScopedGlideElementReference = GlideElementReference | GlideElementReferenceSecure;
+
 declare type GlideElementReference = {
     /**
      * Gets the table name for a reference element.
@@ -1795,6 +2327,16 @@ declare type GlideElementReference = {
      */
     getReferenceTable(): string;
 } & GlideElement;
+
+declare type GlideElementReferenceSecure = {
+    
+    /**
+     * Returns a GlideRecord object for a given reference element.
+     * @return {GlideRecordSecure}
+     * @returns {GlideRecordSecure} A GlideRecord object.
+     */
+    getRefRecord(): GlideRecordSecure;
+} & GlideElementReference;
 
 /**
  * TODO: Document GlideElementDescriptor
@@ -3822,25 +4364,6 @@ declare class GlideChoice implements Packages.com.glide.script.fencing.ScopedCho
 }
 
 /**
- * TODO: Document GlideRecordSecure
- * @class GlideRecordSecure
- * @implements {Packages.com.glide.script.fencing.ScopedGlideRecordSecure}
- */
-declare class GlideRecordSecure extends GlideRecord implements Packages.com.glide.script.fencing.ScopedGlideRecordSecure {
-    /**
-     * Creates an instance of the GlideRecordSecure class for the specified table.
-     * @constructor
-     * @param {string} tableName - The table to be used.
-     */
-    constructor(tableName: string);
-
-    // TODO: Implement getValue from com.glide.script.GlideRecordSecure under com.glide.script.fencing.ScopedGlideRecordSecure
-    equals(obj: object): $$rhino.Boolean;
-    hashCode(): $$rhino.Number;
-    toString(): $$rhino.String;
-}
-
-/**
  * TODO: Document GlideappAJAXMapPage
  * @class GlideappAJAXMapPage
  * @implements {Packages.com.glideapp.google_maps.ScopedAJAXMapPage}
@@ -4367,26 +4890,26 @@ declare class GlideSysAttachment implements Packages.com.glide.script.fencing.Gl
     deleteAttachment(attachmentID: $$rhino.String): void;
 
     /**
-     * Returns a GlideRecord containing the matching attachment metadata such as name, type, or size.
+     * Returns a ScopedGlideRecord containing the matching attachment metadata such as name, type, or size.
      * @param {$$rhino.String} tableName - Name of the table to which the attachment belongs; for example, incident.
      * @param {$$rhino.String} sys_id - The sys_id of record to which the attachment belongs.
-     * @return {GlideRecord} GlideRecord object containing the matching attachment metadata such as name, type, or size.
+     * @return {ScopedGlideRecord} ScopedGlideRecord object containing the matching attachment metadata such as name, type, or size.
      */
-    getAttachments(tableName: $$rhino.String, sys_id: $$rhino.String): GlideRecord;
+    getAttachments(tableName: $$rhino.String, sys_id: $$rhino.String): ScopedGlideRecord;
 
     /**
      * Returns the attachment content as a string.
-     * @param {GlideRecord} sysAttachment - Attachment record.
+     * @param {ScopedGlideRecord} sysAttachment - Attachment record.
      * @return {$$rhino.String} Attachment contents as a string. Returns up to 5MB of data.
      */
-    getContent(sysAttachment: GlideRecord): $$rhino.String;
+    getContent(sysAttachment: ScopedGlideRecord): $$rhino.String;
 
     /**
      * Returns the attachment content as a string with base64 encoding.
-     * @param {GlideRecord} sysAttachment - Attachment record.
+     * @param {ScopedGlideRecord} sysAttachment - Attachment record.
      * @return {$$rhino.String} Attachment contents as a string with base64 encoding. Returns up to 5MB of data.
      */
-    getContentBase64(sysAttachment: GlideRecord): $$rhino.String;
+    getContentBase64(sysAttachment: ScopedGlideRecord): $$rhino.String;
 
     /**
      * Returns a GlideScriptableInputStream object given the sys_id of an attachment.
@@ -4397,33 +4920,33 @@ declare class GlideSysAttachment implements Packages.com.glide.script.fencing.Gl
 
     /**
      * Attaches a specified attachment to the specified record.
-     * @param {GlideRecord} record - Record to which to attach the attachment.
+     * @param {ScopedGlideRecord} record - Record to which to attach the attachment.
      * @param {$$rhino.String} fileName - Attachment file name.
      * @param {$$rhino.String} contentType - Attachment content type.
      * @param {$$rhino.String} content - Attachment content.
      * @return {$$rhino.String | null} Attachment sys_id or null if the attachment was not added.
      */
-    write(record: GlideRecord, fileName: $$rhino.String, contentType: $$rhino.String, content: $$rhino.String): $$rhino.String | null;
+    write(record: ScopedGlideRecord, fileName: $$rhino.String, contentType: $$rhino.String, content: $$rhino.String): $$rhino.String | null;
 
     /**
      * 
-     * @param {GlideRecord} now_GR - 
+     * @param {ScopedGlideRecord} now_GR - 
      * @param {$$rhino.String} fileName - 
      * @param {$$rhino.String} contentType - 
      * @param {$$rhino.String} content_base64Encoded - 
      * @return {$$rhino.String}
      */
-    writeBase64(now_GR: GlideRecord, fileName: $$rhino.String, contentType: $$rhino.String, content_base64Encoded: $$rhino.String): $$rhino.String;
+    writeBase64(now_GR: ScopedGlideRecord, fileName: $$rhino.String, contentType: $$rhino.String, content_base64Encoded: $$rhino.String): $$rhino.String;
 
     /**
      * 
-     * @param {GlideRecord} now_GR - 
+     * @param {ScopedGlideRecord} now_GR - 
      * @param {$$rhino.String} fileName - 
      * @param {$$rhino.String} contentType - 
      * @param {GlideScriptableInputStream} inputStream - 
      * @return {$$rhino.String}
      */
-    writeContentStream(now_GR: GlideRecord, fileName: $$rhino.String, contentType: $$rhino.String, inputStream: GlideScriptableInputStream): $$rhino.String;
+    writeContentStream(now_GR: ScopedGlideRecord, fileName: $$rhino.String, contentType: $$rhino.String, inputStream: GlideScriptableInputStream): $$rhino.String;
 
     equals(obj: object): $$rhino.Boolean;
     hashCode(): $$rhino.Number;
@@ -5752,8 +6275,6 @@ declare class GlideCompositeElement implements Packages.com.glide.db.CompositeEl
 }
 
 declare namespace $$tableFields {
-    // #region Done
-    
     export interface IBaseRecord {
         /**
          * "Sys ID" element (sys_id)
@@ -5797,23 +6318,40 @@ declare namespace $$tableFields {
          */
         sys_updated_on: GlideDateTimeElement;
     }
+
+    // /**
+    //  * "Business Unit" glide record fields.
+    //  * @see {@link $$GlideElement.business_unit}
+    //  * @see {@link $$GlideRecord.business_unit}
+    //  */
+    // export interface business_unit extends IBaseRecord {
+    // }
 }
 
+// declare namespace $$GlideRecord {
+//     /**
+//      * "Business Unit" glide record.
+//      */
+//     export type business_unit = $$tableFields.business_unit & ScopedGlideRecord;
+// }
 
 /**
  * Contains helper types for table-specific GlideElement instances.
  * @namespace $$GlideElement
  */
 declare namespace $$GlideElement {
-    // #region Done
-    
     /**
     * Reference
     * scalar_type: GUID; name: reference
     */
-    export type Reference<TFields = $$tableFields.IBaseRecord, TRecord extends GlideRecord & TFields = GlideRecord & TFields> = TFields & {
+    export type Reference<TFields = $$tableFields.IBaseRecord, TRecord extends ScopedGlideRecord & TFields = ScopedGlideRecord & TFields> = TFields & {
         getRefRecord(): TRecord;
     } & GlideElementReference;
+
+    // /**
+    //  * Element that refers to a "Business Unit" glide record.
+    //  */
+    // export type business_unit = Reference<$$tableFields.business_unit, $$GlideRecord.business_unit>;
 }
 
 declare namespace sn_kmf_ns {
