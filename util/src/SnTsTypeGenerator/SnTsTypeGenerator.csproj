@@ -40,4 +40,25 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="appsettings.json" />
+    <AdditionalFiles Include="Resources/ts/global/$$class.d.ts" />
+    <AdditionalFiles Include="Resources/ts/global/$$class.md" />
+    <AdditionalFiles Include="Resources/ts/global/$$rhino.d.ts" />
+    <AdditionalFiles Include="Resources/ts/global/GlideTypes.d.ts" />
+    <AdditionalFiles Include="Resources/ts/global/index.d.ts" />
+    <AdditionalFiles Include="Resources/ts/global/Packages.d.ts" />
+    <AdditionalFiles Include="Resources/ts/global/ScriptIncludes.d.ts" />
+    <AdditionalFiles Include="Resources/ts/global/tsconfig.json" />
+    <AdditionalFiles Include="Resources/ts/scoped/$$class.d.ts" />
+    <AdditionalFiles Include="Resources/ts/scoped/$$class.md" />
+    <AdditionalFiles Include="Resources/ts/scoped/$$rhino.d.ts" />
+    <AdditionalFiles Include="Resources/ts/scoped/ElementTypes.d.ts" />
+    <AdditionalFiles Include="Resources/ts/scoped/GlideScriptable.d.ts" />
+    <AdditionalFiles Include="Resources/ts/scoped/global.d.ts" />
+    <AdditionalFiles Include="Resources/ts/scoped/index.d.ts" />
+    <AdditionalFiles Include="Resources/ts/scoped/Packages.d.ts" />
+    <AdditionalFiles Include="Resources/ts/scoped/sn_kmf_ns.d.ts" />
+    <AdditionalFiles Include="Resources/ts/scoped/tsconfig.json" />
+  </ItemGroup>
 </Project>

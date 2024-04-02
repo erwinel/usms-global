@@ -18,7 +18,6 @@
   - [Development Environment setup](#development-environment-setup)
     - [Create Application Registry](#create-application-registry)
     - [Store Client Secret and User Account Password](#store-client-secret-and-user-account-password)
-  - [TODO](#todo)
 
 Creates `.d.ts` from ServiceNow tables, using the [ServiceNow Table REST API](https://developer.servicenow.com/dev.do#!/reference/api/utah/rest/c_TableAPI).
 
@@ -318,8 +317,3 @@ dotnet user-secrets set "SnTsTypeGenerator:Password" "{password}" --project util
 ```
 
 - See [Safe storage of app secrets in development in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) for more information about user secrets.
-
-## TODO
-
-- [X] Add base type definitions to the `Resources/ts/scoped` folder.
-- [ ] Add files from `Resources/ts` as content items in the project file.
