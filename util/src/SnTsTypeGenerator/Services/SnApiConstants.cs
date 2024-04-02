@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace SnTsTypeGenerator.Services;
 
 internal static class SnApiConstants
@@ -5,6 +7,11 @@ internal static class SnApiConstants
     internal static readonly StringComparer NameComparer = StringComparer.InvariantCultureIgnoreCase;
 
     internal static readonly Uri EmptyURI = new(string.Empty, UriKind.Relative);
+
+    internal static readonly ImmutableArray<string> ReservedBaseNames = new string[]
+    {
+        "$$class", "$$rhino", "ElementTypes", "GlideScriptable", "GlideTypes", "global", "Packages", "ScriptIncludes"
+    }.ToImmutableArray();
 
     internal const string GLOBAL_NAMESPACE = "global";
 
