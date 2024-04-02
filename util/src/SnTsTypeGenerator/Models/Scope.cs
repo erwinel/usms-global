@@ -29,7 +29,7 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
     public string Value
     {
         get => _value;
-        set => _value = value ?? string.Empty;
+        set => _value = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -46,7 +46,7 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
     public string Name
     {
         get => _name;
-        set => _name = value ?? string.Empty;
+        set => _name = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -74,7 +74,7 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
     public string ID
     {
         get => _id;
-        set => _id = value ?? string.Empty;
+        set => _id = value.EmptyIfWhiteSpace();
     }
 
     #endregion

@@ -28,7 +28,7 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
     public string Name
     {
         get => _name;
-        set => _name = value ?? string.Empty;
+        set => _name = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -45,7 +45,7 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
     public string Label
     {
         get => _label;
-        set => _label = value ?? string.Empty;
+        set => _label = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -275,7 +275,7 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
     public string SysID
     {
         get => _sysID;
-        set => _sysID = value ?? string.Empty;
+        set => _sysID = value.EmptyIfWhiteSpace();
     }
 
     #endregion

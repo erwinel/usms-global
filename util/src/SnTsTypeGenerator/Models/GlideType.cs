@@ -28,7 +28,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     public string Name
     {
         get => _name;
-        set => _name = value ?? string.Empty;
+        set => _name = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -45,7 +45,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     public string Label
     {
         get => _label;
-        set => _label = value ?? string.Empty;
+        set => _label = value.EmptyIfWhiteSpace();
     }
 
     #endregion

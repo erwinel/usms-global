@@ -28,7 +28,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     public string Name
     {
         get => _name;
-        set => _name = value ?? string.Empty;
+        set => _name = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -45,7 +45,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     public string Label
     {
         get => _label;
-        set => _label = value ?? string.Empty;
+        set => _label = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -67,7 +67,7 @@ public sealed class Table : IEquatable<Table>, IValidatableObject
     public string AccessibleFrom
     {
         get => _accessibleFrom;
-        set => _accessibleFrom = value ?? string.Empty;
+        set => _accessibleFrom = value.EmptyIfWhiteSpace();
     }
 
     #endregion

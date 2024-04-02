@@ -123,11 +123,17 @@ public static partial class StringExtensionMethods
 
     public static string AsWhitespaceNormalized(this string? text) => text is null || (text = text.Trim()).Length == 0 ? string.Empty : AbnormalWsRegex.Replace(text, " ");
 
+    public static string AsWhitespaceNormalizedOrDefaultIfEmpty(this string? text, string defaultValue) => text is null || (text = text.Trim()).Length == 0 ? defaultValue : AbnormalWsRegex.Replace(text, " ");
+
+    public static string AsWhitespaceNormalizedOrDefaultIfEmpty(this string? text, Func<string> defaultValue) => text is null || (text = text.Trim()).Length == 0 ? defaultValue() : AbnormalWsRegex.Replace(text, " ");
+
     public static string AsNonEmpty(this string? value, Func<string> getDefaultValue) => string.IsNullOrWhiteSpace(value) ? getDefaultValue() : value;
 
     public static string AsNonEmpty(this string? value, string defaultValue) => string.IsNullOrWhiteSpace(value) ? defaultValue : value;
 
     public static string? NullIfWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
+
+    public static string EmptyIfWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value) ? string.Empty : value;
 
     private static readonly ImmutableArray<string> JSDOC_START = new string[] { "/**" }.ToImmutableArray();
 

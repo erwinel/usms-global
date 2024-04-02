@@ -22,7 +22,7 @@ public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
     public string FQDN
     {
         get => _fqdn;
-        set => _fqdn = value ?? string.Empty;
+        set => _fqdn = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -39,7 +39,7 @@ public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
     public string Label
     {
         get => _label;
-        set => _label = value ?? string.Empty;
+        set => _label = value.EmptyIfWhiteSpace();
     }
 
     #endregion
