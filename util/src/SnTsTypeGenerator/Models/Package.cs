@@ -30,7 +30,7 @@ public sealed class Package : IValidatableObject, IEquatable<Package>
     public string ID
     {
         get => _id;
-        set => _id = value ?? string.Empty;
+        set => _id = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -46,7 +46,7 @@ public sealed class Package : IValidatableObject, IEquatable<Package>
     public string Name
     {
         get => _name;
-        set => _name = value ?? string.Empty;
+        set => _name = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -70,16 +70,16 @@ public sealed class Package : IValidatableObject, IEquatable<Package>
 
     #region Group Navigation Property
 
-    private string _groupName = string.Empty;
+    private string _fileName = string.Empty;
 
     /// <summary>
     /// The name of the package group.
     /// </summary>
-    [BackingField(nameof(_groupName))]
-    public string GroupName
+    [BackingField(nameof(_fileName))]
+    public string FileName
     {
-        get { lock (_syncRoot) { return _group?.Name ?? _groupName; } }
-        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _groupName, ref _group, s => s.Name);
+        get { lock (_syncRoot) { return _group?.FileName ?? _fileName; } }
+        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _fileName, ref _group, s => s.FileName);
     }
 
     private PackageGroup? _group;
@@ -90,7 +90,7 @@ public sealed class Package : IValidatableObject, IEquatable<Package>
     public PackageGroup? Group
     {
         get { lock (_syncRoot) { return _group; } }
-        set => SetRequiredNavProperty(_syncRoot, value, ref _groupName, ref _group, s => s.Name);
+        set => SetRequiredNavProperty(_syncRoot, value, ref _fileName, ref _group, s => s.FileName);
     }
 
     #endregion
@@ -214,8 +214,8 @@ public sealed class Package : IValidatableObject, IEquatable<Package>
         {
             if (_id.Length == 0)
                 results.Add(new ValidationResult($"{nameof(ID)} cannot be empty.", new[] { nameof(ID) }));
-            if (string.IsNullOrWhiteSpace(GroupName))
-                results.Add(new ValidationResult($"{nameof(GroupName)} cannot be empty.", new[] { nameof(GroupName) }));
+            if (string.IsNullOrWhiteSpace(FileName))
+                results.Add(new ValidationResult($"{nameof(FileName)} cannot be empty.", new[] { nameof(FileName) }));
             if (string.IsNullOrWhiteSpace(SourceFqdn))
                 results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be empty.", new[] { nameof(SourceFqdn) }));
         }

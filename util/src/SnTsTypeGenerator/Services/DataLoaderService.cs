@@ -16,6 +16,7 @@ public sealed class DataLoaderService : IDisposable
     private readonly TableAPIService _tableAPIService;
     private readonly ILogger<DataLoaderService> _logger;
     private readonly ReadOnlyDictionary<string, KnownGlideType> _knownGlideTypes;
+    private readonly bool _baselineInit;
     private readonly Dictionary<string, string> _tableIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, string> _scopeIdMap = new(StringComparer.InvariantCultureIgnoreCase);
     private readonly Dictionary<string, string> _packageIdMap = new(StringComparer.InvariantCultureIgnoreCase);
@@ -435,8 +436,34 @@ public sealed class DataLoaderService : IDisposable
         return await AddTableAsync(tableRecord, cancellationToken);
     }
 
-    private async Task<PackageGroup> GetPackageGroupAsync(string name, bool activeAndNotLicensable, CancellationToken cancellationToken)
+    // BUG: Package groups can have more than one package name to them.
+    private async Task<PackageGroup> GetPackageGroupAsync(string packageName, string @namespace, bool activeAndNotLicensable, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(packageName)) packageName = GLOBAL_NAMESPACE;
+        if (string.IsNullOrWhiteSpace(@namespace)) @namespace = GLOBAL_NAMESPACE;
+        var packageGroup = await _dbContext.PackageGroups.FirstOrDefaultAsync(g => g.PackageName == packageName && g.Namespace == @namespace, cancellationToken);
+        if (packageGroup is not null) return packageGroup;
+        string fileName;
+        fileName = NameComparer.Equals(packageName, @namespace) ? packageName : $"{packageName}-{@namespace}";
+        
+        if (ReservedBaseNames.Contains(fileName, NameComparer) || (await _dbContext.PackageGroups.FirstOrDefaultAsync(g => g.PackageName == packageName && g.Namespace == @namespace, cancellationToken)) is not null)
+        {
+            string baseName = fileName;
+            int pos = 1;
+            fileName = $"{fileName}-{pos}";
+            while ((await _dbContext.PackageGroups.FirstOrDefaultAsync(g => g.PackageName == packageName && g.Namespace == @namespace, cancellationToken)) is not null)
+            {
+                pos++;
+                fileName = $"{fileName}-{pos}";
+            }
+        }
+
+        packageGroup = new()
+        {
+            PackageName = packageName,
+            Namespace = @namespace,
+            IsBaseline = activeAndNotLicensable && _baselineInit
+        };
         throw new NotImplementedException();
     }
 
@@ -449,6 +476,7 @@ public sealed class DataLoaderService : IDisposable
             return await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken);
         var packageRecord = await _tableAPIService.GetPackageByIDAsync(sys_id, cancellationToken);
         Package? package;
+        string pkgName;
         if (packageRecord is null)
         {
             if (_scopeIdMap.TryGetValue(sys_id, out id))
@@ -457,6 +485,7 @@ public sealed class DataLoaderService : IDisposable
                 if (scope is null)
                     return null;
                 id = scope.ID;
+                pkgName = pkgRef.Name.AsNonEmpty(scope.Value);
                 if ((package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken)) is null)
                 {
                     package = new()
@@ -467,7 +496,7 @@ public sealed class DataLoaderService : IDisposable
                         SysID = sys_id,
                         LastUpdated = DateTime.Now,
                         Source = source,
-                        Group = await GetPackageGroupAsync(scope.Name, false, cancellationToken)
+                        Group = await GetPackageGroupAsync(pkgName, scope.Name, false, cancellationToken)
                     };
                     await _dbContext.Packages.AddAsync(package, cancellationToken);
                     await _dbContext.SaveChangesAsync(cancellationToken);
@@ -475,8 +504,23 @@ public sealed class DataLoaderService : IDisposable
             }
             else
             {
-                var name = pkgRef.Name;
-                if (name is null || (package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken)) is null)
+                var name = pkgRef.Name.AsNonEmpty(GLOBAL_NAMESPACE);
+                if (string.IsNullOrWhiteSpace(pkgRef.Name))
+                {
+                    pkgName = GLOBAL_NAMESPACE;
+                    package = new()
+                    {
+                        ID = pkgName,
+                        Name = pkgName,
+                        SysID = sys_id,
+                        LastUpdated = DateTime.Now,
+                        Source = source,
+                        Group = await GetPackageGroupAsync(pkgName, pkgName, false, cancellationToken)
+                    };
+                    await _dbContext.Packages.AddAsync(package, cancellationToken);
+                    await _dbContext.SaveChangesAsync(cancellationToken);
+                }
+                else if ((package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name, cancellationToken)) is null)
                     return null;
                 id = package.ID;
             }
@@ -492,7 +536,8 @@ public sealed class DataLoaderService : IDisposable
                 SysID = sys_id,
                 LastUpdated = DateTime.Now,
                 Source = source,
-                Group = await GetPackageGroupAsync(packageRecord.Name, packageRecord.Active && !packageRecord.Licensable, cancellationToken)
+                // BUG: Need to re-do logic for getting scope and package
+                Group = await GetPackageGroupAsync(packageRecord.Name, packageRecord.Name, packageRecord.Active && !packageRecord.Licensable, cancellationToken)
             };
             // if (packageRecord is ScopeRecord scopeRecord)
             // {
@@ -587,7 +632,9 @@ public sealed class DataLoaderService : IDisposable
         _dbContext = dbContext;
         _tableAPIService = tableAPIService;
         _logger = logger;
-        _knownGlideTypes = appSettingsOptions.Value.GetKnownGlideTypes();
+        var appSettings = appSettingsOptions.Value;
+        _knownGlideTypes = appSettings.GetKnownGlideTypes();
+        _baselineInit = appSettings.BaselineInit ?? false;
     }
 
     private void Dispose(bool disposing)
