@@ -244,8 +244,8 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
                 results.Add(new ValidationResult($"{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
             if (string.IsNullOrWhiteSpace(_label))
                 results.Add(new ValidationResult($"{nameof(Label)} cannot be empty.", new[] { nameof(Label) }));
-            if (_sourceFqdn is null)
-                results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be null.", new[] { nameof(SourceFqdn) }));
+            if (string.IsNullOrWhiteSpace(SourceFqdn))
+                results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be empty.", new[] { nameof(SourceFqdn) }));
         }
         return results;
     }

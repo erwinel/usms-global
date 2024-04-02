@@ -166,7 +166,7 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
                 results.Add(new ValidationResult($"{nameof(Value)} cannot be empty.", new[] { nameof(Value) }));
             if (string.IsNullOrWhiteSpace(_name))
                 results.Add(new ValidationResult($"{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
-            if (_sourceFqdn.Length == 0)
+            if (string.IsNullOrWhiteSpace(SourceFqdn))
                 results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be empty.", new[] { nameof(SourceFqdn) }));
         }
         return results;
