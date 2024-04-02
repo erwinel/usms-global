@@ -58,7 +58,6 @@
     <AdditionalFiles Include="Resources/ts/scoped/global.d.ts" />
     <AdditionalFiles Include="Resources/ts/scoped/index.d.ts" />
     <AdditionalFiles Include="Resources/ts/scoped/Packages.d.ts" />
-    <AdditionalFiles Include="Resources/ts/scoped/sn_kmf_ns.d.ts" />
     <AdditionalFiles Include="Resources/ts/scoped/tsconfig.json" />
   </ItemGroup>
 </Project>
