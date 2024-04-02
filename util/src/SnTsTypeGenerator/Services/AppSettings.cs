@@ -78,6 +78,16 @@ public class AppSettings
     public string? Mode { get; set; }
 
     /// <summary>
+    /// All newly found packages that are active and not licensable on the remote instance are to be considered baseline.
+    /// </summary>
+    public bool? BaselineInit { get; set; }
+
+    /// <summary>
+    /// Synchronize Resources/PackageGroups.json with database contents.
+    /// </summary>
+    public bool? SetPackageGroups { get; set; }
+
+    /// <summary>
     /// Gets the glide type mappings to refer to when adding new rows to the <see cref="Models.GlideType"/> table.
     /// </summary>
     public List<KnownGlideType>? KnownGlideTypes { get; set; }
@@ -148,6 +158,10 @@ public class AppSettings
         { $"-{SHORTHAND_f}", $"{nameof(SnTsTypeGenerator)}:{nameof(ForceOverwrite)}" },
         { $"--{SHORTHAND_force}", $"{nameof(SnTsTypeGenerator)}:{nameof(ForceOverwrite)}" },
         { $"--{nameof(ForceOverwrite)}", $"{nameof(SnTsTypeGenerator)}:{nameof(ForceOverwrite)}" },
+        { $"-{SHORTHAND_n}", $"{nameof(SnTsTypeGenerator)}:{nameof(BaselineInit)}" },
+        { $"--{nameof(BaselineInit)}", $"{nameof(SnTsTypeGenerator)}:{nameof(BaselineInit)}" },
+        { $"-{SHORTHAND_g}", $"{nameof(SnTsTypeGenerator)}:{nameof(SetPackageGroups)}" },
+        { $"--{nameof(SetPackageGroups)}", $"{nameof(SnTsTypeGenerator)}:{nameof(SetPackageGroups)}" },
         { $"-{SHORTHAND_h}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
         { $"-{SHORTHAND__3F_}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
         { $"--{nameof(Help)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" }

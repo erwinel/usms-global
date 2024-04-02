@@ -14,7 +14,7 @@ namespace SnTsTypeGenerator.Models;
 /// https://dev93009.service-now.com/nav_to.do?uri=sys_db_object.do?sys_id=c7795303b4232110320f8dc279c80442
 /// </summary>
 [Table(nameof(Services.TypingsDbContext.Packages))]
-public sealed class Package : IValidatableObject
+public sealed class Package : IValidatableObject, IEquatable<Package>
 {
     private readonly object _syncRoot = new();
 
@@ -64,14 +64,36 @@ public sealed class Package : IValidatableObject
     #endregion
 
     /// <summary>
-    /// Indicates whether the package is considered a baseline package.
-    /// </summary>
-    public bool IsBaseline { get; set; }
-
-    /// <summary>
     /// Date and time that this record was last updated.
     /// </summary>
     public DateTime LastUpdated { get; set; }
+
+    #region Group Navigation Property
+
+    private string _groupName = string.Empty;
+
+    /// <summary>
+    /// The name of the package group.
+    /// </summary>
+    [BackingField(nameof(_groupName))]
+    public string GroupName
+    {
+        get { lock (_syncRoot) { return _group?.Name ?? _groupName; } }
+        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _groupName, ref _group, s => s.Name);
+    }
+
+    private PackageGroup? _group;
+
+    /// <summary>
+    /// The record representing the package group (output file).
+    /// </summary>
+    public PackageGroup? Group
+    {
+        get { lock (_syncRoot) { return _group; } }
+        set => SetRequiredNavProperty(_syncRoot, value, ref _groupName, ref _group, s => s.Name);
+    }
+
+    #endregion
 
     #region Source Navigation Property
 
@@ -191,8 +213,10 @@ public sealed class Package : IValidatableObject
         if (entry is not null)
         {
             if (_id.Length == 0)
-                results.Add(new ValidationResult($"{nameof(ID)} cannot be empty.", new[] { nameof(SourceFqdn) }));
-            if (_sourceFqdn.Length == 0)
+                results.Add(new ValidationResult($"{nameof(ID)} cannot be empty.", new[] { nameof(ID) }));
+            if (string.IsNullOrWhiteSpace(GroupName))
+                results.Add(new ValidationResult($"{nameof(GroupName)} cannot be empty.", new[] { nameof(GroupName) }));
+            if (string.IsNullOrWhiteSpace(SourceFqdn))
                 results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be empty.", new[] { nameof(SourceFqdn) }));
         }
         return results;

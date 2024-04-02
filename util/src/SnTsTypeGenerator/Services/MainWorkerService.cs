@@ -112,7 +112,11 @@ public sealed class MainWorkerService : BackgroundService
             }
 
             writeBooleanSwitch(SHORTHAND_f, "Overwrites the existing output file if it already exist.",
-                "If this option is not present, and the output file already exists, this will return wiht an error.");
+                "If this option is not present, and the output file already exists, this will return with an error.");
+
+            writeBooleanSwitch(SHORTHAND_n, "All newly found packages that are active and not licensable on the remote instance are to be considered baseline.");
+
+            writeBooleanSwitch(SHORTHAND_g, "Synchronize Resources/PackageGroups.json with database contents.");
 
             writeValueSwitch(SHORTHAND_d, "filename",
                 "Specifies the database file, relative to the current working directory. This defaults to a file named \"Typings.db\" in the same subdirectory as the application executable.");

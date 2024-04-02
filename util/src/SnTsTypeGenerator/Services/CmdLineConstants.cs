@@ -65,6 +65,16 @@ public static class CmdLineConstants
     public const char SHORTHAND_o = 'o';
 
     /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.SetPackageGroups" /></c> setting.
+    /// </summary>
+    public const char SHORTHAND_g = 'g';
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.BaselineInit" /></c> setting.
+    /// </summary>
+    public const char SHORTHAND_n = 'n';
+
+    /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.ForceOverwrite" /></c> setting.
     /// </summary>
     public const char SHORTHAND_f = 'f';

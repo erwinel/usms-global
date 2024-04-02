@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -435,6 +436,11 @@ public sealed class DataLoaderService : IDisposable
         return await AddTableAsync(tableRecord, cancellationToken);
     }
 
+    private async Task<PackageGroup> GetPackageGroupAsync(string name, bool activeAndNotLicensable, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     private async Task<Package?> FromPackageRefAsync(PackageRef? pkgRef, SncSource source, CancellationToken cancellationToken)
     {
         if (pkgRef is null)
@@ -461,7 +467,8 @@ public sealed class DataLoaderService : IDisposable
                         Version = scope.Version,
                         SysID = sys_id,
                         LastUpdated = DateTime.Now,
-                        Source = source
+                        Source = source,
+                        Group = await GetPackageGroupAsync(scope.Name, false, cancellationToken)
                     };
                     await _dbContext.Packages.AddAsync(package, cancellationToken);
                     await _dbContext.SaveChangesAsync(cancellationToken);
@@ -486,7 +493,7 @@ public sealed class DataLoaderService : IDisposable
                 SysID = sys_id,
                 LastUpdated = DateTime.Now,
                 Source = source,
-                IsBaseline = packageRecord.Active && !packageRecord.Licensable
+                Group = await GetPackageGroupAsync(packageRecord.Name, packageRecord.Active && !packageRecord.Licensable, cancellationToken)
             };
             // if (packageRecord is ScopeRecord scopeRecord)
             // {
@@ -500,7 +507,7 @@ public sealed class DataLoaderService : IDisposable
             await _dbContext.SaveChangesAsync(cancellationToken);
             // if (packageRecord is PluginRecord pluginRecord && pluginRecord.ParentID is not null)
             // {
-                // TODO: Ensure parent is in DB and set parent
+            // TODO: Ensure parent is in DB and set parent
             // }
         }
         _packageIdMap.Add(sys_id, id);
