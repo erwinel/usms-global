@@ -60,12 +60,10 @@ public partial class TypingsDbContext : DbContext
     private static IEnumerable<string> GetPackageGroupDbInitCommands()
     {
         yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(PackageGroups)}"" (
-    ""{nameof(PackageGroup.FileName)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(PackageGroup.PackageName)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(PackageGroup.Namespace)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(PackageGroup.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(PackageGroup.IsBaseline)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(PackageGroup.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    CONSTRAINT ""PK_{nameof(PackageGroups)}"" PRIMARY KEY(""{nameof(PackageGroup.FileName)}"")
+    CONSTRAINT ""PK_{nameof(PackageGroups)}"" PRIMARY KEY(""{nameof(PackageGroup.Name)}"")
 )";
     }
 
@@ -362,10 +360,8 @@ public partial class TypingsDbContext : DbContext
                 })
                 .Entity<PackageGroup>(builder =>
                 {
-                    _ = builder.HasKey(s => s.FileName);
-                    _ = builder.Property(nameof(PackageGroup.FileName)).UseCollation(COLLATION_NOCASE);
-                    _ = builder.Property(nameof(PackageGroup.PackageName)).UseCollation(COLLATION_NOCASE);
-                    _ = builder.Property(nameof(PackageGroup.Namespace)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.HasKey(s => s.Name);
+                    _ = builder.Property(nameof(PackageGroup.Name)).UseCollation(COLLATION_NOCASE);
                 })
                 .Entity<Package>(builder =>
                 {
@@ -373,10 +369,10 @@ public partial class TypingsDbContext : DbContext
                     _ = builder.Property(nameof(Package.ID)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Package.Name)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Package.Version)).UseCollation(COLLATION_NOCASE);
-                    _ = builder.Property(nameof(Package.FileName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(Package.GroupName)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Package.SourceFqdn)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(Package.SysID)).UseCollation(COLLATION_NOCASE);
-                    _ = builder.HasOne(t => t.Group).WithMany(s => s.Packages).HasForeignKey(t => t.FileName).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                    _ = builder.HasOne(t => t.Group).WithMany(s => s.Packages).HasForeignKey(t => t.GroupName).IsRequired().OnDelete(DeleteBehavior.Restrict);
                     _ = builder.HasOne(t => t.Source).WithMany(s => s.Packages).HasForeignKey(t => t.SourceFqdn).IsRequired().OnDelete(DeleteBehavior.Restrict);
                     _ = builder.HasOne(t => t.Parent).WithMany(s => s.Children).HasForeignKey(t => t.ParentID).OnDelete(DeleteBehavior.Restrict);
                 })

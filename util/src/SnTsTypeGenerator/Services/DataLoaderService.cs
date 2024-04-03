@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,11 +18,14 @@ public sealed class DataLoaderService : IDisposable
     private readonly ILogger<DataLoaderService> _logger;
     private readonly ReadOnlyDictionary<string, KnownGlideType> _knownGlideTypes;
     private readonly bool _baselineInit;
-    private readonly Dictionary<string, string> _tableIdMap = new(StringComparer.InvariantCultureIgnoreCase);
-    private readonly Dictionary<string, string> _scopeIdMap = new(StringComparer.InvariantCultureIgnoreCase);
-    private readonly Dictionary<string, string> _packageIdMap = new(StringComparer.InvariantCultureIgnoreCase);
-    private readonly Dictionary<string, SncSource> _sourceCache = new(StringComparer.InvariantCultureIgnoreCase);
-
+    private readonly Dictionary<string, string> _tableIdMap = new(NameComparer);
+    private readonly Dictionary<string, string> _scopeIdMap = new(NameComparer);
+    private readonly Dictionary<string, string> _packageIdMap = new(NameComparer);
+    private readonly Dictionary<string, SncSource> _sourceCache = new(NameComparer);
+    private readonly Dictionary<string, string> _packageGroupMap = new(NameComparer);
+    private readonly ImmutableArray<string> _defaultBaselinePackageGroups;
+    /// 
+    /// 
     /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
@@ -102,6 +106,7 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
+                    Scope: null,
                     SourceFqdn: sourceFqdn),
                 new(
                     Name: JSON_KEY_SYS_CREATED_BY,
@@ -122,6 +127,7 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
+                    Scope: null,
                     SourceFqdn: sourceFqdn),
                 new(
                     Name: JSON_KEY_SYS_CREATED_ON,
@@ -142,6 +148,7 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
+                    Scope: null,
                     SourceFqdn: sourceFqdn),
                 new(
                     Name: JSON_KEY_SYS_MOD_COUNT,
@@ -162,6 +169,7 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
+                    Scope: null,
                     SourceFqdn: sourceFqdn),
                 new(
                     Name: JSON_KEY_SYS_UPDATED_BY,
@@ -182,6 +190,7 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
+                    Scope: null,
                     SourceFqdn: sourceFqdn),
                 new(
                     Name: JSON_KEY_SYS_UPDATED_ON,
@@ -202,6 +211,7 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
+                    Scope: null,
                     SourceFqdn: sourceFqdn)
             }, table, cancellationToken);
         }
@@ -439,31 +449,6 @@ public sealed class DataLoaderService : IDisposable
     // BUG: Package groups can have more than one package name to them.
     private async Task<PackageGroup> GetPackageGroupAsync(string packageName, string @namespace, bool activeAndNotLicensable, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(packageName)) packageName = GLOBAL_NAMESPACE;
-        if (string.IsNullOrWhiteSpace(@namespace)) @namespace = GLOBAL_NAMESPACE;
-        var packageGroup = await _dbContext.PackageGroups.FirstOrDefaultAsync(g => g.PackageName == packageName && g.Namespace == @namespace, cancellationToken);
-        if (packageGroup is not null) return packageGroup;
-        string fileName;
-        fileName = NameComparer.Equals(packageName, @namespace) ? packageName : $"{packageName}-{@namespace}";
-        
-        if (ReservedBaseNames.Contains(fileName, NameComparer) || (await _dbContext.PackageGroups.FirstOrDefaultAsync(g => g.PackageName == packageName && g.Namespace == @namespace, cancellationToken)) is not null)
-        {
-            string baseName = fileName;
-            int pos = 1;
-            fileName = $"{fileName}-{pos}";
-            while ((await _dbContext.PackageGroups.FirstOrDefaultAsync(g => g.PackageName == packageName && g.Namespace == @namespace, cancellationToken)) is not null)
-            {
-                pos++;
-                fileName = $"{fileName}-{pos}";
-            }
-        }
-
-        packageGroup = new()
-        {
-            PackageName = packageName,
-            Namespace = @namespace,
-            IsBaseline = activeAndNotLicensable && _baselineInit
-        };
         throw new NotImplementedException();
     }
 
@@ -635,6 +620,33 @@ public sealed class DataLoaderService : IDisposable
         var appSettings = appSettingsOptions.Value;
         _knownGlideTypes = appSettings.GetKnownGlideTypes();
         _baselineInit = appSettings.BaselineInit ?? false;
+        if (appSettings.DefaultPackageGroups is not null)
+        {
+            List<string> baselinePackageGroups = new();
+            Dictionary<string, string> pkgMap = new(NameComparer);
+            foreach (DefaultPackageGroup g in appSettings.DefaultPackageGroups)
+            {
+                if (g is null || g.Packages is null || g.Packages.Count == 0) continue;
+                var n = g.Name.AsWhitespaceNormalizedOrDefaultIfEmpty(GLOBAL_NAMESPACE);
+                if (g.IsBaseline.HasValue)
+                {
+                    if (g.IsBaseline.Value)
+                        baselinePackageGroups.Add(n);
+                    else
+                        baselinePackageGroups.Remove(n);
+                }
+                foreach (var p in g.Packages.Select(v => v.AsWhitespaceNormalizedOrDefaultIfEmpty(GLOBAL_NAMESPACE)))
+                {
+                    if (_packageGroupMap.ContainsKey(p))
+                        _packageGroupMap[p] = n;
+                    else
+                        _packageGroupMap.Add(p, n);
+                }
+            }
+            _defaultBaselinePackageGroups = baselinePackageGroups.ToArray().Distinct(NameComparer).ToArray().ToImmutableArray();
+        }
+        else
+            _defaultBaselinePackageGroups = ImmutableArray<string>.Empty;
     }
 
     private void Dispose(bool disposing)

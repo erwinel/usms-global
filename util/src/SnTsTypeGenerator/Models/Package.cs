@@ -70,16 +70,16 @@ public sealed class Package : IValidatableObject, IEquatable<Package>
 
     #region Group Navigation Property
 
-    private string _fileName = string.Empty;
+    private string _groupName = string.Empty;
 
     /// <summary>
     /// The name of the package group.
     /// </summary>
-    [BackingField(nameof(_fileName))]
-    public string FileName
+    [BackingField(nameof(_groupName))]
+    public string GroupName
     {
-        get { lock (_syncRoot) { return _group?.FileName ?? _fileName; } }
-        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _fileName, ref _group, s => s.FileName);
+        get { lock (_syncRoot) { return _group?.Name ?? _groupName; } }
+        set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _groupName, ref _group, s => s.Name);
     }
 
     private PackageGroup? _group;
@@ -90,7 +90,7 @@ public sealed class Package : IValidatableObject, IEquatable<Package>
     public PackageGroup? Group
     {
         get { lock (_syncRoot) { return _group; } }
-        set => SetRequiredNavProperty(_syncRoot, value, ref _fileName, ref _group, s => s.FileName);
+        set => SetRequiredNavProperty(_syncRoot, value, ref _groupName, ref _group, s => s.Name);
     }
 
     #endregion
@@ -214,8 +214,8 @@ public sealed class Package : IValidatableObject, IEquatable<Package>
         {
             if (_id.Length == 0)
                 results.Add(new ValidationResult($"{nameof(ID)} cannot be empty.", new[] { nameof(ID) }));
-            if (string.IsNullOrWhiteSpace(FileName))
-                results.Add(new ValidationResult($"{nameof(FileName)} cannot be empty.", new[] { nameof(FileName) }));
+            if (string.IsNullOrWhiteSpace(GroupName))
+                results.Add(new ValidationResult($"{nameof(GroupName)} cannot be empty.", new[] { nameof(GroupName) }));
             if (string.IsNullOrWhiteSpace(SourceFqdn))
                 results.Add(new ValidationResult($"{nameof(SourceFqdn)} cannot be empty.", new[] { nameof(SourceFqdn) }));
         }
