@@ -83,14 +83,19 @@ public class AppSettings
     public bool? BaselineInit { get; set; }
 
     /// <summary>
-    /// Synchronize Resources/PackageGroups.json with database contents.
+    /// Gets package groups listed in <see cref="TypingsDbContext.PackageGroups"/> and <see cref="DefaultPackageGroups"/>.
     /// </summary>
-    public bool? SetPackageGroups { get; set; }
+    public bool? GetPackageGroups { get; set; }
 
     /// <summary>
     /// Gets the glide type mappings to refer to when adding new rows to the <see cref="Models.GlideType"/> table.
     /// </summary>
     public List<KnownGlideType>? KnownGlideTypes { get; set; }
+
+    /// /// <summary>
+    /// Gets the glide type mappings to refer to when adding new rows to the <see cref="Models.GlideType"/> table.
+    /// </summary>
+    public List<DefaultPackageGroup>? DefaultPackageGroups { get; set; }
 
     public bool? Help { get; set; }
 
@@ -160,8 +165,8 @@ public class AppSettings
         { $"--{nameof(ForceOverwrite)}", $"{nameof(SnTsTypeGenerator)}:{nameof(ForceOverwrite)}" },
         { $"-{SHORTHAND_n}", $"{nameof(SnTsTypeGenerator)}:{nameof(BaselineInit)}" },
         { $"--{nameof(BaselineInit)}", $"{nameof(SnTsTypeGenerator)}:{nameof(BaselineInit)}" },
-        { $"-{SHORTHAND_g}", $"{nameof(SnTsTypeGenerator)}:{nameof(SetPackageGroups)}" },
-        { $"--{nameof(SetPackageGroups)}", $"{nameof(SnTsTypeGenerator)}:{nameof(SetPackageGroups)}" },
+        { $"-{SHORTHAND_g}", $"{nameof(SnTsTypeGenerator)}:{nameof(GetPackageGroups)}" },
+        { $"--{nameof(GetPackageGroups)}", $"{nameof(SnTsTypeGenerator)}:{nameof(GetPackageGroups)}" },
         { $"-{SHORTHAND_h}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
         { $"-{SHORTHAND__3F_}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
         { $"--{nameof(Help)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" }

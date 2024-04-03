@@ -116,7 +116,7 @@ public sealed class MainWorkerService : BackgroundService
 
             writeBooleanSwitch(SHORTHAND_n, "All newly found packages that are active and not licensable on the remote instance are to be considered baseline.");
 
-            writeBooleanSwitch(SHORTHAND_g, "Synchronize Resources/PackageGroups.json with database contents.");
+            writeBooleanSwitch(SHORTHAND_g, "Display package groups from database and app settings.");
 
             writeValueSwitch(SHORTHAND_d, "filename",
                 "Specifies the database file, relative to the current working directory. This defaults to a file named \"Typings.db\" in the same subdirectory as the application executable.");

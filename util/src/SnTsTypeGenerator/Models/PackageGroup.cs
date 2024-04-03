@@ -11,51 +11,18 @@ namespace SnTsTypeGenerator.Models;
 [Table(nameof(Services.TypingsDbContext.PackageGroups))]
 public class PackageGroup : IValidatableObject, IEquatable<PackageGroup>
 {
-    #region FileName Property
+    #region Name Property
 
-    private string _fileName = string.Empty;
+    private string _name = string.Empty;
 
     /// <summary>
     /// Gets or sets the package name.
     /// </summary>
-    [BackingField(nameof(_fileName))]
-    public string FileName
+    [BackingField(nameof(_name))]
+    public string Name
     {
-        get => _fileName;
-        set => _fileName = value.EmptyIfWhiteSpace();
-    }
-
-    #endregion
-
-    #region PackageName Property
-
-    private string _packageName = string.Empty;
-
-    // BUG: Package groups can have more than one package name to them. Maybe use 'DefaultPackageName'?
-    /// <summary>
-    /// Gets or sets the package name.
-    /// </summary>
-    [BackingField(nameof(_packageName))]
-    public string PackageName
-    {
-        get => _packageName;
-        set => _packageName = value.EmptyIfWhiteSpace();
-    }
-
-    #endregion
-
-    #region Namespace Property
-
-    private string _namespace = GLOBAL_NAMESPACE;
-
-    /// <summary>
-    /// Gets or sets the namespace scope.
-    /// </summary>
-    [BackingField(nameof(_namespace))]
-    public string Namespace
-    {
-        get => _namespace;
-        set => _namespace = value.AsNonEmpty(GLOBAL_NAMESPACE);
+        get => _name;
+        set => _name = value.EmptyIfWhiteSpace();
     }
 
     #endregion
@@ -76,17 +43,17 @@ public class PackageGroup : IValidatableObject, IEquatable<PackageGroup>
         var entry = validationContext.GetService(typeof(EntityEntry)) as EntityEntry;
         if (entry is not null)
         {
-            if (string.IsNullOrWhiteSpace(_packageName))
-                results.Add(new ValidationResult($"{nameof(PackageName)} cannot be empty.", new[] { nameof(PackageName) }));
+            if (string.IsNullOrWhiteSpace(_name))
+                results.Add(new ValidationResult($"{nameof(Name)} cannot be empty.", new[] { nameof(Name) }));
         }
         return results;
     }
 
-    public bool Equals(PackageGroup? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_packageName, other._packageName));
+    public bool Equals(PackageGroup? other) => other is not null && (ReferenceEquals(this, other) || NameComparer.Equals(_name, other._name));
 
     public override bool Equals(object? obj) => obj is PackageGroup other && Equals(other);
 
-    public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_packageName);
+    public override int GetHashCode() => NameComparer.GetHashCode(_name);
 
     #region Packages Property
 
@@ -100,7 +67,7 @@ public class PackageGroup : IValidatableObject, IEquatable<PackageGroup>
 
     public override string ToString() => nameof(PackageGroup) + new JsonObject()
     {
-        { nameof(PackageName), JsonValue.Create(_packageName) },
+        { nameof(Name), JsonValue.Create(_name) },
         { nameof(IsBaseline), JsonValue.Create(IsBaseline) }
     }.ToJsonString();
 }
