@@ -183,6 +183,7 @@ public sealed class TableAPIService
                         Comments: sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_COMMENTS),
                         IsDisplay: sysDictionary.GetFieldAsBoolean(JSON_KEY_DISPLAY),
                         DefaultValue: sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_DEFAULT_VALUE),
+                        Scope: DeserializeProperty(sysDictionary, JSON_KEY_SYS_SCOPE, (id, name) => new ScopeRef(ID: id, Name: name.NullIfWhiteSpace())),
                         Package: DeserializeProperty(sysDictionary, JSON_KEY_SYS_PACKAGE, (sys_id, name) => new PackageRef(SysID: sys_id, Name: name.NullIfWhiteSpace())),
                         SourceFqdn: requestUri.Host);
                     return elementRecord;
