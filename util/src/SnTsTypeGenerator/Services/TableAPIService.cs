@@ -207,25 +207,40 @@ public sealed class TableAPIService
         if (!_handler.InitSuccessful)
             throw new InvalidOperationException();
         _logger.LogGettingScopeByIdentifierFromRemote(id);
-        (Uri requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
+        // (Uri requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
+        (Uri requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_STORE_APP, id, cancellationToken);
+        string? sys_id, value;
         if (sysScopeResult is null)
         {
-            (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_STORE_APP, id, cancellationToken);
+            (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_APP, id, cancellationToken);
             if (sysScopeResult is null)
             {
-                (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_APP, id, cancellationToken);
+                (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
                 if (sysScopeResult is null)
                 {
                     _logger.LogNoResultsFromQuery(requestUri, responseObj);
                     return null;
                 }
             }
+            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out sys_id))
+                throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SYS_ID);
+            if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out value))
+                throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SCOPE);
+            return new(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
+                Value: value,
+                ID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SOURCE),
+                Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
+                ShortDescription: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SHORT_DESCRIPTION),
+                SysID: sys_id,
+                Licensable: sysScopeResult.GetFieldAsBoolean(JSON_KEY_LICENSABLE),
+                Active: sysScopeResult.GetFieldAsBoolean(JSON_KEY_ACTIVE),
+                SourceFqdn: requestUri.Host);
         }
-        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out string? sys_id))
+        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SYS_ID, out sys_id))
             throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SYS_ID);
-        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out string? value))
+        if (!sysScopeResult.TryGetFieldAsNonEmpty(JSON_KEY_SCOPE, out value))
             throw new ExpectedPropertyNotFoundException(requestUri, responseObj, JSON_KEY_SCOPE);
-        return new(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
+        return new StoreAppRecord(Name: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_NAME, value),
             Value: value,
             ID: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_SOURCE),
             Version: sysScopeResult.GetFieldAsNonEmpty(JSON_KEY_VERSION),
@@ -233,6 +248,7 @@ public sealed class TableAPIService
             SysID: sys_id,
             Licensable: sysScopeResult.GetFieldAsBoolean(JSON_KEY_LICENSABLE),
             Active: sysScopeResult.GetFieldAsBoolean(JSON_KEY_ACTIVE),
+            Dependencies: sysScopeResult.GetFieldAsStringArray(JSON_KEY_DEPENDENCIES),
             SourceFqdn: requestUri.Host);
     }
 
