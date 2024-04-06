@@ -17,7 +17,7 @@ namespace SnTsTypeGenerator.Models;
 /// <param name="Active">The value of the <c><see cref="JSON_KEY_ACTIVE" />.value</c> property.</param>
 public record RemotePackage(string ID, string Name, string Version, string SysID, bool Licensable, string SubscriptionRequirement, bool Active)
 {
-    internal static RemoteApplication? ApplicationFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray)
+    internal static RemoteApplication? ApplicationFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysScope)
             throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
@@ -69,7 +69,7 @@ public record RemotePackage(string ID, string Name, string Version, string SysID
             Active: sysScope.GetFieldAsBoolean(JSON_KEY_ACTIVE));
     }
     
-    internal static RemoteSysPlugin? PluginFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray)
+    internal static RemoteSysPlugin? PluginFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysPlugin)
             throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
@@ -121,7 +121,7 @@ public record RemotePackage(string ID, string Name, string Version, string SysID
             Active: sysPlugin.GetFieldAsBoolean(JSON_KEY_ACTIVE));
     }
     
-    internal static RemotePackage? PackageFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray)
+    internal static RemotePackage? PackageFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysPackage)
             throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
@@ -168,7 +168,7 @@ public record RemotePackage(string ID, string Name, string Version, string SysID
             Active: sysPackage.GetFieldAsBoolean(JSON_KEY_ACTIVE));
     }
     
-    internal static RemoteCustomApplication? CustomApplicationFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray)
+    internal static RemoteCustomApplication? CustomApplicationFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysApp)
             throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
@@ -225,7 +225,7 @@ public record RemotePackage(string ID, string Name, string Version, string SysID
             Dependencies: sysApp.GetFieldAsStringArray(JSON_KEY_DEPENDENCIES));
     }
 
-    internal static RemoteStoreApp? StoreAppFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray)
+    internal static RemoteStoreApp? StoreAppFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysStoreApp)
             throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());

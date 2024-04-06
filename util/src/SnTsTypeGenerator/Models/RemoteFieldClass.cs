@@ -18,10 +18,10 @@ namespace SnTsTypeGenerator.Models;
 /// <param name="IsVisible">The boolean value of the <c><see cref="JSON_KEY_VISIBLE" />.value</c> property.</param>
 /// <param name="Package">The deserialized <see cref="JSON_KEY_SYS_PACKAGE" /> property or <see langword="null"/> if the <c>sys_package.value</c> is empty.</param>
 /// <param name="Scope">The deserialized <see cref="JSON_KEY_SYS_SCOPE" /> property or <see langword="null"/> if the <c>sys_scope.value</c> is empty.</param>
-public record RemoteGlideType(string Name, string Label, string SysID, string? ScalarType, int? ScalarLength, string? ClassName, bool UseOriginalValue, bool IsVisible, RemoteRef? Package,
+public record RemoteFieldClass(string Name, string Label, string SysID, string? ScalarType, int? ScalarLength, string? ClassName, bool UseOriginalValue, bool IsVisible, RemoteRef? Package,
     RemoteRef? Scope)
 {
-    internal static RemoteGlideType? FromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray)
+    internal static RemoteFieldClass? FromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray)
     {
         if (jsonNode is not JsonObject sysGlideObject)
             throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
@@ -59,7 +59,7 @@ public record RemoteGlideType(string Name, string Label, string SysID, string? S
             throw new ExpectedPropertyNotFoundException(requestUri, sysGlideObject, JSON_KEY_SYS_ID);
         if (!sysGlideObject.TryGetFieldAsNonEmpty(JSON_KEY_NAME, out string? name))
             throw new ExpectedPropertyNotFoundException(requestUri, sysGlideObject, JSON_KEY_NAME);
-        return new RemoteGlideType(Name: name,
+        return new RemoteFieldClass(Name: name,
             Label: sysGlideObject.GetFieldAsNonEmpty(JSON_KEY_LABEL, name),
             SysID: sys_id,
             ScalarType: sysGlideObject.GetFieldAsNonEmptyOrNull(JSON_KEY_SCALAR_TYPE),

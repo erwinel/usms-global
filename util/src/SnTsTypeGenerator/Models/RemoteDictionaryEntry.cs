@@ -30,7 +30,7 @@ public record RemoteDictionaryEntry(string Name, string Label, string SysID, Rem
     bool IsActive, bool IsUnique, bool IsPrimary, bool IsCalculated, int? SizeClass, bool IsMandatory, bool IsArray,
     string? Comments, bool IsDisplay, string? DefaultValue, RemoteRef? Scope, RemoteRef? Package)
 {
-    internal static RemoteDictionaryEntry? FromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray)
+    internal static RemoteDictionaryEntry? FromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysDictionary)
             throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());

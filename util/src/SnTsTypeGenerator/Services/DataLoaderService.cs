@@ -77,27 +77,26 @@ public sealed class DataLoaderService : IDisposable
         Table? table = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == TS_NAME_BASERECORD && t.IsInterface, cancellationToken);
         if (table is null)
         {
-            string sourceFqdn = (await EnsureCurrentSourceAsync(cancellationToken)).FQDN;
-            table = await AddTableAsync(new(
-                Name: TS_NAME_BASERECORD,
-                Label: TS_NAME_BASERECORD,
-                SysID: Guid.Empty.ToString("N"),
-                IsExtendable: true,
-                NumberPrefix: null,
-                Package: null,
-                Scope: null,
-                SuperClass: null,
-                AccessibleFrom: string.Empty,
-                ExtensionModel: null,
-                SourceFqdn: sourceFqdn), true, cancellationToken);
-            _ = await AddElementsAsync(new ElementRecord[] {
+            var source = await EnsureCurrentSourceAsync(cancellationToken);
+            string sourceFqdn = source.FQDN;
+            table = new()
+            {
+                Name = TS_NAME_BASERECORD,
+                Label = TS_NAME_BASERECORD,
+                SysID = Guid.Empty.ToString("N"),
+                IsExtendable = true,
+                IsInterface = true,
+                Source = source
+            };
+            await AddTableAsync(table, null, cancellationToken);
+            _ = await AddElementsAsync(new RemoteDictionaryEntry[] {
                 new(
                     Name: JSON_KEY_SYS_ID,
                     Label: "Sys ID",
                     SysID: Guid.Empty.ToString("N"),
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Name: TYPE_NAME_GUID, Label: "Sys ID (GUID)"),
+                    Type: new(TYPE_NAME_GUID, "Sys ID (GUID)"),
                     MaxLength: 32,
                     IsActive: true,
                     IsUnique: false,
@@ -110,15 +109,14 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
-                    Scope: null,
-                    SourceFqdn: sourceFqdn),
+                    Scope: null),
                 new(
                     Name: JSON_KEY_SYS_CREATED_BY,
                     Label: "Created by",
                     SysID: "9be67479a3b34cf395f500f3c165a9af",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Name: TYPE_NAME_string, Label: "String"),
+                    Type: new(TYPE_NAME_string, "String"),
                     MaxLength: 40,
                     IsActive: true,
                     IsUnique: false,
@@ -131,15 +129,14 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
-                    Scope: null,
-                    SourceFqdn: sourceFqdn),
+                    Scope: null),
                 new(
                     Name: JSON_KEY_SYS_CREATED_ON,
                     Label: "Created",
                     SysID: "6bd533127c67405d998d3cb50f44419a",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Name: TYPE_NAME_glide_date_time, Label: "Date/Time"),
+                    Type: new(TYPE_NAME_glide_date_time, "Date/Time"),
                     MaxLength: null,
                     IsActive: true,
                     IsUnique: false,
@@ -152,15 +149,14 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
-                    Scope: null,
-                    SourceFqdn: sourceFqdn),
+                    Scope: null),
                 new(
                     Name: JSON_KEY_SYS_MOD_COUNT,
                     Label: "Updates",
                     SysID: "75a55d94320c4041a7e4a1e14813de27",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Name: TYPE_NAME_integer, Label: "Integer"),
+                    Type: new(TYPE_NAME_integer, "Integer"),
                     MaxLength: null,
                     IsActive: false,
                     IsUnique: false,
@@ -173,15 +169,14 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
-                    Scope: null,
-                    SourceFqdn: sourceFqdn),
+                    Scope: null),
                 new(
                     Name: JSON_KEY_SYS_UPDATED_BY,
                     Label: "Updated by",
                     SysID: "ef0b4750753d4f6c82499a605b490af4",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Name: TYPE_NAME_string, Label: "String"),
+                    Type: new(TYPE_NAME_string, "String"),
                     MaxLength: 40,
                     IsActive: true,
                     IsUnique: false,
@@ -194,15 +189,14 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
-                    Scope: null,
-                    SourceFqdn: sourceFqdn),
+                    Scope: null),
                 new(
                     Name: JSON_KEY_SYS_UPDATED_ON,
                     Label: "Updated",
                     SysID: "3f68a52adc8a4c5a960ec2a9a2bd9fd6",
                     Reference: null,
                     IsReadOnly: false,
-                    Type: new(Name: TYPE_NAME_glide_date_time, Label: "Date/Time"),
+                    Type: new(TYPE_NAME_glide_date_time, "Date/Time"),
                     MaxLength: null,
                     IsActive: true,
                     IsUnique: false,
@@ -215,21 +209,20 @@ public sealed class DataLoaderService : IDisposable
                     IsDisplay: false,
                     DefaultValue: null,
                     Package: null,
-                    Scope: null,
-                    SourceFqdn: sourceFqdn)
+                    Scope: null)
             }, table, cancellationToken);
         }
         return table;
     }
 
-    private async Task<Element[]> AddElementsAsync(IEnumerable<ElementRecord> elements, Table table, CancellationToken cancellationToken)
+    private async Task<Element[]> AddElementsAsync(IEnumerable<RemoteDictionaryEntry> elements, Table table, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (!elements.Any())
             return Array.Empty<Element>();
         var source = (await table.GetReferencedEntityAsync(_dbContext.Tables, t => t.Source, cancellationToken))!;
         _logger.LogAddingElementsToDatabase(table.Name);
-        var entities = elements.Select<ElementRecord, (Element Element, PackageRef? Package, TableRef? Reference, TypeRef? Type, string SourceFqdn)>(e =>
+        var entities = elements.Select<RemoteDictionaryEntry, (Element Element, RemoteRef? Package, RemoteRef? Reference, RemoteRef? Type, string SourceFqdn)>(e =>
         (new Element()
         {
             Name = e.Name,
@@ -250,14 +243,14 @@ public sealed class DataLoaderService : IDisposable
             SysID = e.SysID,
             Table = table,
             Source = source
-        }, e.Package, e.Reference, e.Type, e.SourceFqdn));
+        }, e.Package, e.Reference, e.Type, source.FQDN));
         foreach (var g in entities.GroupBy(a => a.SourceFqdn))
         {
             var s = await GetSourceAsync(g.Key, cancellationToken);
             foreach (var a in g)
                 a.Element.Source = s;
         }
-        foreach (var g in entities.Where(a => a.Package is not null).GroupBy(a => a.Package!.SysID))
+        foreach (var g in entities.Where(a => a.Package is not null).GroupBy(a => a.Package!.Value))
         {
             var e = g.First();
             var p = await FromPackageRefAsync(e.Package, e.Element.Source!, cancellationToken);
@@ -265,15 +258,15 @@ public sealed class DataLoaderService : IDisposable
                 foreach (var a in g)
                     a.Element.Package = p;
         }
-        foreach (var g in entities.Where(a => a.Type is not null).GroupBy(a => a.Type!.Name))
+        foreach (var g in entities.Where(a => a.Type is not null).GroupBy(a => a.Type!.Value))
         {
             var e = g.First();
-            var t = await FromGlideTypeRefAsync(e.Type!, e.Element.Source!, cancellationToken);
+            var t = await FromFieldClassRefAsync(e.Type!, e.Element.Source!, cancellationToken);
             if (t is not null)
                 foreach (var a in g)
                     a.Element.Type = t;
         }
-        foreach (var g in entities.Where(a => a.Reference is not null).GroupBy(a => a.Reference!.Name))
+        foreach (var g in entities.Where(a => a.Reference is not null).GroupBy(a => a.Reference!.Value))
         {
             var e = g.First();
             var t = await FromTableRefAsync(e.Reference!, cancellationToken);
@@ -287,35 +280,101 @@ public sealed class DataLoaderService : IDisposable
         return result;
     }
 
-    private async Task<Table> AddTableAsync(TableRecord @record, CancellationToken cancellationToken) => await AddTableAsync(@record, false, cancellationToken);
+    private async Task<Table> AddTableAsync(RemoteTable remoteTable, CancellationToken cancellationToken) => await AddTableAsync(remoteTable, false, cancellationToken);
 
-    private async Task<Table> AddTableAsync(TableRecord @record, bool isInterface, CancellationToken cancellationToken)
+    private async Task AddTableAsync(Table table, RemoteRef? superClassRef, CancellationToken cancellationToken)
+    {
+        _logger.LogAddingTableToDb(table.Name);
+        await _dbContext.Tables.AddAsync(table, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _tableIdMap.Add(table.SysID, table.Name);
+        _logger.LogNewTableSaveCompleted(table.Name);
+        Table? superClass = (superClassRef is null) ? null : await FromSuperClassRefAsync(superClassRef, cancellationToken);
+        IEnumerable<Element> superElements;
+        var elements = (await _tableAPIService.GetDictionaryEntryRecordsByTableNameAsync(table.Name, cancellationToken)).ToArray();
+        if (superClass is null)
+        {
+            if (elements.ExtendsBaseRecord())
+            {
+                superClass = await GetBaseRecordTypeAsync(cancellationToken);
+                table.SuperClass = superClass;
+                _dbContext.Tables.Update(table);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                superElements = await superClass.GetRelatedCollectionAsync(_dbContext.Tables, e => e.Elements, cancellationToken);
+            }
+            else
+                return;
+        }
+        else
+        {
+            table.SuperClass = superClass;
+            _dbContext.Tables.Update(table);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            if (elements.Length == 0)
+                return;
+            var entry = _dbContext.Tables.Entry(superClass);
+            var inh = await entry.GetAllElementInheritancesAsync(cancellationToken);
+            if (!(superElements = inh.Select(e => e.Element)).Any())
+            {
+                await AddElementsAsync(elements, table, cancellationToken);
+                return;
+            }
+        }
+
+        await AddElementsAsync(elements.Where(e => !superElements.Any(s => e.IsIdenticalTo(s))), table, cancellationToken);
+
+    }
+    
+    private async Task<Table> AddTableAsync(RemoteTable remoteTable, bool isInterface, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        SncSource source = await GetSourceAsync(@record.SourceFqdn, cancellationToken);
+        SncSource source = await EnsureCurrentSourceAsync(cancellationToken);
         Table table = new()
         {
-            Name = @record.Name,
-            AccessibleFrom = @record.AccessibleFrom,
-            ExtensionModel = @record.ExtensionModel,
-            IsExtendable = @record.IsExtendable,
+            Name = remoteTable.Name,
+            AccessibleFrom = remoteTable.AccessibleFrom,
+            ExtensionModel = remoteTable.ExtensionModel,
+            IsExtendable = remoteTable.IsExtendable,
             IsInterface = isInterface,
-            Label = @record.Label,
+            Label = remoteTable.Label,
             LastUpdated = DateTime.Now,
-            NumberPrefix = @record.NumberPrefix,
+            NumberPrefix = remoteTable.NumberPrefix,
             Source = source,
-            SysID = @record.SysID,
-            Package = await FromPackageRefAsync(@record.Package, source, cancellationToken),
-            Scope = await FromScopeRefAsync(@record.Scope, source, cancellationToken)
+            SysID = remoteTable.SysID,
+            Package = await FromPackageRefAsync(remoteTable.Package, source, cancellationToken),
+            Scope = await FromScopeRefAsync(remoteTable.Scope, source, cancellationToken)
+        };
+
+        return table;
+    }
+
+    private async Task<Table> AddTableFromRemoteRecordAsync(RemoteTable remoteTable, bool isInterface, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        SncSource source = await EnsureCurrentSourceAsync(cancellationToken);
+        Table table = new()
+        {
+            Name = remoteTable.Name,
+            AccessibleFrom = remoteTable.AccessibleFrom,
+            ExtensionModel = remoteTable.ExtensionModel,
+            IsExtendable = remoteTable.IsExtendable,
+            IsInterface = isInterface,
+            Label = remoteTable.Label,
+            LastUpdated = DateTime.Now,
+            NumberPrefix = remoteTable.NumberPrefix,
+            Source = source,
+            SysID = remoteTable.SysID,
+            Package = await FromPackageRefAsync(remoteTable.Package, source, cancellationToken),
+            Scope = await FromScopeRefAsync(remoteTable.Scope, source, cancellationToken)
         };
         _logger.LogAddingTableToDb(table.Name);
         await _dbContext.Tables.AddAsync(table, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         _tableIdMap.Add(table.SysID, table.Name);
         _logger.LogNewTableSaveCompleted(table.Name);
-        Table? superClass = (@record.SuperClass is null) ? null : await FromSuperClassRefAsync(@record.SuperClass, cancellationToken);
+        Table? superClass = (remoteTable.SuperClass is null) ? null : await FromSuperClassRefAsync(remoteTable.SuperClass, cancellationToken);
         IEnumerable<Element> superElements;
-        var elements = (await _tableAPIService.GetElementsByTableNameAsync(@record.Name, cancellationToken)).ToArray();
+        var elements = (await _tableAPIService.GetDictionaryEntryRecordsByTableNameAsync(remoteTable.Name, cancellationToken)).ToArray();
         if (superClass is null)
         {
             if (elements.ExtendsBaseRecord())
@@ -350,30 +409,30 @@ public sealed class DataLoaderService : IDisposable
         return table;
     }
 
-    private async Task<GlideType> FromGlideTypeRefAsync(TypeRef typeRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<GlideType> FromFieldClassRefAsync(RemoteRef remoteRef, SncSource source, CancellationToken cancellationToken)
     {
-        string name = typeRef.Name;
+        string name = remoteRef.Value;
         GlideType? type = await _dbContext.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         if (type is null)
         {
-            var typeRecord = await _tableAPIService.GetGlideTypeByNameAsync(name, cancellationToken);
-            if (typeRecord is not null)
+            var fieldClass = await _tableAPIService.GetFieldClassRecordByNameAsync(name, cancellationToken);
+            if (fieldClass is not null)
             {
-                source = await GetSourceAsync(typeRecord.SourceFqdn, cancellationToken);
+                source = await EnsureCurrentSourceAsync(cancellationToken);
                 type = new()
                 {
                     Name = name,
-                    Label = typeRecord.Label,
-                    ScalarType = typeRecord.ScalarType,
-                    ScalarLength = typeRecord.ScalarLength,
-                    ClassName = typeRecord.ClassName,
-                    UseOriginalValue = typeRecord.UseOriginalValue,
-                    IsVisible = typeRecord.IsVisible,
+                    Label = fieldClass.Label,
+                    ScalarType = fieldClass.ScalarType,
+                    ScalarLength = fieldClass.ScalarLength,
+                    ClassName = fieldClass.ClassName,
+                    UseOriginalValue = fieldClass.UseOriginalValue,
+                    IsVisible = fieldClass.IsVisible,
                     LastUpdated = DateTime.Now,
-                    SysID = typeRecord.SysID,
+                    SysID = fieldClass.SysID,
                     Source = source,
-                    Package = await FromPackageRefAsync(typeRecord.Package, source, cancellationToken),
-                    Scope = await FromScopeRefAsync(typeRecord.Scope, source, cancellationToken)
+                    Package = await FromPackageRefAsync(fieldClass.Package, source, cancellationToken),
+                    Scope = await FromScopeRefAsync(fieldClass.Scope, source, cancellationToken)
                 };
                 if (_knownGlideTypes.TryGetValue(name, out KnownGlideType? knownGlideType))
                 {
@@ -388,13 +447,13 @@ public sealed class DataLoaderService : IDisposable
                 type = new()
                 {
                     Name = name,
-                    Label = typeRef.Label,
+                    Label = remoteRef.Display ?? name,
                     LastUpdated = DateTime.Now,
                     Source = source
                 };
                 if (_knownGlideTypes.TryGetValue(name, out KnownGlideType? knownGlideType))
                 {
-                    if (string.IsNullOrWhiteSpace(typeRef.Label))
+                    if (string.IsNullOrWhiteSpace(remoteRef.Display))
                         type.Label = string.IsNullOrWhiteSpace(knownGlideType.Label) ? name : knownGlideType.Label;
                     type.ScalarLength = knownGlideType.ScalarLength;
                     if (!string.IsNullOrWhiteSpace(knownGlideType.ScalarType))
@@ -404,7 +463,7 @@ public sealed class DataLoaderService : IDisposable
                     if (!string.IsNullOrWhiteSpace(knownGlideType.ScopedElementType))
                         type.ScopedElementType = knownGlideType.ScopedElementType;
                 }
-                else if (string.IsNullOrWhiteSpace(typeRef.Label))
+                else if (string.IsNullOrWhiteSpace(remoteRef.Display))
                     type.Label = name;
             }
             await _dbContext.Types.AddAsync(type, cancellationToken);
@@ -412,8 +471,6 @@ public sealed class DataLoaderService : IDisposable
         }
         return type;
     }
-
-
 
     private async Task<SncSource> GetCurrentSourceAsync(CancellationToken cancellationToken)
     {
@@ -475,38 +532,39 @@ public sealed class DataLoaderService : IDisposable
         finally { Monitor.Exit(_syncRoot); }
     }
 
-    private async Task<Table?> FromTableRefAsync(TableRef? tableRef, CancellationToken cancellationToken)
+    private async Task<Table?> FromTableRefAsync(RemoteRef? remoteRef, CancellationToken cancellationToken)
     {
-        if (tableRef is null)
+        if (remoteRef is null)
             return null;
-        string name = tableRef.Name;
-        var table = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        if (table is not null)
-            return table;
-        var tableRecord = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
-        tableRecord ??= new(
-                Name: name,
-                Label: tableRef.Label,
-                SysID: Guid.NewGuid().ToString("N"),
-                IsExtendable: true,
-                NumberPrefix: null,
-                Package: null,
-                Scope: null,
-                SuperClass: null,
-                AccessibleFrom: string.Empty,
-                ExtensionModel: null,
-                SourceFqdn: (await EnsureCurrentSourceAsync(cancellationToken)).FQDN);
-        return await AddTableAsync(tableRecord, cancellationToken);
+        string name = remoteRef.Value;
+        var tableEntity = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
+        if (tableEntity is not null)
+            return tableEntity;
+        var remoteTable = await _tableAPIService.GetTableRecordByNameAsync(name, cancellationToken);
+        if (remoteTable is not null)
+            return await AddTableAsync(remoteTable, cancellationToken);
+        Table table = new()
+        {
+            Name = name,
+            AccessibleFrom = string.Empty,
+            IsExtendable = true,
+            Label = remoteRef.Display ?? name,
+            LastUpdated = DateTime.Now,
+            Source = await EnsureCurrentSourceAsync(cancellationToken),
+            SysID =  Guid.NewGuid().ToString("N")
+        };
+        await AddTableAsync(table, null, cancellationToken);
+        return table;
     }
 
-    private async Task<Table?> FromSuperClassRefAsync(SuperClassRef? tableRef, CancellationToken cancellationToken)
+    private async Task<Table?> FromSuperClassRefAsync(RemoteRef? tableRef, CancellationToken cancellationToken)
     {
         if (tableRef is null)
             return null;
-        string sys_id = tableRef.SysID;
+        string sys_id = tableRef.Value;
         if (_tableIdMap.TryGetValue(sys_id, out string? name))
             return await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        var tableRecord = await _tableAPIService.GetTableByIdAsync(sys_id, cancellationToken);
+        var tableRecord = await _tableAPIService.GetTableRecordByIdAsync(sys_id, cancellationToken);
         if (tableRecord is null) // TODO: Add warning for table not found
             return null;
         return await AddTableAsync(tableRecord, cancellationToken);
@@ -518,14 +576,14 @@ public sealed class DataLoaderService : IDisposable
         throw new NotImplementedException();
     }
 
-    private async Task<Package?> FromPackageRefAsync(PackageRef? pkgRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<Package?> FromPackageRefAsync(RemoteRef? pkgRef, SncSource source, CancellationToken cancellationToken)
     {
         if (pkgRef is null)
             return null;
-        string sys_id = pkgRef.SysID;
+        string sys_id = pkgRef.Value;
         if (_packageIdMap.TryGetValue(sys_id, out string? id))
             return await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken);
-        var packageRecord = await _tableAPIService.GetPackageByIDAsync(sys_id, cancellationToken);
+        var packageRecord = await _tableAPIService.GetPackageRecordByIDAsync(sys_id, cancellationToken);
         Package? package;
         string pkgName;
         if (packageRecord is null)
@@ -536,7 +594,7 @@ public sealed class DataLoaderService : IDisposable
                 if (scope is null)
                     return null;
                 id = scope.ID;
-                pkgName = pkgRef.Name.AsNonEmpty(scope.Value);
+                pkgName = pkgRef.Display.AsNonEmpty(scope.Value);
                 if ((package = await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken)) is null)
                 {
                     package = new()
@@ -555,8 +613,8 @@ public sealed class DataLoaderService : IDisposable
             }
             else
             {
-                var name = pkgRef.Name.AsNonEmpty(GLOBAL_NAMESPACE);
-                if (string.IsNullOrWhiteSpace(pkgRef.Name))
+                var name = pkgRef.Display.AsNonEmpty(GLOBAL_NAMESPACE);
+                if (string.IsNullOrWhiteSpace(pkgRef.Display))
                 {
                     pkgName = GLOBAL_NAMESPACE;
                     package = new()
@@ -609,18 +667,18 @@ public sealed class DataLoaderService : IDisposable
         return package;
     }
 
-    private async Task<Scope?> FromScopeRefAsync(ScopeRef? scopeRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<Scope?> FromScopeRefAsync(RemoteRef? scopeRef, SncSource source, CancellationToken cancellationToken)
     {
         if (scopeRef is null)
             return null;
-        var sys_id = scopeRef.ID;
+        var sys_id = scopeRef.Value;
         if (_scopeIdMap.TryGetValue(sys_id, out string? value))
             return await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken);
-        var scopeRecord = await _tableAPIService.GetScopeByIDAsync(sys_id, cancellationToken);
+        var scopeRecord = await _tableAPIService.GetApplicationRecordByIDAsync(sys_id, cancellationToken);
         Scope? scope;
         if (scopeRecord is null)
         {
-            if ((value = scopeRef.Name) == null || (scope = await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Name == value, cancellationToken)) is null)
+            if ((value = scopeRef.Display) == null || (scope = await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Name == value, cancellationToken)) is null)
                 return null; // TODO: Warn not found
         }
         else
@@ -664,7 +722,7 @@ public sealed class DataLoaderService : IDisposable
         if (table is null)
             return await _logger.WithActivityScope(LogActivityType.AddNewTable, name, async () =>
             {
-                var response = await _tableAPIService.GetTableByNameAsync(name, cancellationToken);
+                var response = await _tableAPIService.GetTableRecordByNameAsync(name, cancellationToken);
                 if (response is not null)
                     table = await AddTableAsync(response, cancellationToken);
                 return table;

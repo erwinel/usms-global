@@ -18,13 +18,6 @@ public sealed class SnClientHandlerService
 
     private SnAccessToken? _token;
 
-    /// <summary>
-    /// Gets the base URL of the remote ServiceNow instance.
-    /// </summary>
-    [Obsolete("Use SnClientHandlerService")]
-    internal Uri BaseURL { get; }
-
-
     public NetworkCredential? ClientCredentials { get; }
 
     public NetworkCredential UserCredentials { get; }
