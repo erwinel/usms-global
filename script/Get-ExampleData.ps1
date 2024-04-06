@@ -1,8 +1,8 @@
 Param(
-    [Uri]$BaseUri = 'https://dev93009.service-now.com',
+    [Uri]$BaseUri = 'https://dev243690.service-now.com',
     [string[]]$TableNames = @('sys_metadata', 'sys_scope', 'sys_package', 'task', 'sys_number', 'sys_user', 'sys_user_group', 'sys_user_role', 'sys_user_grmember',
     'sys_user_group_type', 'sys_user_role', 'sys_user_role_contains', 'sys_user_has_role', 'sys_group_has_role', 'sys_glide_object', 'sys_db_object', 'sys_dictionary',
-    'incident', 'sc_request', 'sc_req_item', 'sc_task', 'idontexist'),
+    'incident', 'sc_request', 'sc_req_item', 'sc_task', 'cab_meeting', 'idontexist'),
     [string[]]$ScopeIds = @('global')
 )
 if ($null -eq $Script:SnCredentials) {
