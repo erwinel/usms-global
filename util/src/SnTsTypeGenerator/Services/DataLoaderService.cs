@@ -345,6 +345,7 @@ public sealed class DataLoaderService : IDisposable
             Scope = await FromScopeRefAsync(remoteTable.Scope, source, cancellationToken)
         };
 
+        await AddTableAsync(table, remoteTable.SuperClass, cancellationToken);
         return table;
     }
 
@@ -418,7 +419,6 @@ public sealed class DataLoaderService : IDisposable
             var fieldClass = await _tableAPIService.GetFieldClassRecordByNameAsync(name, cancellationToken);
             if (fieldClass is not null)
             {
-                source = await EnsureCurrentSourceAsync(cancellationToken);
                 type = new()
                 {
                     Name = name,
