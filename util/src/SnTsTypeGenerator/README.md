@@ -3,7 +3,7 @@
 - [ServiceNow Typings Generator](#servicenow-typings-generator)
   - [Settings and Command Line Options](#settings-and-command-line-options)
     - [Table Names](#table-names)
-    - [Output Mode](#output-mode)
+    - [Output for globally-scoped scripting](#output-for-globally-scoped-scripting)
     - [ServiceNow Instance URL](#servicenow-instance-url)
     - [Login User Name](#login-user-name)
     - [Login Password](#login-password)
@@ -14,6 +14,8 @@
     - [Override Database File Path](#override-database-file-path)
     - [Emitting Base Types](#emitting-base-types)
     - [Including Referenced and Parent Types](#including-referenced-and-parent-types)
+    - [Get Package Groups](#get-package-groups)
+    - [Get Remote Sources](#get-remote-sources)
     - [Show Help](#show-help)
   - [Development Environment setup](#development-environment-setup)
     - [Create Application Registry](#create-application-registry)
@@ -46,14 +48,14 @@ Settings Example:
 }
 ```
 
-### Output Mode
+### Output for globally-scoped scripting
 
-This determines whether the typings file is generated for use with scoped applications or for globally-scoped scripting. This can be specified using the `-m` command line switch or the `SnTsTypeGenerator/Mode` setting. If this is not specified, you will be prompted for the URL. Valid values are `scoped` or `s` for targeting scoped applications, and `global`, or `g` for global-scope mode. If this is not specified, the default behavior is to generate typings for scoped applications.
+To generate typings for globally-scoped scripting, use the `-g` command line switch or set the the `SnTsTypeGenerator/GlobalScope` settings to `true`.
 
 Command Line Example:
 
 ```sh
-SnTsTypeGenerator -t=sys_metadata,task,sys_user -m s
+SnTsTypeGenerator -t=sys_metadata,task,sys_user -g
 ```
 
 Settings Example:
@@ -61,7 +63,7 @@ Settings Example:
 ```json
 {
     "SnTsTypeGenerator": {
-        "Mode": "scoped",
+        "GlobalScope": true,
         "RemoteURL": "https://dev00000.service-now.com"
     }
 }
@@ -192,7 +194,8 @@ Settings Example:
 
 #### Force Overwrite
 
-To overwrite any existing output file, use the `-f` command line switch or set the `SnTsTypeGenerator/Force` setting to `true`; otherwise the type generation will fail if the output file already exists.
+To overwrite any existing output file, use the `-f` or `--force` command line switch or set the `SnTsTypeGenerator/Force` setting to `true`;
+otherwise the type generation will fail if the output file already exists.
 
 Command Line Example:
 
@@ -275,6 +278,28 @@ Settings Example:
         "RemoteURL": "https://dev00000.service-now.com"
     }
 }
+```
+
+### Get Package Groups
+
+To show a list of package groups defined in app settings and in the database, use the '--get-package-groups' switch.
+This switch cannot be used with other command line switches.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator --get-package-groups
+```
+
+### Get Remote Sources
+
+To show a list of remote sources in the database, use the '--get-remote-sources' switch.
+This switch cannot be used with other command line switches.
+
+Command Line Example:
+
+```sh
+SnTsTypeGenerator --get-remote-sources
 ```
 
 ### Show Help

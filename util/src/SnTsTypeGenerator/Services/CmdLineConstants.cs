@@ -65,9 +65,14 @@ public static class CmdLineConstants
     public const char SHORTHAND_o = 'o';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="AppSettings.SetPackageGroups" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.GetPackageGroups" /></c> setting.
     /// </summary>
-    public const char SHORTHAND_g = 'g';
+    public const string SHORTHAND_get_package_groups = "get-package-groups";
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.GetRemoteSources" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_get_remote_sources = "get-remote-sources";
 
     /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.BaselineInit" /></c> setting.
@@ -82,30 +87,10 @@ public static class CmdLineConstants
     /// <summary>
     /// Gets the alternate command line option for the <c><see cref="AppSettings.ForceOverwrite" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_force = "Force";
+    public const string SHORTHAND_force = "force";
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="AppSettings.Mode" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.GlobalScope" /></c> setting.
     /// </summary>
-    public const char SHORTHAND_m = 'm';
-
-    /// <summary>
-    /// Gets the <see cref="AppSettings.Mode"/> equivalent to <c><see cref="MODE_SCOPED" /></c>.
-    /// </summary>
-    public const string MODE_SCOPED_ABBR = "s";
-
-    /// <summary>
-    /// Gets the <see cref="AppSettings.Mode"/> equivalent to <c><see cref="MODE_GLOBAL" /></c>.
-    /// </summary>
-    public const string MODE_GLOBAL_ABBR = "g";
-
-    /// <summary>
-    /// Value of <see cref="AppSettings.Mode"/> when the render mode is for global-scoped scripts.
-    /// </summary>
-    public const string MODE_GLOBAL = "global";
-
-    /// <summary>
-    /// Value of <see cref="AppSettings.Mode"/> when the render mode is for scoped app scripts.
-    /// </summary>
-    public const string MODE_SCOPED = "scoped";
+    public const char SHORTHAND_g = 'g';
 }

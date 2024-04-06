@@ -61,6 +61,37 @@ public class AppSettings
     public string? RemoteURL { get; set; }
 
     /// <summary>
+    /// Indicates whether to modify the target remote source.
+    /// </summary>
+    /// <remarks>Only the <see cref="RemoteURL"/>, <see cref="NewURL"/>, <see cref="IsPdi"/>, and <see cref="RemoteLabel"/> options are used when this is <see langword="true"/>.</remarks>
+    // TODO: Add command line switch and help text
+    public bool? ModifySource { get; set; }
+
+    /// <summary>
+    /// Used with the <see cref="ModifySource"/> option to change the remote ServiceNow instance URI from the value of this option to <see cref="RemoteURL"/>.
+    /// </summary>
+    // TODO: Add command line switch and help text
+    public string? ExistingURL { get; set; }
+
+    /// <summary>
+    /// Indicates whether the remote instance is a Personal Developer Instance.
+    /// </summary>
+    // TODO: Add command line switch and help text
+    public bool? IsPdi { get; set; }
+    
+    /// <summary>
+    /// The descriptive name to use for the remote instance.
+    /// </summary>
+    // TODO: Add command line switch and help text
+    public string? RemoteLabel { get; set; }
+
+    /// <summary>
+    /// The name of the package group for all new packages that could not be automatically grouped.
+    /// </summary>
+    // TODO: Add command line switch and help text
+    public string? DefaultPackageGroup { get; set; }
+
+    /// <summary>
     /// The output file name.
     /// </summary>
     public string? Output { get; set; }
@@ -71,21 +102,24 @@ public class AppSettings
     public bool? ForceOverwrite { get; set; }
 
     /// <summary>
-    /// The output mode.
-    /// Should be <see cref="MODE_SCOPED"/>, <see cref="MODE_SCOPED_ABBR"/>, <see cref="MODE_GLOBAL"/>, or <see cref="MODE_GLOBAL_ABBR"/>.
+    /// Indicates whether the typings are generated for globally-scoped scripting.
     /// </summary>
-    /// <remarks>The default behavior is <see cref="MODE_GLOBAL"/>.</remarks>
-    public string? Mode { get; set; }
+    public bool? GlobalScope { get; set; }
 
     /// <summary>
     /// All newly found packages that are active and not licensable on the remote instance are to be considered baseline.
     /// </summary>
     public bool? BaselineInit { get; set; }
-
+    
     /// <summary>
-    /// Gets package groups listed in <see cref="TypingsDbContext.PackageGroups"/> and <see cref="DefaultPackageGroups"/>.
+    /// Gets package groups contained in <see cref="TypingsDbContext.PackageGroups"/> table and the <see cref="DefaultPackageGroups"/> setting.
     /// </summary>
     public bool? GetPackageGroups { get; set; }
+
+    /// <summary>
+    /// Gets remote sources contained in <see cref="TypingsDbContext.Sources"/> table.
+    /// </summary>
+    public bool? GetRemoteSources { get; set; }
 
     /// <summary>
     /// Gets the glide type mappings to refer to when adding new rows to the <see cref="Models.GlideType"/> table.
@@ -149,9 +183,7 @@ public class AppSettings
         { $"-{SHORTHAND_r}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
         { $"--{nameof(RemoteURL)}", $"{nameof(SnTsTypeGenerator)}:{nameof(RemoteURL)}" },
         { $"-{SHORTHAND_o}", $"{nameof(SnTsTypeGenerator)}:{nameof(Output)}" },
-        { $"--{nameof(Output)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Output)}" },
-        { $"-{SHORTHAND_m}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" },
-        { $"--{nameof(Mode)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Mode)}" }
+        { $"--{nameof(Output)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Output)}" }
     };
 
     private static readonly Dictionary<string, string> _booleanSwitchMappings = new()
@@ -165,8 +197,8 @@ public class AppSettings
         { $"--{nameof(ForceOverwrite)}", $"{nameof(SnTsTypeGenerator)}:{nameof(ForceOverwrite)}" },
         { $"-{SHORTHAND_n}", $"{nameof(SnTsTypeGenerator)}:{nameof(BaselineInit)}" },
         { $"--{nameof(BaselineInit)}", $"{nameof(SnTsTypeGenerator)}:{nameof(BaselineInit)}" },
-        { $"-{SHORTHAND_g}", $"{nameof(SnTsTypeGenerator)}:{nameof(GetPackageGroups)}" },
-        { $"--{nameof(GetPackageGroups)}", $"{nameof(SnTsTypeGenerator)}:{nameof(GetPackageGroups)}" },
+        { $"--{SHORTHAND_get_package_groups}", $"{nameof(SnTsTypeGenerator)}:{nameof(GetPackageGroups)}" },
+        { $"--{SHORTHAND_get_remote_sources}", $"{nameof(SnTsTypeGenerator)}:{nameof(GetRemoteSources)}" },
         { $"-{SHORTHAND_h}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
         { $"-{SHORTHAND__3F_}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" },
         { $"--{nameof(Help)}", $"{nameof(SnTsTypeGenerator)}:{nameof(Help)}" }

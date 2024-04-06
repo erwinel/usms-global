@@ -10,4 +10,5 @@ namespace SnTsTypeGenerator.Models;
 /// <param name="Licensable">The value of the <c><see cref="Services.SnApiConstants.JSON_KEY_LICENSABLE" />.value</c> property.</param>
 /// <param name="Active">The value of the <c><see cref="Services.SnApiConstants.JSON_KEY_ACTIVE" />.value</c> property.</param>
 /// <param name="SourceFqdn">The FQDN of the source ServiceNow instance.</param>
+[Obsolete("Use RemotePackage")]
 public record PackageRecord(string ID, string Name, string Version, string SysID, bool Licensable, bool Active, string SourceFqdn);

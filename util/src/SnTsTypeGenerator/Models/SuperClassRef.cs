@@ -5,4 +5,5 @@ namespace SnTsTypeGenerator.Models;
 /// </summary>
 /// <param name="SysID">The value of <c><see cref="Services.SnApiConstants.JSON_KEY_SUPER_CLASS" />.value</c>.</param>
 /// <param name="Label">The value of <c><see cref="Services.SnApiConstants.JSON_KEY_SUPER_CLASS" />.display_value</c> or <see langword="null"/> if that value was empty.</param>
+[Obsolete("Use RemoteRef")]
 public record SuperClassRef(string SysID, string? Label);

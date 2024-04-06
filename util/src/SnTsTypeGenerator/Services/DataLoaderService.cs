@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SnTsTypeGenerator.Models;
@@ -15,7 +16,11 @@ public sealed class DataLoaderService : IDisposable
 {
     private TypingsDbContext _dbContext;
     private readonly TableAPIService _tableAPIService;
+    private readonly RemoteUriService _remoteUri;
     private readonly ILogger<DataLoaderService> _logger;
+    private readonly object _syncRoot = new();
+    private SncSource? _currentSourceEntity;
+    private EntityEntry<SncSource>? _currentSourceEntry;
     private readonly ReadOnlyDictionary<string, KnownGlideType> _knownGlideTypes;
     private readonly bool _baselineInit;
     private readonly Dictionary<string, string> _tableIdMap = new(NameComparer);
@@ -24,12 +29,11 @@ public sealed class DataLoaderService : IDisposable
     private readonly Dictionary<string, SncSource> _sourceCache = new(NameComparer);
     private readonly Dictionary<string, string> _packageGroupMap = new(NameComparer);
     private readonly ImmutableArray<string> _defaultBaselinePackageGroups;
-    /// 
-    /// 
+
     /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
-    internal bool InitSuccessful => _tableAPIService is not null && _tableAPIService.InitSuccessful && (_dbContext?.InitSuccessful ?? false);
+    internal bool InitSuccessful => (_remoteUri?.InitSuccessful ?? false) && (_tableAPIService?.InitSuccessful ?? false) && (_dbContext?.InitSuccessful ?? false);
 
     private async Task<SncSource> GetSourceAsync(string fqdn, CancellationToken cancellationToken)
     {
@@ -73,7 +77,7 @@ public sealed class DataLoaderService : IDisposable
         Table? table = await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == TS_NAME_BASERECORD && t.IsInterface, cancellationToken);
         if (table is null)
         {
-            string sourceFqdn = _tableAPIService.SourceFqdn;
+            string sourceFqdn = (await EnsureCurrentSourceAsync(cancellationToken)).FQDN;
             table = await AddTableAsync(new(
                 Name: TS_NAME_BASERECORD,
                 Label: TS_NAME_BASERECORD,
@@ -409,6 +413,68 @@ public sealed class DataLoaderService : IDisposable
         return type;
     }
 
+
+
+    private async Task<SncSource> GetCurrentSourceAsync(CancellationToken cancellationToken)
+    {
+        if (!_dbContext.InitSuccessful && _remoteUri.InitSuccessful) throw new InvalidOperationException();
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_currentSourceEntity is not null) return _currentSourceEntity;
+        var fqdn = _remoteUri.Fqdn;
+        if ((_currentSourceEntity = _dbContext.Sources.FirstOrDefault(e => e.FQDN == fqdn)) is not null)
+        {
+            if (_remoteUri.Label is not null && _remoteUri.Label != _currentSourceEntity.Label)
+                _currentSourceEntity.Label = _remoteUri.Label;
+            else if (_currentSourceEntity.IsPersonalDev == _remoteUri.IsPdi)
+                return _currentSourceEntity;
+            _currentSourceEntity.IsPersonalDev = _remoteUri.IsPdi;
+            _dbContext.Sources.Update(_currentSourceEntity);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return _currentSourceEntity;
+        }
+        var oldFqdn = _remoteUri.OldFqdn;
+        if (fqdn != oldFqdn && (_currentSourceEntity = _dbContext.Sources.FirstOrDefault(e => e.FQDN == oldFqdn)) is not null)
+        {
+            _currentSourceEntity.FQDN = fqdn;
+            if (_remoteUri.Label is not null && _remoteUri.Label != _currentSourceEntity.Label)
+                _currentSourceEntity.Label = _remoteUri.Label;
+            _currentSourceEntity.IsPersonalDev = _remoteUri.IsPdi;
+            _dbContext.Sources.Update(_currentSourceEntity);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return _currentSourceEntity;
+        }
+        _currentSourceEntity = new()
+        {
+            Label = _remoteUri.Label ?? fqdn,
+            FQDN = fqdn,
+            IsPersonalDev = _remoteUri.IsPdi,
+            LastAccessed = DateTime.Now
+        };
+        await _dbContext.Sources.AddAsync(_currentSourceEntity, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return _currentSourceEntity;
+    }
+
+    internal async Task<SncSource> EnsureCurrentSourceAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        Monitor.Enter(_syncRoot);
+        try { return await GetCurrentSourceAsync(cancellationToken); }
+        finally { Monitor.Exit(_syncRoot); }
+    }
+
+    internal async Task<EntityEntry<SncSource>> EnsureCurrentSourceEntryAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        Monitor.Enter(_syncRoot);
+        try
+        {
+            _currentSourceEntry ??= _dbContext.Sources.Entry(await GetCurrentSourceAsync(cancellationToken));
+            return _currentSourceEntry;
+        }
+        finally { Monitor.Exit(_syncRoot); }
+    }
+
     private async Task<Table?> FromTableRefAsync(TableRef? tableRef, CancellationToken cancellationToken)
     {
         if (tableRef is null)
@@ -429,7 +495,7 @@ public sealed class DataLoaderService : IDisposable
                 SuperClass: null,
                 AccessibleFrom: string.Empty,
                 ExtensionModel: null,
-                SourceFqdn: _tableAPIService.SourceFqdn);
+                SourceFqdn: (await EnsureCurrentSourceAsync(cancellationToken)).FQDN);
         return await AddTableAsync(tableRecord, cancellationToken);
     }
 
@@ -612,9 +678,10 @@ public sealed class DataLoaderService : IDisposable
         return await dbContext.LoadAllReferencedAsync(tables, cancellationToken);
     }
 
-    public DataLoaderService(TypingsDbContext dbContext, TableAPIService tableAPIService, IOptions<AppSettings> appSettingsOptions, ILogger<DataLoaderService> logger)
+    public DataLoaderService(TypingsDbContext dbContext, RemoteUriService remoteUriService, TableAPIService tableAPIService, IOptions<AppSettings> appSettingsOptions, ILogger<DataLoaderService> logger)
     {
         _dbContext = dbContext;
+        _remoteUri = remoteUriService;
         _tableAPIService = tableAPIService;
         _logger = logger;
         var appSettings = appSettingsOptions.Value;

@@ -22,6 +22,7 @@ namespace SnTsTypeGenerator.Models;
 /// <param name="DefaultValue">The value of the <c>default_value.value</c> property or <see langword="null"/> if the <c>default_value.value</c> is empty.</param>
 /// <param name="Package">The deserialized <c>sys_package</c> property or <see langword="null"/> if the <c>sys_package.value</c> is empty.</param>
 /// <param name="SourceFqdn">The FQDN of the source ServiceNow instance.</param>
+[Obsolete("Use RemoteElement")]
 public record ElementRecord(string Name, string Label, string SysID, TableRef? Reference, bool IsReadOnly, TypeRef? Type, int? MaxLength,
     bool IsActive, bool IsUnique, bool IsPrimary, bool IsCalculated, int? SizeClass, bool IsMandatory, bool IsArray,
     string? Comments, bool IsDisplay, string? DefaultValue, ScopeRef? Scope, PackageRef? Package, string SourceFqdn);

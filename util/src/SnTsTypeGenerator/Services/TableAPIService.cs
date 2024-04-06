@@ -11,17 +11,12 @@ namespace SnTsTypeGenerator.Services;
 public sealed class TableAPIService
 {
     private readonly ILogger<TableAPIService> _logger;
-    private readonly SnClientHandlerService? _handler;
-
-    /// <summary>
-    /// Gets the base URL of the remote ServiceNow instance.
-    /// </summary>
-    internal string SourceFqdn => (_handler ?? throw new InvalidOperationException()).BaseURL.Host;
+    private readonly SnClientHandlerService _handler;
 
     /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
-    internal bool InitSuccessful => _handler?.InitSuccessful ?? false;
+    internal bool InitSuccessful => _handler.InitSuccessful;
 
     delegate TResult DeserializeRef<out TResult>(string value, string? display_value);
 

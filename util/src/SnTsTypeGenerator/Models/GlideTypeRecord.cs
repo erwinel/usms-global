@@ -14,5 +14,6 @@ namespace SnTsTypeGenerator.Models;
 /// <param name="Package">The deserialized <see cref="Services.SnApiConstants.JSON_KEY_SYS_PACKAGE" /> property or <see langword="null"/> if the <c>sys_package.value</c> is empty.</param>
 /// <param name="Scope">The deserialized <see cref="Services.SnApiConstants.JSON_KEY_SYS_SCOPE" /> property or <see langword="null"/> if the <c>sys_scope.value</c> is empty.</param>
 /// <param name="SourceFqdn">The FQDN of the source ServiceNow instance.</param>
+[Obsolete("Use RemoteGlideType")]
 public record GlideTypeRecord(string Name, string Label, string SysID, string? ScalarType, int? ScalarLength, string? ClassName, bool UseOriginalValue, bool IsVisible, PackageRef? Package,
     ScopeRef? Scope, string SourceFqdn);

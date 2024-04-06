@@ -14,5 +14,8 @@ namespace SnTsTypeGenerator.Models;
 /// <param name="AccessibleFrom">The value of the <c><see cref="Services.SnApiConstants.JSON_KEY_ACCESS" />.value</c> property.</param>
 /// <param name="ExtensionModel">The value of the <c><see cref="Services.SnApiConstants.JSON_KEY_EXTENSION_MODEL" />.value</c> property.</param>
 /// <param name="SourceFqdn">The FQDN of the source ServiceNow instance.</param>
+[Obsolete("Use RemoteTable")]
 public record TableRecord(string Name, string Label, string SysID, bool IsExtendable, string? NumberPrefix, PackageRef? Package, ScopeRef? Scope, SuperClassRef? SuperClass,
     string AccessibleFrom, string? ExtensionModel, string SourceFqdn);
+
+

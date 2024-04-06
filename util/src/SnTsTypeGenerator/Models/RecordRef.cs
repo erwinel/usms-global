@@ -9,7 +9,7 @@ namespace SnTsTypeGenerator.Models;
 /// </summary>
 /// <param name="Value">The value of the <c>value</c> property.</param>
 /// <param name="DisplayValue">The value of the <c>display_value</c> property.</param>
-[Obsolete("Use PackageRef, ScopeRef, SuperClassRef, TableRef, or TypeRef")]
+[Obsolete("Use RemoteRef")]
 public record RecordRef(string Value, string? DisplayValue)
 {
     internal static RecordRef? DeserializeProperty(JsonObject obj, string propertyName) => (obj.TryGetProperty(propertyName, out JsonObject? p) && p.TryGetPropertyAsNonEmpty(JSON_KEY_VALUE, out string? value)) ?

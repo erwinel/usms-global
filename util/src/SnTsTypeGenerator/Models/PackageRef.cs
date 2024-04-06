@@ -6,4 +6,5 @@ namespace SnTsTypeGenerator.Models;
 /// </summary>
 /// <param name="SysID">The value of <c><see cref="Services.SnApiConstants.JSON_KEY_SYS_PACKAGE" />.value</c>.</param>
 /// <param name="Name">The value of <c><see cref="Services.SnApiConstants.JSON_KEY_SYS_PACKAGE" />.display_value</c> or <see langword="null"/> if that value was empty.</param>
+[Obsolete("Use RemoteRef")]
 public record PackageRef(string SysID, string? Name);

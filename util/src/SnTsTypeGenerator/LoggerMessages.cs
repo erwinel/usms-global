@@ -623,19 +623,21 @@ public static class LoggerMessages
     private static readonly Action<ILogger, string, char, string, Exception?> _renderMode2 = LoggerMessage.Define<string, char, string>(LogLevel.Debug, RenderMode,
         "Setting {Setting} (-{Switch}) defaulted to {Value}.");
 
+    // TODO: Apply rendering for new meaning of mode
     /// <summary>
     /// Logs an RenderMode event with event code 0x0006.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="isScoped">Indicates whether the mode is for scoped scripts.</param>
-    public static void LogRenderModeSettingValue(this ILogger logger, bool isScoped) => _renderMode1(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
+    public static void LogRenderModeSettingValue(this ILogger logger, bool isScoped) => throw new NotImplementedException(); // _renderMode1(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
 
+    // TODO: Apply rendering for new meaning of mode
     /// <summary>
     /// Logs an RenderMode event with event code 0x0006.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="isScoped">Indicates whether the default mode is for scoped scripts.</param>
-    public static void LogDefaultRenderMode(this ILogger logger, bool isScoped) => _renderMode2(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
+    public static void LogDefaultRenderMode(this ILogger logger, bool isScoped) =>throw new NotImplementedException(); //  _renderMode2(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
 
     #endregion
 
@@ -721,29 +723,7 @@ public static class LoggerMessages
 
     #endregion
 
-    #region Critical InvalidModeOption Error (0x000a)
-
-    /// <summary>
-    /// Numerical event code for InvalidModeOption.
-    /// </summary>
-    public const int EVENT_ID_InvalidModeOption = 0x000a;
-
-    /// <summary>
-    /// Event ID for InvalidModeOption.
-    /// </summary>
-    public static readonly EventId InvalidModeOption = new(EVENT_ID_InvalidModeOption, nameof(InvalidModeOption));
-
-    private static readonly Action<ILogger, string, Exception?> _invalidModeOption = LoggerMessage.Define<string>(LogLevel.Critical, InvalidModeOption,
-        $"The {nameof(AppSettings.Mode)} ({SHORTHAND_m}) option contains unknown mode value \"{{Mode}}\". Mode must be {MODE_SCOPED}, {MODE_SCOPED_ABBR}, {MODE_GLOBAL}, or {MODE_GLOBAL_ABBR}.");
-
-    /// <summary>
-    /// Logs an InvalidModeOption event with event code 0x000a.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <param name="mode">The invalid mode value.</param>
-    public static void LogInvalidModeOption(this ILogger logger, string mode) => _invalidModeOption(logger, mode, null);
-
-    #endregion
+    // TODO: Create next new event with code 0x000a
 
     #region Critical OutputFileAlreadyExists Error (0x000b)
 
