@@ -56,7 +56,7 @@ public sealed class TableAPIService
         (Uri requestUri, JsonNode? response) = await _handler.GetTableApiJsonResponseAsync(TABLE_NAME_SYS_DB_OBJECT, JSON_KEY_NAME, name, cancellationToken);
         return RemoteTable.FromJson(requestUri, response, _logger, true);
     }
-    
+
     /// <summary>
     /// Gets the table from the remote ServiceNow instance that matches the specified Sys ID.
     /// </summary>
@@ -101,7 +101,7 @@ public sealed class TableAPIService
         return arr.Select((node, index) => RemoteDictionaryEntry.FromJson(requestUri, node, _logger)!).Where(n => n is not null).ToArray();
     }
 
-/// 
+    /// 
     /// <summary>
     /// Gets the Application from the remote ServiceNow instance that matches the specified unique identifier.
     /// </summary>
@@ -166,7 +166,7 @@ public sealed class TableAPIService
         return RemotePackage.PackageFromJson(requestUri, sysScopeResult, _logger);
     }
 
-    /// /// <summary>
+    /// <summary>
     /// Gets the type information from the remote ServiceNow instance that matches the specified name.
     /// </summary>
     /// <param name="name">The name of the type record.</param>

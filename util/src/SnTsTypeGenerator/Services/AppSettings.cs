@@ -78,7 +78,7 @@ public class AppSettings
     /// </summary>
     // TODO: Add command line switch and help text
     public bool? IsPdi { get; set; }
-    
+
     /// <summary>
     /// The descriptive name to use for the remote instance.
     /// </summary>
@@ -110,7 +110,7 @@ public class AppSettings
     /// All newly found packages that are active and not licensable on the remote instance are to be considered baseline.
     /// </summary>
     public bool? BaselineInit { get; set; }
-    
+
     /// <summary>
     /// Gets package groups contained in <see cref="TypingsDbContext.PackageGroups"/> table and the <see cref="DefaultPackageGroups"/> setting.
     /// </summary>

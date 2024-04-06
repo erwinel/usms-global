@@ -68,7 +68,7 @@ public record RemotePackage(string ID, string Name, string Version, string SysID
             Private: sysScope.GetFieldAsBoolean(JSON_KEY_PRIVATE),
             Active: sysScope.GetFieldAsBoolean(JSON_KEY_ACTIVE));
     }
-    
+
     internal static RemoteSysPlugin? PluginFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysPlugin)
@@ -120,7 +120,7 @@ public record RemotePackage(string ID, string Name, string Version, string SysID
             Private: sysPlugin.GetFieldAsBoolean(JSON_KEY_PRIVATE),
             Active: sysPlugin.GetFieldAsBoolean(JSON_KEY_ACTIVE));
     }
-    
+
     internal static RemotePackage? PackageFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysPackage)
@@ -167,7 +167,7 @@ public record RemotePackage(string ID, string Name, string Version, string SysID
             SubscriptionRequirement: sysPackage.GetFieldAsString(JSON_KEY_ENFORCE_LICENSE),
             Active: sysPackage.GetFieldAsBoolean(JSON_KEY_ACTIVE));
     }
-    
+
     internal static RemoteCustomApplication? CustomApplicationFromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysApp)
@@ -323,5 +323,5 @@ public record RemotePackageDependency(RemoteRef Package, RemoteRef Dependency, s
         var dependency = RemoteRef.FromProperty(sysPackage, JSON_KEY_DEPENDENCY) ?? throw new ExpectedPropertyNotFoundException(requestUri, sysPackage, JSON_KEY_DEPENDENCY);
         return new RemotePackageDependency(Package: package, Dependency: dependency, MinVersion: sysPackage.GetFieldAsString(JSON_KEY_MIN_VERSION));
     }
-    
+
 }

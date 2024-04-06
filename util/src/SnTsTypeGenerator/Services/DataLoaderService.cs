@@ -324,7 +324,7 @@ public sealed class DataLoaderService : IDisposable
         await AddElementsAsync(elements.Where(e => !superElements.Any(s => e.IsIdenticalTo(s))), table, cancellationToken);
 
     }
-    
+
     private async Task<Table> AddTableAsync(RemoteTable remoteTable, bool isInterface, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -551,7 +551,7 @@ public sealed class DataLoaderService : IDisposable
             Label = remoteRef.Display ?? name,
             LastUpdated = DateTime.Now,
             Source = await EnsureCurrentSourceAsync(cancellationToken),
-            SysID =  Guid.NewGuid().ToString("N")
+            SysID = Guid.NewGuid().ToString("N")
         };
         await AddTableAsync(table, null, cancellationToken);
         return table;

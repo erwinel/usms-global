@@ -26,7 +26,7 @@ public class RemoteUriService
     /// Gets the original, user-provided URL of the remote ServiceNow instance.
     /// </summary>
     internal string OriginalUrl { get; }
-    
+
     /// <summary>
     /// Indicates whether the remote instance is a Personal Developer Instance.
     /// </summary>
@@ -65,7 +65,7 @@ public class RemoteUriService
                 {
                     BaseURL = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
                     Fqdn = BaseURL.Host.ToLower();
-                    
+
                     var uriString = appSettings.ExistingURL;
                     if (string.IsNullOrWhiteSpace(uriString))
                     {

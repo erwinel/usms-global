@@ -117,7 +117,7 @@ public sealed class SnClientHandlerService
                 { HEADER_KEY_CLIENT_ID, JsonValue.Create(ClientCredentials.UserName) },
                 { HEADER_KEY_USERNAME, JsonValue.Create(UserCredentials.UserName) }
             });
-            
+
             createdOn = DateTime.Now;
             using HttpClientHandler handler = CreateHttpClientHandler();
             using HttpClient httpClient = new(handler);

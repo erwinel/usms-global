@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SnTsTypeGenerator.Models;
-using SQLitePCL;
 using static SnTsTypeGenerator.Services.CmdLineConstants;
 
 namespace SnTsTypeGenerator.Services;

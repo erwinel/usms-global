@@ -163,7 +163,7 @@ internal static class SnApiConstants
     /// "Package" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_SYS_PACKAGE = "sys_package";
-    
+
     /// <summary>
     /// "Dependency" Column (element) name.
     /// </summary>
