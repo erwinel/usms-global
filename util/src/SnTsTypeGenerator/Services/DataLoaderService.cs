@@ -564,7 +564,7 @@ public sealed class DataLoaderService : IDisposable
         string sys_id = tableRef.Value;
         if (_tableIdMap.TryGetValue(sys_id, out string? name))
             return await _dbContext.Tables.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
-        var tableRecord = await _tableAPIService.GetTableRecordByIdAsync(sys_id, cancellationToken);
+        var tableRecord = await _tableAPIService.GetTableRecordBySysIdAsync(sys_id, cancellationToken);
         if (tableRecord is null) // TODO: Add warning for table not found
             return null;
         return await AddTableAsync(tableRecord, cancellationToken);
@@ -583,7 +583,7 @@ public sealed class DataLoaderService : IDisposable
         string sys_id = pkgRef.Value;
         if (_packageIdMap.TryGetValue(sys_id, out string? id))
             return await _dbContext.Packages.FirstOrDefaultAsync(p => p.ID == id, cancellationToken);
-        var packageRecord = await _tableAPIService.GetPackageRecordByIDAsync(sys_id, cancellationToken);
+        var packageRecord = await _tableAPIService.GetPackageRecordBySysIdAsync(sys_id, cancellationToken);
         Package? package;
         string pkgName;
         if (packageRecord is null)
@@ -674,7 +674,7 @@ public sealed class DataLoaderService : IDisposable
         var sys_id = scopeRef.Value;
         if (_scopeIdMap.TryGetValue(sys_id, out string? value))
             return await _dbContext.Scopes.FirstOrDefaultAsync(s => s.Value == value, cancellationToken);
-        var scopeRecord = await _tableAPIService.GetApplicationRecordByIDAsync(sys_id, cancellationToken);
+        var scopeRecord = await _tableAPIService.GetApplicationRecordBySysIdAsync(sys_id, cancellationToken);
         Scope? scope;
         if (scopeRecord is null)
         {
