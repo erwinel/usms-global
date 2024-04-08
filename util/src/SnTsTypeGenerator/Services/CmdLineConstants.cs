@@ -10,19 +10,14 @@ public static class CmdLineConstants
     internal const string DEFAULT_OUTPUT_FILENAME = "types.d.ts";
 
     /// <summary>
-    /// Command line switch for showing help.
+    /// Gets the command line option for the <c><see cref="AppSettings.RemoteURL" /></c> setting.
     /// </summary>
-    internal const string SHORTHAND_h = "h";
+    public const char SHORTHAND_r = 'r';
 
     /// <summary>
-    /// Command line switch for showing help.
+    /// Gets the command line option for the <c><see cref="AppSettings.ClientSecret" /></c> setting.
     /// </summary>
-    internal const string SHORTHAND__3F_ = "?";
-
-    /// <summary>
-    /// Gets the command line option for the <c><see cref="AppSettings.Dbfile" /></c> setting.
-    /// </summary>
-    public const char SHORTHAND_d = 'd';
+    public const string SHORTHAND_remote_url = "remote-url";
 
     /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.Table" /></c> setting.
@@ -30,9 +25,29 @@ public static class CmdLineConstants
     public const char SHORTHAND_t = 't';
 
     /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.GlobalScope" /></c> setting.
+    /// </summary>
+    public const char SHORTHAND_g = 'g';
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.Dbfile" /></c> setting.
+    /// </summary>
+    public const char SHORTHAND_d = 'd';
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.Dbfile" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_db_file = "db-file";
+
+    /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.EmitBaseTypes" /></c> setting.
     /// </summary>
     public const char SHORTHAND_b = 'b';
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.EmitBaseTypes" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_emit_base_types = "emit-base-types";
 
     /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.IncludeReferenced" /></c> setting.
@@ -40,9 +55,39 @@ public static class CmdLineConstants
     public const char SHORTHAND_i = 'i';
 
     /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.IncludeReferenced" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_include_referenced = "include-referenced";
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.DefaultPackageGroup" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_default_pkg = "default-pkg";
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.BaselineInit" /></c> setting.
+    /// </summary>
+    public const char SHORTHAND_n = 'n';
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.BaselineInit" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_baseline_init = "baseline-init";
+
+    /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.UserName" /></c> setting.
     /// </summary>
     public const char SHORTHAND_u = 'u';
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.UserName" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_user_name = "user-name";
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.UserName" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_login = "login";
 
     /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.Password" /></c> setting.
@@ -50,29 +95,29 @@ public static class CmdLineConstants
     public const char SHORTHAND_p = 'p';
 
     /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.ClientId" /></c> setting.
+    /// </summary>
+    public const char SHORTHAND_c = 'c';
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.ClientId" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_client_id = "client-id";
+
+    /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.ClientSecret" /></c> setting.
     /// </summary>
     public const char SHORTHAND_x = 'x';
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="AppSettings.RemoteURL" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.ClientSecret" /></c> setting.
     /// </summary>
-    public const char SHORTHAND_r = 'r';
+    public const string SHORTHAND_client_secret = "client-secret";
 
     /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.Output" /></c> setting.
     /// </summary>
     public const char SHORTHAND_o = 'o';
-
-    /// <summary>
-    /// Gets the command line option for the <c><see cref="AppSettings.SetPackageGroups" /></c> setting.
-    /// </summary>
-    public const char SHORTHAND_g = 'g';
-
-    /// <summary>
-    /// Gets the command line option for the <c><see cref="AppSettings.BaselineInit" /></c> setting.
-    /// </summary>
-    public const char SHORTHAND_n = 'n';
 
     /// <summary>
     /// Gets the command line option for the <c><see cref="AppSettings.ForceOverwrite" /></c> setting.
@@ -82,30 +127,51 @@ public static class CmdLineConstants
     /// <summary>
     /// Gets the alternate command line option for the <c><see cref="AppSettings.ForceOverwrite" /></c> setting.
     /// </summary>
-    public const string SHORTHAND_force = "Force";
+    public const string SHORTHAND_force = "force";
 
     /// <summary>
-    /// Gets the command line option for the <c><see cref="AppSettings.Mode" /></c> setting.
+    /// Gets the command line option for the <c><see cref="AppSettings.ModifySource" /></c> setting.
     /// </summary>
     public const char SHORTHAND_m = 'm';
 
     /// <summary>
-    /// Gets the <see cref="AppSettings.Mode"/> equivalent to <c><see cref="MODE_SCOPED" /></c>.
+    /// Gets the alternate command line option for the <c><see cref="AppSettings.ModifySource" /></c> setting.
     /// </summary>
-    public const string MODE_SCOPED_ABBR = "s";
+    public const string SHORTHAND_modify_source = "modify-source";
 
     /// <summary>
-    /// Gets the <see cref="AppSettings.Mode"/> equivalent to <c><see cref="MODE_GLOBAL" /></c>.
+    /// Gets the alternate command line option for the <c><see cref="AppSettings.ExistingURL" /></c> setting.
     /// </summary>
-    public const string MODE_GLOBAL_ABBR = "g";
+    public const string SHORTHAND_existing_url = "existing-url";
 
     /// <summary>
-    /// Value of <see cref="AppSettings.Mode"/> when the render mode is for global-scoped scripts.
+    /// Gets the alternate command line option for the <c><see cref="AppSettings.IsPdi" /></c> setting.
     /// </summary>
-    public const string MODE_GLOBAL = "global";
+    public const string SHORTHAND_pdi = "pdi";
 
     /// <summary>
-    /// Value of <see cref="AppSettings.Mode"/> when the render mode is for scoped app scripts.
+    /// Gets the alternate command line option for the <c><see cref="AppSettings.RemoteLabel" /></c> setting.
     /// </summary>
-    public const string MODE_SCOPED = "scoped";
+    public const string SHORTHAND_remote_label = "remote-label";
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.GetPackageGroups" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_get_package_groups = "get-package-groups";
+
+    /// <summary>
+    /// Gets the command line option for the <c><see cref="AppSettings.GetRemoteSources" /></c> setting.
+    /// </summary>
+    public const string SHORTHAND_get_remote_sources = "get-remote-sources";
+
+    /// <summary>
+    /// Command line switch for showing help.
+    /// </summary>
+    internal const string SHORTHAND_h = "h";
+
+    /// <summary>
+    /// Command line switch for showing help.
+    /// </summary>
+    internal const string SHORTHAND__3F_ = "?";
+
 }

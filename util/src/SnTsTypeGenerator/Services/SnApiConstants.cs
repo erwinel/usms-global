@@ -165,6 +165,16 @@ internal static class SnApiConstants
     internal const string JSON_KEY_SYS_PACKAGE = "sys_package";
 
     /// <summary>
+    /// "Dependency" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_DEPENDENCY = "dependency";
+
+    /// <summary>
+    /// "Min version" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_MIN_VERSION = "min_version";
+
+    /// <summary>
     /// "Dependencies" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_DEPENDENCIES = "dependencies";
@@ -205,9 +215,59 @@ internal static class SnApiConstants
     internal const string JSON_KEY_ACTIVE = "active";
 
     /// <summary>
+    /// "Private" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_PRIVATE = "private";
+
+    /// <summary>
+    /// "Vendor" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_VENDOR = "vendor";
+
+    /// <summary>
+    /// "Store correlation ID" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_STORE_CORRELATION_ID = "store_correlation_id";
+
+    /// <summary>
+    /// "Store URL" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_STORE_URL = "store_url";
+
+    /// <summary>
+    /// "Code" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_SYS_CODE = "sys_code";
+
+    /// <summary>
+    /// "Installed via Dependency" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_INSTALLED_AS_DEPENDENCY = "installed_as_dependency";
+
+    /// <summary>
+    /// "Install date" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_INSTALL_DATE = "install_date";
+
+    /// <summary>
+    /// "Is Store App" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_IS_STORE_APP = "is_store_app";
+
+    /// <summary>
+    /// "Vendor prefix" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_VENDOR_PREFIX = "vendor_prefix";
+
+    /// <summary>
     /// "Licensable" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_LICENSABLE = "licensable";
+
+    /// <summary>
+    /// "Subscription requirement" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_ENFORCE_LICENSE = "enforce_license";
 
     /// <summary>
     /// "Array" Column (element) name.

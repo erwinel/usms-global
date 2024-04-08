@@ -141,6 +141,10 @@ public static class JsonExtensions
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out int result) ? result :
             jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i) ? i : null : null;
 
+    public static DateTime? CoercePropertyAsDateTimeOrNull(this JsonObject source, string propertyName) =>
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out DateTime result) ? result :
+            jsonValue.TryGetValue(out string? s) && DateTime.TryParse(s, out DateTime i) ? i : null : null;
+
     public static int CoercePropertyAsInt(this JsonObject source, string propertyName, int defaultValue = 0) =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonValue jsonValue) ? jsonValue.TryGetValue(out int result) ? result :
             jsonValue.TryGetValue(out string? s) && int.TryParse(s, out int i) ? i : defaultValue : defaultValue;
@@ -348,6 +352,9 @@ public static class JsonExtensions
 
     public static int? GetFieldAsIntOrNull(this JsonObject source, string propertyName) =>
         (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsIntOrNull(JSON_KEY_VALUE) : null;
+
+    public static DateTime? GetFieldAsDateTimeOrNull(this JsonObject source, string propertyName) =>
+        (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is JsonObject field) ? field.CoercePropertyAsDateTimeOrNull(JSON_KEY_VALUE) : null;
 
     public static int GetFieldAsInt(this JsonObject source, string propertyName, int defaultValue, out string? display_value)
     {

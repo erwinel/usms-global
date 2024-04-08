@@ -78,6 +78,7 @@ internal class Program
             .AddTransient<SnTsTypeGenerator.Services.SnClientHandlerService>()
             .AddTransient<SnTsTypeGenerator.Services.TableAPIService>()
             .AddTransient<SnTsTypeGenerator.Services.DataLoaderService>()
+            .AddSingleton<SnTsTypeGenerator.Services.RemoteUriService>()
             .AddSingleton<SnTsTypeGenerator.Services.RenderingService>();
         Host = builder.Build();
         Host.Run();

@@ -14,13 +14,9 @@ namespace SnTsTypeGenerator.Services;
 public sealed class SnClientHandlerService
 {
     private readonly ILogger<SnClientHandlerService> _logger;
+    private readonly RemoteUriService _remoteUri;
 
     private SnAccessToken? _token;
-
-    /// <summary>
-    /// Gets the base URL of the remote ServiceNow instance.
-    /// </summary>
-    internal Uri BaseURL { get; }
 
     public NetworkCredential? ClientCredentials { get; }
 
@@ -29,7 +25,7 @@ public sealed class SnClientHandlerService
     /// <summary>
     /// Indicates whether service initialization was successful.
     /// </summary>
-    internal bool InitSuccessful => BaseURL.IsAbsoluteUri && UserCredentials is not null;
+    internal bool InitSuccessful => _remoteUri.InitSuccessful && UserCredentials is not null;
 
     private async Task<JsonNode?> GetJsonResponseAsync(HttpClientHandler handler, HttpRequestMessage message, Uri requestUri, CancellationToken cancellationToken)
     {
@@ -114,14 +110,14 @@ public sealed class SnClientHandlerService
         Uri requestUri;
         if (token is null)
         {
-            requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
+            requestUri = _remoteUri.GetUrl(URI_PATH_AUTH_TOKEN);
             using var getTokenScope = _logger.BeginActivityScope(LogActivityType.GetAccessToken, new JsonObject()
             {
                 { nameof(HttpRequestMessage.RequestUri), JsonValue.Create(requestUri.AbsoluteUri) },
                 { HEADER_KEY_CLIENT_ID, JsonValue.Create(ClientCredentials.UserName) },
                 { HEADER_KEY_USERNAME, JsonValue.Create(UserCredentials.UserName) }
             });
-            
+
             createdOn = DateTime.Now;
             using HttpClientHandler handler = CreateHttpClientHandler();
             using HttpClient httpClient = new(handler);
@@ -143,7 +139,7 @@ public sealed class SnClientHandlerService
         {
             if (token.ExpiresOn > DateTime.Now)
                 return token;
-            requestUri = new UriBuilder(BaseURL) { Path = URI_PATH_AUTH_TOKEN }.Uri;
+            requestUri = _remoteUri.GetUrl(URI_PATH_AUTH_TOKEN);
             using var refreshTokenScope = _logger.BeginActivityScope(LogActivityType.RefreshAccessToken, new JsonObject()
             {
                 { nameof(HttpRequestMessage.RequestUri), JsonValue.Create(requestUri.AbsoluteUri) },
@@ -180,7 +176,7 @@ public sealed class SnClientHandlerService
     {
         cancellationToken.ThrowIfCancellationRequested();
         using HttpClientHandler handler = CreateHttpClientHandler();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await GetJsonAsync(handler, requestUri, null, cancellationToken));
     }
 
@@ -189,7 +185,7 @@ public sealed class SnClientHandlerService
         cancellationToken.ThrowIfCancellationRequested();
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await GetJsonAsync(handler, requestUri, null, cancellationToken));
     }
 
@@ -197,7 +193,7 @@ public sealed class SnClientHandlerService
     {
         cancellationToken.ThrowIfCancellationRequested();
         using HttpClientHandler handler = CreateHttpClientHandler();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path, Query = query }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path, query);
         return (requestUri, await GetJsonAsync(handler, requestUri, null, cancellationToken));
     }
 
@@ -206,7 +202,7 @@ public sealed class SnClientHandlerService
         cancellationToken.ThrowIfCancellationRequested();
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path, Query = query }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path, query);
         return (requestUri, await GetJsonAsync(handler, requestUri, null, cancellationToken));
     }
 
@@ -214,7 +210,7 @@ public sealed class SnClientHandlerService
     {
         cancellationToken.ThrowIfCancellationRequested();
         using HttpClientHandler handler = CreateHttpClientHandler();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await GetJsonAsync(handler, requestUri, configureHeaders, cancellationToken));
     }
 
@@ -223,7 +219,7 @@ public sealed class SnClientHandlerService
         cancellationToken.ThrowIfCancellationRequested();
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await GetJsonAsync(handler, requestUri, configureHeaders, cancellationToken));
     }
 
@@ -231,7 +227,7 @@ public sealed class SnClientHandlerService
     {
         cancellationToken.ThrowIfCancellationRequested();
         using HttpClientHandler handler = CreateHttpClientHandler();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path, Query = query }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path, query);
         return (requestUri, await GetJsonAsync(handler, requestUri, configureHeaders, cancellationToken));
     }
 
@@ -240,7 +236,7 @@ public sealed class SnClientHandlerService
         cancellationToken.ThrowIfCancellationRequested();
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path, Query = query }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path, query);
         return (requestUri, await GetJsonAsync(handler, requestUri, configureHeaders, cancellationToken));
     }
 
@@ -248,7 +244,7 @@ public sealed class SnClientHandlerService
     {
         cancellationToken.ThrowIfCancellationRequested();
         using HttpClientHandler handler = CreateHttpClientHandler();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await PostJsonAsync(handler, requestUri, null, null, cancellationToken));
     }
 
@@ -256,7 +252,7 @@ public sealed class SnClientHandlerService
     {
         cancellationToken.ThrowIfCancellationRequested();
         using HttpClientHandler handler = CreateHttpClientHandler();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await PostJsonAsync(handler, requestUri, content, null, cancellationToken));
     }
 
@@ -265,7 +261,7 @@ public sealed class SnClientHandlerService
         cancellationToken.ThrowIfCancellationRequested();
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await PostJsonAsync(handler, requestUri, null, null, cancellationToken));
     }
 
@@ -274,7 +270,7 @@ public sealed class SnClientHandlerService
         cancellationToken.ThrowIfCancellationRequested();
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await PostJsonAsync(handler, requestUri, content, null, cancellationToken));
     }
 
@@ -282,7 +278,7 @@ public sealed class SnClientHandlerService
     {
         cancellationToken.ThrowIfCancellationRequested();
         using HttpClientHandler handler = CreateHttpClientHandler();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await PostJsonAsync(handler, requestUri, null, configureHeaders, cancellationToken));
     }
 
@@ -290,7 +286,7 @@ public sealed class SnClientHandlerService
     {
         cancellationToken.ThrowIfCancellationRequested();
         using HttpClientHandler handler = CreateHttpClientHandler();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await PostJsonAsync(handler, requestUri, content, configureHeaders, cancellationToken));
     }
 
@@ -299,7 +295,7 @@ public sealed class SnClientHandlerService
         cancellationToken.ThrowIfCancellationRequested();
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await PostJsonAsync(handler, requestUri, null, configureHeaders, cancellationToken));
     }
 
@@ -308,91 +304,66 @@ public sealed class SnClientHandlerService
         cancellationToken.ThrowIfCancellationRequested();
         if (!InitSuccessful)
             throw new InvalidOperationException();
-        Uri requestUri = new UriBuilder(BaseURL) { Path = path }.Uri;
+        Uri requestUri = _remoteUri.GetUrl(path);
         return (requestUri, await PostJsonAsync(handler, requestUri, content, configureHeaders, cancellationToken));
     }
 
-    public SnClientHandlerService(IOptions<AppSettings> appSettingsOptions, ILogger<SnClientHandlerService> logger)
+    public SnClientHandlerService(IOptions<AppSettings> appSettingsOptions, RemoteUriService remoteUriService, ILogger<SnClientHandlerService> logger)
     {
         _logger = logger;
+        _remoteUri = remoteUriService;
         AppSettings appSettings = appSettingsOptions.Value;
-        var remoteUri = appSettings.RemoteURL;
-        if (appSettings.ShowHelp())
+        if (appSettings.ShowHelp() || !_remoteUri.InitSuccessful)
         {
-            BaseURL = EmptyURI;
             UserCredentials = null!;
             return;
         }
-        if (string.IsNullOrWhiteSpace(remoteUri))
+        string? clientId = appSettings.ClientId;
+        string? clientSecret = appSettings.ClientSecret;
+        if (clientId is null)
         {
-            _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.RemoteURL), SHORTHAND_r);
-            BaseURL = EmptyURI;
-            UserCredentials = null!;
-            return;
-        }
-        if (Uri.TryCreate(remoteUri, UriKind.Absolute, out Uri? uri))
-        {
-            if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
-            {
-                BaseURL = EmptyURI;
-                _logger.LogInvalidRemoteInstanceUrl(uri);
-                UserCredentials = null!;
-                return;
-            }
-            BaseURL = new UriBuilder(uri) { Fragment = null, Query = null, Path = "/" }.Uri;
-            string? clientId = appSettings.ClientId;
-            string? clientSecret = appSettings.ClientSecret;
-            if (clientId is null)
-            {
-                if (clientSecret is not null)
-                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientId));
-            }
-            else
-            {
-                if (clientSecret is null)
-                {
-                    Console.Write("Client Secret: ");
-                    clientSecret = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(clientSecret))
-                    {
-                        _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientSecret));
-                        UserCredentials = null!;
-                        return;
-                    }
-                }
-                ClientCredentials = new(clientId, clientSecret);
-            }
-            string? userName = appSettings.UserName;
-            if (userName is null)
-            {
-                Console.Write("User Name: ");
-                userName = Console.ReadLine();
-                if (string.IsNullOrEmpty(userName))
-                {
-                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.UserName), SHORTHAND_u);
-                    UserCredentials = null!;
-                    return;
-                }
-            }
-            string? password = appSettings.Password;
-            if (password is null)
-            {
-                Console.Write("Password: ");
-                password = Console.ReadLine();
-                if (string.IsNullOrEmpty(password))
-                {
-                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.Password), SHORTHAND_p);
-                    UserCredentials = null!;
-                    return;
-                }
-            }
-            UserCredentials = new NetworkCredential(userName, password);
+            if (clientSecret is not null)
+                _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientId));
         }
         else
         {
-            BaseURL = EmptyURI;
-            _logger.LogInvalidRemoteInstanceUrl(Uri.TryCreate(remoteUri, UriKind.Relative, out uri) ? uri : new Uri(Uri.EscapeDataString(remoteUri), UriKind.Relative));
-            UserCredentials = null!;
+            if (clientSecret is null)
+            {
+                Console.Write("Client Secret: ");
+                clientSecret = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(clientSecret))
+                {
+                    _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.ClientSecret));
+                    UserCredentials = null!;
+                    return;
+                }
+            }
+            ClientCredentials = new(clientId, clientSecret);
         }
+        string? userName = appSettings.UserName;
+        if (userName is null)
+        {
+            Console.Write("User Name: ");
+            userName = Console.ReadLine();
+            if (string.IsNullOrEmpty(userName))
+            {
+                _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.UserName), SHORTHAND_u);
+                UserCredentials = null!;
+                return;
+            }
+        }
+        string? password = appSettings.Password;
+        if (password is null)
+        {
+            Console.Write("Password: ");
+            password = Console.ReadLine();
+            if (string.IsNullOrEmpty(password))
+            {
+                _logger.LogCriticalSettingValueNotProvided(nameof(AppSettings.Password), SHORTHAND_p);
+                UserCredentials = null!;
+                return;
+            }
+        }
+        UserCredentials = new NetworkCredential(userName, password);
     }
 }

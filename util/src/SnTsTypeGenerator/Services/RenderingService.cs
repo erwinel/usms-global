@@ -801,28 +801,15 @@ public partial class RenderingService
             _outputFile = null;
             return;
         }
-        if (string.IsNullOrWhiteSpace(appSettings.Mode))
+        if (appSettings.GlobalScope.HasValue)
         {
-            _isScoped = true;
-            _logger.LogDefaultRenderMode(_isScoped);
+            _isScoped = !appSettings.GlobalScope.Value;
+            _logger.LogRenderModeSettingValue(_isScoped);
         }
         else
         {
-            switch (appSettings.Mode.Trim().ToLower())
-            {
-                case MODE_SCOPED:
-                case MODE_SCOPED_ABBR:
-                    _isScoped = true;
-                    break;
-                case MODE_GLOBAL:
-                case MODE_GLOBAL_ABBR:
-                    _isScoped = false;
-                    break;
-                default:
-                    _logger.LogInvalidModeOption(appSettings.Mode);
-                    return;
-            }
-            _logger.LogRenderModeSettingValue(_isScoped);
+            _isScoped = true;
+            _logger.LogDefaultRenderMode(_isScoped);
         }
 
         _forceOverwrite = appSettings.ForceOverwrite ?? false;

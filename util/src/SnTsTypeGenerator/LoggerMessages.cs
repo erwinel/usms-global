@@ -45,7 +45,7 @@ public static class LoggerMessages
             throw new TrackedException(exception);
         }
     }
-    
+
     public static async Task LogIfThrownAsync(this ILogger logger, Func<Task> asyncAction)
     {
         try { await asyncAction(); }
@@ -61,7 +61,7 @@ public static class LoggerMessages
             throw new TrackedException(exception);
         }
     }
-    
+
     public static T LogIfThrown<T>(this ILogger logger, Func<T> func)
     {
         try { return func(); }
@@ -77,7 +77,7 @@ public static class LoggerMessages
             throw new TrackedException(exception);
         }
     }
-    
+
     public static async Task<T> LogIfThrownAsync<T>(this ILogger logger, Func<Task<T>> asyncFunc)
     {
         try { return await asyncFunc(); }
@@ -93,7 +93,7 @@ public static class LoggerMessages
             throw new TrackedException(exception);
         }
     }
-    
+
     public static void LogOrThrowIfNotTrackable(this ILogger logger, Exception exception)
     {
         if (exception is ILogTrackable logTrackable)
@@ -330,41 +330,6 @@ public static class LoggerMessages
 
     #endregion
 
-    #region Critical UnexpectedServiceException (0xffff)
-
-    /// <summary>
-    /// Numerical event code for UnexpectedServiceException.
-    /// </summary>
-    public const int EVENT_ID_UnexpectedServiceException = 0xffff;
-
-    /// <summary>
-    /// Event ID for UnexpectedServiceException.
-    /// </summary>
-    public static readonly EventId UnexpectedServiceException = new(EVENT_ID_UnexpectedServiceException, nameof(UnexpectedServiceException));
-
-    private static readonly Action<ILogger, string, Exception?> _unexpectedServiceException = LoggerMessage.Define<string>(LogLevel.Critical, UnexpectedServiceException,
-        "Unexpected error executing service {TypeName}");
-
-    /// <summary>
-    /// Logs an UnexpectedServiceException event with event code 0xffff.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <param name="type">The service type that failed.</param>
-    /// <param name="error">The exception that caused the event.</param>
-    [Obsolete("Use LogUnexpectedException")]
-    public static void LogUnexpectedServiceException(this ILogger logger, Type type, Exception? error) => _unexpectedServiceException(logger, type.FullName ?? type.Name, error);
-
-    /// <summary>
-    /// Logs an UnexpectedServiceException event with event code 0xffff.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <param name="error">The exception that caused the event.</param>
-    /// <typeparam name="T">The service type that failed.</typeparam>
-    [Obsolete("Use LogUnexpectedException")]
-    public static void LogUnexpectedServiceException<T>(this ILogger logger, Exception error) => LogUnexpectedServiceException(logger, typeof(T), error);
-
-    #endregion
-
     #region Critical DbfileValidationError (0x0001)
 
     /// <summary>
@@ -373,11 +338,11 @@ public static class LoggerMessages
     public const int EVENT_ID_DbfileValidationError = 0x0001;
 
     public const string TEMPLATE_DbfileValidationError_Unexpected = "Unexpected error validating DB file path \"{DbFile}\".";
-    
+
     public const string TEMPLATE_DbfileValidationError_Invalid = "DB file path is invalid: \"{DbFile}\"";
-    
+
     public const string TEMPLATE_DbfileValidationError_TooLong = "DB file path is too long: {DbFile}";
-    
+
     /// <summary>
     /// Event ID for database file validation error.
     /// </summary>
@@ -628,14 +593,14 @@ public static class LoggerMessages
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="isScoped">Indicates whether the mode is for scoped scripts.</param>
-    public static void LogRenderModeSettingValue(this ILogger logger, bool isScoped) => _renderMode1(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
+    public static void LogRenderModeSettingValue(this ILogger logger, bool isScoped) => throw new NotImplementedException(); // _renderMode1(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
 
     /// <summary>
     /// Logs an RenderMode event with event code 0x0006.
     /// </summary>
     /// <param name="logger">The current logger.</param>
     /// <param name="isScoped">Indicates whether the default mode is for scoped scripts.</param>
-    public static void LogDefaultRenderMode(this ILogger logger, bool isScoped) => _renderMode2(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
+    public static void LogDefaultRenderMode(this ILogger logger, bool isScoped) => throw new NotImplementedException(); //  _renderMode2(logger, nameof(AppSettings.Mode), SHORTHAND_m, isScoped ? MODE_SCOPED : MODE_GLOBAL, null);
 
     #endregion
 
@@ -721,29 +686,7 @@ public static class LoggerMessages
 
     #endregion
 
-    #region Critical InvalidModeOption Error (0x000a)
-
-    /// <summary>
-    /// Numerical event code for InvalidModeOption.
-    /// </summary>
-    public const int EVENT_ID_InvalidModeOption = 0x000a;
-
-    /// <summary>
-    /// Event ID for InvalidModeOption.
-    /// </summary>
-    public static readonly EventId InvalidModeOption = new(EVENT_ID_InvalidModeOption, nameof(InvalidModeOption));
-
-    private static readonly Action<ILogger, string, Exception?> _invalidModeOption = LoggerMessage.Define<string>(LogLevel.Critical, InvalidModeOption,
-        $"The {nameof(AppSettings.Mode)} ({SHORTHAND_m}) option contains unknown mode value \"{{Mode}}\". Mode must be {MODE_SCOPED}, {MODE_SCOPED_ABBR}, {MODE_GLOBAL}, or {MODE_GLOBAL_ABBR}.");
-
-    /// <summary>
-    /// Logs an InvalidModeOption event with event code 0x000a.
-    /// </summary>
-    /// <param name="logger">The current logger.</param>
-    /// <param name="mode">The invalid mode value.</param>
-    public static void LogInvalidModeOption(this ILogger logger, string mode) => _invalidModeOption(logger, mode, null);
-
-    #endregion
+    // TODO: Create next new event with code 0x000a
 
     #region Critical OutputFileAlreadyExists Error (0x000b)
 
@@ -1533,7 +1476,7 @@ public static class LoggerMessages
     private static readonly Action<ILogger, Exception?> _unexpectedException1 = LoggerMessage.Define(LogLevel.Critical, UnexpectedException,
         "An unexpected exception has occurred.");
 
-    
+
     private static readonly Action<ILogger, string, Exception?> _unexpectedException2 = LoggerMessage.Define<string>(LogLevel.Critical, UnexpectedException,
         "An unexpected exception has occurred - Activity: {Activity}");
 
