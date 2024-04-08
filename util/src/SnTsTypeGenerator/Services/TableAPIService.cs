@@ -255,6 +255,35 @@ public sealed class TableAPIService
         return null;
     }
 
+    /// 
+    /// <summary>
+    /// Gets the Application from the remote ServiceNow instance that matches the specified package ID.
+    /// </summary>
+    /// <param name="name">The ID of the <see cref="RemoteApplication" />.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="RemoteApplication"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no scope was found in the remote ServiceNow instance.</returns>
+    internal async Task<RemoteApplication?> GetApplicationRecordByNameAsync(string name, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_handler is null)
+            throw new ObjectDisposedException(nameof(TableAPIService));
+        if (!_handler.InitSuccessful)
+            throw new InvalidOperationException();
+        _logger.LogGettingScopeByIdentifierFromRemote(name);
+        // (Uri requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
+        (Uri requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_STORE_APP, JSON_KEY_NAME, name, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.StoreAppFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_APP, JSON_KEY_NAME, name, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.CustomApplicationFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, JSON_KEY_NAME, name, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.ApplicationFromJson(requestUri, sysScopeResult, _logger);
+        _logger.LogNoResultsFromQuery(requestUri, responseObj);
+        return null;
+    }
+
     /// <summary>
     /// Gets the scope from the remote ServiceNow instance that matches the specified unique identifier.
     /// </summary>
@@ -319,6 +348,42 @@ public sealed class TableAPIService
         if (sysScopeResult is not null)
             return RemotePackage.ApplicationFromJson(requestUri, sysScopeResult, _logger);
         (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PACKAGE, JSON_KEY_SOURCE, id, cancellationToken);
+        if (sysScopeResult is null)
+        {
+            _logger.LogNoResultsFromQuery(requestUri, responseObj);
+            return null;
+        }
+        return RemotePackage.PackageFromJson(requestUri, sysScopeResult, _logger);
+    }
+
+    /// <summary>
+    /// Gets the scope from the remote ServiceNow instance that matches the specified package ID.
+    /// </summary>
+    /// <param name="name">The ID of the scope record.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="RemotePackage"/> record that matches the specified <paramref name="name"/> or <see langword="null" /> if no scope was found in the remote ServiceNow instance.</returns>
+    internal async Task<RemotePackage?> GetPackageRecordByNameAsync(string name, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_handler is null)
+            throw new ObjectDisposedException(nameof(TableAPIService));
+        if (!_handler.InitSuccessful)
+            throw new InvalidOperationException();
+        _logger.LogGettingScopeByIdentifierFromRemote(name);
+
+        (Uri? requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PLUGINS, JSON_KEY_NAME, name, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.PluginFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_STORE_APP, JSON_KEY_NAME, name, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.StoreAppFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_APP, JSON_KEY_NAME, name, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.CustomApplicationFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, JSON_KEY_NAME, name, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.ApplicationFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PACKAGE, JSON_KEY_NAME, name, cancellationToken);
         if (sysScopeResult is null)
         {
             _logger.LogNoResultsFromQuery(requestUri, responseObj);
