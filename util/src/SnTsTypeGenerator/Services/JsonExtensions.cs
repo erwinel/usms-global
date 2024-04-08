@@ -6,6 +6,23 @@ namespace SnTsTypeGenerator.Services;
 
 public static class JsonExtensions
 {
+    public static string ToOperatorString(this SnQueryOperator op) => op switch
+    {
+        SnQueryOperator.NotEqualTo => "!=",
+        SnQueryOperator.In => "IN",
+        SnQueryOperator.NotIn => "NOT IN",
+        SnQueryOperator.StartsWith => "STARTSWITH",
+        SnQueryOperator.EndsWith => "ENDSWITH",
+        SnQueryOperator.Contains => "CONTAINS",
+        SnQueryOperator.DoesNotContain => "DOES NOT CONTAIN",
+        SnQueryOperator.InstanceOf => "INSTANCEOF",
+        SnQueryOperator.GreaterThan => ">",
+        SnQueryOperator.GreaterThanOrEqualTo => ">=",
+        SnQueryOperator.LessThan => "<",
+        SnQueryOperator.LessThanOrEqualTo => "<",
+        _ => "=",
+    };
+
     /// <summary>
     /// Surrounds a string with quotes if it contains spaces or specific symbols.
     /// </summary>
@@ -21,13 +38,43 @@ public static class JsonExtensions
         return !value.Any(c => char.IsWhiteSpace(c)) && value.Length == result.Length - 2 ? value : result;
     }
 
-    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string id, CancellationToken cancellationToken) =>
-        await handler.GetJsonAsync($"{URI_PATH_API}/{tableName}/{Uri.EscapeDataString(id)}", $"{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
+    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string uniqueId, CancellationToken cancellationToken) =>
+        await handler.GetJsonAsync($"{URI_PATH_API}/{tableName.ToLower()}/{Uri.EscapeDataString(uniqueId.ToLower())}", $"{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
 
     public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string element, string value, CancellationToken cancellationToken)
     {
-        value = Uri.EscapeDataString($"{element}={value}");
-        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName}", $"{URI_PARAM_QUERY}={value}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
+        var encodedQuery = Uri.EscapeDataString($"{element.ToLower()}={value.ToLower()}");
+        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName.ToLower()}", $"{URI_PARAM_QUERY}={encodedQuery}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
+    }
+
+    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string element, SnQueryOperator @operator, string value, CancellationToken cancellationToken)
+    {
+        var encodedQuery = Uri.EscapeDataString($"{element.ToLower()}{@operator.ToOperatorString()}{value.ToLower()}");
+        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName.ToLower()}", $"{URI_PARAM_QUERY}={encodedQuery}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
+    }
+
+    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string element1, string value1, string element2, string value2, CancellationToken cancellationToken)
+    {
+        var encodedQuery = Uri.EscapeDataString($"{element1.ToLower()}={value1.ToLower()}^{element2.ToLower()}={value2.ToLower()}");
+        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName.ToLower()}", $"{URI_PARAM_QUERY}={encodedQuery}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
+    }
+
+    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string element1, string value1, bool joinOr, string element2, string value2, CancellationToken cancellationToken)
+    {
+        var encodedQuery = Uri.EscapeDataString($"{element1.ToLower()}={value1.ToLower()}{(joinOr ? "OR^" : "^")}{element2.ToLower()}={value2.ToLower()}");
+        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName.ToLower()}", $"{URI_PARAM_QUERY}={encodedQuery}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
+    }
+
+    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string element1, SnQueryOperator operator1, string value1, string element2, SnQueryOperator operator2, string value2, CancellationToken cancellationToken)
+    {
+        var encodedQuery = Uri.EscapeDataString($"{element1.ToLower()}{operator1.ToOperatorString()}{value1.ToLower()}^{element2.ToLower()}{operator2.ToOperatorString()}{value2.ToLower()}");
+        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName.ToLower()}", $"{URI_PARAM_QUERY}={encodedQuery}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
+    }
+
+    public static async Task<(Uri requestUri, JsonNode? Result)> GetTableApiJsonResponseAsync(this SnClientHandlerService handler, string tableName, string element1, SnQueryOperator operator1, string value1, bool joinOr, string element2, SnQueryOperator operator2, string value2, CancellationToken cancellationToken)
+    {
+        var encodedQuery = Uri.EscapeDataString($"{element1.ToLower()}{operator1.ToOperatorString()}{value1.ToLower()}{(joinOr ? "OR^" : "^")}{element2.ToLower()}{operator2.ToOperatorString()}{value2.ToLower()}");
+        return await handler.GetJsonAsync($"{URI_PATH_API}/{tableName.ToLower()}", $"{URI_PARAM_QUERY}={encodedQuery}&{URI_PARAM_DISPLAY_VALUE}=all", cancellationToken);
     }
 
     public static T? GetProperty<T>(this JsonObject source, string propertyName) where T : JsonNode => (source.TryGetPropertyValue(propertyName, out JsonNode? node) && node is T result) ? result : null;
