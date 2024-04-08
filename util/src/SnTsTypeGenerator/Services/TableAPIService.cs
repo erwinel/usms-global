@@ -39,6 +39,102 @@ public sealed class TableAPIService
         throw new InvalidHttpResponseException(requestUri, string.Empty);
     }
 
+    private async Task<(Uri RequestUri, JsonObject? Item, JsonObject ResponseObject)> GetTableApiJsonResponseAsync(string tableName, string element, string value, CancellationToken cancellationToken)
+    {
+        (Uri requestUri, JsonNode? jsonNode) = await _handler!.GetTableApiJsonResponseAsync(tableName, element, value, cancellationToken);
+        if (jsonNode is null)
+            throw new InvalidHttpResponseException(requestUri, string.Empty);
+        if (jsonNode is not JsonObject resultObj)
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
+        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
+            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
+        if (jsonNode is JsonObject response)
+            return (requestUri, response, resultObj);
+        if (jsonNode is JsonArray arr && arr.Count == 0)
+            return (requestUri, null, resultObj);
+        throw new InvalidHttpResponseException(requestUri, string.Empty);
+    }
+
+    private async Task<(Uri RequestUri, JsonObject? Item, JsonObject ResponseObject)> GetTableApiJsonResponseAsync(string tableName, string element, SnQueryOperator @operator, string value, CancellationToken cancellationToken)
+    {
+        (Uri requestUri, JsonNode? jsonNode) = await _handler!.GetTableApiJsonResponseAsync(tableName, element, @operator, value, cancellationToken);
+        if (jsonNode is null)
+            throw new InvalidHttpResponseException(requestUri, string.Empty);
+        if (jsonNode is not JsonObject resultObj)
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
+        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
+            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
+        if (jsonNode is JsonObject response)
+            return (requestUri, response, resultObj);
+        if (jsonNode is JsonArray arr && arr.Count == 0)
+            return (requestUri, null, resultObj);
+        throw new InvalidHttpResponseException(requestUri, string.Empty);
+    }
+
+    private async Task<(Uri RequestUri, JsonObject? Item, JsonObject ResponseObject)> GetTableApiJsonResponseAsync(string tableName, string element1, string value1, string element2, string value2, CancellationToken cancellationToken)
+    {
+        (Uri requestUri, JsonNode? jsonNode) = await _handler!.GetTableApiJsonResponseAsync(tableName, element1, value1, element2, value2, cancellationToken);
+        if (jsonNode is null)
+            throw new InvalidHttpResponseException(requestUri, string.Empty);
+        if (jsonNode is not JsonObject resultObj)
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
+        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
+            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
+        if (jsonNode is JsonObject response)
+            return (requestUri, response, resultObj);
+        if (jsonNode is JsonArray arr && arr.Count == 0)
+            return (requestUri, null, resultObj);
+        throw new InvalidHttpResponseException(requestUri, string.Empty);
+    }
+
+    private async Task<(Uri RequestUri, JsonObject? Item, JsonObject ResponseObject)> GetTableApiJsonResponseAsync(string tableName, string element1, string value1, bool joinOr, string element2, string value2, CancellationToken cancellationToken)
+    {
+        (Uri requestUri, JsonNode? jsonNode) = await _handler!.GetTableApiJsonResponseAsync(tableName, element1, value1, joinOr, element2, value2, cancellationToken);
+        if (jsonNode is null)
+            throw new InvalidHttpResponseException(requestUri, string.Empty);
+        if (jsonNode is not JsonObject resultObj)
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
+        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
+            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
+        if (jsonNode is JsonObject response)
+            return (requestUri, response, resultObj);
+        if (jsonNode is JsonArray arr && arr.Count == 0)
+            return (requestUri, null, resultObj);
+        throw new InvalidHttpResponseException(requestUri, string.Empty);
+    }
+
+    private async Task<(Uri RequestUri, JsonObject? Item, JsonObject ResponseObject)> GetTableApiJsonResponseAsync(string tableName, string element1, SnQueryOperator operator1, string value1, string element2, SnQueryOperator operator2, string value2, CancellationToken cancellationToken)
+    {
+        (Uri requestUri, JsonNode? jsonNode) = await _handler!.GetTableApiJsonResponseAsync(tableName, element1, operator1, value1, element2, operator2, value2, cancellationToken);
+        if (jsonNode is null)
+            throw new InvalidHttpResponseException(requestUri, string.Empty);
+        if (jsonNode is not JsonObject resultObj)
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
+        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
+            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
+        if (jsonNode is JsonObject response)
+            return (requestUri, response, resultObj);
+        if (jsonNode is JsonArray arr && arr.Count == 0)
+            return (requestUri, null, resultObj);
+        throw new InvalidHttpResponseException(requestUri, string.Empty);
+    }
+
+    private async Task<(Uri RequestUri, JsonObject? Item, JsonObject ResponseObject)> GetTableApiJsonResponseAsync(string tableName, string element1, SnQueryOperator operator1, string value1, bool joinOr, string element2, SnQueryOperator operator2, string value2, CancellationToken cancellationToken)
+    {
+        (Uri requestUri, JsonNode? jsonNode) = await _handler!.GetTableApiJsonResponseAsync(tableName, element1, operator1, value1, joinOr, element2, operator2, value2, cancellationToken);
+        if (jsonNode is null)
+            throw new InvalidHttpResponseException(requestUri, string.Empty);
+        if (jsonNode is not JsonObject resultObj)
+            throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
+        if (!resultObj.TryGetPropertyValue(JSON_KEY_RESULT, out jsonNode))
+            throw new ResponseResultPropertyNotFoundException(requestUri, resultObj);
+        if (jsonNode is JsonObject response)
+            return (requestUri, response, resultObj);
+        if (jsonNode is JsonArray arr && arr.Count == 0)
+            return (requestUri, null, resultObj);
+        throw new InvalidHttpResponseException(requestUri, string.Empty);
+    }
+
     /// <summary>
     /// Gets the table from the remote ServiceNow instance that matches the specified name.
     /// </summary>
@@ -130,6 +226,35 @@ public sealed class TableAPIService
         return null;
     }
 
+    /// 
+    /// <summary>
+    /// Gets the Application from the remote ServiceNow instance that matches the specified package ID.
+    /// </summary>
+    /// <param name="id">The ID of the <see cref="RemoteApplication" />.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="RemoteApplication"/> record that matches the specified <paramref name="id"/> or <see langword="null" /> if no scope was found in the remote ServiceNow instance.</returns>
+    internal async Task<RemoteApplication?> GetApplicationRecordByIdAsync(string id, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_handler is null)
+            throw new ObjectDisposedException(nameof(TableAPIService));
+        if (!_handler.InitSuccessful)
+            throw new InvalidOperationException();
+        _logger.LogGettingScopeByIdentifierFromRemote(id);
+        // (Uri requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, id, cancellationToken);
+        (Uri requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_STORE_APP, JSON_KEY_SOURCE, id, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.StoreAppFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_APP, JSON_KEY_SOURCE, id, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.CustomApplicationFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, JSON_KEY_SOURCE, id, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.ApplicationFromJson(requestUri, sysScopeResult, _logger);
+        _logger.LogNoResultsFromQuery(requestUri, responseObj);
+        return null;
+    }
+
     /// <summary>
     /// Gets the scope from the remote ServiceNow instance that matches the specified unique identifier.
     /// </summary>
@@ -158,6 +283,42 @@ public sealed class TableAPIService
         if (sysScopeResult is not null)
             return RemotePackage.ApplicationFromJson(requestUri, sysScopeResult, _logger);
         (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PACKAGE, sys_id, cancellationToken);
+        if (sysScopeResult is null)
+        {
+            _logger.LogNoResultsFromQuery(requestUri, responseObj);
+            return null;
+        }
+        return RemotePackage.PackageFromJson(requestUri, sysScopeResult, _logger);
+    }
+
+    /// <summary>
+    /// Gets the scope from the remote ServiceNow instance that matches the specified package ID.
+    /// </summary>
+    /// <param name="id">The ID of the scope record.</param>
+    /// <param name="cancellationToken">The token to observe.</param>
+    /// <returns>The <see cref="RemotePackage"/> record that matches the specified <paramref name="id"/> or <see langword="null" /> if no scope was found in the remote ServiceNow instance.</returns>
+    internal async Task<RemotePackage?> GetPackageRecordByIdAsync(string id, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_handler is null)
+            throw new ObjectDisposedException(nameof(TableAPIService));
+        if (!_handler.InitSuccessful)
+            throw new InvalidOperationException();
+        _logger.LogGettingScopeByIdentifierFromRemote(id);
+
+        (Uri? requestUri, JsonObject? sysScopeResult, JsonObject responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PLUGINS, JSON_KEY_SOURCE, id, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.PluginFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_STORE_APP, JSON_KEY_SOURCE, id, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.StoreAppFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_APP, JSON_KEY_SOURCE, id, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.CustomApplicationFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_SCOPE, JSON_KEY_SOURCE, id, cancellationToken);
+        if (sysScopeResult is not null)
+            return RemotePackage.ApplicationFromJson(requestUri, sysScopeResult, _logger);
+        (requestUri, sysScopeResult, responseObj) = await GetTableApiJsonResponseAsync(TABLE_NAME_SYS_PACKAGE, JSON_KEY_SOURCE, id, cancellationToken);
         if (sysScopeResult is null)
         {
             _logger.LogNoResultsFromQuery(requestUri, responseObj);
