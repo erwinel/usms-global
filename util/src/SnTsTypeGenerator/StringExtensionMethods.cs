@@ -152,4 +152,62 @@ public static partial class StringExtensionMethods
     public static readonly Regex ScopeNameRegex = GetScopeNameRegex();
 
     public static bool IsValidScopeName([NotNullWhen(true)] this string? value) => !string.IsNullOrEmpty(value) && ScopeNameRegex.IsMatch(value);
+
+    public static string? ToUriEncodedList(this IEnumerable<string>? values)
+    {
+        if (values is null) return null;
+        var arr = values.Where(a => !string.IsNullOrWhiteSpace(a)).Select(a =>
+        {
+            var i = a.IndexOf('=');
+            if (i < 0) return Uri.EscapeDataString(a);
+            if (i == 0)
+                return (a.Length == 1) ? a : "=" + Uri.EscapeDataString(a[1..]);
+            return Uri.EscapeDataString(a[..i]) + ((i < a.Length - 1) ? "=" + Uri.EscapeDataString(a[(i + 1)..]) : "=");
+        }).ToArray();
+        return arr.Length switch
+        {
+            0 => null,
+            1 => arr[0],
+            _ => string.Join('&', arr),
+        };
+    }
+
+    public static IEnumerable<string> FromUriEncodedList(this string? value)
+    {
+        if (!string.IsNullOrEmpty(value))
+            foreach (var s in value.Split('&'))
+                yield return s.Length switch
+                {
+                    0 or 1 => s,
+                    _ => Uri.UnescapeDataString(s),
+                };
+    }
+
+    public static string SplitPair(this string source, char separator, out string? value)
+    {
+        switch (source.Length)
+        {
+            case 0:
+                break;
+            case 1:
+                if (source[0] == separator)
+                {
+                    value = string.Empty;
+                    return value;
+                }
+                break;
+            default:
+                var i = source.IndexOf(separator);
+                if (i < 0) break;
+                if (i == 0)
+                {
+                    value = source[1..];
+                    return string.Empty;
+                }
+                value = (i < source.Length - 1) ? source[(i + 1)..] : string.Empty;
+                return source[0..i];
+        }
+        value = null;
+        return source;
+    }
 }
