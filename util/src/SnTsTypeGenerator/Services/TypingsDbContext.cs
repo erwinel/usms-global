@@ -91,11 +91,21 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(GlideType.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(GlideType.ScalarType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(GlideType.ScalarLength)}"" INT DEFAULT NULL,
-    ""{nameof(GlideType.ClassName)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.UnderlyingType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(GlideType.UseOriginalValue)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(GlideType.IsVisible)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(GlideType.GlobalElementType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
-    ""{nameof(GlideType.ScopedElementType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.ElementType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.CaseSensitive)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.EncodeUtf8)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.OmitSysOriginal)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.EdgeEncryptionEnabled)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.Serializer)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.IsMultiText)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.PdfCellType)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
+    ""{nameof(GlideType.NoSort)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.NoDataReplicate)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.NoAudit)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(GlideType.Attributes)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(GlideType.LastUpdated)}"" DATETIME NOT NULL,
     ""{nameof(GlideType.PackageID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Scope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(Scope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
@@ -397,7 +407,7 @@ public partial class TypingsDbContext : DbContext
                     _ = builder.Property(nameof(GlideType.Label)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(GlideType.SysID)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(GlideType.ScalarType)).UseCollation(COLLATION_NOCASE);
-                    _ = builder.Property(nameof(GlideType.ClassName)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(GlideType.UnderlyingType)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(GlideType.PackageID)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(GlideType.ScopeValue)).UseCollation(COLLATION_NOCASE);
                     _ = builder.Property(nameof(GlideType.SourceFqdn)).UseCollation(COLLATION_NOCASE);

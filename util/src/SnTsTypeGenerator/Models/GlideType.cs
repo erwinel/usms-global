@@ -66,14 +66,14 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     /// </summary>
     public int? ScalarLength { get; set; }
 
-    #region ClassName Property
+    #region UnderlyingType Property
 
-    private string? _className;
+    private string? _underlyingType;
     /// <summary>
     /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_CLASS_NAME" />) column.
     /// </summary>
-    [BackingField(nameof(_className))]
-    public string? ClassName { get => _className; set => _className = value.NullIfWhiteSpace(); }
+    [BackingField(nameof(_underlyingType))]
+    public string? UnderlyingType { get => _underlyingType; set => _underlyingType = value.NullIfWhiteSpace(); }
 
     #endregion
 
@@ -86,6 +86,61 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     /// Value of the "Visible" (<see cref="SnApiConstants.JSON_KEY_VISIBLE" />) column.
     /// </summary>
     public bool IsVisible { get; set; }
+
+    /// <summary>
+    /// Value of the <c>case_sensitive</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public bool CaseSensitive { get; set; }
+
+    /// <summary>
+    /// Value of the <c>encode_utf8</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public bool EncodeUtf8 { get; set; }
+
+    /// <summary>
+    /// Value of the <c>omit_sys_original</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public bool OmitSysOriginal { get; set; }
+
+    /// <summary>
+    /// Value of the <c>edge_encryption_enabled</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public bool EdgeEncryptionEnabled { get; set; }
+
+    /// <summary>
+    /// Value of the <c>serializer</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public string? Serializer { get; set; }
+
+    /// <summary>
+    /// Value of the <c>is_multi_text</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public bool IsMultiText { get; set; }
+
+    /// <summary>
+    /// Value of the <c>pdf_cell_type</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public string? PdfCellType { get; set; }
+
+    /// <summary>
+    /// Value of the <c>no_sort</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public bool NoSort { get; set; }
+
+    /// <summary>
+    /// Value of the <c>no_data_replicate</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public bool NoDataReplicate { get; set; }
+
+    /// <summary>
+    /// Value of the <c>no_audit</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public bool NoAudit { get; set; }
+
+    /// <summary>
+    /// Unparsed, URI-encoded values from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// </summary>
+    public string? Attributes { get; set; }
 
     /// <summary>
     /// Date and time that this record was last updated.
@@ -190,33 +245,17 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
 
     #endregion
 
-    #region GlobalElementType Property
+    #region ElementType Property
 
-    private string? _globalElementType;
-
-    /// <summary>
-    /// Gets the TypeScript GlideElement type name used in globally-scoped scripts.
-    /// </summary>
-    /// <value>The TypeScript name to use when referring to the corresponding GlideElement object in globally-scoped scripts or <see langword="null"/> to use the default type name.</value>
-    /// <remarks>This should correspond to the name of a TypeScript definition that is assignable from the 'GlideElement' type,
-    /// and is defined in any of the <c>*.d.ts</c> files in the <c>Resources/ts/global</c> folder.</remarks>
-    [BackingField(nameof(_globalElementType))]
-    public string? GlobalElementType { get => _globalElementType; set => _globalElementType = value.NullIfWhiteSpace(); }
-
-    #endregion
-
-    #region ScopedElementType Property
-
-    private string? _scopedElementType;
+    private string? _elementType;
 
     /// <summary>
-    /// Gets the TypeScript GlideElement type name used in scoped applications.
+    /// Gets the TypeScript GlideElement type name.
     /// </summary>
-    /// <value>The TypeScript name to use when referring to the corresponding GlideElement object in scoped applications or <see langword="null"/> to use the default type name.</value>
-    /// <remarks>This should correspond to the name of a TypeScript definition that is assignable from the 'GlideElement' type,
-    /// and is defined in any of the <c>*.d.ts</c> files in the <c>Resources/ts/scoped</c> folder.</remarks>
-    [BackingField(nameof(_scopedElementType))]
-    public string? ScopedElementType { get => _scopedElementType; set => _scopedElementType = value.NullIfWhiteSpace(); }
+    /// <value>The TypeScript name to use when referring to the corresponding GlideElement object or <see langword="null"/> to use the default type name.</value>
+    /// <remarks>This should correspond to the name of a TypeScript definition in the <c>ElementTypes.d.ts</c> file in the <c>Resources/ts/global</c> or <c>Resources/ts/scoped</c> folder.</remarks>
+    [BackingField(nameof(_elementType))]
+    public string? ElementType { get => _elementType; set => _elementType = value.NullIfWhiteSpace(); }
 
     #endregion
 
@@ -262,7 +301,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         { nameof(Label), JsonValue.Create(_label) },
         { nameof(ScalarType), JsonValue.Create(ScalarType) },
         { nameof(ScalarLength), JsonValue.Create(ScalarLength) },
-        { nameof(ClassName), JsonValue.Create(ClassName) },
+        { nameof(UnderlyingType), JsonValue.Create(UnderlyingType) },
         { nameof(UseOriginalValue), JsonValue.Create(UseOriginalValue) },
         { nameof(IsVisible), JsonValue.Create(IsVisible) },
         { nameof(LastUpdated), JsonValue.Create(LastUpdated) },

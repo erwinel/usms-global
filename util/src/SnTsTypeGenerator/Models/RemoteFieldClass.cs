@@ -16,9 +16,10 @@ namespace SnTsTypeGenerator.Models;
 /// <param name="ClassName">The value of the <c><see cref="JSON_KEY_CLASS_NAME" />.value</c> property or <see langword="null"/> if the <c>class_name.value</c> is empty.</param>
 /// <param name="UseOriginalValue">The boolean value of the <c><see cref="JSON_KEY_USE_ORIGINAL_VALUE" />.value</c> property.</param>
 /// <param name="IsVisible">The boolean value of the <c><see cref="JSON_KEY_VISIBLE" />.value</c> property.</param>
+/// <param name="Attributes">The boolean value of the <c><see cref="JSON_KEY_ATTRIBUTES" />.value</c> property.</param>
 /// <param name="Package">The deserialized <see cref="JSON_KEY_SYS_PACKAGE" /> property or <see langword="null"/> if the <c>sys_package.value</c> is empty.</param>
 /// <param name="Scope">The deserialized <see cref="JSON_KEY_SYS_SCOPE" /> property or <see langword="null"/> if the <c>sys_scope.value</c> is empty.</param>
-public record RemoteFieldClass(string Name, string Label, string SysID, string? ScalarType, int? ScalarLength, string? ClassName, bool UseOriginalValue, bool IsVisible, RemoteRef? Package,
+public record RemoteFieldClass(string Name, string Label, string SysID, string? ScalarType, int? ScalarLength, string? ClassName, bool UseOriginalValue, bool IsVisible, string? Attributes, RemoteRef? Package,
     RemoteRef? Scope)
 {
     internal static RemoteFieldClass? FromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray)
@@ -67,6 +68,7 @@ public record RemoteFieldClass(string Name, string Label, string SysID, string? 
             ClassName: sysGlideObject.GetFieldAsNonEmptyOrNull(JSON_KEY_CLASS_NAME),
             UseOriginalValue: sysGlideObject.GetFieldAsBoolean(JSON_KEY_USE_ORIGINAL_VALUE),
             IsVisible: sysGlideObject.GetFieldAsBoolean(JSON_KEY_VISIBLE),
+            Attributes: sysGlideObject.GetFieldAsNonEmptyOrNull(JSON_KEY_ATTRIBUTES),
             Package: RemoteRef.FromProperty(sysGlideObject, JSON_KEY_SYS_PACKAGE),
             Scope: RemoteRef.FromProperty(sysGlideObject, JSON_KEY_SYS_SCOPE));
     }

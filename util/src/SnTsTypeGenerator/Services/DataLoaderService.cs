@@ -425,7 +425,7 @@ public sealed class DataLoaderService : IDisposable
                     Label = fieldClass.Label,
                     ScalarType = fieldClass.ScalarType,
                     ScalarLength = fieldClass.ScalarLength,
-                    ClassName = fieldClass.ClassName,
+                    UnderlyingType = fieldClass.ClassName,
                     UseOriginalValue = fieldClass.UseOriginalValue,
                     IsVisible = fieldClass.IsVisible,
                     LastUpdated = DateTime.Now,
@@ -434,37 +434,159 @@ public sealed class DataLoaderService : IDisposable
                     Package = await FromPackageRefAsync(fieldClass.Package, source, cancellationToken),
                     Scope = await FromScopeRefAsync(fieldClass.Scope, source, cancellationToken)
                 };
-                if (_knownGlideTypes.TryGetValue(name, out KnownGlideType? knownGlideType))
+                if (!string.IsNullOrWhiteSpace(fieldClass.Attributes))
                 {
-                    if (!string.IsNullOrWhiteSpace(knownGlideType.GlobalElementType))
-                        type.GlobalElementType = knownGlideType.GlobalElementType;
-                    if (!string.IsNullOrWhiteSpace(knownGlideType.ScopedElementType))
-                        type.ScopedElementType = knownGlideType.ScopedElementType;
+                    List<string> notParsed = new();
+                    foreach (string a in fieldClass.Attributes.Split(','))
+                    {
+                        var key = a.SplitPair('=', out string? value);
+                        if (value is null)
+                            switch (key.ToLower())
+                            {
+                                case JSON_KEY_CASE_SENSITIVE:
+                                    type.CaseSensitive = true;
+                                    break;
+                                case JSON_KEY_ENCODE_UTF8:
+                                    type.EncodeUtf8 = true;
+                                    break;
+                                case JSON_KEY_OMIT_SYS_ORIGINAL:
+                                    type.OmitSysOriginal = true;
+                                    break;
+                                case JSON_KEY_EDGE_ENCRYPTION_ENABLED:
+                                    type.EdgeEncryptionEnabled = true;
+                                    break;
+                                case JSON_KEY_IS_MULTI_TEXT:
+                                    type.IsMultiText = true;
+                                    break;
+                                case JSON_KEY_NO_SORT:
+                                    type.NoSort = true;
+                                    break;
+                                case JSON_KEY_NO_DATA_REPLICATE:
+                                    type.NoDataReplicate = true;
+                                    break;
+                                case JSON_KEY_NO_AUDIT:
+                                    type.NoAudit = true;
+                                    break;
+                                default:
+                                    notParsed.Add(a);
+                                    break;
+                            }
+                        else
+                        {
+                            bool b;
+                            switch (key.ToLower())
+                            {
+                                case JSON_KEY_CASE_SENSITIVE:
+                                    if (bool.TryParse(value.ToLower(), out b))
+                                        type.CaseSensitive = b;
+                                    else
+                                        notParsed.Add(a);
+                                    break;
+                                case JSON_KEY_ENCODE_UTF8:
+                                    if (bool.TryParse(value.ToLower(), out b))
+                                        type.EncodeUtf8 = b;
+                                    else
+                                        notParsed.Add(a);
+                                    break;
+                                case JSON_KEY_OMIT_SYS_ORIGINAL:
+                                    if (bool.TryParse(value.ToLower(), out b))
+                                        type.OmitSysOriginal = b;
+                                    else
+                                        notParsed.Add(a);
+                                    break;
+                                case JSON_KEY_EDGE_ENCRYPTION_ENABLED:
+                                    if (bool.TryParse(value.ToLower(), out b))
+                                        type.EdgeEncryptionEnabled = b;
+                                    else
+                                        notParsed.Add(a);
+                                    break;
+                                case JSON_KEY_SERIALIZER:
+                                    type.Serializer = value;
+                                    break;
+                                case JSON_KEY_IS_MULTI_TEXT:
+                                    if (bool.TryParse(value.ToLower(), out b))
+                                        type.IsMultiText = b;
+                                    else
+                                        notParsed.Add(a);
+                                    break;
+                                case JSON_KEY_PDF_CELL_TYPE:
+                                    type.PdfCellType = value;
+                                    break;
+                                case JSON_KEY_NO_SORT:
+                                    if (bool.TryParse(value.ToLower(), out b))
+                                        type.NoSort = b;
+                                    else
+                                        notParsed.Add(a);
+                                    break;
+                                case JSON_KEY_NO_DATA_REPLICATE:
+                                    if (bool.TryParse(value.ToLower(), out b))
+                                        type.NoDataReplicate = b;
+                                    else
+                                        notParsed.Add(a);
+                                    break;
+                                case JSON_KEY_NO_AUDIT:
+                                    if (bool.TryParse(value.ToLower(), out b))
+                                        type.NoAudit = b;
+                                    else
+                                        notParsed.Add(a);
+                                    break;
+                                default:
+                                    notParsed.Add(a);
+                                    break;
+                            }
+                        }
+                    }
+                    type.Attributes = notParsed.ToUriEncodedList();
                 }
+                if (_knownGlideTypes.TryGetValue(name, out KnownGlideType? knownGlideType) && !string.IsNullOrWhiteSpace(knownGlideType.JsClass))
+                    type.ElementType = knownGlideType.JsClass;
             }
             else
             {
                 type = new()
                 {
                     Name = name,
-                    Label = remoteRef.Display ?? name,
                     LastUpdated = DateTime.Now,
                     Source = source
                 };
                 if (_knownGlideTypes.TryGetValue(name, out KnownGlideType? knownGlideType))
                 {
-                    if (string.IsNullOrWhiteSpace(remoteRef.Display))
-                        type.Label = string.IsNullOrWhiteSpace(knownGlideType.Label) ? name : knownGlideType.Label;
+                    type.Label = string.IsNullOrWhiteSpace(remoteRef.Display) ? (string.IsNullOrWhiteSpace(knownGlideType.Label) ? name : knownGlideType.Label) : remoteRef.Display;
                     type.ScalarLength = knownGlideType.ScalarLength;
                     if (!string.IsNullOrWhiteSpace(knownGlideType.ScalarType))
                         type.ScalarType = knownGlideType.ScalarType;
-                    if (!string.IsNullOrWhiteSpace(knownGlideType.GlobalElementType))
-                        type.GlobalElementType = knownGlideType.GlobalElementType;
-                    if (!string.IsNullOrWhiteSpace(knownGlideType.ScopedElementType))
-                        type.ScopedElementType = knownGlideType.ScopedElementType;
+                    if (!string.IsNullOrWhiteSpace(knownGlideType.JsClass))
+                        type.ElementType = knownGlideType.JsClass;
+                    if (!string.IsNullOrWhiteSpace(knownGlideType.UnderlyingType))
+                        type.UnderlyingType = knownGlideType.UnderlyingType;
+                    if (knownGlideType.DoNotUseOriginalValue.HasValue)
+                        type.UseOriginalValue = !knownGlideType.DoNotUseOriginalValue.Value;
+                    if (knownGlideType.Visible.HasValue)
+                        type.IsVisible = knownGlideType.Visible.Value;
+                    if (knownGlideType.CaseSensitive.HasValue)
+                        type.CaseSensitive = knownGlideType.CaseSensitive.Value;
+                    if (knownGlideType.EncodeUtf8.HasValue)
+                        type.EncodeUtf8 = knownGlideType.EncodeUtf8.Value;
+                    if (knownGlideType.OmitSysOriginal.HasValue)
+                        type.OmitSysOriginal = knownGlideType.OmitSysOriginal.Value;
+                    if (knownGlideType.EdgeEncryptionEnabled.HasValue)
+                        type.EdgeEncryptionEnabled = knownGlideType.EdgeEncryptionEnabled.Value;
+                    if (!string.IsNullOrWhiteSpace(knownGlideType.Serializer))
+                        type.Serializer = knownGlideType.Serializer;
+                    if (knownGlideType.IsMultiText.HasValue)
+                        type.IsMultiText = knownGlideType.IsMultiText.Value;
+                    if (!string.IsNullOrWhiteSpace(knownGlideType.PdfCellType))
+                        type.PdfCellType = knownGlideType.PdfCellType;
+                    if (knownGlideType.NoSort.HasValue)
+                        type.NoSort = knownGlideType.NoSort.Value;
+                    if (knownGlideType.NoDataReplicate.HasValue)
+                        type.NoDataReplicate = knownGlideType.NoDataReplicate.Value;
+                    if (knownGlideType.NoAudit.HasValue)
+                        type.NoAudit = knownGlideType.NoAudit.Value;
+                    type.Attributes = knownGlideType.Attributes?.ToUriEncodedList();
                 }
-                else if (string.IsNullOrWhiteSpace(remoteRef.Display))
-                    type.Label = name;
+                else
+                    type.Label = string.IsNullOrWhiteSpace(remoteRef.Display) ? name : remoteRef.Display;
             }
             await _dbContext.Types.AddAsync(type, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);

@@ -375,6 +375,31 @@ internal static class SnApiConstants
     internal const string JSON_KEY_VISIBLE = "visible";
 
     /// <summary>
+    /// "Attributes" Column (element) name.
+    /// </summary>
+    internal const string JSON_KEY_ATTRIBUTES = "attributes";
+
+    internal const string JSON_KEY_CASE_SENSITIVE = "case_sensitive";
+
+    internal const string JSON_KEY_ENCODE_UTF8 = "encode_utf8";
+
+    internal const string JSON_KEY_OMIT_SYS_ORIGINAL = "omit_sys_original";
+
+    internal const string JSON_KEY_EDGE_ENCRYPTION_ENABLED = "edge_encryption_enabled";
+
+    internal const string JSON_KEY_SERIALIZER = "serializer";
+
+    internal const string JSON_KEY_IS_MULTI_TEXT = "is_multi_text";
+
+    internal const string JSON_KEY_PDF_CELL_TYPE = "pdf_cell_type";
+
+    internal const string JSON_KEY_NO_SORT = "no_sort";
+
+    internal const string JSON_KEY_NO_DATA_REPLICATE = "no_data_replicate";
+
+    internal const string JSON_KEY_NO_AUDIT = "no_audit";
+
+    /// <summary>
     /// "Created By" Column (element) name.
     /// </summary>
     internal const string JSON_KEY_SYS_CREATED_BY = "sys_created_by";

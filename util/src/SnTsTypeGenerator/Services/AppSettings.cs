@@ -126,9 +126,14 @@ public class AppSettings
     /// <summary>
     /// Gets the glide type mappings to refer to when adding new rows to the <see cref="Models.GlideType"/> table.
     /// </summary>
+    public List<JsClassMapping>? JsClassMappings { get; set; }
+
+    /// <summary>
+    /// Gets the glide type mappings to refer to when adding new rows to the <see cref="Models.GlideType"/> table.
+    /// </summary>
     public List<KnownGlideType>? KnownGlideTypes { get; set; }
 
-    /// /// <summary>
+    /// <summary>
     /// Gets the glide type mappings to refer to when adding new rows to the <see cref="Models.GlideType"/> table.
     /// </summary>
     public List<DefaultPackageGroup>? DefaultPackageGroups { get; set; }
@@ -136,6 +141,26 @@ public class AppSettings
     public bool? Help { get; set; }
 
     public bool ShowHelp() => Help ?? false;
+
+    private ReadOnlyDictionary<string, string>? _jsClassMappings = null;
+    public ReadOnlyDictionary<string, string> GetJsClassMappings()
+    {
+        if (_jsClassMappings is not null) return _jsClassMappings;
+        Dictionary<string, string> result = new(StringComparer.InvariantCultureIgnoreCase);
+        _jsClassMappings = new(result);
+        if (JsClassMappings is not null)
+            foreach (JsClassMapping t in JsClassMappings.Where(t => t is not null && !(string.IsNullOrEmpty(t.JsClass) || string.IsNullOrEmpty(t.PackageName))))
+            {
+                if (!result.ContainsKey(t.JsClass))
+                    result.Add(t.JsClass, t.PackageName);
+            }
+        foreach (JsClassMapping t in JsClassMapping.GetDefaultJsClassMappings())
+        {
+            if (!result.ContainsKey(t.JsClass))
+                result.Add(t.JsClass, t.PackageName);
+        }
+        return _jsClassMappings;
+    }
 
     private ReadOnlyDictionary<string, KnownGlideType>? _knownGlideTypes = null;
     public ReadOnlyDictionary<string, KnownGlideType> GetKnownGlideTypes()
@@ -155,14 +180,51 @@ public class AppSettings
             {
                 if (string.IsNullOrWhiteSpace(existing.Label) && !string.IsNullOrWhiteSpace(t.Label))
                     existing.Label = t.Label;
+                if (string.IsNullOrWhiteSpace(existing.JsClass))
+                    existing.JsClass = t.JsClass;
                 if (string.IsNullOrWhiteSpace(existing.ScalarType) && !string.IsNullOrWhiteSpace(t.ScalarType))
                     existing.ScalarType = t.ScalarType;
-                if (string.IsNullOrWhiteSpace(existing.GlobalElementType) && !string.IsNullOrWhiteSpace(t.GlobalElementType))
-                    existing.GlobalElementType = t.GlobalElementType;
-                if (string.IsNullOrWhiteSpace(existing.ScopedElementType) && !string.IsNullOrWhiteSpace(t.ScopedElementType))
-                    existing.ScopedElementType = t.ScopedElementType;
                 if (!existing.ScalarLength.HasValue && t.ScalarLength.HasValue)
                     existing.ScalarLength = t.ScalarLength;
+                if (string.IsNullOrWhiteSpace(existing.UnderlyingType) && !string.IsNullOrWhiteSpace(t.UnderlyingType))
+                    existing.UnderlyingType = t.UnderlyingType;
+                if (!existing.Visible.HasValue && t.Visible.HasValue)
+                    existing.Visible = t.Visible;
+                if (!existing.DoNotUseOriginalValue.HasValue && t.DoNotUseOriginalValue.HasValue)
+                    existing.DoNotUseOriginalValue = t.DoNotUseOriginalValue;
+                if (!existing.CaseSensitive.HasValue && t.CaseSensitive.HasValue)
+                    existing.CaseSensitive = t.CaseSensitive;
+                if (!existing.EncodeUtf8.HasValue && t.EncodeUtf8.HasValue)
+                    existing.EncodeUtf8 = t.EncodeUtf8;
+                if (!existing.OmitSysOriginal.HasValue && t.OmitSysOriginal.HasValue)
+                    existing.OmitSysOriginal = t.OmitSysOriginal;
+                if (!existing.EdgeEncryptionEnabled.HasValue && t.EdgeEncryptionEnabled.HasValue)
+                    existing.EdgeEncryptionEnabled = t.EdgeEncryptionEnabled;
+                if (string.IsNullOrWhiteSpace(existing.Serializer) && !string.IsNullOrWhiteSpace(t.Serializer))
+                    existing.Serializer = t.Serializer;
+                if (!existing.IsMultiText.HasValue && t.IsMultiText.HasValue)
+                    existing.IsMultiText = t.IsMultiText;
+                if (string.IsNullOrWhiteSpace(existing.PdfCellType) && !string.IsNullOrWhiteSpace(t.PdfCellType))
+                    existing.PdfCellType = t.PdfCellType;
+                if (!existing.NoSort.HasValue && t.NoSort.HasValue)
+                    existing.NoSort = t.NoSort;
+                if (!existing.NoDataReplicate.HasValue && t.NoDataReplicate.HasValue)
+                    existing.NoDataReplicate = t.NoDataReplicate;
+                if (!existing.NoAudit.HasValue && t.NoAudit.HasValue)
+                    existing.NoAudit = t.NoAudit;
+
+                if (t.Attributes is not null && t.Attributes.Count > 0)
+                {
+                    if (existing.Attributes is null || existing.Attributes.Count == 0)
+                        existing.Attributes = new(t.Attributes.ToArray());
+                    else
+                    {
+                        var comparer = StringComparer.InvariantCultureIgnoreCase;
+                        foreach (var a in t.Attributes.Where(s => !string.IsNullOrWhiteSpace(s)))
+                            if (!existing.Attributes.Contains(a, comparer))
+                                existing.Attributes.Add(a);
+                    }
+                }
             }
             else
                 result.Add(t.Name, t);
