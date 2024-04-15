@@ -120,7 +120,7 @@ public class AltCommandLineConfigurationProvider : ConfigurationProvider
                 {
                     // "/SomeSwitch" is equivalent to "--SomeSwitch" when interpreting switch mappings
                     // So we do a conversion to simplify later processing
-                    currentArg = string.Format("--{0}", currentArg.Substring(1));
+                    currentArg = string.Format("--{0}", currentArg[1..]);
                     keyStartIndex = 2;
                 }
 
