@@ -29,7 +29,7 @@ declare namespace $$class {
         /**
          * The optional class initialization method.
          */
-        readonly initialize?: {  (): void; };
+        readonly initialize?: { (): void; };
     }
 
     /**
@@ -42,7 +42,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype0;
-        
+
         /**
          * Creates a new instance of the implementing class.
          */
@@ -50,7 +50,7 @@ declare namespace $$class {
     }
 
     // #endregion
-    
+
     // #region 1 constructor arg.
 
     /**
@@ -64,7 +64,7 @@ declare namespace $$class {
          */
         initialize(arg: TArg): void;
     }
-    
+
     /**
      * Defines an object constructor that has 1 argument.
      * @template TArg - The constructor argument type.
@@ -76,7 +76,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype1<TArg>;
-        
+
         /**
          * Default constructor.
          * @param {TArg} arg - The constructor argument.
@@ -95,7 +95,7 @@ declare namespace $$class {
          */
         initialize(arg?: TArg): void;
     }
-    
+
     /**
      * Defines a prototype for a class that has 1 optional argument.
      * @template TArg - The optional constructor argument type.
@@ -107,7 +107,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype1Opt<TArg>;
-        
+
         /**
          * Default constructor.
          * @param {TArg} [arg] - The optional constructor argument.
@@ -128,9 +128,9 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2): void;
     }
-    
+
     // #endregion
-    
+
     // #region 2 constructor args.
 
     /**
@@ -145,7 +145,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype2<TArg1, TArg2>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -167,7 +167,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2?: TArg2): void;
     }
-    
+
     /**
      * Defines an object constructor that has 1 or 2 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -180,7 +180,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype2Opt1<TArg1, TArg2>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -202,7 +202,7 @@ declare namespace $$class {
          */
         initialize(arg1?: TArg1, arg2?: TArg2): void;
     }
-    
+
     /**
      * Defines an object constructor that has up to 2 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -215,7 +215,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype2Opt<TArg1, TArg2>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} [arg1] - The first optional constructor argument.
@@ -225,7 +225,7 @@ declare namespace $$class {
     }
 
     // #endregion
-    
+
     // #region 3 constructor args.
 
     /**
@@ -243,7 +243,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3): void;
     }
-    
+
     /**
      * Defines an object constructor that has 3 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -257,7 +257,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype3<TArg1, TArg2, TArg3>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -282,7 +282,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3?: TArg3): void;
     }
-    
+
     /**
      * Defines an object constructor that has 2 or 3 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -296,7 +296,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype3Opt1<TArg1, TArg2, TArg3>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -321,7 +321,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2?: TArg2, arg3?: TArg3): void;
     }
-    
+
     /**
      * Defines an object constructor that has 1 to 3 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -335,7 +335,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype3Opt2<TArg1, TArg2, TArg3>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -360,7 +360,7 @@ declare namespace $$class {
          */
         initialize(arg1?: TArg1, arg2?: TArg2, arg3?: TArg3): void;
     }
-    
+
     /**
      * Defines an object constructor that has up to 3 arguments.
      * @template TArg1 - The type of the first optional constructor argument.
@@ -374,7 +374,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype3Opt<TArg1, TArg2, TArg3>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} [arg1] - The first constructor argument.
@@ -385,7 +385,7 @@ declare namespace $$class {
     }
 
     // #endregion
-    
+
     // #region 4 constructor args.
 
     /**
@@ -405,7 +405,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4): void;
     }
-    
+
     /**
      * Defines an object constructor that has 4 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -420,7 +420,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype4<TArg1, TArg2, TArg3, TArg4>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -448,7 +448,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4?: TArg4): void;
     }
-    
+
     /**
      * Defines an object constructor that has 3 or 4 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -463,7 +463,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype4Opt1<TArg1, TArg2, TArg3, TArg4>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -491,7 +491,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3?: TArg3, arg4?: TArg4): void;
     }
-    
+
     /**
      * Defines an object constructor that has 2 to 4 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -506,7 +506,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype4Opt2<TArg1, TArg2, TArg3, TArg4>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -534,7 +534,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2?: TArg2, arg3?: TArg3, arg4?: TArg4): void;
     }
-    
+
     /**
      * Defines an object constructor that has 2 to 4 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -549,7 +549,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype4Opt3<TArg1, TArg2, TArg3, TArg4>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -577,7 +577,7 @@ declare namespace $$class {
          */
         initialize(arg1?: TArg1, arg2?: TArg2, arg3?: TArg3, arg4?: TArg4): void;
     }
-    
+
     /**
      * Defines an object constructor that has 4 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -592,7 +592,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype4Opt<TArg1, TArg2, TArg3, TArg4>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} [arg1] - The first optional constructor argument.
@@ -604,7 +604,7 @@ declare namespace $$class {
     }
 
     // #endregion
-    
+
     // #region 5 constructor args.
 
     /**
@@ -626,7 +626,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5): void;
     }
-    
+
     /**
      * Defines an object constructor that has 5 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -642,7 +642,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype5<TArg1, TArg2, TArg3, TArg4, TArg5>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -673,7 +673,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5?: TArg5): void;
     }
-    
+
     /**
      * Defines an object constructor that has 4 or 5 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -689,7 +689,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype5Opt1<TArg1, TArg2, TArg3, TArg4, TArg5>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -720,7 +720,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4?: TArg4, arg5?: TArg5): void;
     }
-    
+
     /**
      * Defines an object constructor that has 3 to 5 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -736,7 +736,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype5Opt2<TArg1, TArg2, TArg3, TArg4, TArg5>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -767,7 +767,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3?: TArg3, arg4?: TArg4, arg5?: TArg5): void;
     }
-    
+
     /**
      * Defines an object constructor that has 2 to 5 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -783,7 +783,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype5Opt3<TArg1, TArg2, TArg3, TArg4, TArg5>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -814,7 +814,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2?: TArg2, arg3?: TArg3, arg4?: TArg4, arg5?: TArg5): void;
     }
-    
+
     /**
      * Defines an object constructor that has 1 to 5 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -830,7 +830,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype5Opt4<TArg1, TArg2, TArg3, TArg4, TArg5>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -861,7 +861,7 @@ declare namespace $$class {
          */
         initialize(arg1?: TArg1, arg2?: TArg2, arg3?: TArg3, arg4?: TArg4, arg5?: TArg5): void;
     }
-    
+
     /**
      * Defines an object constructor that has up to 5 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -877,7 +877,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype5Opt<TArg1, TArg2, TArg3, TArg4, TArg5>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} [arg1] - The first optional constructor argument.
@@ -890,7 +890,7 @@ declare namespace $$class {
     }
 
     // #endregion
-    
+
     // #region 6 constructor args.
 
     /**
@@ -914,7 +914,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5, arg6: TArg6): void;
     }
-    
+
     /**
      * Defines an object constructor that has 6 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -931,7 +931,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype6<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -965,7 +965,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5, arg6?: TArg6): void;
     }
-    
+
     /**
      * Defines an object constructor that has 5 or 6 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -982,7 +982,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype6Opt1<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1016,7 +1016,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5?: TArg5, arg6?: TArg6): void;
     }
-    
+
     /**
      * Defines an object constructor that has 4 to 6 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1033,7 +1033,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype6Opt2<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1067,7 +1067,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4?: TArg4, arg5?: TArg5, arg6?: TArg6): void;
     }
-    
+
     /**
      * Defines an object constructor that has 3 to 6 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1084,7 +1084,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype6Opt3<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1118,7 +1118,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3?: TArg3, arg4?: TArg4, arg5?: TArg5, arg6?: TArg6): void;
     }
-    
+
     /**
      * Defines an object constructor that has 2 to 6 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1135,7 +1135,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype6Opt4<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1169,7 +1169,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2?: TArg2, arg3?: TArg3, arg4?: TArg4, arg5?: TArg5, arg6?: TArg6): void;
     }
-    
+
     /**
      * Defines an object constructor that has 1 to 6 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1186,7 +1186,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype6Opt5<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1220,7 +1220,7 @@ declare namespace $$class {
          */
         initialize(arg1?: TArg1, arg2?: TArg2, arg3?: TArg3, arg4?: TArg4, arg5?: TArg5, arg6?: TArg6): void;
     }
-    
+
     /**
      * Defines an object constructor that has up to 6 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1237,7 +1237,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype6Opt<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} [arg1] - The first optional constructor argument.
@@ -1251,7 +1251,7 @@ declare namespace $$class {
     }
 
     // #endregion
-    
+
     // #region 7 constructor args.
 
     /**
@@ -1277,7 +1277,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5, arg6: TArg6, arg7: TArg7): void;
     }
-    
+
     /**
      * Defines an object constructor that has 7 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1295,7 +1295,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype7<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1332,7 +1332,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5, arg6: TArg6, arg7?: TArg7): void;
     }
-    
+
     /**
      * Defines an object constructor that has 6 or 7 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1350,7 +1350,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype7Opt1<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1387,7 +1387,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5: TArg5, arg6?: TArg6, arg7?: TArg7): void;
     }
-    
+
     /**
      * Defines an object constructor that has 5 to 7 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1405,7 +1405,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype7Opt2<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1442,7 +1442,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, arg5?: TArg5, arg6?: TArg6, arg7?: TArg7): void;
     }
-    
+
     /**
      * Defines an object constructor that has 4 to 7 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1460,7 +1460,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype7Opt3<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1497,7 +1497,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4?: TArg4, arg5?: TArg5, arg6?: TArg6, arg7?: TArg7): void;
     }
-    
+
     /**
      * Defines an object constructor that has 3 to 7 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1515,7 +1515,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype7Opt4<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1552,7 +1552,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, arg3?: TArg3, arg4?: TArg4, arg5?: TArg5, arg6?: TArg6, arg7?: TArg7): void;
     }
-    
+
     /**
      * Defines an object constructor that has 2 to 7 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1570,7 +1570,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype7Opt5<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1607,7 +1607,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg?: TArg2, arg3?: TArg3, arg4?: TArg4, arg5?: TArg5, arg6?: TArg6, arg7?: TArg7): void;
     }
-    
+
     /**
      * Defines an object constructor that has 1 to 7 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1625,7 +1625,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype7Opt6<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} arg1 - The first constructor argument.
@@ -1662,7 +1662,7 @@ declare namespace $$class {
          */
         initialize(arg1?: TArg1, arg2?: TArg2, arg3?: TArg3, arg4?: TArg4, arg5?: TArg5, arg6?: TArg6, arg7?: TArg7): void;
     }
-    
+
     /**
      * Defines an object constructor that has up to 7 arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1680,7 +1680,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype7Opt<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1} [arg1] - The first optional constructor argument.
@@ -1695,7 +1695,7 @@ declare namespace $$class {
     }
 
     // #endregion
-    
+
     // #region varying constructor args.
 
     /**
@@ -1709,7 +1709,7 @@ declare namespace $$class {
          */
         initialize(...args: TArg[]): void;
     }
-    
+
     /**
      * Defines an object constructor that has a varying number of constructor arguments.
      * @template TArg - The type of the optional constructor arguments.
@@ -1721,7 +1721,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototypeN<TArg>;
-        
+
         /**
          * Default constructor.
          * @param {...TArg[]} args -  Optional constructor arguments.
@@ -1742,7 +1742,7 @@ declare namespace $$class {
          */
         initialize(value: TArg1, ...additionalArgs: TArgN[]): void;
     }
-    
+
     /**
      * Defines an object constructor that has 1 argument optionally followed by a varying number of additional arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1755,7 +1755,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype1N<TArg1, TArgN>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1[]} value - The first constructor argument.
@@ -1779,7 +1779,7 @@ declare namespace $$class {
          */
         initialize(arg1: TArg1, arg2: TArg2, ...additionalArgs: TArg3[]): void;
     }
-    
+
     /**
      * Defines an object constructor that has 2 arguments optionally followed by a varying number of additional arguments.
      * @template TArg1 - The type of the first constructor argument.
@@ -1793,7 +1793,7 @@ declare namespace $$class {
          * Gets or sets the prototype for the implementing class.
          */
         prototype: TPrototype & IPrototype2N<TArg1, TArg2>;
-        
+
         /**
          * Default constructor.
          * @param {TArg1[]} arg1 - The first constructor argument.
@@ -1815,7 +1815,7 @@ declare namespace $$class {
         Constructor7Opt2<any, any, any, any, any, any, any, T> | Constructor7Opt3<any, any, any, any, any, any, any, T> | Constructor7Opt4<any, any, any, any, any, any, any, T> |
         Constructor7Opt5<any, any, any, any, any, any, any, T> | Constructor7Opt6<any, any, any, any, any, any, any, T> | Constructor7Opt<any, any, any, any, any, any, any, T> |
         ConstructorN<T, any>;
-        
+
     /**
      * Marker type for a JavaScript object type.
      */
@@ -1881,7 +1881,7 @@ declare namespace $$class {
         create<TArg1, TArg2, TArg3,
             TInstance extends JSProto,
             TConstructor extends Constructor3<TArg1, TArg2, TArg3, TInstance, TPrototype> | Constructor3Opt1<TArg1, TArg2, TArg3, TInstance, TPrototype> | Constructor3Opt2<TArg1, TArg2, TArg3, TInstance, TPrototype> | Constructor3Opt<TArg1, TArg2, TArg3,
-            TInstance, TPrototype>, TPrototype extends TInstance = TInstance>(): TConstructor;
+                TInstance, TPrototype>, TPrototype extends TInstance = TInstance>(): TConstructor;
 
         /**
          * Creates a class constructor object
@@ -1977,7 +1977,7 @@ interface ObjectConstructor {
     //  */
     // extendsObject<B extends Function, TInstance, TPrototype extends TInstance = TInstance>(base: B, derived: TPrototype & ThisType<$$class.PickProperty<B, 'prototype'> & TInstance>):
     //     $$class.PickProperty<B, 'prototype'> & $$class.Constructor<TInstance & B, TPrototype & B> & ThisType<$$class.PickProperty<B, 'prototype'> & TInstance>;
-    
+
     // extendsObject<TBaseType extends $$class.JSProto, TBaseConstructor extends $$class.Constructor<TBaseType>, TInstance, TPrototype>(base: TBaseConstructor, derived: TPrototype & ThisType<TInstance> & $$class.IPrototype0):
     //     TPrototype & TBaseType & $$class.IPrototype0;
 
@@ -1986,10 +1986,10 @@ interface ObjectConstructor {
 
     extendsObject<TArg, B extends $$class.JSProto, P, A extends $$class.IPrototype1<TArg> | $$class.IPrototype1Opt<TArg> | $$class.IPrototypeN<TArg>, I extends B>(base: $$class.AnyConstructor<B>,
         derived: P & ThisType<I & P> & A): P & B & A;
-    
+
     extendsObject<TArg1, TArg2, B extends $$class.JSProto, P,
         A extends $$class.IPrototype2<TArg1, TArg2> | $$class.IPrototype2Opt1<TArg1, TArg2> | $$class.IPrototype2Opt<TArg1, TArg2> | $$class.IPrototype1N<TArg1, TArg2>, I extends B>(base: $$class.AnyConstructor<B>,
-        derived: P & ThisType<I & P> & A): P & B & A;
+            derived: P & ThisType<I & P> & A): P & B & A;
 
     extendsObject<TArg1, TArg2, TArg3, B extends $$class.JSProto, P,
         A extends $$class.IPrototype3<TArg1, TArg2, TArg3> | $$class.IPrototype3Opt1<TArg1, TArg2, TArg3> | $$class.IPrototype3Opt2<TArg1, TArg2, TArg3> | $$class.IPrototype3Opt<TArg1, TArg2, TArg3> |
@@ -1998,7 +1998,7 @@ interface ObjectConstructor {
     extendsObject<TArg1, TArg2, TArg3, TArg4, B extends $$class.JSProto, P,
         A extends $$class.IPrototype4<TArg1, TArg2, TArg3, TArg4> | $$class.IPrototype4Opt1<TArg1, TArg2, TArg3, TArg4> | $$class.IPrototype4Opt2<TArg1, TArg2, TArg3, TArg4> |
         $$class.IPrototype4Opt3<TArg1, TArg2, TArg3, TArg4> | $$class.IPrototype4Opt<TArg1, TArg2, TArg3, TArg4>, I extends B>(base: $$class.AnyConstructor<B>,
-        derived: P & ThisType<I & P> & A): P & B & A;
+            derived: P & ThisType<I & P> & A): P & B & A;
 
     extendsObject<TArg1, TArg2, TArg3, TArg4, TArg5, B extends $$class.JSProto, P,
         A extends $$class.IPrototype5<TArg1, TArg2, TArg3, TArg4, TArg5> | $$class.IPrototype5Opt1<TArg1, TArg2, TArg3, TArg4, TArg5> | $$class.IPrototype5Opt2<TArg1, TArg2, TArg3, TArg4, TArg5> |
@@ -2015,8 +2015,8 @@ interface ObjectConstructor {
         $$class.IPrototype7Opt2<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> | $$class.IPrototype7Opt3<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> |
         $$class.IPrototype7Opt4<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> | $$class.IPrototype7Opt5<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> |
         $$class.IPrototype7Opt6<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7> | $$class.IPrototype7Opt<TArg1, TArg2, TArg3, TArg4, TArg5, TArg6, TArg7>, I extends B>(base: $$class.AnyConstructor<B>,
-        derived: P & ThisType<I & P> & A): P & B & A;
-    
+            derived: P & ThisType<I & P> & A): P & B & A;
+
     clone<T extends $$class.JSProto>(obj: T): T;
 }
 

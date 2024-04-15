@@ -284,7 +284,7 @@ declare namespace global {
          * @return {T[]} An array of elements from both input arrays. Duplicates are not removed.
          */
         concat<T>(parent: T[], child: T[]): T[];
-    
+
         /**
          * Searches the array for the specified element.
          * @template T - The element type,
@@ -293,7 +293,7 @@ declare namespace global {
          * @return {boolean} True if the element exists in the array; otherwise returns false.
          */
         contains<T>(array: T[], element: T): boolean;
-    
+
         /**
          * Converts a Java object to an array.
          * @param {*} a - Object to convert.
@@ -309,14 +309,14 @@ declare namespace global {
          * @return {T[]} - Returns an array of items from array a that were not found in any other input array. Duplicates are removed from the result.
          */
         diff<T>(a: T[], b: T[], ...c: T[]): T[];
-    
+
         /**
          * Returns an array from the specified object.
          * @param {*} obj - Object from which to create an array.
          * @return {any[]} Array created from the object.
          */
         ensureArray(object: any): any[];
-    
+
         /**
          * Searches the array for the element.
          * @template T - The element type.
@@ -326,7 +326,7 @@ declare namespace global {
          * @return {number} Zero-based position of the element in the array, or -1 if the element is not found.
          */
         indexOf<T>(array: T, element: T, startIndex?: number): number;
-    
+
         /**
          * Finds the elements present in all arrays.
          * @template T - The element type.
@@ -346,7 +346,7 @@ declare namespace global {
          * @return {T[]} An array of items from all the input arrays. Duplicates are removed.
          */
         union<T>(a: T[], b: T[], ...c: T[]): T[];
-    
+
         /**
          * Removes duplicate items from an array.
          * @template T - The element type.
@@ -358,54 +358,54 @@ declare namespace global {
 
     export interface IAbstractAjaxProcessor {
         readonly CALLABLE_PREFIX: 'ajaxFunction_';
-        
+
         // readonly prototype: AbstractAjaxProcessor;
 
         readonly request?: GlideServletRequest;
-        
+
         readonly responseXML?: XMLDocument2;
 
         readonly gc?: Packages.com.glide.script.GlideController;
 
         initialize(request?: GlideServletRequest, responseXML?: XMLDocument2, gc?: Packages.com.glide.script.GlideController): void;
-        
+
         process(): any;
-        
+
         newItem(name?: string): Packages.org.w3c.dom.Element;
-        
+
         /**
          * returns value of parameter as a Java String instance
          * @param {string} name - The name of the parameter
          * @return {$$rhino.String} The value of the parameter.
          */
         getParameter(name: string): $$rhino.Nilable<$$rhino.String>;
-        
+
         getDocument(): XMLDocument2 | undefined;
-        
+
         getRootElement(): Packages.org.w3c.dom.Element;
-        
+
         /**
          * Returns value of "sysparm_name" as a Java String instance
          * @return {$$rhino.Stringg}
          */
         getName(): $$rhino.String;
-        
+
         /**
          * Returns value of "sysparm_value" as a Java String instance
          * @return {$$rhino.String}
          */
         getValue(): $$rhino.String;
-        
+
         /**
          * Returns value of "sysparm_type" as a Java String instance
          * @return {$$rhino.String}
          */
         getType(): $$rhino.String;
-        
+
         getChars(): $$rhino.String;
-        
+
         setAnswer(value: any): void;
-        
+
         setError(error: any): void;
     }
 
@@ -426,7 +426,7 @@ declare namespace global {
         readonly prototype: AbstractAjaxProcessor;
 
         readonly request?: GlideServletRequest;
-        
+
         readonly responseXML?: XMLDocument2;
 
         readonly gc?: Packages.com.glide.script.GlideController;
@@ -478,49 +478,49 @@ declare namespace global {
      */
     export class AttachmentUtils {
         attInptStream: GlideScriptableInputStream;
-    
+
         /**
          * Creates an instance of AttachmentUtils.
          * @param {string} attachmentSysId - Attachment sys_id.
          */
         constructor(attachmentSysId: string);
-    
+
         /**
          * Gets MD5 checksum for the attachment identified by the attachmentSysId parameter in the class initialization.
          * @return {$$rhino.String} MD5 checksum string.
          */
         getMD5ChecksumFromAttachment(): $$rhino.String;
-    
+
         /**
          * Gets SHA1 checksum for the attachment identified by the attachmentSysId parameter in the class initialization.
          * @return {$$rhino.String} SHA1 checksum string
          */
         getSHA1ChecksumFromAttachment(): $$rhino.String;
-    
+
         /**
          * Gets SHA256 checksum for the attachment identified by the attachmentSysId parameter in the class initialization.
          * @return {$$rhino.String} SHA256 checksum string
          */
         getSHA256ChecksumFromAttachment(): $$rhino.String;
-    
+
         /**
          * Gets MD5 Hex checksum for the attachment identified by the attachmentSysId parameter in the class initialization.
          * @return {$$rhino.String} MD5 Hex checksum string
          */
         getMD5HexChecksumFromAttachment(): $$rhino.String;
-    
+
         /**
          * Gets SHA1 Hex checksum for the attachment identified by the attachmentSysId parameter in the class initialization.
          * @return {$$rhino.String} SHA1 Hex checksum string
          */
         getSHA1HexChecksumFromAttachment(): $$rhino.String;
-    
+
         /**
          * Gets SHA256 Hex checksum for the attachment identified by the attachmentSysId parameter in the class initialization.
          * @return {$$rhino.String} SHA256 HEx checksum string
          */
         getSHA256HexChecksumFromAttachment(): $$rhino.String;
-    
+
         type: "AttachmentUtils";
     }
 
@@ -540,7 +540,7 @@ declare namespace global {
     }
 
     export class AvailabilityRecord {
-        type : service_availabilityType;
+        type: service_availabilityType;
         constructor(cmdb_ci: $$rhino.String, start: GlideDateTime, end: GlideDateTime);
         post(commitment: $$rhino.String, absolute: GlideDuration, scheduled: GlideDuration, absolute_avail: $$rhino.Number, scheduled_avail: $$rhino.Number, absolute_count: $$rhino.Number,
             scheduled_count: $$rhino.Number, ast: GlideDuration, mtbf: GlideDuration, mtrs: GlideDuration, allowed: GlideDuration, met: $$rhino.Boolean): void;
@@ -594,7 +594,7 @@ declare namespace global {
     export class ContentTypeValidator {
         defaultSupportedContentTypes: "image/svg+xml";
 
-	    constructor();
+        constructor();
 
         isValidType(attachment: GlideRecord, userDefinedSupportedContentTypes?: string[]): boolean;
     }
@@ -681,7 +681,7 @@ declare namespace global {
          * @param {$$rhino.String} table - Name of table to query.
          */
         constructor(table: $$rhino.String);
-    
+
         /**
          * Aggregates a field using a specified aggregation function.
          * @param {$$rhino.String} aggregateType - The type of aggregation function to perform.
@@ -692,7 +692,7 @@ declare namespace global {
          * and you don't need to use {@link #groupBy()}, then use {@link #avg()}, {@link #min()}, {@link #max()} or {@link #count()}, instead.
          */
         aggregate(aggregateType: AggregateType, field: $$rhino.String): GlideQuery;
-    
+
         /**
          * Returns the aggregate average of a given numeric field.
          * @param {$$rhino.String} field - Field on which to perform the operation.
@@ -700,37 +700,37 @@ declare namespace global {
          * @description You can only use this method on Integer, Long, Floating Point Number, Double and Currency fields.
          */
         avg(field: $$rhino.String): Optional<$$rhino.Number>;
-    
+
         /**
          * Returns the number of records that match the query.
          * @return {$$rhino.Number} Number of records that match the query.
          */
         count(): $$rhino.Number;
-    
+
         /**
          * Deletes all records in the table specified by the preceding Where clauses.
          */
         deleteMultiple(): void;
-    
+
         /**
          * Disables updating system fields, or fields with a name that starts with the sys prefix, such as sys_created_on, sys_updated_on, and sys_mod_count.
          * Only applies to the specified query.
          * @return {GlideQuery} The query object being built.
          */
         disableAutoSysFields(): GlideQuery;
-    
+
         /**
          * Disables any business rules, flows, workflows, or audit records that would run or be created as the result of the query.
          * @return {GlideQuery} The query object being built.
          */
         disableWorkflow(): GlideQuery;
-    
+
         /**
          * Forces a database update even when no record changes are made. For example, you can use this method to force a business rule to execute.
          * @return {GlideQuery} The query object being built.
          */
         forceUpdate(): GlideQuery;
-    
+
         /**
          * Returns a single record from the query.
          * @param {$$rhino.String} key - Sys_id of the record to return.
@@ -739,7 +739,7 @@ declare namespace global {
          * @return {Optional<{ [key: string]: $$rhino.String; }>} Object used to interact with a single record.
          */
         get(key: $$rhino.String, selectedFields?: $$rhino.String[]): Optional<{ [key: string]: $$rhino.String; }>;
-    
+
         /**
          * Returns an Optional object containing a single record based on a set of name-value pairs to query by.
          * Assumes the '=' operator for each name-value pair.
@@ -749,7 +749,7 @@ declare namespace global {
          * @return {Optional<{ [key: string]: $$rhino.String; }>} Object used to interact with a single record.
          */
         getBy(keyValues: { [key: string]: any; }, selectedFields?: $$rhino.String[]): Optional<{ [key: string]: $$rhino.String; }>;
-    
+
         /**
          * Groups the query results by a designated field or fields.
          * @param {($$rhino.String | $$rhino.String[])} fields - Field or fields to group the results by.
@@ -757,7 +757,7 @@ declare namespace global {
          * @description You must use this method with the {@link #aggregate} method.
          */
         groupBy(fields: $$rhino.String | $$rhino.String[]): GlideQuery;
-    
+
         /**
          * Filters aggregate groups so that you can display only groups of results that match a specified condition.
          * @param {AggregateType} aggregateType - The type of aggregation function to perform.
@@ -767,7 +767,7 @@ declare namespace global {
          * @return {GlideQuery} The query object being built.
          */
         having(aggregateType: AggregateType, field: $$rhino.String, operator: NumberQueryOperator, value: $$rhino.Number): GlideQuery;
-    
+
         /**
          * Inserts a record and returns an Optional object containing the record.
          * @param {{ [key: string]: any; }} keyValues - Object containing name-value pairs to insert into the record. Unspecified fields will be null.
@@ -776,7 +776,7 @@ declare namespace global {
          * @return {Optional<{ [key: string]: $$rhino.String; }>} Object used to interact with a single record.
          */
         insert(keyValues: { [key: string]: any; }, selectedFields?: $$rhino.String[]): Optional<{ [key: string]: $$rhino.String; }>;
-    
+
         /**
          * Updates an existing record, or inserts a new record if one does not already exist.
          * @param {{ [key: string]: any; }} changes - Object containing name-value pairs to update or insert into the record.
@@ -785,35 +785,35 @@ declare namespace global {
          * @return {Optional<{ [key: string]: $$rhino.String; }>} Object used to interact with a single record.
          */
         insertOrUpdate(changes: { [key: string]: any; }, selectedFields?: $$rhino.String[]): Optional<{ [key: string]: $$rhino.String; }>;
-    
+
         /**
          * Limits the number of records returned in a query.
          * @param {$$rhino.Number} limit - Number of records to return.
          * @return {GlideQuery} The query object being built.
          */
         limit(limit: $$rhino.Number): GlideQuery;
-    
+
         /**
          * Returns the aggregate maximum of a given field.
          * @param {$$rhino.String} field - Field on which to perform the operation.
          * @return {Optional<$$rhino.String>} Object used to interact with a single record.
          */
         max(field: $$rhino.String): Optional<$$rhino.String>;
-    
+
         /**
          * Returns the aggregate minimum of a given field.
          * @param {$$rhino.String} field - Field on which to perform the operation.
          * @return {Optional<$$rhino.String>} Object used to interact with a single record.
          */
         min(field: $$rhino.String): Optional<$$rhino.String>;
-    
+
         /**
          * Orders the returned result in ascending order by a given field.
          * @param {$$rhino.String} fields - Comma-delimited fields to order the result by in ascending order.
          * @return {GlideQuery} The query object being built.
          */
         orderBy(fields: $$rhino.String): GlideQuery;
-    
+
         /**
          * Orders the returned result in descending order by a given field.
          * @param {$$rhino.String} fieldOrAggregate - If the query does not use the aggregate() method, pass the field to order the results by.
@@ -822,7 +822,7 @@ declare namespace global {
          * @return {GlideQuery} The query object being built.
          */
         orderByDesc(fieldOrAggregate: $$rhino.String, field: $$rhino.String): GlideQuery;
-    
+
         /**
          * Adds an OR clause to a query that returns values based on a given condition.
          * @param {($$rhino.String | GlideQuery)} fieldOrQuery - Field or another GlideQuery object used in the where clause.
@@ -833,21 +833,21 @@ declare namespace global {
          * @return {GlideQuery} The query object being built.
          */
         orWhere(fieldOrQuery: $$rhino.String | GlideQuery, operator: $$rhino.Nilable<QueryOperator>, value: any): GlideQuery;
-    
+
         /**
          * Adds an OR clause that returns records that do not contain a null value in a given field.
          * @param {$$rhino.String} field - Field on which to perform the operation.
          * @return {GlideQuery} The query object being built.
          */
         orWhereNotNull(field: $$rhino.String): GlideQuery;
-    
+
         /**
          * Adds an OR clause to a query that returns records that contain a null value in a given field.
          * @param {$$rhino.String} field - Field on which to perform the operation.
          * @return {GlideQuery} The query object being built.
          */
         orWhereNull(field: $$rhino.String): GlideQuery;
-    
+
         /**
          * Returns the results of the query as a Stream object containing the specified fields.
          * @param {($$rhino.String | $$rhino.String[])} fields - Fields to display in the result.
@@ -861,7 +861,7 @@ declare namespace global {
          * CURRENCY_STRING=Returns the currency string of a currency field.
          */
         select(fields: $$rhino.String | $$rhino.String[]): Stream<{ [key: string]: $$rhino.String; }>;
-    
+
         /**
          * Returns the result of the query as an Optional object containing specified fields.
          * @param {$$rhino.String} [fields] - Fields to display in the result.
@@ -875,7 +875,7 @@ declare namespace global {
          * CURRENCY_STRING=Returns the currency string of a currency field.
          */
         selectOne(fields?: $$rhino.String): Optional<{ [key: string]: $$rhino.String; }>;
-    
+
         /**
          * Returns the aggregate sum of a given numeric field.
          * @param {$$rhino.String} field - Field on which to perform the operation.
@@ -883,14 +883,14 @@ declare namespace global {
          * @description You can only use this method on Integer, Long, Floating Point Number, Double and Currency fields.
          */
         sum(field: $$rhino.String): Optional<$$rhino.Number>;
-    
+
         /**
          * Returns a GlideRecord or GlideAggregate object that represents the current query.
          * @return {(GlideRecord | GlideAggregate)} GlideRecord or GlideAggregate object that contains the query.
          * @description After transforming the query, use the query() method in the GlideRecord or GlideAggregate classes to query the database.
          */
         toGlideRecord(): GlideRecord | GlideAggregate;
-    
+
         /**
          * Updates an existing record that matches the defined conditions.
          * @param {{ [key: string]: any; }} changes - Object containing name-value pairs to update in the record. Names must match fields in the table.
@@ -899,14 +899,14 @@ declare namespace global {
          * @return {Optional<{ [key: string]: $$rhino.String; }>} Object used to interact with a single record.
          */
         update(changes: { [key: string]: any; }, selectedFields?: $$rhino.String[]): Optional<{ [key: string]: $$rhino.String; }>;
-    
+
         /**
          * Updates all existing records that match the defined conditions. Returns the number of records updated.
          * @param {{ [key: string]: any; }} changes - Object containing name-value pairs to update in the record. Names must match fields in the table.
          * @return {{ rowCount: $$rhino.Number; }} Object containing the number of records that were updated.
          */
         updateMultiple(changes: { [key: string]: any; }): { rowCount: $$rhino.Number; };
-    
+
         /**
          * Adds a Where clause to the query that returns values based on a given condition.
          * @param {($$rhino.String | GlideQuery)} fieldOrQuery - Field or another GlideQuery object used in the where clause.
@@ -917,7 +917,7 @@ declare namespace global {
          * @description Do not precede this method with the {@link #orWhere}, {@link #orWhereNull}, or {@link #orWhereNotNull} methods.
          */
         where(fieldOrQuery: $$rhino.String | GlideQuery, operator: $$rhino.Nilable<$$rhino.String>, value: any): GlideQuery;
-    
+
         /**
          * Returns records that do not contain a null value in a given field.
          * @param {$$rhino.String} field - Field used in the query.
@@ -925,7 +925,7 @@ declare namespace global {
          * @description Do not precede this method with the {@link #orWhere}, {@link #orWhereNull}, or {@link #orWhereNotNull} methods.
          */
         whereNotNull(field: $$rhino.String): GlideQuery;
-    
+
         /**
          * Returns records that do not contain a null value in a given field.
          * @param {$$rhino.String} field - Field used in the query.
@@ -933,13 +933,13 @@ declare namespace global {
          * @description Do not precede this method with the {@link #orWhere}, {@link #orWhereNull}, or {@link #orWhereNotNull} methods.
          */
         whereNull(field: $$rhino.String): GlideQuery;
-    
+
         /**
          * Executes the query using the GlideRecordSecure API to securely query the database while honoring ACLs.
          * @return {GlideQuery} The query object being built.
          */
         withAcls(): GlideQuery;
-    
+
         type: "GlideQuery";
     }
 
@@ -1007,7 +1007,7 @@ declare namespace global {
          * @param {{ [key: string]: boolean; }} [ignore] - An optional hashmap of field names to ignore.
          */
         mergeToGR(hashMap: { [key: string]: string; }, now_GR: GlideRecord, ignore?: { [key: string]: boolean; }): void;
-        
+
         /**
          * Populates the given hashmap from the given GlideRecord instance. Each field in the GlideRecord becomes a property in the hashmap.
          * @param {{ [key: string]: string }} hashMap - An object being used as a hashmap.
@@ -1118,7 +1118,7 @@ declare namespace global {
          * @description Proxies calls to the ES5 JSON object, named NativeJSON in the global scope.
          */
         parse(str: $$rhino.String, reviver?: (this: any, key: string, value: any) => any): any;
-    
+
         /**
          * Creates a string from a JSON object.
          * @static
@@ -1144,7 +1144,7 @@ declare namespace global {
          * For all other object instances, only their enumerable properties are serialized.
          */
         stringify(jsonObject: any, replacer?: (this: any, key: string, value: any) => any, space?: string | number): string;
-    
+
         /**
          * Creates a string from a JSON object.
          * @static
@@ -1170,10 +1170,10 @@ declare namespace global {
          * For all other object instances, only their enumerable properties are serialized.
          */
         stringify(jsonObject: any, replacer?: (number | string)[] | null, space?: string | number): string;
-    
+
         type: "JSON";
     }
-    
+
     /**
      * JavaScript utility functions.
      * @see {@link https://docs.servicenow.com/bundle/utah-api-reference/page/app-store/dev_portal/API_reference/JSUtil/concept/c_JSUtilAPI.html}
@@ -1184,7 +1184,7 @@ declare namespace global {
          * Returns a map (Object) that is the union of all the given maps.
          */
         static union(...maps: { [key: string]: any }[]): { [key: string]: any };
-    
+
         /**
         * Removes entries from the given map. The second argument defines what will be removed. If it
         * is an array, it is treated as an array of names to remove. If it is an object, the names of
@@ -1192,37 +1192,37 @@ declare namespace global {
         * the single item to remove.
         */
         static removeFromMap(map: { [key: string]: any }, names: any): void;
-    
+
         /*
         *  Returns true if item is defined but has no properties or functions. (handy for associative arrays)
         */
         static isEmpty(item: any): boolean;
-    
+
         /*
         * Returns true if the given item is not null and is not undefined.
         */
         static has(item: any): boolean;
-    
+
         /*
         * Returns true if the given item is null or is undefined (the logical inverse of .has(), above).
         */
         static doesNotHave(item: any): boolean;
-    
+
         /*
         * Returns true if the given item is null, undefined, or evaluates to the empty string.
         */
         static nil(item: any): boolean;
-    
+
         /*
         * Returns true if the given item exists and is not empty (the logical inverse of .nil(), above).
         */
         static notNil(item: any): boolean;
-    
+
         /*
         * Returns the Rhino global object.
         */
         static getGlobal(): any;
-    
+
         /**
          * Returns true if the given item is a member of the given class.
          * For JavaScript objects, this method behaves exactly like the JavaScript operator "instanceof". However, this method (unlike the JavaScript operator) also tests Java objects.
@@ -1232,7 +1232,7 @@ declare namespace global {
          * @return {boolean}
          */
         static instance_of(item: any, klass: string): boolean;
-    
+
         /**
          * Returns the type of the given value as a string, as follows.
          * @static
@@ -1240,8 +1240,8 @@ declare namespace global {
          * @return {GlideJSType} A string value indicating the objec type.
          */
         static type_of(value: any | undefined): string;
-    
-    
+
+
         /**
         * Returns the type of the given value.
         *
@@ -1261,23 +1261,23 @@ declare namespace global {
         * See Also: type_of
         */
         static typeOf(x: any): string;
-    
+
         /*
         * Returns true if the given value is an instance of a Java object.
         */
         static isJavaObject(value: any): boolean;
-    
+
         /*
         * Coerces the given item to a boolean. If the given item is a boolean, it is passed through. Non-zero numbers return true. Null or
         * undefined returns false. Strings return true only if exactly equal to 'true'.
         */
         static toBoolean(item: any): boolean;
-    
+
         /*
         * Returns the value in a boolean GlideRecord field.
         */
         static getBooleanValue(gr: GlideRecord, field: string): boolean;
-    
+
         /**
         * Determines whether a value exists within an object or not.
         * @param {} container The haystack to search within.
@@ -1286,7 +1286,7 @@ declare namespace global {
         * @return True if value exists in container, False otherwise.
         */
         static contains(container: any, value: any, compareByIdentity?: boolean): boolean;
-    
+
         /*
         * Returns true if the two given values are equivalent, and optionally logs any differences. The two
         * values may be any value - JavaScript primitives or objects. Objects of classes Object, Array, Date,
@@ -1295,18 +1295,18 @@ declare namespace global {
         * new String('abc'). If differences are logged, they may be retrieved from JSUtil.areEqualLog.
         */
         static areEqual(val1: any, val2: any, logDiff?: boolean): boolean;
-    
+
         /*
         * Logs all the properties (recursively) in the given object: name, type, and value. The optional second parameter is a name for the logged object.
         */
         static logObject(obj: any, name: string): void;
-    
+
         /*
         * Returns a string that recursively describes all the properties in the given object: name, type, and value.
         * The optional second parameter is a name for the logged object.
         */
         static describeObject(obj: any, name?: string): string;
-    
+
         /*
         * NOTE: between this banner and the following banner, several string literals are specified in an odd way: by the contatenation of a single
         *       character ('&') and the remainder of the HTML entity (such as 'amp;'). This method was employed to avoid having the entities translated
@@ -1320,15 +1320,15 @@ declare namespace global {
         static readonly GT_ENT: RegExp;
         static readonly LT_ENT: RegExp;
         static readonly QT_ENT: RegExp;
-    
+
         static escapeText(text: string): string;
-    
+
         static unescapeText(text: string): string;
-    
+
         static escapeAttr(attr: string): string;
-    
+
         static unescapeAttr(attr: string): string;
-    
+
         /** Render an expanded/evaluted string from a string that may contain one
         *  or more Javascript expressions, each wrapped in a dolloar-braces
         *  delimiter pattern.
@@ -1385,7 +1385,7 @@ declare namespace global {
          * @param {string} [reason] - Reason given when an empty Optional is unwrapped (e.g. using `get()`)
          */
         constructor(value: T | null | undefined, lazyGetFn?: { (): T | null | undefined }, reason?: string);
-    
+
         /**
          * Applies a predicate function, a function that takes a single value and returns true or false, to the record inside the Optional object.
          * If the function returns true, the method returns the Optional record unchanged. If the function returns false, it returns an empty Optional object.
@@ -1393,7 +1393,7 @@ declare namespace global {
          * @return {Optional<U>} Object used to interact with a single record.
          */
         filter(predicate: { (value: T): boolean }): Optional<T>;
-    
+
         /**
          * Function to apply to the results of the query that returned the Optional object.
          * @template U - The record type.
@@ -1401,31 +1401,31 @@ declare namespace global {
          * @return {Optional<U>} Object used to interact with a single record.
          */
         flatMap<U>(fn: { (value: T): Optional<U> }): Optional<U>;
-    
+
         /**
          * Returns the record inside the Optional object, or throws an error if the query does not return a record.
          * @return {T} The record inside the Optional object. If the value is null or undefined, the system throws an error.
          */
         get(): T;
-    
+
         /**
          * Applies a function to the record within an Optional object. If the Optional object does not contain a record, the function does not execute.
          * @param {{ (value: T): void }} fn - The function to apply to the record within the Optional object.
          */
         ifPresent(fn: { (value: T): void }): void;
-    
+
         /**
          * Tests whether the current Optional contains no value.
          * @return {boolean} True if the current Optional contains no value; otherwise, false.
          */
         isEmpty(): boolean;
-    
+
         /**
          * Tests whether the current Optional object contains a value.
          * @return {boolean} True if the current Optional contains a value; otherwise, false.
          */
         isPresent(): boolean;
-    
+
         /**
          * Applies a function to the result of a query.
          * @template U - The mapped record type.
@@ -1433,7 +1433,7 @@ declare namespace global {
          * @return {Optional<U>} Object used to interact with a single record.
          */
         map<U>(fn: { (value: T): U }): Optional<U>;
-    
+
         /**
          * Provides an alternate value if the current Optional is empty.
          * @template U - The alternate value type.
@@ -1441,9 +1441,9 @@ declare namespace global {
          * @return {(T | U)} Value within the current Optional object or the alternate value if the current Optional is empty.
          */
         orElse<U>(defaultValue: U): T | U;
-    
+
         toString(): string;
-    
+
         /**
          * Returns an empty Optional object. Use this method in an Else clause to handle a query that might not return a result.
          * @static
@@ -1452,7 +1452,7 @@ declare namespace global {
          * @return {Optional<U>} Object used to interact with a single record.
          */
         static empty<U>(reason?: string): Optional<U>;
-    
+
         /**
          * Returns a new Optional object. Instead of containing the record,
          * the object contains a function to get the record that is only called if and when requested in the code.
@@ -1462,7 +1462,7 @@ declare namespace global {
          * @return {Optional<U>} Object used to interact with a single record.
          */
         static lazy<U>(lazyGetFn: { (): U | null | undefined }): Optional<U>;
-    
+
         /**
          * Wraps a given value in an Optional object. For example, you can wrap the result of a GlideRecord query in an Optional object to use the associated methods.
          * @static
@@ -1601,7 +1601,7 @@ declare namespace global {
          * @param {...Stream<U>[]} streams - The streams to combine.
          * @return {Stream<V>} The merged stream.
          */
-        static zip<U, V>(combinerFn: { (...values: U[]): V}, ...streams: Stream<U>[]): Stream<V>;
+        static zip<U, V>(combinerFn: { (...values: U[]): V }, ...streams: Stream<U>[]): Stream<V>;
 
         static readonly END: STREAM_END;
     }

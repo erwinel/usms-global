@@ -1586,7 +1586,7 @@ declare namespace Packages {
              * @template E
              * @see {@link https://docs.oracle.com/javase/10/docs/api/java/util/AbstractCollection.html}
              */
-            export interface AbstractCollection<E> extends lang.Object, util.Collection<E>  {
+            export interface AbstractCollection<E> extends lang.Object, util.Collection<E> {
                 /**
                  * Ensures that this collection contains the specified element (optional operation).
                  * @param e {E}
@@ -4223,7 +4223,7 @@ declare namespace Packages {
                  * Library: glide-16.6.0.3.jar;
                  * Java declaration: 'public class GlideTime extends GlideDateTime'.
                  */
-                 export interface GlideTime extends GlideDateTime { }
+                export interface GlideTime extends GlideDateTime { }
 
                 /**
                  * Represents the "Time" element ("com.glide.glideobject.GlideUTCTime" Java class).
@@ -4234,7 +4234,7 @@ declare namespace Packages {
                  * Library: glide-16.6.0.3.jar;
                  * Java declaration: 'public class GlideUTCTime extends GlideTime'.
                  */
-                 export interface GlideUTCTime extends GlideTime { }
+                export interface GlideUTCTime extends GlideTime { }
 
                 /**
                  * Represents the "HTML" element ("com.glide.glideobject.GlideHTML" Java class).
@@ -5563,7 +5563,7 @@ declare namespace Packages {
                      * Library: glide-16.6.0.3.jar;
                      * Java declaration: 'public class GlideElementConditions extends GlideElement implements IQueryConstants'.
                      */
-                     export interface GlideElementConditions extends GlideElement { }
+                    export interface GlideElementConditions extends GlideElement { }
 
                     /**
                      * Represents the "Counter" element type ("com.glide.script.glide_elements.GlideElementCounter" Java class).
@@ -5642,7 +5642,7 @@ declare namespace Packages {
                      */
                     export interface GlideElementFullUTF8 extends GlideElement, java.lang.String { }
 
-                    export interface GlideElementGeoPoint extends GlideElement,  java.lang.String { }
+                    export interface GlideElementGeoPoint extends GlideElement, java.lang.String { }
                     /**
                      * Represents the "com.glide.script.glide_elements.GlideElementGlideObject" Java class.
                      * @export
@@ -6308,7 +6308,7 @@ declare namespace Packages {
                  * Library: glide-variables-16.6.0.3.jar;
                  * Java declaration: 'public class GlideElementVariable extends com.glide.script.glide_elements.GlideElementGlideObject implements com.glide.script.IGlideElementVariable, com.glide.sys.security.IDecryptable'.
                  */
-                 export interface GlideElementVariable extends script.glide_elements.GlideElementGlideObject {
+                export interface GlideElementVariable extends script.glide_elements.GlideElementGlideObject {
                 }
 
                 /**
@@ -6410,7 +6410,7 @@ declare namespace Packages {
                          * @description: Library: glide-16.6.0.3.jar
                          * Java declaration: 'public class CartJS extends com.​glide.​script.​fencing.ScopedScriptableObject implements com.​glideapp.​servicecatalog.ICatalogConstants'.
                          */
-                        export interface CartJS extends ​glide.​script.​fencing.ScopedScriptableObject {
+                        export interface CartJS extends glide.script.fencing.ScopedScriptableObject {
                         }
                     }
                 }
@@ -6581,7 +6581,7 @@ declare namespace Packages {
                  * Library: glide-workflow-16.6.0.3.jar;
                  * Java declaration: 'public class GlideElementDataObject extends com.glide.script.GlideElement'.
                  */
-                 export interface GlideElementDataObject extends com.glide.script.GlideElement { }
+                export interface GlideElementDataObject extends com.glide.script.GlideElement { }
 
                 /**
                  * Represents the "Data Structure" element type ("com.snc.datastructure.GlideElementDataStructure" Java class).
@@ -6593,7 +6593,7 @@ declare namespace Packages {
                  * Library: glide-workflow-16.6.0.3.jar;
                  * Java declaration: 'public class GlideElementDataStructure extends ​glide.​glideobject.GlideObject'.
                  */
-                 export interface GlideElementDataStructure extends ​glide.​glideobject.AGlideObject { }
+                export interface GlideElementDataStructure extends glide.glideobject.AGlideObject { }
             }
 
             export namespace pa {
@@ -6620,7 +6620,7 @@ declare namespace Packages {
                      * Library: glide-analytics-16.6.0.3.jar;
                      * Java declaration: 'public class GlideElementBreakdownElement extends com.glide.script.GlideElement'.
                      */
-                     export interface GlideElementBreakdownElement extends com.glide.script.GlideElement { }
+                    export interface GlideElementBreakdownElement extends com.glide.script.GlideElement { }
                 }
 
                 export namespace js {
@@ -6667,7 +6667,7 @@ declare namespace Packages {
                  * Library: glide-project-workbench-16.6.0.3.jar;
                  * Java declaration: 'public class GlideElementCompositeField extends com.glide.script.GlideElement implements PWConstants'.
                  */
-                 export interface GlideElementCompositeField extends com.glide.script.GlideElement { }
+                export interface GlideElementCompositeField extends com.glide.script.GlideElement { }
             }
 
             export namespace skills_management {
