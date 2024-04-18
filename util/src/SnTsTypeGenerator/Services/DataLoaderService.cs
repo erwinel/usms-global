@@ -19,10 +19,10 @@ public sealed class DataLoaderService : IDisposable
     private readonly TableAPIService _tableAPIService;
     private readonly RemoteUriService _remoteUri;
     private readonly ILogger<DataLoaderService> _logger;
+    private readonly GlideTypesService _glideTypes;
     private readonly object _syncRoot = new();
     private SncSource? _currentSourceEntity;
     private EntityEntry<SncSource>? _currentSourceEntry;
-    private readonly ReadOnlyDictionary<string, KnownGlideType> _knownGlideTypes;
     private readonly bool _baselineInit;
     private readonly Dictionary<string, string> _tableIdMap = new(NameComparer);
     private readonly Dictionary<string, string> _scopeIdMap = new(NameComparer);
@@ -539,7 +539,8 @@ public sealed class DataLoaderService : IDisposable
                     }
                     type.Attributes = notParsed.ToUriEncodedList();
                 }
-                if (_knownGlideTypes.TryGetValue(name, out KnownGlideType? knownGlideType) && !string.IsNullOrWhiteSpace(knownGlideType.JsClass))
+                var knownGlideType = await _glideTypes.GetDefaultGlideTypeAsync(name, cancellationToken);
+                if (knownGlideType is not null && !string.IsNullOrWhiteSpace(knownGlideType.JsClass))
                     type.ElementType = knownGlideType.JsClass;
             }
             else
@@ -550,7 +551,10 @@ public sealed class DataLoaderService : IDisposable
                     LastUpdated = DateTime.Now,
                     Source = source
                 };
-                if (_knownGlideTypes.TryGetValue(name, out KnownGlideType? knownGlideType))
+                var knownGlideType = await _glideTypes.GetDefaultGlideTypeAsync(name, cancellationToken);
+                if (knownGlideType is null)
+                    type.Label = string.IsNullOrWhiteSpace(remoteRef.Display) ? name : remoteRef.Display;
+                else
                 {
                     type.Label = string.IsNullOrWhiteSpace(remoteRef.Display) ? (string.IsNullOrWhiteSpace(knownGlideType.Label) ? name : knownGlideType.Label) : remoteRef.Display;
                     type.ScalarLength = knownGlideType.ScalarLength;
@@ -584,10 +588,8 @@ public sealed class DataLoaderService : IDisposable
                         type.NoDataReplicate = knownGlideType.NoDataReplicate.Value;
                     if (knownGlideType.NoAudit.HasValue)
                         type.NoAudit = knownGlideType.NoAudit.Value;
-                    type.Attributes = knownGlideType.Attributes?.ToUriEncodedList();
+                    type.Attributes = knownGlideType.Attributes.ToUriEncodedList();
                 }
-                else
-                    type.Label = string.IsNullOrWhiteSpace(remoteRef.Display) ? name : remoteRef.Display;
             }
             await _dbContext.Types.AddAsync(type, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -859,14 +861,14 @@ public sealed class DataLoaderService : IDisposable
         return await dbContext.LoadAllReferencedAsync(tables, cancellationToken);
     }
 
-    public DataLoaderService(TypingsDbContext dbContext, RemoteUriService remoteUriService, TableAPIService tableAPIService, IOptions<AppSettings> appSettingsOptions, ILogger<DataLoaderService> logger)
+    public DataLoaderService(TypingsDbContext dbContext, RemoteUriService remoteUriService, TableAPIService tableAPIService, GlideTypesService glideTypes, IOptions<AppSettings> appSettingsOptions, ILogger<DataLoaderService> logger)
     {
         _dbContext = dbContext;
         _remoteUri = remoteUriService;
         _tableAPIService = tableAPIService;
         _logger = logger;
+        _glideTypes = glideTypes;
         var appSettings = appSettingsOptions.Value;
-        _knownGlideTypes = appSettings.GetKnownGlideTypes();
         _baselineInit = appSettings.BaselineInit ?? false;
         if (appSettings.DefaultPackageGroups is not null)
         {

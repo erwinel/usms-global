@@ -1,9 +1,18 @@
 namespace SnTsTypeGenerator.Services;
 
+/// <summary>
+/// Maps a JavaScript class to a Java package type.
+/// </summary>
 public class JsClassMapping
 {
+    /// <summary>
+    /// Gets or sets the name of the JavaScript class.
+    /// </summary>
     public string JsClass { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets the full name of the Java class (without preceding <c>Package</c>.).
+    /// </summary>
     public string PackageName { get; set; } = null!;
 
     public static IEnumerable<JsClassMapping> GetDefaultJsClassMappings()

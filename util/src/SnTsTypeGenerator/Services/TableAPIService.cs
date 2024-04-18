@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SnTsTypeGenerator.Models.Remote;
 using static SnTsTypeGenerator.Services.SnApiConstants;
@@ -410,7 +411,7 @@ public sealed class TableAPIService
         return FieldClass.FromJson(requestUri, jsonNode, _logger, true);
     }
 
-    public TableAPIService(SnClientHandlerService handler, ILogger<TableAPIService> logger)
+    public TableAPIService(SnClientHandlerService handler, IHostEnvironment hostEnvironment, ILogger<TableAPIService> logger)
     {
         _logger = logger;
         _handler = handler;

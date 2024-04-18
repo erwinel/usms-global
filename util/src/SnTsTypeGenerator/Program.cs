@@ -43,12 +43,12 @@ internal class Program
             }
             catch (System.Security.SecurityException exc)
             {
-                SnTsTypeGenerator.LoggerMessages.LogDbfileAccessError(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
+                SnTsTypeGenerator.LoggerMessages.LogDbFileAccessError(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
                 dbFile = null;
             }
             catch (UnauthorizedAccessException exc)
             {
-                SnTsTypeGenerator.LoggerMessages.LogDbfileAccessError(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
+                SnTsTypeGenerator.LoggerMessages.LogDbFileAccessError(serviceProvider.GetService<ILogger<Program>>(), dbFile!, exc);
                 dbFile = null;
             }
             catch (NotSupportedException exc)
@@ -76,6 +76,7 @@ internal class Program
         })
             .AddHostedService<SnTsTypeGenerator.Services.MainWorkerService>()
             .AddTransient<SnTsTypeGenerator.Services.SnClientHandlerService>()
+            .AddTransient<SnTsTypeGenerator.Services.GlideTypesService>()
             .AddTransient<SnTsTypeGenerator.Services.TableAPIService>()
             .AddTransient<SnTsTypeGenerator.Services.DataLoaderService>()
             .AddSingleton<SnTsTypeGenerator.Services.RemoteUriService>()

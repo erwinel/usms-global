@@ -15,7 +15,7 @@ public class DbfileAccessException : Exception, ILogTrackable
         if (IsLogged)
             return;
         if (InnerException is System.Security.SecurityException || InnerException is UnauthorizedAccessException)
-            logger.LogDbfileAccessError(DbFilePath, InnerException);
+            logger.LogDbFileAccessError(DbFilePath, InnerException);
         else if (InnerException is NotSupportedException notSupportedException)
             logger.LogDbfilePathInvalid(DbFilePath, notSupportedException);
         else if (InnerException is PathTooLongException pathTooLongException)

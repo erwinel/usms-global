@@ -5,9 +5,12 @@ public class KnownGlideType
     /// <summary>
     /// Gets the internal Glide type name.
     /// </summary>
-    /// <value>The value of the "Name" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column from the <see cref="Services.SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" /> table.</value>
+    /// <value>The value of the "Name" (<see cref="SnApiConstants.JSON_KEY_NAME" />) column from the <see cref="SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" /> table.</value>
     public string Name { get; set; } = null!;
 
+    /// <summary>
+    /// Gets the name of the JavaScript class or interface representing the element type.
+    /// </summary>
     public string JsClass { get; set; } = null!;
 
     /// <summary>
@@ -28,37 +31,79 @@ public class KnownGlideType
     /// <value>The optional scalar length to use when the corresponding <see cref="Models.GlideType"/> does not exist in the database.</value>
     public int? ScalarLength { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value representing the type of object returned by the getGlideObject() method, which may be derived from of the "Class name" (<see cref="SnApiConstants.JSON_KEY_CLASS_NAME" />) column.
+    /// </summary>
     public string? UnderlyingType { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the "Visible" (<see cref="Services.SnApiConstants.JSON_KEY_VISIBLE" />) column.
+    /// </summary>
     public bool? Visible { get; set; }
 
+    /// <summary>
+    /// Gets or sets the inverse value corresponding to the "Use original value" (<see cref="SnApiConstants.JSON_KEY_USE_ORIGINAL_VALUE" />) column.
+    /// </summary>
     public bool? DoNotUseOriginalValue { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_CASE_SENSITIVE" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public bool? CaseSensitive { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_ENCODE_UTF8" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public bool? EncodeUtf8 { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_OMIT_SYS_ORIGINAL" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public bool? OmitSysOriginal { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_EDGE_ENCRYPTION_ENABLED" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public bool? EdgeEncryptionEnabled { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_SERIALIZER" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public string? Serializer { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_IS_MULTI_TEXT" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public bool? IsMultiText { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_PDF_CELL_TYPE" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public string? PdfCellType { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_NO_SORT" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public bool? NoSort { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_NO_DATA_REPLICATE" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public bool? NoDataReplicate { get; set; }
 
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_NO_AUDIT" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
     public bool? NoAudit { get; set; }
 
+    /// <summary>
+    /// Gets the un-parsed attributes for the current Field class.
+    /// </summary>
+    /// <value>The un-parsed segments from the the "Attributes" (<see cref="SnApiConstants.JSON_KEY_ATTRIBUTES" />) column of the <see cref="SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" /> table.</value>
     public List<string>? Attributes { get; set; }
 
     public static IEnumerable<KnownGlideType> GetDefaultKnownTypes()
     {
-
         yield return new KnownGlideType { Name = "action_conditions", Label = "Action Conditions", JsClass = "GlideElementActionConditions", ScalarType = "string" };
         yield return new KnownGlideType { Name = "audio", Label = "Audio", JsClass = "GlideElementAudio", ScalarType = "string", Visible = true };
         yield return new KnownGlideType { Name = "auto_increment", Label = "Auto Increment", JsClass = "GlideElement", ScalarType = "longint" };

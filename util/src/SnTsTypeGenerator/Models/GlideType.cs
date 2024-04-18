@@ -21,7 +21,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private string _name = string.Empty;
 
     /// <summary>
-    /// Value of the "Name" (<see cref="Services.SnApiConstants.JSON_KEY_NAME" />) column.
+    /// Gets or sets the value corresponding to the "Name" (<see cref="Services.SnApiConstants.JSON_KEY_NAME" />) column.
     /// </summary>
     [Key]
     [BackingField(nameof(_name))]
@@ -38,7 +38,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private string _label = string.Empty;
 
     /// <summary>
-    /// Value of the "Label" (<see cref="Services.SnApiConstants.JSON_KEY_LABEL" />) column.
+    /// Gets or sets the value corresponding to the "Label" (<see cref="Services.SnApiConstants.JSON_KEY_LABEL" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_label))]
@@ -53,8 +53,9 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     #region ScalarType Property
 
     private string? _scalarType;
+
     /// <summary>
-    /// Value of the "Extends" (<see cref="Services.SnApiConstants.JSON_KEY_SCALAR_TYPE" />) column.
+    /// Gets or sets the value corresponding to the "Extends" (<see cref="Services.SnApiConstants.JSON_KEY_SCALAR_TYPE" />) column.
     /// </summary>
     [BackingField(nameof(_scalarType))]
     public string? ScalarType { get => _scalarType; set => _scalarType = value.NullIfWhiteSpace(); }
@@ -62,15 +63,16 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     #endregion
 
     /// <summary>
-    /// Value of the "Length" (<see cref="Services.SnApiConstants.JSON_KEY_SCALAR_LENGTH" />) column.
+    /// Gets or sets the value corresponding to the "Length" (<see cref="Services.SnApiConstants.JSON_KEY_SCALAR_LENGTH" />) column.
     /// </summary>
     public int? ScalarLength { get; set; }
 
     #region UnderlyingType Property
 
     private string? _underlyingType;
+
     /// <summary>
-    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_CLASS_NAME" />) column.
+    /// Gets or sets the value representing the type of object returned by the getGlideObject() method, which may be derived from of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_CLASS_NAME" />) column.
     /// </summary>
     [BackingField(nameof(_underlyingType))]
     public string? UnderlyingType { get => _underlyingType; set => _underlyingType = value.NullIfWhiteSpace(); }
@@ -78,79 +80,100 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     #endregion
 
     /// <summary>
-    /// Value of the "Use original value" (<see cref="Services.SnApiConstants.JSON_KEY_USE_ORIGINAL_VALUE" />) column.
+    /// Gets or sets the value corresponding to the "Use original value" (<see cref="Services.SnApiConstants.JSON_KEY_USE_ORIGINAL_VALUE" />) column.
     /// </summary>
     public bool UseOriginalValue { get; set; }
 
     /// <summary>
-    /// Value of the "Visible" (<see cref="SnApiConstants.JSON_KEY_VISIBLE" />) column.
+    /// Gets or sets the value corresponding to the "Visible" (<see cref="Services.SnApiConstants.JSON_KEY_VISIBLE" />) column.
     /// </summary>
     public bool IsVisible { get; set; }
 
     /// <summary>
-    /// Value of the <c>case_sensitive</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_CASE_SENSITIVE" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
     /// </summary>
     public bool CaseSensitive { get; set; }
 
     /// <summary>
-    /// Value of the <c>encode_utf8</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_ENCODE_UTF8" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
     /// </summary>
     public bool EncodeUtf8 { get; set; }
 
     /// <summary>
-    /// Value of the <c>omit_sys_original</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_OMIT_SYS_ORIGINAL" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
     /// </summary>
     public bool OmitSysOriginal { get; set; }
 
     /// <summary>
-    /// Value of the <c>edge_encryption_enabled</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_EDGE_ENCRYPTION_ENABLED" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
     /// </summary>
     public bool EdgeEncryptionEnabled { get; set; }
 
-    /// <summary>
-    /// Value of the <c>serializer</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
-    /// </summary>
-    public string? Serializer { get; set; }
+    #region Serializer Property
+
+    private string? _serializer;
 
     /// <summary>
-    /// Value of the <c>is_multi_text</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_SERIALIZER" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
+    [BackingField(nameof(_serializer))]
+    public string? Serializer { get => _serializer; set => _serializer = value.NullIfWhiteSpace(); }
+
+    #endregion
+
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_IS_MULTI_TEXT" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
     /// </summary>
     public bool IsMultiText { get; set; }
 
-    /// <summary>
-    /// Value of the <c>pdf_cell_type</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
-    /// </summary>
-    public string? PdfCellType { get; set; }
+    #region PdfCellType Property
+
+    private string? _pdfCellType;
 
     /// <summary>
-    /// Value of the <c>no_sort</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_PDF_CELL_TYPE" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
+    [BackingField(nameof(_pdfCellType))]
+    public string? PdfCellType { get => _pdfCellType; set => _pdfCellType = value.NullIfWhiteSpace(); }
+
+    #endregion
+
+    /// <summary>
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_NO_SORT" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
     /// </summary>
     public bool NoSort { get; set; }
 
     /// <summary>
-    /// Value of the <c>no_data_replicate</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_NO_DATA_REPLICATE" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
     /// </summary>
     public bool NoDataReplicate { get; set; }
 
     /// <summary>
-    /// Value of the <c>no_audit</c> attribute from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
+    /// Gets or sets the value corresponding to the <see cref="Services.SnApiConstants.JSON_KEY_NO_AUDIT" /> attribute from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
     /// </summary>
     public bool NoAudit { get; set; }
 
-    /// <summary>
-    /// Unparsed, URI-encoded values from the "Attributes" (<see cref="SnApiConstants.JSON_KEY_attributes" />) column.
-    /// </summary>
-    public string? Attributes { get; set; }
+    #region Attributes Property
+
+    private string? _attributes;
 
     /// <summary>
-    /// Date and time that this record was last updated.
+    /// Gets or sets the unparsed, URI-encoded values from the "Attributes" (<see cref="Services.SnApiConstants.JSON_KEY_ATTRIBUTES" />) column.
+    /// </summary>
+    [BackingField(nameof(_attributes))]
+    public string? Attributes { get => _attributes; set => _attributes = value.NullIfWhiteSpace(); }
+
+    #endregion
+
+    /// <summary>
+    /// Gets or sets the date and time that this record was last updated.
     /// </summary>
     public DateTime LastUpdated { get; set; }
 
     #region Package Navigation Property
 
     /// <summary>
-    /// Name of the associated record for the "Package" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
+    /// Gets or sets the name of the associated record for the "Package" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_PACKAGE" />) column.
     /// </summary>
     private string? _packageID;
 
@@ -164,7 +187,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private Package? _package;
 
     /// <summary>
-    /// The source package of the type.
+    /// Gets or sets the source package of the type.
     /// </summary>
     public Package? Package
     {
@@ -179,7 +202,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private string? _scopeValue;
 
     /// <summary>
-    /// Value of the associated record for the "Application" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
+    /// Gets or sets the unique identifier of the associated record for the "Application" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_SCOPE" />) column.
     /// </summary>
     [BackingField(nameof(_scopeValue))]
     public string? ScopeValue
@@ -191,7 +214,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private Scope? _scope;
 
     /// <summary>
-    /// The scope for the type.
+    /// Gets or sets the scope for the type.
     /// </summary>
     public Scope? Scope
     {
@@ -233,7 +256,7 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
     private string _sysID = string.Empty;
 
     /// <summary>
-    /// Value of the "Sys ID" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// Gets or sets the value corresponding to the "Sys ID" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
     /// </summary>
     [NotNull]
     [BackingField(nameof(_sysID))]

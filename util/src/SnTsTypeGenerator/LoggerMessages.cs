@@ -391,7 +391,7 @@ public static class LoggerMessages
     public static void LogDbfileValidationError(this ILogger? logger, string dbFile, Exception error)
     {
         if (logger is null)
-            Serilog.Log.Logger.Fatal(error, TEMPLATE_DbfileAccessError, dbFile);
+            Serilog.Log.Logger.Fatal(error, TEMPLATE_DbFileAccessError, dbFile);
         else
             _dbfileValidationError(logger, dbFile, error);
     }
@@ -423,21 +423,21 @@ public static class LoggerMessages
 
     #endregion
 
-    #region Critical DbfileAccessError (0x0003)
+    #region Critical DbFileAccessError (0x0003)
 
     /// <summary>
-    /// Numerical event code for file access error.
+    /// Numerical event code for database file access error.
     /// </summary>
-    public const int EVENT_ID_DbfileAccessError = 0x0003;
+    public const int EVENT_ID_DbFileAccessError = 0x0003;
 
-    public const string TEMPLATE_DbfileAccessError = "Unable to create DB file \"{Dbfile}\".";
+    public const string TEMPLATE_DbFileAccessError = "Unable to create DB file \"{Dbfile}\".";
 
     /// <summary>
     /// Event ID for database file access error.
     /// </summary>
-    public static readonly EventId DbfileAccessError = new(EVENT_ID_DbfileAccessError, nameof(DbfileAccessError));
+    public static readonly EventId DbFileAccessError = new(EVENT_ID_DbFileAccessError, nameof(DbFileAccessError));
 
-    private static readonly Action<ILogger, string, Exception?> _dbfileAccessError = LoggerMessage.Define<string>(LogLevel.Critical, DbfileAccessError, TEMPLATE_DbfileAccessError);
+    private static readonly Action<ILogger, string, Exception?> _dbFileAccessError = LoggerMessage.Define<string>(LogLevel.Critical, DbFileAccessError, TEMPLATE_DbFileAccessError);
 
     /// <summary>
     /// Logs a database file access error event (DbfileAccessError) with event code 0x0003.
@@ -445,12 +445,12 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="dbFile">The path of the database file.</param>
     /// <param name="error">The exception that caused the event.</param>
-    public static void LogDbfileAccessError(this ILogger? logger, string dbFile, Exception error)
+    public static void LogDbFileAccessError(this ILogger? logger, string dbFile, Exception error)
     {
         if (logger is null)
-            Serilog.Log.Logger.Fatal(error, TEMPLATE_DbfileAccessError, dbFile);
+            Serilog.Log.Logger.Fatal(error, TEMPLATE_DbFileAccessError, dbFile);
         else
-            _dbfileAccessError(logger, dbFile, error);
+            _dbFileAccessError(logger, dbFile, error);
     }
 
     #endregion
@@ -686,7 +686,37 @@ public static class LoggerMessages
 
     #endregion
 
-    // TODO: Create next new event with code 0x000a
+    #region JsonFileAccess Error (0x000a)
+
+    /// <summary>
+    /// Numerical event code for JSON file access error.
+    /// </summary>
+    public const int EVENT_ID_JsonFileAccessError = 0x000a;
+
+    public const string TEMPLATE_JsonFileAccessError = "Unable to read from JSON file \"{Name}\".";
+
+    /// <summary>
+    /// Event ID for JSON file access error.
+    /// </summary>
+    public static readonly EventId JsonFileAccessError = new(EVENT_ID_JsonFileAccessError, nameof(JsonFileAccessError));
+
+    private static readonly Action<ILogger, string, Exception?> _jsonFileAccessError = LoggerMessage.Define<string>(LogLevel.Error, JsonFileAccessError, TEMPLATE_JsonFileAccessError);
+
+    /// <summary>
+    /// Logs a JSON file access error event (JsonFileAccessError) with event code 0x000a.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="name">The name of the JSON file.</param>
+    /// <param name="error">The exception that caused the event.</param>
+    public static void LogJsonFileAccessError(this ILogger? logger, string name, Exception error)
+    {
+        if (logger is null)
+            Serilog.Log.Logger.Error(error, TEMPLATE_JsonFileAccessError, name);
+        else
+            _jsonFileAccessError(logger, name, error);
+    }
+
+    #endregion
 
     #region Critical OutputFileAlreadyExists Error (0x000b)
 
@@ -1458,6 +1488,140 @@ public static class LoggerMessages
     /// <param name="logger">The current logger.</param>
     /// <param name="tableName">The name of the table.</param>
     public static void LogNewTableSaveCompleted(this ILogger logger, string tableName) => _newTableSaveCompleted(logger, tableName, null);
+
+    #endregion
+
+    #region InvalidJsClassMapping Error (0x0025)
+
+    /// <summary>
+    /// Numerical event code for Invalid JS Class Mapping error.
+    /// </summary>
+    public const int EVENT_ID_InvalidJsClassMapping = 0x0025;
+
+    public const string TEMPLATE_InvalidJsClassMapping = "Invalid Class Mapping JSON object in \"{FileName}\", index {Index}.";
+
+    /// <summary>
+    /// Event ID for Invalid JS Class Mapping error.
+    /// </summary>
+    public static readonly EventId InvalidJsClassMapping = new(EVENT_ID_InvalidJsClassMapping, nameof(InvalidJsClassMapping));
+
+    private static readonly Action<ILogger, string, int, Exception?> _invalidJsClassMapping = LoggerMessage.Define<string, int>(LogLevel.Error, InvalidJsClassMapping, TEMPLATE_InvalidJsClassMapping);
+
+    /// <summary>
+    /// Logs a Invalid JS Class Mapping error event (InvalidJsClassMapping) with event code 0x0025.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="fileName">The name of the JSON file.</param>
+    /// <param name="index">The index of the invalid element.</param>
+    /// <param name="error">The optional exception that caused the event.</param>
+    public static void LogInvalidJsClassMapping(this ILogger? logger, string fileName, int index, Exception? error = null)
+    {
+        if (logger is null)
+            Serilog.Log.Logger.Error(error, TEMPLATE_InvalidJsClassMapping, fileName, index);
+        else
+            _invalidJsClassMapping(logger, fileName, index, error);
+    }
+
+    #endregion
+
+    #region DuplicateJsClassMapping Warning (0x0026)
+
+    /// <summary>
+    /// Numerical event code for Duplicate JS Class Mapping warning.
+    /// </summary>
+    public const int EVENT_ID_DuplicateJsClassMapping = 0x0026;
+
+    public const string TEMPLATE_DuplicateJsClassMapping = $"Ignoring Class Mapping JSON object with duplicate {nameof(JsClassMapping.JsClass)} \"{{JsClass}}\" in \"{{FileName}}\", index {{Index}}.";
+
+    /// <summary>
+    /// Event ID for Duplicate JS Class Mapping warning.
+    /// </summary>
+    public static readonly EventId DuplicateJsClassMapping = new(EVENT_ID_DuplicateJsClassMapping, nameof(DuplicateJsClassMapping));
+
+    private static readonly Action<ILogger, string, string, int, Exception?> _duplicateJsClassMapping = LoggerMessage.Define<string, string, int>(LogLevel.Warning, DuplicateJsClassMapping, TEMPLATE_DuplicateJsClassMapping);
+
+    /// <summary>
+    /// Logs a Duplicate JS Class Mapping warning event (DuplicateJsClassMapping) with event code 0x0026.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="jsClass">The value of the duplicate key.</param>
+    /// <param name="fileName">The name of the JSON file.</param>
+    /// <param name="index">The index of the duplicate element.</param>
+    /// <param name="error">The optional exception that caused the event.</param>
+    public static void LogDuplicateJsClassMapping(this ILogger? logger, string jsClass, string fileName, int index, Exception? error = null)
+    {
+        if (logger is null)
+            Serilog.Log.Logger.Warning(error, TEMPLATE_DuplicateJsClassMapping, jsClass, index);
+        else
+            _duplicateJsClassMapping(logger, jsClass, fileName, index, error);
+    }
+
+    #endregion
+
+    #region InvalidGlideTypeJson Error (0x0027)
+
+    /// <summary>
+    /// Numerical event code for Invalid Glide Type error.
+    /// </summary>
+    public const int EVENT_ID_InvalidGlideTypeJson = 0x0027;
+
+    public const string TEMPLATE_InvalidGlideTypeJson = "Invalid Glide Type JSON object in \"{FileName}\", index {Index}.";
+
+    /// <summary>
+    /// Event ID for Invalid Glide Type error.
+    /// </summary>
+    public static readonly EventId InvalidGlideTypeJson = new(EVENT_ID_InvalidGlideTypeJson, nameof(InvalidGlideTypeJson));
+
+    private static readonly Action<ILogger, string, int, Exception?> _invalidGlideTypeJson = LoggerMessage.Define<string, int>(LogLevel.Error, InvalidGlideTypeJson, TEMPLATE_InvalidGlideTypeJson);
+
+    /// <summary>
+    /// Logs a Invalid Glide Type error event (InvalidGlideTypeJson) with event code 0x0027.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="fileName">The name of the JSON file.</param>
+    /// <param name="index">The index of the invalid element.</param>
+    /// <param name="error">The optional exception that caused the event.</param>
+    public static void LogInvalidGlideTypeJson(this ILogger? logger, string fileName, int index, Exception? error = null)
+    {
+        if (logger is null)
+            Serilog.Log.Logger.Error(error, TEMPLATE_InvalidGlideTypeJson, fileName, index);
+        else
+            _invalidGlideTypeJson(logger, fileName, index, error);
+    }
+
+    #endregion
+
+    #region DuplicateGlideTypeJson Warning (0x0028)
+
+    /// <summary>
+    /// Numerical event code for Duplicate Glide Type warning.
+    /// </summary>
+    public const int EVENT_ID_DuplicateGlideTypeJson = 0x0028;
+
+    public const string TEMPLATE_DuplicateGlideTypeJson = $"Ignoring Glide Type JSON object with duplicate {nameof(KnownGlideType.Name)} \"{{Name}}\" in \"{{FileName}}\", index {{Index}}.";
+
+    /// <summary>
+    /// Event ID for Duplicate Glide Type warning.
+    /// </summary>
+    public static readonly EventId DuplicateGlideTypeJson = new(EVENT_ID_DuplicateGlideTypeJson, nameof(DuplicateGlideTypeJson));
+
+    private static readonly Action<ILogger, string, string, int, Exception?> _duplicateGlideTypeJson = LoggerMessage.Define<string, string, int>(LogLevel.Warning, DuplicateGlideTypeJson, TEMPLATE_DuplicateGlideTypeJson);
+
+    /// <summary>
+    /// Logs a Duplicate Glide Type warning event (DuplicateGlideTypeJson) with event code 0x0028.
+    /// </summary>
+    /// <param name="logger">The current logger.</param>
+    /// <param name="name">The name of the duplicate type.</param>
+    /// <param name="fileName">The name of the JSON file.</param>
+    /// <param name="index">The index of the duplicate element.</param>
+    /// <param name="error">The optional exception that caused the event.</param>
+    public static void LogDuplicateGlideTypeJson(this ILogger? logger, string name, string fileName, int index, Exception? error = null)
+    {
+        if (logger is null)
+            Serilog.Log.Logger.Warning(error, TEMPLATE_DuplicateGlideTypeJson, name, index);
+        else
+            _duplicateGlideTypeJson(logger, name, fileName, index, error);
+    }
 
     #endregion
 
