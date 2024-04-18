@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using SnTsTypeGenerator.Services;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
-namespace SnTsTypeGenerator.Models;
+namespace SnTsTypeGenerator.Models.Remote;
 
 /// <summary>
 /// Deserialized <c>sys_dictionary</c> record from ServiceNow instance.
@@ -26,11 +26,11 @@ namespace SnTsTypeGenerator.Models;
 /// <param name="IsDisplay">The boolean value of the <c>is_extendable.value</c> property.</param>
 /// <param name="DefaultValue">The value of the <c>default_value.value</c> property or <see langword="null"/> if the <c>default_value.value</c> is empty.</param>
 /// <param name="Package">The deserialized <c>sys_package</c> property or <see langword="null"/> if the <c>sys_package.value</c> is empty.</param>
-public record RemoteDictionaryEntry(string Name, string Label, string SysID, RemoteRef? Reference, bool IsReadOnly, RemoteRef? Type, int? MaxLength,
+public record DictionaryEntry(string Name, string Label, string SysID, Reference? Reference, bool IsReadOnly, Reference? Type, int? MaxLength,
     bool IsActive, bool IsUnique, bool IsPrimary, bool IsCalculated, int? SizeClass, bool IsMandatory, bool IsArray,
-    string? Comments, bool IsDisplay, string? DefaultValue, RemoteRef? Scope, RemoteRef? Package)
+    string? Comments, bool IsDisplay, string? DefaultValue, Reference? Scope, Reference? Package)
 {
-    internal static RemoteDictionaryEntry? FromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
+    internal static DictionaryEntry? FromJson(Uri requestUri, JsonNode? jsonNode, ILogger logger, bool expectArray = false)
     {
         if (jsonNode is not JsonObject sysDictionary)
             throw new InvalidHttpResponseException(requestUri, jsonNode?.ToJsonString());
@@ -68,13 +68,13 @@ public record RemoteDictionaryEntry(string Name, string Label, string SysID, Rem
             throw new ExpectedPropertyNotFoundException(requestUri, sysDictionary, JSON_KEY_SYS_ID);
         if (!sysDictionary.TryGetFieldAsNonEmpty(JSON_KEY_NAME, out string? name))
             throw new ExpectedPropertyNotFoundException(requestUri, sysDictionary, JSON_KEY_NAME);
-        return new RemoteDictionaryEntry(
+        return new DictionaryEntry(
             Name: name,
             Label: sysDictionary.GetFieldAsNonEmpty(JSON_KEY_COLUMN_LABEL, name),
             SysID: sys_id,
-            Reference: RemoteRef.FromProperty(sysDictionary, JSON_KEY_REFERENCE),
+            Reference: Reference.FromProperty(sysDictionary, JSON_KEY_REFERENCE),
             IsReadOnly: sysDictionary.GetFieldAsBoolean(JSON_KEY_READ_ONLY),
-            Type: RemoteRef.FromProperty(sysDictionary, JSON_KEY_INTERNAL_TYPE),
+            Type: Reference.FromProperty(sysDictionary, JSON_KEY_INTERNAL_TYPE),
             MaxLength: sysDictionary.GetFieldAsIntOrNull(JSON_KEY_MAX_LENGTH),
             IsActive: sysDictionary.GetFieldAsBoolean(JSON_KEY_ACTIVE),
             IsUnique: sysDictionary.GetFieldAsBoolean(JSON_KEY_UNIQUE),
@@ -86,8 +86,8 @@ public record RemoteDictionaryEntry(string Name, string Label, string SysID, Rem
             Comments: sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_COMMENTS),
             IsDisplay: sysDictionary.GetFieldAsBoolean(JSON_KEY_DISPLAY),
             DefaultValue: sysDictionary.GetFieldAsNonEmptyOrNull(JSON_KEY_DEFAULT_VALUE),
-            Scope: RemoteRef.FromProperty(sysDictionary, JSON_KEY_SYS_SCOPE),
-            Package: RemoteRef.FromProperty(sysDictionary, JSON_KEY_SYS_PACKAGE)
+            Scope: Reference.FromProperty(sysDictionary, JSON_KEY_SYS_SCOPE),
+            Package: Reference.FromProperty(sysDictionary, JSON_KEY_SYS_PACKAGE)
         );
     }
 }

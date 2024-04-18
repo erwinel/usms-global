@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SnTsTypeGenerator.Models;
+using Remote = SnTsTypeGenerator.Models.Remote;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Services;
@@ -89,7 +90,7 @@ public sealed class DataLoaderService : IDisposable
                 Source = source
             };
             await AddTableAsync(table, null, cancellationToken);
-            _ = await AddElementsAsync(new RemoteDictionaryEntry[] {
+            _ = await AddElementsAsync(new Remote.DictionaryEntry[] {
                 new(
                     Name: JSON_KEY_SYS_ID,
                     Label: "Sys ID",
@@ -215,14 +216,14 @@ public sealed class DataLoaderService : IDisposable
         return table;
     }
 
-    private async Task<Element[]> AddElementsAsync(IEnumerable<RemoteDictionaryEntry> elements, Table table, CancellationToken cancellationToken)
+    private async Task<Element[]> AddElementsAsync(IEnumerable<Remote.DictionaryEntry> elements, Table table, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (!elements.Any())
             return Array.Empty<Element>();
         var source = (await table.GetReferencedEntityAsync(_dbContext.Tables, t => t.Source, cancellationToken))!;
         _logger.LogAddingElementsToDatabase(table.Name);
-        var entities = elements.Select<RemoteDictionaryEntry, (Element Element, RemoteRef? Package, RemoteRef? Reference, RemoteRef? Type, string SourceFqdn)>(e =>
+        var entities = elements.Select<Remote.DictionaryEntry, (Element Element, Remote.Reference? Package, Remote.Reference? Reference, Remote.Reference? Type, string SourceFqdn)>(e =>
         (new Element()
         {
             Name = e.Name,
@@ -280,9 +281,9 @@ public sealed class DataLoaderService : IDisposable
         return result;
     }
 
-    private async Task<Table> AddTableAsync(RemoteTable remoteTable, CancellationToken cancellationToken) => await AddTableAsync(remoteTable, false, cancellationToken);
+    private async Task<Table> AddTableAsync(Remote.Table remoteTable, CancellationToken cancellationToken) => await AddTableAsync(remoteTable, false, cancellationToken);
 
-    private async Task AddTableAsync(Table table, RemoteRef? superClassRef, CancellationToken cancellationToken)
+    private async Task AddTableAsync(Table table, Remote.Reference? superClassRef, CancellationToken cancellationToken)
     {
         _logger.LogAddingTableToDb(table.Name);
         await _dbContext.Tables.AddAsync(table, cancellationToken);
@@ -325,7 +326,7 @@ public sealed class DataLoaderService : IDisposable
 
     }
 
-    private async Task<Table> AddTableAsync(RemoteTable remoteTable, bool isInterface, CancellationToken cancellationToken)
+    private async Task<Table> AddTableAsync(Remote.Table remoteTable, bool isInterface, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         SncSource source = await EnsureCurrentSourceAsync(cancellationToken);
@@ -349,7 +350,7 @@ public sealed class DataLoaderService : IDisposable
         return table;
     }
 
-    private async Task<Table> AddTableFromRemoteRecordAsync(RemoteTable remoteTable, bool isInterface, CancellationToken cancellationToken)
+    private async Task<Table> AddTableFromRemoteRecordAsync(Remote.Table remoteTable, bool isInterface, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         SncSource source = await EnsureCurrentSourceAsync(cancellationToken);
@@ -410,7 +411,7 @@ public sealed class DataLoaderService : IDisposable
         return table;
     }
 
-    private async Task<GlideType> FromFieldClassRefAsync(RemoteRef remoteRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<GlideType> FromFieldClassRefAsync(Remote.Reference remoteRef, SncSource source, CancellationToken cancellationToken)
     {
         string name = remoteRef.Value;
         GlideType? type = await _dbContext.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
@@ -654,7 +655,7 @@ public sealed class DataLoaderService : IDisposable
         finally { Monitor.Exit(_syncRoot); }
     }
 
-    private async Task<Table?> FromTableRefAsync(RemoteRef? remoteRef, CancellationToken cancellationToken)
+    private async Task<Table?> FromTableRefAsync(Remote.Reference? remoteRef, CancellationToken cancellationToken)
     {
         if (remoteRef is null)
             return null;
@@ -679,7 +680,7 @@ public sealed class DataLoaderService : IDisposable
         return table;
     }
 
-    private async Task<Table?> FromSuperClassRefAsync(RemoteRef? tableRef, CancellationToken cancellationToken)
+    private async Task<Table?> FromSuperClassRefAsync(Remote.Reference? tableRef, CancellationToken cancellationToken)
     {
         if (tableRef is null)
             return null;
@@ -698,7 +699,7 @@ public sealed class DataLoaderService : IDisposable
         throw new NotImplementedException();
     }
 
-    private async Task<Package?> FromPackageRefAsync(RemoteRef? pkgRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<Package?> FromPackageRefAsync(Remote.Reference? pkgRef, SncSource source, CancellationToken cancellationToken)
     {
         if (pkgRef is null)
             return null;
@@ -789,7 +790,7 @@ public sealed class DataLoaderService : IDisposable
         return package;
     }
 
-    private async Task<Scope?> FromScopeRefAsync(RemoteRef? scopeRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<Scope?> FromScopeRefAsync(Remote.Reference? scopeRef, SncSource source, CancellationToken cancellationToken)
     {
         if (scopeRef is null)
             return null;

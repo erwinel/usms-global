@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
 using SnTsTypeGenerator.Models;
+using Remote = SnTsTypeGenerator.Models.Remote;
 using static SnTsTypeGenerator.Services.SnApiConstants;
 
 namespace SnTsTypeGenerator.Services;
@@ -246,7 +247,7 @@ public static class EntityFrameworkExtensions
             NameComparer.Equals(x.Label, y.Label) && x.Comments.NoCaseEquals(y.Comments) && x.DefaultValue.NoCaseEquals(y.DefaultValue) && x.PackageID.NoCaseEquals(y.PackageID));
     }
 
-    public static bool IsIdenticalTo(this RemoteDictionaryEntry x, Element y)
+    public static bool IsIdenticalTo(this Remote.DictionaryEntry x, Element y)
     {
         if (ReferenceEquals(x, y))
             return true;
@@ -386,7 +387,7 @@ public static class EntityFrameworkExtensions
         elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && e.TypeName.NoCaseEquals(TYPE_NAME_integer)) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && e.TypeName.NoCaseEquals(TYPE_NAME_string)) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && e.TypeName.NoCaseEquals(TYPE_NAME_glide_date_time));
 
-    public static bool ExtendsBaseRecord(this IEnumerable<RemoteDictionaryEntry> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && TYPE_NAME_GUID.NoCaseEquals(e.Type?.Value)) &&
+    public static bool ExtendsBaseRecord(this IEnumerable<Remote.DictionaryEntry> elements) => elements is not null && elements.Any(e => e.Name == JSON_KEY_SYS_ID && TYPE_NAME_GUID.NoCaseEquals(e.Type?.Value)) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_BY && TYPE_NAME_string.NoCaseEquals(e.Type?.Value)) && elements.Any(e => e.Name == JSON_KEY_SYS_CREATED_ON && TYPE_NAME_glide_date_time.NoCaseEquals(e.Type?.Value)) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_MOD_COUNT && TYPE_NAME_integer.NoCaseEquals(e.Type?.Value)) && elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_BY && TYPE_NAME_string.NoCaseEquals(e.Type?.Value)) &&
         elements.Any(e => e.Name == JSON_KEY_SYS_UPDATED_ON && TYPE_NAME_glide_date_time.NoCaseEquals(e.Type?.Value));

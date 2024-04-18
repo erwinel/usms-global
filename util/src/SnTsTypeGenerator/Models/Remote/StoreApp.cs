@@ -1,4 +1,4 @@
-namespace SnTsTypeGenerator.Models;
+namespace SnTsTypeGenerator.Models.Remote;
 
 /// <summary>
 /// Deserialized "Store Application" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_STORE_APP" />) record from ServiceNow instance.
@@ -19,6 +19,6 @@ namespace SnTsTypeGenerator.Models;
 /// <param name="Private">The value of the <c><see cref="Services.SnApiConstants.JSON_KEY_PRIVATE" />.value</c> property.</param>
 /// <param name="Active">The value of the <c><see cref="Services.SnApiConstants.JSON_KEY_ACTIVE" />.value</c> property.</param>
 /// <param name="Dependencies">The values of the <c><see cref="Services.SnApiConstants.JSON_KEY_DEPENDENCIES" />.value</c> property.</param>
-public record RemoteStoreApp(string Name, string Value, string ID, string Version, string ShortDescription, string SysID, bool Licensable, string SubscriptionRequirement,
+public record StoreApp(string Name, string Value, string ID, string Version, string ShortDescription, string SysID, bool Licensable, string SubscriptionRequirement,
     string Vendor, string VendorPrefix, string Code, DateTime? InstallDate, bool IsStoreApp, bool Private, bool Active, string[] Dependencies) :
-    RemoteApplication(Name, Value, ID, Version, ShortDescription, SysID, Licensable, SubscriptionRequirement, Vendor, VendorPrefix, Private, Active);
+    Application(Name, Value, ID, Version, ShortDescription, SysID, Licensable, SubscriptionRequirement, Vendor, VendorPrefix, Private, Active);
