@@ -189,17 +189,17 @@ public sealed class MainWorkerService : BackgroundService
         using TypingsDbContext dbContext = _scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
         if (!dbContext.InitSuccessful) return;
         var totalCount = 0;
-        await foreach (var sncSource in dbContext.Sources.OrderBy(s => s.Label).AsAsyncEnumerable())
+        await foreach (var sourceInstance in dbContext.SourceInstances.OrderBy(s => s.Label).AsAsyncEnumerable())
         {
-            var entry = dbContext.Sources.Entry(sncSource);
+            var entry = dbContext.SourceInstances.Entry(sourceInstance);
             Console.Write("https://");
-            Console.WriteLine(sncSource.FQDN);
+            Console.WriteLine(sourceInstance.FQDN);
             Console.Write("    Label: ");
-            Console.WriteLine(sncSource.Label.AsNonEmpty(sncSource.FQDN));
+            Console.WriteLine(sourceInstance.Label.AsNonEmpty(sourceInstance.FQDN));
             Console.Write("    Is PDI: ");
-            Console.WriteLine(sncSource.IsPersonalDev ? "Yes" : "No");
+            Console.WriteLine(sourceInstance.IsPersonalDev ? "Yes" : "No");
             Console.Write("    Last Accessed:");
-            Console.WriteLine(sncSource.LastAccessed.ToLocalTime().ToString("yyyy-mm-dd HH:mm:ss"));
+            Console.WriteLine(sourceInstance.LastAccessed.ToLocalTime().ToString("yyyy-mm-dd HH:mm:ss"));
             Console.WriteLine("    Packages: {0}", (await entry.GetRelatedCollectionAsync(s => s.Packages, stoppingToken)).Count());
             Console.WriteLine("    Scopes: {0}", (await entry.GetRelatedCollectionAsync(s => s.Scopes, stoppingToken)).Count());
             Console.WriteLine("    Tables: {0}", (await entry.GetRelatedCollectionAsync(s => s.Tables, stoppingToken)).Count());
@@ -267,14 +267,14 @@ public sealed class MainWorkerService : BackgroundService
         await TypingsDbContext.InitializeAsync(_scope, stoppingToken);
         using TypingsDbContext dbContext = _scope.ServiceProvider.GetRequiredService<TypingsDbContext>();
         if (!dbContext.InitSuccessful) return;
-        SncSource? currentSource;
+        SourceInstance? currentSource;
         if (remoteUri.Fqdn != remoteUri.OldFqdn)
         {
-            if ((currentSource = await dbContext.Sources.FirstOrDefaultAsync(s => s.FQDN == remoteUri.Fqdn)) is null)
+            if ((currentSource = await dbContext.SourceInstances.FirstOrDefaultAsync(s => s.FQDN == remoteUri.Fqdn)) is null)
             {
-                if ((currentSource = await dbContext.Sources.FirstOrDefaultAsync(s => s.FQDN == remoteUri.OldFqdn)) is null)
+                if ((currentSource = await dbContext.SourceInstances.FirstOrDefaultAsync(s => s.FQDN == remoteUri.OldFqdn)) is null)
                 {
-                    dbContext.Sources.Add(new SncSource()
+                    dbContext.SourceInstances.Add(new SourceInstance()
                     {
                         FQDN = remoteUri.Fqdn,
                         Label = remoteUri.Label ?? remoteUri.Fqdn,
@@ -298,9 +298,9 @@ public sealed class MainWorkerService : BackgroundService
         }
         else
         {
-            if ((currentSource = await dbContext.Sources.FirstOrDefaultAsync(s => s.FQDN == remoteUri.Fqdn)) is null)
+            if ((currentSource = await dbContext.SourceInstances.FirstOrDefaultAsync(s => s.FQDN == remoteUri.Fqdn)) is null)
             {
-                dbContext.Sources.Add(new SncSource()
+                dbContext.SourceInstances.Add(new SourceInstance()
                 {
                     FQDN = remoteUri.Fqdn,
                     Label = remoteUri.Label ?? remoteUri.Fqdn,
@@ -316,7 +316,7 @@ public sealed class MainWorkerService : BackgroundService
                 return;
         }
         currentSource.IsPersonalDev = remoteUri.IsPdi;
-        dbContext.Sources.Update(currentSource);
+        dbContext.SourceInstances.Update(currentSource);
         await dbContext.SaveChangesAsync(stoppingToken);
     }
 

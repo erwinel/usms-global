@@ -118,7 +118,7 @@ public class AppSettings
     public bool? GetPackageGroups { get; set; }
 
     /// <summary>
-    /// Gets remote sources contained in <see cref="TypingsDbContext.Sources"/> table.
+    /// Gets remote sources contained in <see cref="TypingsDbContext.SourceInstances"/> table.
     /// </summary>
     public bool? GetRemoteSources { get; set; }
 

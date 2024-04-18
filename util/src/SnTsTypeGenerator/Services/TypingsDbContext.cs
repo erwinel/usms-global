@@ -31,16 +31,16 @@ public partial class TypingsDbContext : DbContext
     /// </summary>
     internal bool InitSuccessful => Database.CanConnect();
 
-    private static IEnumerable<string> GetSncSourceDbInitCommands()
+    private static IEnumerable<string> GetSourceInstanceDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Sources)}"" (
-    ""{nameof(SncSource.FQDN)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SncSource.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
-    ""{nameof(SncSource.IsPersonalDev)}"" BIT NOT NULL DEFAULT 0,
-    ""{nameof(SncSource.LastAccessed)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    CONSTRAINT ""PK_{nameof(Sources)}"" PRIMARY KEY(""{nameof(SncSource.FQDN)}"")
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(SourceInstances)}"" (
+    ""{nameof(SourceInstance.FQDN)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SourceInstance.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
+    ""{nameof(SourceInstance.IsPersonalDev)}"" BIT NOT NULL DEFAULT 0,
+    ""{nameof(SourceInstance.LastAccessed)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
+    CONSTRAINT ""PK_{nameof(SourceInstances)}"" PRIMARY KEY(""{nameof(SourceInstance.FQDN)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(Sources)}_{nameof(SncSource.IsPersonalDev)}\" ON \"{nameof(Sources)}\" (\"{nameof(SncSource.IsPersonalDev)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(SourceInstances)}_{nameof(SourceInstance.IsPersonalDev)}\" ON \"{nameof(SourceInstances)}\" (\"{nameof(SourceInstance.IsPersonalDev)}\")";
     }
 
     private static IEnumerable<string> GetPackageDbInitCommands()
@@ -51,7 +51,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(Package.Version)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Package.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
     ""{nameof(Package.ParentID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Packages)}_{nameof(Package.Parent)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(Package.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Packages)}_{nameof(Package.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Package.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Packages)}_{nameof(Package.Source)}"" REFERENCES ""{nameof(SourceInstances)}""(""{nameof(SourceInstance.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Package.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(Packages)}"" PRIMARY KEY(""{nameof(Package.ID)}"")
 )";
@@ -76,7 +76,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(Scope.ID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(Scope.ShortDescription)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(Scope.LastUpdated)}"" DATETIME NOT NULL DEFAULT {DEFAULT_SQL_NOW},
-    ""{nameof(Scope.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Scopes)}_{nameof(Scope.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Scope.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Scopes)}_{nameof(Scope.Source)}"" REFERENCES ""{nameof(SourceInstances)}""(""{nameof(SourceInstance.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Scope.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(Scopes)}"" PRIMARY KEY(""{nameof(Scope.Value)}"")
 )";
@@ -85,7 +85,7 @@ public partial class TypingsDbContext : DbContext
 
     private static IEnumerable<string> GetGlideTypeDbInitCommands()
     {
-        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(Types)}"" (
+        yield return @$"CREATE TABLE IF NOT EXISTS ""{nameof(GlideTypes)}"" (
     ""{nameof(GlideType.Name)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(GlideType.Label)}"" NVARCHAR NOT NULL COLLATE NOCASE,
     ""{nameof(GlideType.SysID)}"" NVARCHAR NOT NULL COLLATE NOCASE,
@@ -107,14 +107,14 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(GlideType.NoAudit)}"" BIT NOT NULL DEFAULT 0,
     ""{nameof(GlideType.Attributes)}"" NVARCHAR DEFAULT NULL COLLATE NOCASE,
     ""{nameof(GlideType.LastUpdated)}"" DATETIME NOT NULL,
-    ""{nameof(GlideType.PackageID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Scope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(Scope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(GlideType.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Types)}_{nameof(GlideType.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    CONSTRAINT ""PK_{nameof(Types)}"" PRIMARY KEY(""{nameof(GlideType.Name)}"")
+    ""{nameof(GlideType.PackageID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideTypes)}_{nameof(GlideType.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(GlideTypes)}_{nameof(GlideType.Scope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(Scope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(GlideType.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(GlideTypes)}_{nameof(GlideType.Source)}"" REFERENCES ""{nameof(SourceInstances)}""(""{nameof(SourceInstance.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    CONSTRAINT ""PK_{nameof(GlideTypes)}"" PRIMARY KEY(""{nameof(GlideType.Name)}"")
 )";
-        yield return $"CREATE INDEX \"IDX_{nameof(Types)}_{nameof(GlideType.SysID)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.SysID)}\" COLLATE NOCASE)";
-        yield return $"CREATE INDEX \"IDX_{nameof(Types)}_{nameof(GlideType.UseOriginalValue)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.UseOriginalValue)}\")";
-        yield return $"CREATE INDEX \"IDX_{nameof(Types)}_{nameof(GlideType.IsVisible)}\" ON \"{nameof(Types)}\" (\"{nameof(GlideType.IsVisible)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(GlideTypes)}_{nameof(GlideType.SysID)}\" ON \"{nameof(GlideTypes)}\" (\"{nameof(GlideType.SysID)}\" COLLATE NOCASE)";
+        yield return $"CREATE INDEX \"IDX_{nameof(GlideTypes)}_{nameof(GlideType.UseOriginalValue)}\" ON \"{nameof(GlideTypes)}\" (\"{nameof(GlideType.UseOriginalValue)}\")";
+        yield return $"CREATE INDEX \"IDX_{nameof(GlideTypes)}_{nameof(GlideType.IsVisible)}\" ON \"{nameof(GlideTypes)}\" (\"{nameof(GlideType.IsVisible)}\")";
     }
 
     private static IEnumerable<string> GetTableDbInitCommands()
@@ -132,7 +132,7 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(Table.PackageID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Table.ScopeValue)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Scope)}"" REFERENCES ""{nameof(Scopes)}""(""{nameof(Scope.Value)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Table.SuperClassName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.SuperClass)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(Table.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(Table.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Table.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Tables)}_{nameof(Table.Source)}"" REFERENCES ""{nameof(SourceInstances)}""(""{nameof(SourceInstance.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(Tables)}"" PRIMARY KEY(""{nameof(Table.Name)}"")
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(Tables)}_{nameof(Table.SysID)}\" ON \"{nameof(Tables)}\" (\"{nameof(Table.SysID)}\" COLLATE NOCASE)";
@@ -161,9 +161,9 @@ public partial class TypingsDbContext : DbContext
     ""{nameof(Element.LastUpdated)}"" DATETIME NOT NULL,
     ""{nameof(Element.PackageID)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Package)}"" REFERENCES ""{nameof(Packages)}""(""{nameof(Package.ID)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Element.TableName)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Table)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(Table.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(Element.TypeName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Type)}"" REFERENCES ""{nameof(Types)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Element.TypeName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Type)}"" REFERENCES ""{nameof(GlideTypes)}""(""{nameof(GlideType.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
     ""{nameof(Element.RefTableName)}"" NVARCHAR DEFAULT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Reference)}"" REFERENCES ""{nameof(Tables)}""(""{nameof(Table.Name)}"") ON DELETE RESTRICT COLLATE NOCASE,
-    ""{nameof(Element.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Source)}"" REFERENCES ""{nameof(Sources)}""(""{nameof(SncSource.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
+    ""{nameof(Element.SourceFqdn)}"" NVARCHAR NOT NULL CONSTRAINT ""FK_{nameof(Elements)}_{nameof(Element.Source)}"" REFERENCES ""{nameof(SourceInstances)}""(""{nameof(SourceInstance.FQDN)}"") ON DELETE RESTRICT COLLATE NOCASE,
     CONSTRAINT ""PK_{nameof(Element)}"" PRIMARY KEY(""{nameof(Element.Name)}"", ""{nameof(Element.TableName)}"")
 )";
         yield return $"CREATE INDEX \"IDX_{nameof(Element)}_{nameof(Element.SysID)}\" ON \"{nameof(Elements)}\" (\"{nameof(Element.SysID)}\" COLLATE NOCASE)";
@@ -231,11 +231,11 @@ public partial class TypingsDbContext : DbContext
             using var transaction = connection.BeginTransaction();
             try
             {
-                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Sources), () => executeDbInitCommandsAsync<SncSource>(GetSncSourceDbInitCommands()));
+                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(SourceInstances), () => executeDbInitCommandsAsync<SourceInstance>(GetSourceInstanceDbInitCommands()));
                 await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(PackageGroups), () => executeDbInitCommandsAsync<PackageGroup>(GetPackageGroupDbInitCommands()));
                 await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Packages), () => executeDbInitCommandsAsync<Package>(GetPackageDbInitCommands()));
                 await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Scopes), () => executeDbInitCommandsAsync<Scope>(GetScopeDbInitCommands()));
-                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Types), () => executeDbInitCommandsAsync<GlideType>(GetGlideTypeDbInitCommands()));
+                await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(GlideTypes), () => executeDbInitCommandsAsync<GlideType>(GetGlideTypeDbInitCommands()));
                 await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Tables), () => executeDbInitCommandsAsync<Table>(GetTableDbInitCommands()));
                 await _logger.WithActivityScope(LogActivityType.InitializeDbTable, nameof(Elements), () => executeDbInitCommandsAsync<Element>(GetElementDbInitCommands()));
             }
@@ -361,12 +361,12 @@ public partial class TypingsDbContext : DbContext
     {
         _logger.WithActivityScope(LogActivityType.ModelCreating, () =>
         {
-            _ = modelBuilder.Entity<SncSource>(builder =>
+            _ = modelBuilder.Entity<SourceInstance>(builder =>
                 {
                     _ = builder.HasKey(s => s.FQDN);
                     _ = builder.HasIndex(t => t.IsPersonalDev);
-                    _ = builder.Property(nameof(SncSource.FQDN)).UseCollation(COLLATION_NOCASE);
-                    _ = builder.Property(nameof(SncSource.Label)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(SourceInstance.FQDN)).UseCollation(COLLATION_NOCASE);
+                    _ = builder.Property(nameof(SourceInstance.Label)).UseCollation(COLLATION_NOCASE);
                 })
                 .Entity<PackageGroup>(builder =>
                 {
@@ -463,7 +463,7 @@ public partial class TypingsDbContext : DbContext
     /// <summary>
     /// Gets the source ServiceNow instance information records.
     /// </summary>
-    public virtual DbSet<SncSource> Sources { get; set; } = null!;
+    public virtual DbSet<SourceInstance> SourceInstances { get; set; } = null!;
 
     /// <summary>
     /// Gets the source packages.
@@ -483,7 +483,7 @@ public partial class TypingsDbContext : DbContext
     /// <summary>
     /// Gets the ServiceNow column types.
     /// </summary>
-    public virtual DbSet<GlideType> Types { get; set; } = null!;
+    public virtual DbSet<GlideType> GlideTypes { get; set; } = null!;
 
     /// <summary>
     /// Gets the ServiceNow tables.

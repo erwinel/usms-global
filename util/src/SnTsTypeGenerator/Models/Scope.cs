@@ -87,6 +87,23 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
 
     #endregion
 
+    #region SysId Property
+
+    private string _sysID = string.Empty;
+
+    /// <summary>
+    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_sysID))]
+    public string SysID
+    {
+        get => _sysID;
+        set => _sysID = value ?? string.Empty;
+    }
+
+    #endregion
+
     /// <summary>
     /// Date and time that this record was last updated.
     /// </summary>
@@ -106,32 +123,15 @@ public sealed class Scope : IEquatable<Scope>, IValidatableObject
         set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
-    private SncSource? _source;
+    private SourceInstance? _source;
 
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
-    public SncSource? Source
+    public SourceInstance? Source
     {
         get { lock (_syncRoot) { return _source; } }
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
-    }
-
-    #endregion
-
-    #region SysId Property
-
-    private string _sysID = string.Empty;
-
-    /// <summary>
-    /// Value of the "Class name" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
-    /// </summary>
-    [NotNull]
-    [BackingField(nameof(_sysID))]
-    public string SysID
-    {
-        get => _sysID;
-        set => _sysID = value ?? string.Empty;
     }
 
     #endregion

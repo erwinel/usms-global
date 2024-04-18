@@ -19,6 +19,7 @@ public class PackageGroup : IValidatableObject, IEquatable<PackageGroup>
     /// Gets or sets the package name.
     /// </summary>
     [BackingField(nameof(_name))]
+    [Key]
     public string Name
     {
         get => _name;

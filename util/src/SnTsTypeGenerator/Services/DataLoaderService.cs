@@ -21,13 +21,13 @@ public sealed class DataLoaderService : IDisposable
     private readonly ILogger<DataLoaderService> _logger;
     private readonly GlideTypesService _glideTypes;
     private readonly object _syncRoot = new();
-    private SncSource? _currentSourceEntity;
-    private EntityEntry<SncSource>? _currentSourceEntry;
+    private SourceInstance? _currentSourceEntity;
+    private EntityEntry<SourceInstance>? _currentSourceEntry;
     private readonly bool _baselineInit;
     private readonly Dictionary<string, string> _tableIdMap = new(NameComparer);
     private readonly Dictionary<string, string> _scopeIdMap = new(NameComparer);
     private readonly Dictionary<string, string> _packageIdMap = new(NameComparer);
-    private readonly Dictionary<string, SncSource> _sourceCache = new(NameComparer);
+    private readonly Dictionary<string, SourceInstance> _sourceCache = new(NameComparer);
     private readonly Dictionary<string, string> _packageGroupMap = new(NameComparer);
     private readonly ImmutableArray<string> _defaultBaselinePackageGroups;
 
@@ -36,12 +36,12 @@ public sealed class DataLoaderService : IDisposable
     /// </summary>
     internal bool InitSuccessful => (_remoteUri?.InitSuccessful ?? false) && (_tableAPIService?.InitSuccessful ?? false) && (_dbContext?.InitSuccessful ?? false);
 
-    private async Task<SncSource> GetSourceAsync(string fqdn, CancellationToken cancellationToken)
+    private async Task<SourceInstance> GetSourceAsync(string fqdn, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (_sourceCache.TryGetValue(fqdn, out SncSource? source))
+        if (_sourceCache.TryGetValue(fqdn, out SourceInstance? source))
             return source;
-        if ((source = await _dbContext.Sources.FirstOrDefaultAsync(s => s.FQDN == fqdn, cancellationToken)) is null)
+        if ((source = await _dbContext.SourceInstances.FirstOrDefaultAsync(s => s.FQDN == fqdn, cancellationToken)) is null)
         {
             source = new()
             {
@@ -50,7 +50,7 @@ public sealed class DataLoaderService : IDisposable
                 IsPersonalDev = false,
                 LastAccessed = DateTime.Now
             };
-            await _dbContext.Sources.AddAsync(source, cancellationToken);
+            await _dbContext.SourceInstances.AddAsync(source, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             _sourceCache.Add(fqdn, source);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -329,7 +329,7 @@ public sealed class DataLoaderService : IDisposable
     private async Task<Table> AddTableAsync(Remote.Table remoteTable, bool isInterface, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        SncSource source = await EnsureCurrentSourceAsync(cancellationToken);
+        SourceInstance source = await EnsureCurrentSourceAsync(cancellationToken);
         Table table = new()
         {
             Name = remoteTable.Name,
@@ -353,7 +353,7 @@ public sealed class DataLoaderService : IDisposable
     private async Task<Table> AddTableFromRemoteRecordAsync(Remote.Table remoteTable, bool isInterface, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        SncSource source = await EnsureCurrentSourceAsync(cancellationToken);
+        SourceInstance source = await EnsureCurrentSourceAsync(cancellationToken);
         Table table = new()
         {
             Name = remoteTable.Name,
@@ -411,10 +411,10 @@ public sealed class DataLoaderService : IDisposable
         return table;
     }
 
-    private async Task<GlideType> FromFieldClassRefAsync(Remote.Reference remoteRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<GlideType> FromFieldClassRefAsync(Remote.Reference remoteRef, SourceInstance source, CancellationToken cancellationToken)
     {
         string name = remoteRef.Value;
-        GlideType? type = await _dbContext.Types.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
+        GlideType? type = await _dbContext.GlideTypes.FirstOrDefaultAsync(t => t.Name == name, cancellationToken);
         if (type is null)
         {
             var fieldClass = await _tableAPIService.GetFieldClassRecordByNameAsync(name, cancellationToken);
@@ -591,37 +591,37 @@ public sealed class DataLoaderService : IDisposable
                     type.Attributes = knownGlideType.Attributes.ToUriEncodedList();
                 }
             }
-            await _dbContext.Types.AddAsync(type, cancellationToken);
+            await _dbContext.GlideTypes.AddAsync(type, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
         return type;
     }
 
-    private async Task<SncSource> GetCurrentSourceAsync(CancellationToken cancellationToken)
+    private async Task<SourceInstance> GetCurrentSourceAsync(CancellationToken cancellationToken)
     {
         if (!_dbContext.InitSuccessful && _remoteUri.InitSuccessful) throw new InvalidOperationException();
         cancellationToken.ThrowIfCancellationRequested();
         if (_currentSourceEntity is not null) return _currentSourceEntity;
         var fqdn = _remoteUri.Fqdn;
-        if ((_currentSourceEntity = _dbContext.Sources.FirstOrDefault(e => e.FQDN == fqdn)) is not null)
+        if ((_currentSourceEntity = _dbContext.SourceInstances.FirstOrDefault(e => e.FQDN == fqdn)) is not null)
         {
             if (_remoteUri.Label is not null && _remoteUri.Label != _currentSourceEntity.Label)
                 _currentSourceEntity.Label = _remoteUri.Label;
             else if (_currentSourceEntity.IsPersonalDev == _remoteUri.IsPdi)
                 return _currentSourceEntity;
             _currentSourceEntity.IsPersonalDev = _remoteUri.IsPdi;
-            _dbContext.Sources.Update(_currentSourceEntity);
+            _dbContext.SourceInstances.Update(_currentSourceEntity);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return _currentSourceEntity;
         }
         var oldFqdn = _remoteUri.OldFqdn;
-        if (fqdn != oldFqdn && (_currentSourceEntity = _dbContext.Sources.FirstOrDefault(e => e.FQDN == oldFqdn)) is not null)
+        if (fqdn != oldFqdn && (_currentSourceEntity = _dbContext.SourceInstances.FirstOrDefault(e => e.FQDN == oldFqdn)) is not null)
         {
             _currentSourceEntity.FQDN = fqdn;
             if (_remoteUri.Label is not null && _remoteUri.Label != _currentSourceEntity.Label)
                 _currentSourceEntity.Label = _remoteUri.Label;
             _currentSourceEntity.IsPersonalDev = _remoteUri.IsPdi;
-            _dbContext.Sources.Update(_currentSourceEntity);
+            _dbContext.SourceInstances.Update(_currentSourceEntity);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return _currentSourceEntity;
         }
@@ -632,12 +632,12 @@ public sealed class DataLoaderService : IDisposable
             IsPersonalDev = _remoteUri.IsPdi,
             LastAccessed = DateTime.Now
         };
-        await _dbContext.Sources.AddAsync(_currentSourceEntity, cancellationToken);
+        await _dbContext.SourceInstances.AddAsync(_currentSourceEntity, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return _currentSourceEntity;
     }
 
-    internal async Task<SncSource> EnsureCurrentSourceAsync(CancellationToken cancellationToken)
+    internal async Task<SourceInstance> EnsureCurrentSourceAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         Monitor.Enter(_syncRoot);
@@ -645,13 +645,13 @@ public sealed class DataLoaderService : IDisposable
         finally { Monitor.Exit(_syncRoot); }
     }
 
-    internal async Task<EntityEntry<SncSource>> EnsureCurrentSourceEntryAsync(CancellationToken cancellationToken)
+    internal async Task<EntityEntry<SourceInstance>> EnsureCurrentSourceEntryAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         Monitor.Enter(_syncRoot);
         try
         {
-            _currentSourceEntry ??= _dbContext.Sources.Entry(await GetCurrentSourceAsync(cancellationToken));
+            _currentSourceEntry ??= _dbContext.SourceInstances.Entry(await GetCurrentSourceAsync(cancellationToken));
             return _currentSourceEntry;
         }
         finally { Monitor.Exit(_syncRoot); }
@@ -701,7 +701,7 @@ public sealed class DataLoaderService : IDisposable
         throw new NotImplementedException();
     }
 
-    private async Task<Package?> FromPackageRefAsync(Remote.Reference? pkgRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<Package?> FromPackageRefAsync(Remote.Reference? pkgRef, SourceInstance source, CancellationToken cancellationToken)
     {
         if (pkgRef is null)
             return null;
@@ -792,7 +792,7 @@ public sealed class DataLoaderService : IDisposable
         return package;
     }
 
-    private async Task<Scope?> FromScopeRefAsync(Remote.Reference? scopeRef, SncSource source, CancellationToken cancellationToken)
+    private async Task<Scope?> FromScopeRefAsync(Remote.Reference? scopeRef, SourceInstance source, CancellationToken cancellationToken)
     {
         if (scopeRef is null)
             return null;

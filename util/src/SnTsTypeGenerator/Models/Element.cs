@@ -122,6 +122,23 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
     /// </summary>
     public bool IsUnique { get; set; }
 
+    #region SysID Property
+
+    private string _sysID = string.Empty;
+
+    /// <summary>
+    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_sysID))]
+    public string SysID
+    {
+        get => _sysID;
+        set => _sysID = value.EmptyIfWhiteSpace();
+    }
+
+    #endregion
+
     /// <summary>
     /// Date and time that this record was last updated.
     /// </summary>
@@ -182,7 +199,7 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
 
     #endregion
 
-    #region GlideType Navigation Property
+    #region Type Navigation Property
 
     private string? _typeName = null;
 
@@ -250,32 +267,15 @@ public sealed class Element : IEquatable<Element>, IValidatableObject
         set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
-    private SncSource? _source;
+    private SourceInstance? _source;
 
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
-    public SncSource? Source
+    public SourceInstance? Source
     {
         get { lock (_syncRoot) { return _source; } }
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
-    }
-
-    #endregion
-
-    #region SysID Property
-
-    private string _sysID = string.Empty;
-
-    /// <summary>
-    /// Value of the "Sys ID" (<see cref="SnApiConstants.JSON_KEY_SYS_ID" />) column.
-    /// </summary>
-    [NotNull]
-    [BackingField(nameof(_sysID))]
-    public string SysID
-    {
-        get => _sysID;
-        set => _sysID = value.EmptyIfWhiteSpace();
     }
 
     #endregion

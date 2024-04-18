@@ -11,7 +11,7 @@ namespace SnTsTypeGenerator.Models;
 /// <summary>
 /// Represents an item from the "Field class" (<see cref="Services.SnApiConstants.TABLE_NAME_SYS_GLIDE_OBJECT" />) table.
 /// </summary>
-[Table(nameof(Services.TypingsDbContext.Types))]
+[Table(nameof(Services.TypingsDbContext.GlideTypes))]
 public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
 {
     private readonly object _syncRoot = new();
@@ -47,6 +47,20 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         get => _label;
         set => _label = value.EmptyIfWhiteSpace();
     }
+
+    #endregion
+
+    #region ElementType Navigation Property
+
+    private string? _elementType;
+
+    /// <summary>
+    /// Gets the TypeScript GlideElement type name.
+    /// </summary>
+    /// <value>The TypeScript name to use when referring to the corresponding GlideElement object or <see langword="null"/> to use the default type name.</value>
+    /// <remarks>This should correspond to the name of a TypeScript definition in the <c>ElementTypes.d.ts</c> file in the <c>Resources/ts/global</c> or <c>Resources/ts/scoped</c> folder.</remarks>
+    [BackingField(nameof(_elementType))]
+    public string? ElementType { get => _elementType; set => _elementType = value.NullIfWhiteSpace(); }
 
     #endregion
 
@@ -165,6 +179,23 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
 
     #endregion
 
+    #region SysID Property
+
+    private string _sysID = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the value corresponding to the "Sys ID" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
+    /// </summary>
+    [NotNull]
+    [BackingField(nameof(_sysID))]
+    public string SysID
+    {
+        get => _sysID;
+        set => _sysID = value ?? string.Empty;
+    }
+
+    #endregion
+
     /// <summary>
     /// Gets or sets the date and time that this record was last updated.
     /// </summary>
@@ -238,47 +269,16 @@ public sealed class GlideType : IEquatable<GlideType>, IValidatableObject
         set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
-    private SncSource? _source;
+    private SourceInstance? _source;
 
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
-    public SncSource? Source
+    public SourceInstance? Source
     {
         get { lock (_syncRoot) { return _source; } }
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
-
-    #endregion
-
-    #region SysID Property
-
-    private string _sysID = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the value corresponding to the "Sys ID" (<see cref="Services.SnApiConstants.JSON_KEY_SYS_ID" />) column.
-    /// </summary>
-    [NotNull]
-    [BackingField(nameof(_sysID))]
-    public string SysID
-    {
-        get => _sysID;
-        set => _sysID = value ?? string.Empty;
-    }
-
-    #endregion
-
-    #region ElementType Property
-
-    private string? _elementType;
-
-    /// <summary>
-    /// Gets the TypeScript GlideElement type name.
-    /// </summary>
-    /// <value>The TypeScript name to use when referring to the corresponding GlideElement object or <see langword="null"/> to use the default type name.</value>
-    /// <remarks>This should correspond to the name of a TypeScript definition in the <c>ElementTypes.d.ts</c> file in the <c>Resources/ts/global</c> or <c>Resources/ts/scoped</c> folder.</remarks>
-    [BackingField(nameof(_elementType))]
-    public string? ElementType { get => _elementType; set => _elementType = value.NullIfWhiteSpace(); }
 
     #endregion
 

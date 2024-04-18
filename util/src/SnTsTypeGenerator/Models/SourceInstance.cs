@@ -7,8 +7,8 @@ using System.Text.Json.Nodes;
 
 namespace SnTsTypeGenerator.Models;
 
-[Table(nameof(Services.TypingsDbContext.Sources))]
-public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
+[Table(nameof(Services.TypingsDbContext.SourceInstances))]
+public sealed class SourceInstance : IEquatable<SourceInstance>, IValidatableObject
 {
     #region FQDN Property
 
@@ -118,13 +118,13 @@ public sealed class SncSource : IEquatable<SncSource>, IValidatableObject
         return results;
     }
 
-    public bool Equals(SncSource? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_fqdn, other._fqdn));
+    public bool Equals(SourceInstance? other) => other is not null && (ReferenceEquals(this, other) || Services.SnApiConstants.NameComparer.Equals(_fqdn, other._fqdn));
 
-    public override bool Equals(object? obj) => obj is SncSource other && Equals(other);
+    public override bool Equals(object? obj) => obj is SourceInstance other && Equals(other);
 
     public override int GetHashCode() => Services.SnApiConstants.NameComparer.GetHashCode(_fqdn);
 
-    public override string ToString() => nameof(SncSource) + new JsonObject()
+    public override string ToString() => nameof(SourceInstance) + new JsonObject()
     {
         { nameof(FQDN), JsonValue.Create(_fqdn) },
         { nameof(Label), JsonValue.Create(_label) },

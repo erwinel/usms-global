@@ -109,12 +109,12 @@ public sealed class Package : IValidatableObject, IEquatable<Package>
         set => SetRequiredNonEmptyNavForeignKey(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
     }
 
-    private SncSource? _source;
+    private SourceInstance? _source;
 
     /// <summary>
     /// The record representing the source ServiceNow instance.
     /// </summary>
-    public SncSource? Source
+    public SourceInstance? Source
     {
         get { lock (_syncRoot) { return _source; } }
         set => SetRequiredNavProperty(_syncRoot, value, ref _sourceFqdn, ref _source, s => s.FQDN);
